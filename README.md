@@ -1,38 +1,104 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# QrContest23
+QrContest23 is an app made for 13'th edition of Fantasmagoria fantasy convention held in Gniezno, Poland (2023).
+It's fourth edition of QrContest, previous hence the name is combined with 2023 year.
+Previous ones in short:
+1. QrContest 2017, ZSEO high school. PHP / MySql / Bootstrap.
+2. QrContest 2018, ZSEO high school. PHP / MySql / React / Bootstrap.
+3. QrContest 2022, 12'th Fantasmagoria fantasy convention. PHP / Laravel / MySql / React with TS / Mantine.
+4. QrContest 2023, 13'th Fantasmagoria fantasy convention. Next.js / React with TS / Firestore / Vercel / Tailwind.
 
-## Getting Started
+# Tech stack
+- React with TS
+- next.js
+- Firestore
+- Vercel
+- Tailwind CSS
+- Content generated using Stable Diffusion / BlueWillow / ChatGPT.
 
-First, run the development server:
+# TODO - Requirements
+## Critical
+- [ ] Auth
+  - [ ] Register new user account
+  - [ ] Log in
+  - [ ] Providers
+    - [ ] Google
+    - [ ] Email
+- [ ] Sections
+  - [ ] Navbar for each section 
+  - [ ] Codes
+  - [ ] My collection
+  - [ ] Rankings
+  - [ ] User account
+- [ ] Codes 
+  - [ ] Collect code via QR scan (external apps, collect url)
+    - One code can be collected only once
+  - [ ] Collect code via input on app main screen (enter code manually)
+    - Prevent spam, one code every 5 seconds on failure
+  - [ ] Acquire points on code collection
+  - [ ] Closed questions on some codes
+    - 4 possible answers
+    - Random but unique (cannot repeat for given user)
+    - Each worth different amount of points based on difficulty rating
+  - [ ] Collectable cards on each code
+    - Ai generated images
+    - Name of a code and acquired points on card screen
+- [ ] My collection
+  - [ ] List of collected codes
+- [ ] Rankings
+  - [ ] View user score
+  - [ ] View ranking (top 10, yourself)
+- [ ] User account
+  - [ ] Notifications section
+  - [ ] Contest status messages
+  - [ ] Log out
+- [ ] Codes management (**Admin**)
+  - [ ] Generate codes
+    - Code without vowels to avoid words generation
+    - Create printable qr codes from already generated ones
+    - All created codes are not collectable
+  - [ ] Activate code
+  - [ ] Save code metadata - name, description, difficulty, points
+- [ ] Users management (**Admin**)
+  - [ ] Users list
+  - [ ] Block user
+- [ ] Contest management (**Admin**)
+  - [ ] Set round start/end datetime
+  - [ ] Edit status messages
+- [ ] Other
+  - [ ] Terms of service and rulebook
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
-
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
-
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
-
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+## Nice-to-have
+- [ ] Auth
+  - [ ] Anonymous provider (?)
+- [ ] User account
+  - [ ] Pick house (and show in rankings)
+    - User can pick one of 4 houses
+    - Pick on registration screen and in user settings
+    - Each house is shown on rankings
+  - [ ] Push notifications
+  - [ ] Delete account
+- [ ] Codes
+  - [ ] Built-in qr scanner
+- [ ] My collection
+  - [ ] Cards collections
+    - Visible in cards gallery as separate rows
+  - [ ] Cards gallery
+    - All acquired cards shown as list
+    - Not acquired ones shown as grayed out, backside only
+  - [ ] Stats of card rarity/popularity
+- [ ] Visuals
+  - [ ] Magic map with random users
+    - [ ] Login screen
+    - [ ] TV Dashboard
+  - [ ] Card reveal animation
+- [ ] TV dashboard
+  - [ ] Ranking (top 10)
+  - [ ] Org's messages
+    - Big fullscreen text on mono-color background or magic map
+  - [ ] Scheduler - nearest events
+    - Nearest events in form of timeline
+  - [ ] Cards showcase
+    - Show a card with stats on collections, rarity
+- [ ] Messages/scheduler management (**Admin**)
+  - [ ] Create, edit and delete org's messages
+  - [ ] Create, edit and delete events in scheduler
