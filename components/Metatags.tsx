@@ -1,8 +1,8 @@
 import Head from 'next/head';
 
 export default function Metatags({
-    title = 'An App',
-    description = 'A complete Next.js + Firebase app',
+    title = 'QrContest - Fantasmagoria 13',
+    description = 'QrContest - Fantasmagoria 13',
     image = 'https://fireship.io/courses/react-next-firebase/img/featured.png',
 }) {
     return (
