@@ -7,7 +7,9 @@ const configuration = {
         messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
         appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
     },
-    emulatorHost: process.env.NEXT_PUBLIC_EMULATOR_HOST,
+    emulatorHost: process.env.NEXT_PUBLIC_FIREBASE_EMULATOR_HOST,
+    emulatorAuthPort: process.env.NEXT_PUBLIC_FIREBASE_AUTH_EMULATOR_PORT,
+    emulatorFirestorePort: process.env.NEXT_PUBLIC_FIREBASE_FIRESTORE_EMULATOR_PORT,
     emulator: process.env.NEXT_PUBLIC_EMULATOR === 'true',
 };
 

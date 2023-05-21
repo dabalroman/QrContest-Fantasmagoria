@@ -1,7 +1,9 @@
 import { FirebaseApp, getApp, initializeApp } from 'firebase/app';
-import { Auth, getAuth, GoogleAuthProvider } from '@firebase/auth';
+import { Auth, connectAuthEmulator, getAuth, GoogleAuthProvider } from '@firebase/auth';
 import {
-    collection, DocumentData,
+    collection,
+    connectFirestoreEmulator,
+    DocumentData,
     DocumentSnapshot,
     Firestore,
     getDocs,
@@ -10,7 +12,8 @@ import {
     orderBy,
     Query,
     query,
-    QueryDocumentSnapshot, Timestamp,
+    QueryDocumentSnapshot,
+    Timestamp,
     where
 } from '@firebase/firestore';
 import { FirebaseStorage, getStorage } from '@firebase/storage';
@@ -30,8 +33,17 @@ export const auth: Auth = getAuth(firebaseApp);
 export const googleAuthProvider: GoogleAuthProvider = new GoogleAuthProvider();
 export const firestore: Firestore = getFirestore(firebaseApp);
 export const storage: FirebaseStorage = getStorage(firebaseApp);
-export const STATE_CHANGED= 'state_changed';
+export const STATE_CHANGED = 'state_changed';
 
+if (configuration.emulator) {
+    console.log(configuration.emulatorHost + ':' + configuration.emulatorAuthPort);
+    connectAuthEmulator(auth, `http://${configuration.emulatorHost}:${configuration.emulatorAuthPort}`);
+    connectFirestoreEmulator(
+        firestore,
+        configuration.emulatorHost as string,
+        parseInt(configuration.emulatorFirestorePort as string, 10)
+    );
+}
 
 //// Helper functions
 export async function getUserWithUsername (username: string): Promise<QueryDocumentSnapshot> {
@@ -75,7 +87,7 @@ export interface AppUser {
     photoURL: string
 }
 
-export interface Post extends DocumentData{
+export interface Post extends DocumentData {
     title: string,
     slug: string,
     uid: string,
