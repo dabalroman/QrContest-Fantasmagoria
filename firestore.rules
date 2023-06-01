@@ -1,24 +1,29 @@
 rules_version = '2';
 service cloud.firestore {
-    function containsRequiredFields(documentType, requestData) {
-        let fieldConfigs = {
-            'user': [
-            'path', 'uid', 'username', 'score', 'role'
-        ], 'user-usernames': [
-            'uid'
-        ], 'card': [
-            'cardId', 'value'
-        ], 'card-user': [
-            'userId', 'cardId'
-        ]
-        };
-
-        let config = documentType in fieldConfigs ? fieldConfigs[documentType] : [];
-
-        return requestData.keys().hasOnly(config);
-    }
-
     match /databases/{database}/documents {
+        function containsRequiredFields(documentType, requestData) {
+            let fieldConfigs = {
+                'user': [
+                'path', 'uid', 'username', 'score', 'role'
+            ], 'user-usernames': [
+                'uid'
+            ], 'card': [
+                'uid', 'name', 'code', 'value', 'tier', 'collection', 'image', 'description', 'withQuestion', 'isActive',
+            ], 'card-user': [
+                'userId', 'cardId'
+            ]
+            };
+
+            let config = documentType in fieldConfigs ? fieldConfigs[documentType] : [];
+
+            return requestData.keys().hasOnly(config);
+        }
+
+        function isUserAdmin() {
+            return request.auth.uid != null
+                && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == "admin";
+        }
+
         match /users/{userId} {
             allow read: if request.auth != null;
 
@@ -45,6 +50,15 @@ service cloud.firestore {
             allow create: if request.resource.data.uid == request.auth.uid
                 && containsRequiredFields('user-usernames', request.resource.data)
                 && !exists(/databases/$(database)/documents/users-usernames/$(username));
+
+            allow update, delete: if false;
+        }
+
+        match /cards/{cardId} {
+            allow read: if request.auth != null;
+
+            allow create: if request.auth != null
+                && isUserAdmin();
 
             allow update, delete: if false;
         }
