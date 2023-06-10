@@ -7,6 +7,7 @@ import Navbar from '@/components/Navbar/Navbar';
 import { config } from '@fortawesome/fontawesome-svg-core';
 import '@fortawesome/fontawesome-svg-core/styles.css';
 import { Spectral, Trykker } from 'next/font/google';
+import Head from 'next/head';
 
 config.autoAddCss = false;
 
@@ -29,16 +30,28 @@ export default function App ({
 
     return (
         <UserContext.Provider value={userData}>
-            <main
-                className={
-                    `${spectral.variable} ${trykker.variable} `
-                    + `font-serif bg-image-default bg-center bg-cover bg-fixed min-h-screen`
-                }
-            >
-                <Navbar/>
-                <Component {...pageProps} />
-                <Toaster/>
-            </main>
+            <>
+                <Head>
+                    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+                    <meta name="color-scheme" content="light only"/>
+                    <link rel="icon" href="/favicon.ico"/>
+                </Head>
+                <div
+                    className={
+                        `${spectral.variable} ${trykker.variable} `
+                        + `font-serif bg-image-default bg-fixed min-h-screen bg-image-mobile-position`
+                    }
+                >
+                    <Navbar/>
+                    <Component
+                        {...pageProps}
+                        className={
+                            `${spectral.variable} ${trykker.variable} `
+                            + `font-serif bg-image-default bg-center bg-cover bg-fixed min-h-screen`
+                        }/>
+                    <Toaster/>
+                </div>
+            </>
         </UserContext.Provider>
     );
 }

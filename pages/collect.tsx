@@ -1,4 +1,5 @@
 import { useForm } from 'react-hook-form';
+import Metatags from '@/components/Metatags';
 
 export default function CollectPage ({}) {
     const {
@@ -23,6 +24,7 @@ export default function CollectPage ({}) {
 
     return (
         <main className="grid grid-rows-layout items-center min-h-screen">
+            <Metatags title='Szukaj'/>
             <h1 className="font-fancy text-4xl p-4 uppercase text-right">Szukaj</h1>
 
             <div>
