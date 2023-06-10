@@ -39,11 +39,6 @@ export default function CardAdminPage ({}) {
         toast.success('Card updated successfully');
     };
 
-    console.log(formState.errors);
-
-    Card.fromUid('dragon-ad')
-        . then(r => console.log(r));
-
     return (
         <main>
             <h1>Card Admin Page</h1>

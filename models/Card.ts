@@ -5,6 +5,7 @@ import { FireDoc } from '@/Enum/FireDoc';
 import { CardTier, CardTierValue, getCardTierValue, isCardTier } from '@/Enum/CardTier';
 import { CardCollection, isCardCollection } from '@/Enum/CardCollection';
 import kebabCase from 'lodash.kebabcase';
+import { decrypt, encrypt } from '@/lib/cipher';
 
 export default class Card extends FirebaseModel {
     path = FireDoc.CARD;
@@ -43,7 +44,7 @@ export default class Card extends FirebaseModel {
 
         this.uid = uid ?? kebabCase(name);
         this.name = name;
-        this.code = code;
+        this.code = encrypt(code);
         this.value = getCardTierValue(tier);
         this.tier = tier;
         this.collection = collection;
@@ -51,6 +52,14 @@ export default class Card extends FirebaseModel {
         this.description = description;
         this.withQuestion = withQuestion;
         this.isActive = isActive;
+    }
+
+    getCode(): string {
+        return decrypt(this.code);
+    }
+
+    setCode(code: string) {
+        this.code = encrypt(code);
     }
 
     public static async fromUid (uid: string): Promise<Card | undefined> {

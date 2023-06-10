@@ -38,11 +38,15 @@ export const STATE_CHANGED = 'state_changed';
 if (configuration.emulator) {
     console.log(configuration.emulatorHost + ':' + configuration.emulatorAuthPort);
     connectAuthEmulator(auth, `http://${configuration.emulatorHost}:${configuration.emulatorAuthPort}`);
-    connectFirestoreEmulator(
-        firestore,
-        configuration.emulatorHost as string,
-        parseInt(configuration.emulatorFirestorePort as string, 10)
-    );
+
+    // @ts-ignore
+    if(!firestore._settingsFrozen) {
+        connectFirestoreEmulator(
+            firestore,
+            configuration.emulatorHost as string,
+            parseInt(configuration.emulatorFirestorePort as string, 10)
+        );
+    }
 }
 
 //// Helper functions

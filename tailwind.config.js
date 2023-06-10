@@ -12,7 +12,31 @@ module.exports = {
     ],
     theme: {
         extend: {
+            fontFamily: {
+                serif: ['var(--font-spectral)'],
+                fancy: ['var(--font-trykker)']
+            },
+            backgroundImage: {
+                'image-default': 'url(\'/backgrounds/bg.jpg\')'
+            },
+            boxShadow: {
+                'panel': '0 8px 5px rgba(0,0,0,0.25)',
+                'inner-input': 'inset 0 4px 4px rgba(0,0,0,0.15)'
+            },
+            gridTemplateRows: {
+                'layout': 'max-content minmax(0,1fr) 100px'
+            },
             colors: {
+                'panel-transparent': 'rgba(255,211,146,0.95)',
+                'panel-transparent-end': 'rgba(255,211,146,0.85)',
+                'panel-solid': 'rgba(255,211,146,1)',
+
+                'text-dark': '#261500',
+                'text-light': '#F2EFEA',
+
+                'input-border': '#261501',
+                'input-background': '#97784B',
+
                 background: '#C59251',
                 'background-transparent': 'rgba(197,146,81,0.9)',
                 'button-brown': '#4d2b00'
