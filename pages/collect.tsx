@@ -1,8 +1,12 @@
 import { useForm } from 'react-hook-form';
 import Metatags from '@/components/Metatags';
-import { addMessageFunction } from '@/lib/firebase';
+import { collectCardFunction } from '@/utils/functions';
+import { useContext } from 'react';
+import { UserContext, UserContextType } from '@/utils/context';
 
 export default function CollectPage ({}) {
+    const { user } = useContext<UserContextType>(UserContext);
+
     const {
         register,
         handleSubmit,
@@ -20,7 +24,7 @@ export default function CollectPage ({}) {
 
     const collectCode = (data: any) => {
         console.log(data);
-        addMessageFunction({ text: data.code })
+        collectCardFunction({ uid: user?.uid, code: data.code })
             .then((result) => console.log(result.data));
         reset();
     };

@@ -1,7 +1,7 @@
 import '@/styles/globals.css';
 import type { AppProps } from 'next/app';
-import { UserContext } from '@/lib/context';
-import { useUserData } from '@/lib/hooks';
+import { UserContext } from '@/utils/context';
+import { useUserData } from '@/utils/hooks';
 import { Toaster } from 'react-hot-toast';
 import Navbar from '@/components/Navbar/Navbar';
 import { config } from '@fortawesome/fontawesome-svg-core';

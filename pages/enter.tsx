@@ -3,8 +3,8 @@ import { ChangeEvent, FormEvent, useCallback, useContext, useEffect, useState } 
 import { doc, getDoc } from '@firebase/firestore';
 import debounce from 'lodash.debounce';
 import Metatags from '@/components/Metatags';
-import { AuthUser, UserContext, UserContextType } from '@/lib/context';
-import { auth, firestore, googleAuthProvider } from '@/lib/firebase';
+import { AuthUser, UserContext, UserContextType } from '@/utils/context';
+import { auth, firestore, googleAuthProvider } from '@/utils/firebase';
 import User from '@/models/User';
 import toast from 'react-hot-toast';
 

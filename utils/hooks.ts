@@ -1,8 +1,8 @@
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { auth } from '@/lib/firebase';
+import { auth } from '@/utils/firebase';
 import { User as AuthUser } from '@firebase/auth';
 import { useEffect, useState } from 'react';
-import { UserContextType } from '@/lib/context';
+import { UserContextType } from '@/utils/context';
 import User from '@/models/User';
 import toast from 'react-hot-toast';
 

@@ -1,11 +1,11 @@
 import FirebaseModel from '@/models/FirebaseModel';
 import { doc, DocumentSnapshot, getDoc, setDoc, SnapshotOptions } from '@firebase/firestore';
-import { firestore } from '@/lib/firebase';
+import { firestore } from '@/utils/firebase';
 import { FireDoc } from '@/Enum/FireDoc';
 import { CardTier, CardTierValue, getCardTierValue, isCardTier } from '@/Enum/CardTier';
 import { CardCollection, isCardCollection } from '@/Enum/CardCollection';
 import kebabCase from 'lodash.kebabcase';
-import { decrypt, encrypt } from '@/lib/cipher';
+import { decrypt, encrypt } from '@/utils/cipher';
 
 export default class Card extends FirebaseModel {
     path = FireDoc.CARD;
@@ -20,6 +20,7 @@ export default class Card extends FirebaseModel {
     description: string;
     withQuestion: boolean;
     isActive: boolean;
+    collectedBy: string[];
 
     constructor (
         uid: string | null = null,
@@ -30,7 +31,8 @@ export default class Card extends FirebaseModel {
         image: string = '',
         description: string = '',
         withQuestion: boolean = false,
-        isActive: boolean = false
+        isActive: boolean = false,
+        collectedBy: string[] = []
     ) {
         super();
 
@@ -44,7 +46,7 @@ export default class Card extends FirebaseModel {
 
         this.uid = uid ?? kebabCase(name);
         this.name = name;
-        this.code = encrypt(code);
+        this.code = code;
         this.value = getCardTierValue(tier);
         this.tier = tier;
         this.collection = collection;
@@ -52,14 +54,7 @@ export default class Card extends FirebaseModel {
         this.description = description;
         this.withQuestion = withQuestion;
         this.isActive = isActive;
-    }
-
-    getCode(): string {
-        return decrypt(this.code);
-    }
-
-    setCode(code: string) {
-        this.code = encrypt(code);
+        this.collectedBy = collectedBy;
     }
 
     public static async fromUid (uid: string): Promise<Card | undefined> {
@@ -93,7 +88,8 @@ export default class Card extends FirebaseModel {
             image: data.image,
             description: data.description,
             withQuestion: data.withQuestion,
-            isActive: data.isActive
+            isActive: data.isActive,
+            collectedBy: data.collectedBy
         };
     }
 
@@ -116,7 +112,8 @@ export default class Card extends FirebaseModel {
             data.image,
             data.description,
             data.withQuestion,
-            data.isActive
+            data.isActive,
+            data.collectedBy
         );
     }
 }

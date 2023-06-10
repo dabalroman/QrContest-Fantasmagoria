@@ -15,7 +15,7 @@ export default class FirebaseModel {
         throw new Error('Not available for FirebaseModel');
     }
 
-    protected static getConverter (): {
+    public static getConverter (): {
         toFirestore: (data: FirebaseModel) => object,
         fromFirestore: (snapshot: DocumentSnapshot, options: SnapshotOptions) => FirebaseModel
     } {

@@ -1,6 +1,6 @@
 import FirebaseModel from '@/models/FirebaseModel';
 import { doc, getDoc, updateDoc, writeBatch } from '@firebase/firestore';
-import { firestore } from '@/lib/firebase';
+import { firestore } from '@/utils/firebase';
 import { isUserRole, UserRole } from '@/Enum/UserRole';
 import { FireDoc } from '@/Enum/FireDoc';
 

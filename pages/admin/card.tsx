@@ -34,7 +34,7 @@ export default function CardAdminPage ({}) {
         console.log('save', card);
         await card.save();
 
-        reset(content);
+        reset();
 
         toast.success('Card updated successfully');
     };
@@ -63,6 +63,7 @@ export default function CardAdminPage ({}) {
                         <option value="horror">horror</option>
                         <option value="young">young</option>
                         <option value="anime">anime</option>
+                        <option value="sci-fi">sci-fi</option>
                         <option value="creature">creature</option>
                         <option value="view">view</option>
                     </select>
@@ -73,7 +74,7 @@ export default function CardAdminPage ({}) {
                         <label>with question</label>
                     </fieldset>
                     <fieldset>
-                        <input type="checkbox" placeholder="isActive" {...register('isActive', {})} />
+                        <input type="checkbox" placeholder="isActive" checked {...register('isActive', {})} />
                         <label>is active</label>
                     </fieldset>
 

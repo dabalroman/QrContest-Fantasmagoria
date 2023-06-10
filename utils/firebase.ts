@@ -34,10 +34,8 @@ export const auth: Auth = getAuth(firebaseApp);
 export const googleAuthProvider: GoogleAuthProvider = new GoogleAuthProvider();
 export const firestore: Firestore = getFirestore(firebaseApp);
 export const storage: FirebaseStorage = getStorage(firebaseApp);
-
 export const functions = getFunctions(firebaseApp);
 
-export const addMessageFunction = httpsCallable(functions, 'addmessage');
 export const STATE_CHANGED = 'state_changed';
 
 if (configuration.emulator) {

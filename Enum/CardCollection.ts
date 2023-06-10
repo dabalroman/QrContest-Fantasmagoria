@@ -4,6 +4,7 @@ export enum CardCollection {
     YOUNG = 'young',
     ANIME = 'anime',
     CREATURE = 'creature',
+    SCIFI = 'sci-fi',
     VIEW = 'view',
 }
 
