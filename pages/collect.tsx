@@ -1,5 +1,6 @@
 import { useForm } from 'react-hook-form';
 import Metatags from '@/components/Metatags';
+import { addMessageFunction } from '@/lib/firebase';
 
 export default function CollectPage ({}) {
     const {
@@ -19,12 +20,14 @@ export default function CollectPage ({}) {
 
     const collectCode = (data: any) => {
         console.log(data);
+        addMessageFunction({ text: data.code })
+            .then((result) => console.log(result.data));
         reset();
     };
 
     return (
         <main className="grid grid-rows-layout items-center min-h-screen">
-            <Metatags title='Szukaj'/>
+            <Metatags title="Szukaj"/>
             <h1 className="font-fancy text-4xl p-4 uppercase text-right">Szukaj</h1>
 
             <div>

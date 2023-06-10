@@ -18,6 +18,7 @@ import {
 } from '@firebase/firestore';
 import { FirebaseStorage, getStorage } from '@firebase/storage';
 import configuration from '@/configuration';
+import { connectFunctionsEmulator, getFunctions, httpsCallable } from '@firebase/functions';
 
 function createFirebaseApp (config: {}) {
     try {
@@ -33,14 +34,23 @@ export const auth: Auth = getAuth(firebaseApp);
 export const googleAuthProvider: GoogleAuthProvider = new GoogleAuthProvider();
 export const firestore: Firestore = getFirestore(firebaseApp);
 export const storage: FirebaseStorage = getStorage(firebaseApp);
+
+export const functions = getFunctions(firebaseApp);
+
+export const addMessageFunction = httpsCallable(functions, 'addmessage');
 export const STATE_CHANGED = 'state_changed';
 
 if (configuration.emulator) {
     console.log(configuration.emulatorHost + ':' + configuration.emulatorAuthPort);
     connectAuthEmulator(auth, `http://${configuration.emulatorHost}:${configuration.emulatorAuthPort}`);
+    connectFunctionsEmulator(
+        functions,
+        configuration.emulatorHost as string,
+        parseInt(configuration.emulatorFunctionsPort as string, 10)
+    );
 
     // @ts-ignore
-    if(!firestore._settingsFrozen) {
+    if (!firestore._settingsFrozen) {
         connectFirestoreEmulator(
             firestore,
             configuration.emulatorHost as string,
