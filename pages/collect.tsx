@@ -25,7 +25,10 @@ export default function CollectPage ({}) {
     const collectCode = (data: any) => {
         console.log(data);
         collectCardFunction({ uid: user?.uid, code: data.code })
-            .then((result) => console.log(result.data));
+            .then((result) => console.log(result.data))
+            .catch((error) => {
+                console.log(error.code, error.message, error.details);
+            });
         reset();
     };
 

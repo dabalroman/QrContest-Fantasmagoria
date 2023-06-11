@@ -1,20 +1,23 @@
 import { initializeApp } from 'firebase-admin/app';
-import { onRequest } from 'firebase-functions/v2/https';
+import { HttpsError, onCall } from 'firebase-functions/v2/https';
 import { FieldValue, getFirestore } from 'firebase-admin/firestore';
 import { logger } from 'firebase-functions';
 import { Card, User } from './firestoreTypes';
 
 initializeApp();
 
-exports.collectcard = onRequest(async (request, response) => {
-    const uid: string | null = request.body.data.uid ?? null;
-    const codeAttempt: string | null = request.body.data.code ?? null;
+exports.collectcard = onCall(async (request) => {
+    if (!request.auth || !request.auth.uid) {
+        logger.error('collectcard', 'permission denied');
+        throw new HttpsError('permission-denied', 'permission denied');
+    }
 
-    if (uid === null || codeAttempt === null) {
-        response.status(400)
-            .json({ result: 'Błąd aplikacji.' });
+    const uid: string = request.auth.uid;
+    const codeAttempt: string | null = request.data.code ?? null;
+
+    if (typeof codeAttempt !== 'string' || codeAttempt.length !== 10) {
         logger.error('collectcard', 'uid or code is null');
-        return;
+        throw new HttpsError('invalid-argument', 'uid or code is null');
     }
 
     const db = getFirestore();
@@ -23,10 +26,8 @@ exports.collectcard = onRequest(async (request, response) => {
     const userSnapshot = await userRef.get();
 
     if (!userSnapshot.exists) {
-        response.status(400)
-            .json({ result: 'Błąd aplikacji.' });
-        logger.error('collectcard', 'user uid invalid');
-        return;
+        logger.error('collectcard', 'user uid does not exist');
+        throw new HttpsError('not-found', 'user uid does not exist');
     }
 
     const cardSnapshot = await db.collection('cards')
@@ -34,10 +35,8 @@ exports.collectcard = onRequest(async (request, response) => {
         .get();
 
     if (cardSnapshot.empty) {
-        response.status(404)
-            .json({ result: 'Kod jest błędny.' });
-        logger.log('collectcard', uid, `card code ${codeAttempt} is invalid`);
-        return;
+        logger.error('collectcard', 'card code is invalid');
+        throw new HttpsError('not-found', 'card code is invalid');
     }
 
     const cardDoc = cardSnapshot.docs[0];
@@ -49,10 +48,8 @@ exports.collectcard = onRequest(async (request, response) => {
     const isAlreadyCollected = card.collectedBy && uid in card.collectedBy;
 
     if (isAlreadyCollected) {
-        response.status(400)
-            .json({ result: 'Karta została już zebrana.' });
-        logger.log('collectcard', uid, `card code ${codeAttempt} is already collected`);
-        return;
+        logger.error('collectcard', 'card is already collected');
+        throw new HttpsError('already-exists', 'card is already collected');
     }
 
     const collectedCardRef = userRef.collection('collected-cards')
@@ -100,14 +97,13 @@ exports.collectcard = onRequest(async (request, response) => {
             }, { merge: true });
         });
     } catch (error) {
-        response.status(500)
-            .json({ result: 'Błąd aplikacji.' });
-        logger.error('collectcard', error);
-        return;
+        logger.error('collectcard', 'error while collecting card: ' + error);
+        throw new HttpsError('aborted', 'error while collecting card');
     }
 
-    response.status(200)
-        .json({ result: 'Kod jest prawidłowy!' });
     logger.log('collectcard', user.username, `card code ${codeAttempt} is valid`);
+    return {
+        text: `ok`
+    };
 });
 

@@ -29,7 +29,8 @@ body {
 
 .bg-image-mobile-position {
     background-size: auto max(600px, 100vh);
-    background-position: center 0
+    background-position: center 0;
+    background-repeat: no-repeat;
 }
 
 .bg-gradient-navbar-button {
