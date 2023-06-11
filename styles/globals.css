@@ -23,16 +23,8 @@ body {
     display: none;
 }
 
-.panel {
-    @apply mx-4 my-8 p-4 rounded-md shadow-panel bg-gradient-to-b from-panel-transparent to-panel-transparent-end;
-}
-
 .bg-image-mobile-position {
     background-size: auto max(600px, 100vh);
     background-position: center 0;
     background-repeat: no-repeat;
-}
-
-.bg-gradient-navbar-button {
-    background: linear-gradient(135deg, #C59251 25%, #FCCE8A 47.4%, #C59251 73.96%);
 }

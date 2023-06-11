@@ -103,7 +103,7 @@ exports.collectcard = onCall(async (request) => {
 
     logger.log('collectcard', user.username, `card code ${codeAttempt} is valid`);
     return {
-        text: `ok`
+        card: (await collectedCardRef.get()).data()
     };
 });
 

@@ -34,7 +34,9 @@ module.exports = {
                 'text-dark': '#261500',
                 'text-light': '#F2EFEA',
 
-                'input-border': '#261501',
+                'card-border': '#261500',
+
+                'input-border': '#261500',
                 'input-background': '#97784B',
 
                 background: '#C59251',

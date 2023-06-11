@@ -5,14 +5,13 @@ import { FireDoc } from '@/Enum/FireDoc';
 import { CardTier, CardTierValue, getCardTierValue, isCardTier } from '@/Enum/CardTier';
 import { CardCollection, isCardCollection } from '@/Enum/CardCollection';
 import kebabCase from 'lodash.kebabcase';
-import { decrypt, encrypt } from '@/utils/cipher';
 
 export default class Card extends FirebaseModel {
     path = FireDoc.CARD;
 
     uid: string;
     name: string;
-    code: string;
+    code: string | null;
     value: CardTierValue;
     tier: CardTier;
     collection: CardCollection;
@@ -25,7 +24,7 @@ export default class Card extends FirebaseModel {
     constructor (
         uid: string | null = null,
         name: string = '',
-        code: string = '',
+        code: string | null = '',
         tier: CardTier = CardTier.COMMON,
         collection: CardCollection = CardCollection.MYSTIC,
         image: string = '',

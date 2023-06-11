@@ -34,3 +34,16 @@ export function getCardTierValue(cardTier: CardTier): CardTierValue {
             return CardTierValue.COMMON;
     }
 }
+
+export function getCardTierFriendlyName(cardTier: CardTier): string {
+    switch (cardTier) {
+        case CardTier.COMMON:
+            return 'Zwykły';
+        case CardTier.RARE:
+            return 'Rzadki';
+        case CardTier.EPIC:
+            return 'Epicki';
+        case CardTier.LEGENDARY:
+            return 'Legendarny';
+    }
+}
