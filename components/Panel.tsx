@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 
-export default function PanelComponent ({
+export default function Panel ({
     children,
     margin = true,
     className = ''

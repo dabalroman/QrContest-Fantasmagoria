@@ -3,6 +3,7 @@ import CollectedCardComponent from '@/components/collect/CollectedCardComponent'
 import Card from '@/models/Card';
 import { CardTier } from '@/Enum/CardTier';
 import { CardCollection } from '@/Enum/CardCollection';
+import ScreenTitle from '@/components/ScreenTitle';
 
 export default function CollectPage ({ code = null }: { code?: string | null }) {
     const card = {
@@ -38,7 +39,7 @@ export default function CollectPage ({ code = null }: { code?: string | null }) 
     return (
         <main className="grid grid-rows-layout items-center min-h-screen p-4">
             <Metatags title="Szukaj"/>
-            <h1 className="font-fancy text-4xl uppercase text-right">Szukaj</h1>
+            <ScreenTitle>Szukaj</ScreenTitle>
             <CollectedCardComponent card={cardObj}/>
         </main>
     );

@@ -10,7 +10,6 @@ export default function Home () {
             <main>
                 <Metatags/>
                 <FontAwesomeIcon icon={faGem}/>
-                <h1 className="text-3xl font-bold underline">{kebabCase('Hello world!')}</h1>
                 <Link href={'enter'}>Enter</Link>
             </main>
         </>

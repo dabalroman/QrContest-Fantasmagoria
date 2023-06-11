@@ -1,7 +1,8 @@
-import PanelComponent from '../PanelComponent';
+import Panel from '../Panel';
 import { useForm } from 'react-hook-form';
 import { useEffect } from 'react';
 import { collectCardFunction } from '@/utils/functions';
+import Button from '@/components/Button';
 
 export default function LookForCodeComponent ({ code = null }: { code?: string | null }) {
     const {
@@ -44,12 +45,12 @@ export default function LookForCodeComponent ({ code = null }: { code?: string |
 
     return (
         <div>
-            <PanelComponent>
+            <Panel>
                 <h2 className="text-2xl font-fancy pb-2">Zeskanuj kod</h2>
                 <p>Użyj aparatu lub aplikacji do skanowania i dołącz do pogoni za skarbami!</p>
-            </PanelComponent>
+            </Panel>
 
-            <PanelComponent>
+            <Panel>
                 <h2 className="text-2xl font-fancy pb-2">Wpisz kod ręcznie</h2>
                 <p className="pb-2">Nie chcesz używać skanera skarbów? Wpisz kod tutaj.</p>
 
@@ -71,11 +72,11 @@ export default function LookForCodeComponent ({ code = null }: { code?: string |
                     {formState.errors.code?.message && (
                         <p className="text-danger">{formState.errors.code?.message as string}</p>)}
 
-                    <button type="submit" disabled={!isValid}>
+                    <Button type="submit" disabled={!isValid}>
                         Potwierdź
-                    </button>
+                    </Button>
                 </form>
-            </PanelComponent>
+            </Panel>
         </div>
     );
 }
