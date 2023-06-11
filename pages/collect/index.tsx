@@ -1,36 +1,46 @@
 import { useForm } from 'react-hook-form';
 import Metatags from '@/components/Metatags';
 import { collectCardFunction } from '@/utils/functions';
-import { useContext } from 'react';
-import { UserContext, UserContextType } from '@/utils/context';
+import { useEffect } from 'react';
 
-export default function CollectPage ({}) {
-    const { user } = useContext<UserContextType>(UserContext);
-
+export default function CollectPage ({ code = null }: { code: string | null | undefined }) {
     const {
         register,
         handleSubmit,
         reset,
-        watch,
+        setValue,
         formState
     } = useForm({
         mode: 'onChange'
     });
 
-    const {
-        isValid,
-        isDirty
-    } = formState;
+    const { isValid } = formState;
 
     const collectCode = (data: any) => {
         console.log(data);
-        collectCardFunction({ uid: user?.uid, code: data.code })
+        collectCardFunction({
+            code: data.code
+        })
             .then((result) => console.log(result.data))
             .catch((error) => {
                 console.log(error.code, error.message, error.details);
             });
         reset();
     };
+
+    useEffect(() => {
+        if (code !== null) {
+            setValue(
+                'code',
+                code,
+                {
+                    shouldValidate: true,
+                    shouldDirty: true,
+                    shouldTouch: true
+                }
+            );
+        }
+    }, [code, setValue]);
 
     return (
         <main className="grid grid-rows-layout items-center min-h-screen">
@@ -65,8 +75,8 @@ export default function CollectPage ({}) {
                         {formState.errors.code?.message && (
                             <p className="text-danger">{formState.errors.code?.message as string}</p>)}
 
-                        <button type="submit" className="btn-green">
-                            {isDirty ? 'Save Changes' : 'No changes detected'}
+                        <button type="submit" disabled={!isValid}>
+                            Potwierdź
                         </button>
                     </form>
                 </div>
