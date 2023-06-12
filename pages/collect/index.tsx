@@ -1,46 +1,35 @@
 import Metatags from '@/components/Metatags';
 import CollectedCardComponent from '@/components/collect/CollectedCardComponent';
 import Card from '@/models/Card';
-import { CardTier } from '@/Enum/CardTier';
-import { CardCollection } from '@/Enum/CardCollection';
 import ScreenTitle from '@/components/ScreenTitle';
+import LookForCodeComponent from '@/components/collect/LookForCodeComponent';
+import toast from 'react-hot-toast';
+import { useState } from 'react';
 
 export default function CollectPage ({ code = null }: { code?: string | null }) {
-    const card = {
-        'image': 'azurnoctis',
-        'uid': 'azurnoctis',
-        'score': 30,
-        'tier': 'legendary',
-        'question': null,
-        'name': 'Azurnoctis',
-        'description': 'Niebieski smok o rogach niczym szafirowe obeliski, skrzydła rozpostarte szeroko jak północne zorze, tchnienie zimne jak najgłębsze odmęty oceanu, spoglądający na świat z tajemniczą łagodnością.',
-        'collection': 'mystic',
-        'value': 30,
-        'withQuestion': true,
-        'collectedAt': {
-            '_seconds': 1686513961,
-            '_nanoseconds': 189000000
-        }
+    const [card, setCard] = useState<Card | null>(null);
+
+    const collectErrorsDictionary: {[key: string]: string} = {
+        'card is already collected': 'Zebrałeś już tę kartę!',
+        'card code is invalid': 'Ten kod jest niepoprawny!',
     };
 
-    const cardObj = new Card(
-        card.uid,
-        card.name,
-        null,
-        card.tier as CardTier,
-        card.collection as CardCollection,
-        card.image,
-        card.description,
-        card.withQuestion,
-        true,
-        []
-    );
+    const onCodeValid = (card: Card) => {
+        setCard(card);
+        toast.success('Karta została pomyślnie zebrana!');
+    };
+
+    const onCodeInvalid = (error: Error) => {
+        toast.error(collectErrorsDictionary[error.message] ?? 'Błąd aplikacji, spróbuj ponownie.');
+        console.error(error.message);
+    };
 
     return (
         <main className="grid grid-rows-layout items-center min-h-screen p-4">
             <Metatags title="Szukaj"/>
             <ScreenTitle>Szukaj</ScreenTitle>
-            <CollectedCardComponent card={cardObj}/>
+            {!card && <LookForCodeComponent code={code} onCodeValid={onCodeValid} onCodeInvalid={onCodeInvalid}/>}
+            {card && <CollectedCardComponent card={card}/>}
         </main>
     );
 }

@@ -1,10 +1,18 @@
 import Panel from '../Panel';
 import { useForm } from 'react-hook-form';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { collectCardFunction } from '@/utils/functions';
 import Button from '@/components/Button';
+import Card from '@/models/Card';
+import { RawCard } from '@/models/Raw';
 
-export default function LookForCodeComponent ({ code = null }: { code?: string | null }) {
+export default function LookForCodeComponent ({
+    code = null,
+    onCodeValid,
+    onCodeInvalid
+}: { code?: string | null, onCodeValid: (card: Card) => void, onCodeInvalid: (error: Error) => void }) {
+    const [loading, setLoading] = useState<boolean>(false);
+
     const {
         register,
         handleSubmit,
@@ -18,15 +26,20 @@ export default function LookForCodeComponent ({ code = null }: { code?: string |
     const { isValid } = formState;
 
     const collectCode = (data: any) => {
-        console.log(data);
+        setLoading(true);
         collectCardFunction({
             code: data.code
         })
-            .then((result) => console.log(result.data))
+            .then((result) => {
+                setLoading(false);
+                reset();
+
+                onCodeValid(Card.fromRaw((result.data as any).card as RawCard));
+            })
             .catch((error) => {
-                console.log(error.code, error.message, error.details);
+                setLoading(false);
+                onCodeInvalid(error);
             });
-        reset();
     };
 
     useEffect(() => {
@@ -50,12 +63,12 @@ export default function LookForCodeComponent ({ code = null }: { code?: string |
                 <p>Użyj aparatu lub aplikacji do skanowania i dołącz do pogoni za skarbami!</p>
             </Panel>
 
-            <Panel>
+            <Panel loading={loading}>
                 <h2 className="text-2xl font-fancy pb-2">Wpisz kod ręcznie</h2>
                 <p className="pb-2">Nie chcesz używać skanera skarbów? Wpisz kod tutaj.</p>
 
                 <form onSubmit={handleSubmit(collectCode)}>
-                    <input type="text" placeholder="code" maxLength={10}
+                    <input type="text" placeholder="ABCDEFGHIJ" maxLength={10}
                            className="rounded block w-full p-1 border-2 border-input-border text-center
                                bg-input-background text-text-light uppercase text-xl shadow-inner-input tracking-wider"
                            {...register(
@@ -72,7 +85,7 @@ export default function LookForCodeComponent ({ code = null }: { code?: string |
                     {formState.errors.code?.message && (
                         <p className="text-danger">{formState.errors.code?.message as string}</p>)}
 
-                    <Button type="submit" disabled={!isValid}>
+                    <Button type="submit" disabled={!isValid} className="w-full mt-3">
                         Potwierdź
                     </Button>
                 </form>

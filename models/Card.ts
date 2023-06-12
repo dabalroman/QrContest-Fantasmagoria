@@ -5,6 +5,7 @@ import { FireDoc } from '@/Enum/FireDoc';
 import { CardTier, CardTierValue, getCardTierValue, isCardTier } from '@/Enum/CardTier';
 import { CardCollection, isCardCollection } from '@/Enum/CardCollection';
 import kebabCase from 'lodash.kebabcase';
+import { RawCard } from '@/models/Raw';
 
 export default class Card extends FirebaseModel {
     path = FireDoc.CARD;
@@ -54,6 +55,21 @@ export default class Card extends FirebaseModel {
         this.withQuestion = withQuestion;
         this.isActive = isActive;
         this.collectedBy = collectedBy;
+    }
+
+    public static fromRaw (rawCard: RawCard): Card {
+        return new Card(
+            rawCard.uid,
+            rawCard.name,
+            rawCard.code,
+            rawCard.tier,
+            rawCard.collection,
+            rawCard.image,
+            rawCard.description,
+            rawCard.withQuestion,
+            rawCard.isActive,
+            rawCard.collectedBy
+        );
     }
 
     public static async fromUid (uid: string): Promise<Card | undefined> {

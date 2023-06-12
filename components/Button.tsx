@@ -9,7 +9,7 @@ export default function Button ({
 }: {
     children: ReactNode,
     onClick?: MouseEventHandler<HTMLButtonElement>,
-    type: React.ButtonHTMLAttributes<HTMLButtonElement>['type'],
+    type?: React.ButtonHTMLAttributes<HTMLButtonElement>['type'],
     disabled?: boolean,
     className?: string
 }) {

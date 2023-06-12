@@ -17,7 +17,8 @@ module.exports = {
                 fancy: ['var(--font-trykker)']
             },
             backgroundImage: {
-                'image-default': 'url(\'/backgrounds/bg.jpg\')'
+                'image-default': 'url(\'/backgrounds/bg.jpg\')',
+                'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
             },
             boxShadow: {
                 'panel': '0 8px 5px rgba(0,0,0,0.25)',
