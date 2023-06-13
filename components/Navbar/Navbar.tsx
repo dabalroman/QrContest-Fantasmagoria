@@ -6,8 +6,8 @@ import { Page } from '@/Enum/Page';
 export default function Navbar () {
     return (
         <div
-            className="grid align-center justify-items-center text-3xl
-            bg-background-transparent fixed bottom-0 w-screen"
+            className={'grid align-center justify-items-center text-3xl'
+            + ' bg-background-transparent fixed bottom-0 w-screen z-50'}
             style={{gridTemplateColumns: 'repeat(2, 1fr) 100px repeat(2, 1fr)'}}
         >
             <NavbarButton href={Page.COLLECT} icon={faMagnifyingGlassLocation}/>

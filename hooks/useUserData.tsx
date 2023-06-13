@@ -12,7 +12,8 @@ export function useUserData (): UserContextType {
     const [userReady, setUserReady] = useState<boolean>(false);
 
     useEffect(() => {
-        restoreSession();
+        restoreSession()
+             .then();
     }, [authUser]);
 
     useEffect(() => {

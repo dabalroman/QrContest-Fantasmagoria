@@ -9,9 +9,9 @@ import { useState } from 'react';
 export default function CollectPage ({ code = null }: { code?: string | null }) {
     const [card, setCard] = useState<Card | null>(null);
 
-    const collectErrorsDictionary: {[key: string]: string} = {
+    const collectErrorsDictionary: { [key: string]: string } = {
         'card is already collected': 'Zebrałeś już tę kartę!',
-        'card code is invalid': 'Ten kod jest niepoprawny!',
+        'card code is invalid': 'Ten kod jest niepoprawny!'
     };
 
     const onCodeValid = (card: Card) => {

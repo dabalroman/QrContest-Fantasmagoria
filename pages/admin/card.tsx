@@ -10,14 +10,12 @@ export default function CardAdminPage ({}) {
         register,
         handleSubmit,
         reset,
-        watch,
         formState
     } = useForm({
         mode: 'onChange'
     });
 
     const {
-        isValid,
         isDirty
     } = formState;
 
@@ -72,7 +70,10 @@ export default function CardAdminPage ({}) {
                             <option value="view">view</option>
                         </select>
                         <input type="text" placeholder="image" {...register('image', { required: true })} />
-                        <input type="text" placeholder="description" {...register('description', { required: true })} />
+                        <input type="text" placeholder="description" {...register(
+                            'description',
+                            { required: true }
+                        )} />
                         <fieldset>
                             <input type="checkbox" placeholder="withQuestion" {...register('withQuestion', {})} />
                             <label>with question</label>
@@ -85,7 +86,7 @@ export default function CardAdminPage ({}) {
                         {formState.errors.content && (
                             <p className="text-danger">{formState.errors.content.message as string}</p>)}
 
-                        <Button type="submit" className='w-full'>
+                        <Button type="submit" className="w-full">
                             {isDirty ? 'Save Changes' : 'No changes detected'}
                         </Button>
                     </div>
