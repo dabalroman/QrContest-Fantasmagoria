@@ -18,14 +18,18 @@ module.exports = {
             },
             backgroundImage: {
                 'image-default': 'url(\'/backgrounds/bg.jpg\')',
-                'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+                'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))'
             },
             boxShadow: {
                 'panel': '0 8px 5px rgba(0,0,0,0.25)',
+                'card': '4px 4px 6px rgba(61,36,0,0.40)',
                 'inner-input': 'inset 0 4px 4px rgba(0,0,0,0.15)'
             },
             gridTemplateRows: {
                 'layout': 'max-content minmax(0,1fr) 100px'
+            },
+            gridTemplateColumns: {
+                'small-cards': 'repeat(3, minmax(96px, 1fr))'
             },
             colors: {
                 'panel-transparent': 'rgba(255,211,146,0.95)',

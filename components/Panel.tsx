@@ -1,13 +1,13 @@
 import { ReactNode } from 'react';
-import { faDiceD6 } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import Loader from '@/components/Loader';
 
 export default function Panel ({
+    title,
     children,
     margin = true,
     loading = false,
     className = ''
-}: { children: ReactNode, margin?: boolean, loading?: boolean, className?: string }) {
+}: { children: ReactNode, margin?: boolean, loading?: boolean, className?: string, title?: string }) {
     return (
         <div
             className={
@@ -18,17 +18,10 @@ export default function Panel ({
             }
         >
             <div className={loading ? 'blur-sm pointer-events-none' : ''}>
+                {title && <h2 className="text-2xl font-fancy pb-2">{title}</h2>}
                 {children}
             </div>
-            {loading && (
-                <div className={
-                    'flex flex-col justify-center items-center w-full h-full absolute top-0 left-0'
-                    + ' bg-gradient-radial from-panel-transparent-end to-transparent'
-                }>
-                    <FontAwesomeIcon className="p-2" icon={faDiceD6} size="3x" spin/>
-                    <p className="p-2 font-fancy">Ładowanie...</p>
-                </div>
-            )}
+            {loading && <Loader/>}
         </div>
     );
 }

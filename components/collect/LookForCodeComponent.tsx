@@ -58,13 +58,11 @@ export default function LookForCodeComponent ({
 
     return (
         <div>
-            <Panel>
-                <h2 className="text-2xl font-fancy pb-2">Zeskanuj kod</h2>
+            <Panel title='Zeskanuj kod'>
                 <p>Użyj aparatu lub aplikacji do skanowania i dołącz do pogoni za skarbami!</p>
             </Panel>
 
-            <Panel loading={loading}>
-                <h2 className="text-2xl font-fancy pb-2">Wpisz kod ręcznie</h2>
+            <Panel title='Wpisz kod ręcznie' loading={loading}>
                 <p className="pb-2">Nie chcesz używać skanera skarbów? Wpisz kod tutaj.</p>
 
                 <form onSubmit={handleSubmit(collectCode)}>

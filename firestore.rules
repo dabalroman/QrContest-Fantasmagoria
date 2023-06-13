@@ -25,7 +25,7 @@ service cloud.firestore {
         }
 
         match /users/{userId} {
-            allow read: if request.auth != null;
+            allow read: if request.auth != null && request.auth.uid == userId;
 
             allow create: if request.auth.uid == userId
                 && containsRequiredFields('user', request.resource.data)
@@ -42,6 +42,13 @@ service cloud.firestore {
                 && request.resource.data.username == resource.data.username;
 
             allow delete: if false;
+
+            match /collected-cards/{cardId} {
+                allow read: if request.auth != null
+                    && request.auth.uid == userId;
+
+                allow write: if false;
+            }
         }
 
         match /users-usernames/{username} {
@@ -55,9 +62,7 @@ service cloud.firestore {
         }
 
         match /cards/{cardId} {
-            allow read: if request.auth != null;
-
-            allow create: if request.auth != null
+            allow read, create, update: if request.auth != null
                 && isUserAdmin();
 
             allow update, delete: if false;

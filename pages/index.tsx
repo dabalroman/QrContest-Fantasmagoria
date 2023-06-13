@@ -1,4 +1,3 @@
-import kebabCase from 'lodash.kebabcase';
 import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGem } from '@fortawesome/free-solid-svg-icons';
@@ -15,3 +14,4 @@ export default function Home () {
         </>
     );
 }
+
