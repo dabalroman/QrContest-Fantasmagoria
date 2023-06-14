@@ -21,6 +21,7 @@ export default class Card extends FirebaseModel {
     withQuestion: boolean;
     isActive: boolean;
     collectedBy: string[];
+    collectedAt: Date | null;
 
     constructor (
         uid: string | null = null,
@@ -32,7 +33,8 @@ export default class Card extends FirebaseModel {
         description: string = '',
         withQuestion: boolean = false,
         isActive: boolean = false,
-        collectedBy: string[] = []
+        collectedBy: string[] = [],
+        collectedAt: Date | null = null
     ) {
         super();
 
@@ -55,6 +57,7 @@ export default class Card extends FirebaseModel {
         this.withQuestion = withQuestion;
         this.isActive = isActive;
         this.collectedBy = collectedBy;
+        this.collectedAt = collectedAt;
     }
 
     public static fromRaw (rawCard: RawCard): Card {
@@ -68,7 +71,8 @@ export default class Card extends FirebaseModel {
             rawCard.description,
             rawCard.withQuestion,
             rawCard.isActive,
-            rawCard.collectedBy
+            rawCard.collectedBy,
+            rawCard.collectedAt.toDate()
         );
     }
 
@@ -104,7 +108,8 @@ export default class Card extends FirebaseModel {
             description: data.description,
             withQuestion: data.withQuestion,
             isActive: data.isActive,
-            collectedBy: data.collectedBy
+            collectedBy: data.collectedBy,
+            collectedAt: data.collectedAt
         };
     }
 
@@ -128,7 +133,8 @@ export default class Card extends FirebaseModel {
             data.description,
             data.withQuestion,
             data.isActive,
-            data.collectedBy
+            data.collectedBy,
+            data.collectedAt.toDate()
         );
     }
 }

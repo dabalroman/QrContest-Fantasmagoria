@@ -6,7 +6,8 @@ import { useContext, useEffect, useState } from 'react';
 import { UserContext, UserContextType } from '@/utils/context';
 import Card from '@/models/Card';
 import Loader from '@/components/Loader';
-import CardsCollectionComponent from '@/components/collection/CardsCollectionComponent';
+import CardsGroupComponent from '@/components/collection/CardsGroupComponent';
+import Metatags from '@/components/Metatags';
 
 export default function CollectionPage ({}) {
     const { user } = useContext<UserContextType>(UserContext);
@@ -34,11 +35,12 @@ export default function CollectionPage ({}) {
 
     return (
         <main className="grid grid-rows-layout items-center min-h-screen p-4">
+            <Metatags title="Kolekcja"/>
             <ScreenTitle>Kolekcja</ScreenTitle>
             <div>
                 {loading && <Loader/>}
                 {!loading &&
-                    <CardsCollectionComponent
+                    <CardsGroupComponent
                         title="Mistyczne stworzenia"
                         description={'Te niezwykłe istoty, posiadające nadprzyrodzone moce i umiejętności,'
                             + ' były mi znane tylko z opowieści i legend, ale teraz mam je przed sobą.'}

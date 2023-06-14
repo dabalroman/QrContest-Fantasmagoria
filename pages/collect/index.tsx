@@ -1,5 +1,5 @@
 import Metatags from '@/components/Metatags';
-import CollectedCardComponent from '@/components/collect/CollectedCardComponent';
+import CollectCardComponent from '@/components/collect/CollectCardComponent';
 import Card from '@/models/Card';
 import ScreenTitle from '@/components/ScreenTitle';
 import LookForCodeComponent from '@/components/collect/LookForCodeComponent';
@@ -29,7 +29,7 @@ export default function CollectPage ({ code = null }: { code?: string | null }) 
             <Metatags title="Szukaj"/>
             <ScreenTitle>Szukaj</ScreenTitle>
             {!card && <LookForCodeComponent code={code} onCodeValid={onCodeValid} onCodeInvalid={onCodeInvalid}/>}
-            {card && <CollectedCardComponent card={card}/>}
+            {card && <CollectCardComponent card={card}/>}
         </main>
     );
 }

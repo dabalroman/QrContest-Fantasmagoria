@@ -1,8 +1,9 @@
 import Card from '@/models/Card';
 import CardSmallComponent from '@/components/CardSmallComponent';
 import Panel from '@/components/Panel';
+import Link from 'next/link';
 
-export default function CardsCollectionComponent ({
+export default function CardsGroupComponent ({
     title,
     description,
     cards
@@ -13,11 +14,13 @@ export default function CardsCollectionComponent ({
             <div className="grid grid-cols-small-cards gap-4 justify-items-center py-4">
                 {cards
                     .map((card: Card) => (
-                        <CardSmallComponent key={card.uid} card={card} className="shadow-card"/>
+                        <Link href={`/collection/${card.uid}`} key={card.uid}>
+                            <CardSmallComponent card={card} className="shadow-card"/>
+                        </Link>
                     ))
                 }
             </div>
-            <p className='text-right'>Zgromadzono {cards.length} z 6 kart</p>
+            <p className="text-right">Zgromadzono {cards.length} z 6 kart</p>
         </Panel>
     );
 }

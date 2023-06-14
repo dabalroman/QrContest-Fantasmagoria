@@ -14,7 +14,7 @@ export default function CardComponent ({
                 + ' ' + className
             }
             style={{
-                'backgroundImage': `url(cards/${card.image}.png)`,
+                'backgroundImage': `url(/cards/${card.image}.png)`,
                 'minHeight': '200px'
             }}
         >

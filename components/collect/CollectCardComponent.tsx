@@ -5,7 +5,7 @@ import { faDiceD6 } from '@fortawesome/free-solid-svg-icons';
 import Card from '@/models/Card';
 import Button from '@/components/Button';
 
-export default function CollectedCardComponent ({ card }: { card: Card }) {
+export default function CollectCardComponent ({ card }: { card: Card }) {
     return (
         <div className="relative h-full flex flex-col">
             <CardComponent card={card} className="z-50 relative top-3 grow w-full"/>
