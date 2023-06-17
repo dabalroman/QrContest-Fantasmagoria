@@ -2,17 +2,19 @@ import Card from '@/models/Card';
 import CardSmallComponent from '@/components/CardSmallComponent';
 import Panel from '@/components/Panel';
 import Link from 'next/link';
+import CardSet from '@/models/CardSet';
 
-export default function CardsGroupComponent ({
-    title,
-    description,
+export default function CardsSetComponent ({
+    cardSet,
     cards
-}: { title: string, description: string, cards: Card[] }) {
+}: { cardSet: CardSet, cards: Card[] }) {
+    const cardsInSet = cards.filter((card: Card) => card.cardSet === cardSet.uid);
+
     return (
-        <Panel title={title}>
-            <p className="text-justify">{description}</p>
+        <Panel title={cardSet.name}>
+            <p className="text-justify">{cardSet.description}</p>
             <div className="grid grid-cols-small-cards gap-4 justify-items-center py-4">
-                {cards
+                {cardsInSet
                     .map((card: Card) => (
                         <Link href={`/collection/${card.uid}`} key={card.uid}>
                             <CardSmallComponent card={card} className="shadow-card"/>
@@ -20,7 +22,7 @@ export default function CardsGroupComponent ({
                     ))
                 }
             </div>
-            <p className="text-right">Zgromadzono {cards.length} z 6 kart</p>
+            <p className="text-right">Zgromadzono {cardsInSet.length} z {cardSet.amountOfCards} kart</p>
         </Panel>
     );
 }

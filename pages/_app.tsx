@@ -12,6 +12,7 @@ import AuthCheck from '@/components/AuthCheck';
 import { useState } from 'react';
 import CollectionCache from '@/models/CollectionCache';
 import Card from '@/models/Card';
+import CardSet from '@/models/CardSet';
 
 config.autoAddCss = false;
 
@@ -32,12 +33,15 @@ export default function App ({
 }: AppProps) {
     const userData = useUserData();
     const [cards, setCards] = useState<CollectionCache<Card> | null>(null);
+    const [cardSets, setCardSets] = useState<CollectionCache<CardSet> | null>(null);
 
     return (
         <UserContext.Provider value={userData}>
             <CardsCacheContext.Provider value={{
                 cards,
-                setCards
+                setCards,
+                cardSets,
+                setCardSets
             }}>
                 <>
                     <Head>

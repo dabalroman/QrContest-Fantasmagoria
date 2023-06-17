@@ -25,16 +25,6 @@ export enum CardTierValue {
     LEGENDARY = 30
 }
 
-export enum CardCollection {
-    MYSTIC = 'mystic',
-    HORROR = 'horror',
-    YOUNG = 'young',
-    ANIME = 'anime',
-    CREATURE = 'creature',
-    SCIFI = 'sci-fi',
-    VIEW = 'view',
-}
-
 export type CollectedBy = {
     [uid: string]: { username: string }
 }
@@ -45,7 +35,7 @@ export type Card = {
     code: string;
     value: CardTierValue;
     tier: CardTier;
-    collection: CardCollection;
+    cardSet: string;
     image: string;
     description: string;
     withQuestion: boolean;

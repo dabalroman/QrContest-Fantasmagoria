@@ -1,12 +1,16 @@
 import ScreenTitle from '@/components/ScreenTitle';
 import { useEffect, useState } from 'react';
 import Loader from '@/components/Loader';
-import CardsGroupComponent from '@/components/collection/CardsGroupComponent';
+import CardsSetComponent from '@/components/collection/CardsSetComponent';
 import Metatags from '@/components/Metatags';
 import useCollectedCards from '@/hooks/useCollectedCards';
+import CardSet from '@/models/CardSet';
 
 export default function CollectionPage ({}) {
-    const { cards } = useCollectedCards();
+    const {
+        cards,
+        cardSets
+    } = useCollectedCards();
     const [loading, setLoading] = useState<boolean>(!cards);
 
     useEffect(() => {
@@ -19,13 +23,15 @@ export default function CollectionPage ({}) {
             <ScreenTitle>Kolekcja</ScreenTitle>
             <div>
                 {loading && <Loader/>}
-                {!loading && cards &&
-                    <CardsGroupComponent
-                        title="Mistyczne stworzenia"
-                        description={'Te niezwykłe istoty, posiadające nadprzyrodzone moce i umiejętności,'
-                            + ' były mi znane tylko z opowieści i legend, ale teraz mam je przed sobą.'}
-                        cards={cards.get()}
-                    />
+                {!loading && cards && cardSets &&
+                    cardSets.get()
+                        .map((cardSet: CardSet) =>
+                            <CardsSetComponent
+                                key={cardSet.uid}
+                                cardSet={cardSet}
+                                cards={cards.get()}
+                            />
+                        )
                 }
             </div>
         </main>

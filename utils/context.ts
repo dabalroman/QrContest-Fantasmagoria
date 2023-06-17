@@ -3,6 +3,7 @@ import User from '@/models/User';
 import { User as FirebaseUser } from '@firebase/auth';
 import CollectionCache from '@/models/CollectionCache';
 import Card from '@/models/Card';
+import CardSet from '@/models/CardSet';
 
 export type AuthUser = FirebaseUser;
 
@@ -23,11 +24,15 @@ export const UserContext: Context<UserContextType> = createContext({
 
 export interface CardsCacheContextType {
     cards: CollectionCache<Card> | null,
-    setCards: (cardsCache: CollectionCache<Card> | null) => void
+    setCards: (cardsCache: CollectionCache<Card> | null) => void,
+    cardSets: CollectionCache<CardSet> | null,
+    setCardSets: (cardSetsCache: CollectionCache<CardSet> | null) => void
 }
 
 // @ts-ignore
 export const CardsCacheContext: Context<CardsCacheContextType> = createContext({
     cards: null,
-    setCards: () => {}
+    setCards: () => {},
+    cardSets: null,
+    setCardSets: () => {}
 });

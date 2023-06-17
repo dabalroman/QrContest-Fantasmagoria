@@ -3,7 +3,6 @@ import { doc, DocumentSnapshot, getDoc, setDoc, SnapshotOptions, Timestamp } fro
 import { firestore } from '@/utils/firebase';
 import { FireDoc } from '@/Enum/FireDoc';
 import { CardTier, CardTierValue, getCardTierValue, isCardTier } from '@/Enum/CardTier';
-import { CardCollection, isCardCollection } from '@/Enum/CardCollection';
 import kebabCase from 'lodash.kebabcase';
 import { RawCard } from '@/models/Raw';
 
@@ -15,7 +14,7 @@ export default class Card extends FirebaseModel {
     code: string | null;
     value: CardTierValue;
     tier: CardTier;
-    collection: CardCollection;
+    cardSet: string;
     image: string;
     description: string;
     withQuestion: boolean;
@@ -28,7 +27,7 @@ export default class Card extends FirebaseModel {
         name: string = '',
         code: string | null = '',
         tier: CardTier = CardTier.COMMON,
-        collection: CardCollection = CardCollection.MYSTIC,
+        cardSet: string = '',
         image: string = '',
         description: string = '',
         withQuestion: boolean = false,
@@ -42,16 +41,12 @@ export default class Card extends FirebaseModel {
             throw new Error(`Invalid value '${tier}' for card.tier`);
         }
 
-        if (!isCardCollection(collection)) {
-            throw new Error(`Invalid value '${collection}' for card.collection`);
-        }
-
         this.uid = uid ?? kebabCase(name);
         this.name = name;
         this.code = code;
         this.value = getCardTierValue(tier);
         this.tier = tier;
-        this.collection = collection;
+        this.cardSet = cardSet;
         this.image = image;
         this.description = description;
         this.withQuestion = withQuestion;
@@ -70,7 +65,7 @@ export default class Card extends FirebaseModel {
             rawCard.name,
             rawCard.code,
             rawCard.tier,
-            rawCard.collection,
+            rawCard.cardSet,
             rawCard.image,
             rawCard.description,
             rawCard.withQuestion,
@@ -108,7 +103,7 @@ export default class Card extends FirebaseModel {
             code: data.code,
             value: data.value,
             tier: data.tier,
-            collection: data.collection,
+            cardSet: data.cardSet,
             image: data.image,
             description: data.description,
             withQuestion: data.withQuestion,
@@ -133,7 +128,7 @@ export default class Card extends FirebaseModel {
             data.name,
             data.code,
             data.tier,
-            data.collection,
+            data.cardSet,
             data.image,
             data.description,
             data.withQuestion,

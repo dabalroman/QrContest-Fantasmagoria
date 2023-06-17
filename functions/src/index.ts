@@ -52,7 +52,7 @@ exports.collectcard = onCall(async (request) => {
         throw new HttpsError('already-exists', 'card is already collected');
     }
 
-    const collectedCardRef = userRef.collection('collected-cards')
+    const collectedCardRef = userRef.collection('collectedCards')
         .doc(card.uid);
 
     const rankingRef = db.collection('users-ranking')
@@ -63,7 +63,7 @@ exports.collectcard = onCall(async (request) => {
     try {
         await db.runTransaction(async (transaction) => {
             transaction.create(collectedCardRef, {
-                collection: card.collection,
+                cardSet: card.cardSet,
                 description: card.description,
                 image: card.image,
                 name: card.name,

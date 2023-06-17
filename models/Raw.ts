@@ -1,11 +1,10 @@
 import { CardTier } from '@/Enum/CardTier';
-import { CardCollection } from '@/Enum/CardCollection';
 
 export interface RawCard {
     code: string | undefined,
     collectedAt: { _seconds: number, _nanoseconds: number }
     collectedBy: string[] | undefined,
-    collection: CardCollection,
+    cardSet: string,
     description: string,
     image: string,
     isActive: boolean | undefined,

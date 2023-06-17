@@ -43,7 +43,7 @@ service cloud.firestore {
 
             allow delete: if false;
 
-            match /collected-cards/{cardId} {
+            match /collectedCards/{cardId} {
                 allow read: if request.auth != null
                     && request.auth.uid == userId;
 
@@ -66,6 +66,14 @@ service cloud.firestore {
                 && isUserAdmin();
 
             allow update, delete: if false;
+        }
+
+        match /cardSets/{cardSet} {
+            allow read: if request.auth != null;
+
+            allow create, update: if request.auth != null && isUserAdmin();
+
+            allow delete: if false;
         }
 
         //   function immutableFields(documentType) {
