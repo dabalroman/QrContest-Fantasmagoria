@@ -32,6 +32,7 @@ exports.collectcard = onCall(async (request) => {
 
     const cardSnapshot = await db.collection('cards')
         .where('code', '==', codeAttempt)
+        .where('isActive', '==', true)
         .get();
 
     if (cardSnapshot.empty) {

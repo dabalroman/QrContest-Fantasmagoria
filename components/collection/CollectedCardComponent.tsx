@@ -3,7 +3,7 @@ import Panel from '@/components/Panel';
 import Card from '@/models/Card';
 import { formatTimeFromNow } from '@/utils/date';
 
-export default function CollectionCardComponent ({ card }: { card: Card }) {
+export default function CollectedCardComponent ({ card }: { card: Card }) {
     return (
         <div className="relative h-full flex flex-col">
             <CardComponent card={card} className="z-50 relative top-3 grow w-full"/>

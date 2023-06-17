@@ -4,7 +4,7 @@ import Metatags from '@/components/Metatags';
 import ScreenTitle from '@/components/ScreenTitle';
 import { useRouter } from 'next/router';
 import Loader from '@/components/Loader';
-import CollectionCardComponent from '@/components/collection/CollectionCardComponent';
+import CollectedCardComponent from '@/components/collection/CollectedCardComponent';
 import useCollectedCards from '@/hooks/useCollectedCards';
 
 export default function CollectedCardPage () {
@@ -26,7 +26,7 @@ export default function CollectedCardPage () {
             <Metatags title="Kolekcja"/>
             <ScreenTitle>Kolekcja</ScreenTitle>
             {loading && <Loader/>}
-            {!loading && card && <CollectionCardComponent card={card}/>}
+            {!loading && card && <CollectedCardComponent card={card}/>}
         </main>
     );
 }

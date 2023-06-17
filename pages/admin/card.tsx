@@ -4,8 +4,12 @@ import Card from '@/models/Card';
 import ScreenTitle from '@/components/ScreenTitle';
 import Panel from '@/components/Panel';
 import Button from '@/components/Button';
+import useCollectedCards from '@/hooks/useCollectedCards';
+import CardSet from '@/models/CardSet';
+import { CardTier, getCardTierFriendlyName } from '@/Enum/CardTier';
 
 export default function CardAdminPage ({}) {
+    const { cardSets } = useCollectedCards();
     const {
         register,
         handleSubmit,
@@ -44,7 +48,7 @@ export default function CardAdminPage ({}) {
         <main className="grid grid-rows-layout items-center min-h-screen p-4">
             <ScreenTitle>Card Admin Page</ScreenTitle>
 
-            <Panel>
+            <Panel loading={!cardSets}>
                 <form onSubmit={handleSubmit(updatePost)}>
                     <div>
                         <input type="text" placeholder="name" {...register('name', { required: true })} />
@@ -56,18 +60,16 @@ export default function CardAdminPage ({}) {
                             }
                         )} />
                         <select {...register('tier', { required: true })}>
-                            <option value="common">common</option>
-                            <option value="rare">rare</option>
-                            <option value="legendary">legendary</option>
+                            <option value={CardTier.COMMON}>{getCardTierFriendlyName(CardTier.COMMON)}</option>
+                            <option value={CardTier.RARE}>{getCardTierFriendlyName(CardTier.RARE)}</option>
+                            <option value={CardTier.EPIC}>{getCardTierFriendlyName(CardTier.EPIC)}</option>
+                            <option value={CardTier.LEGENDARY}>{getCardTierFriendlyName(CardTier.LEGENDARY)}</option>
                         </select>
                         <select {...register('collection', { required: true })}>
-                            <option value="mystic">mystic</option>
-                            <option value="horror">horror</option>
-                            <option value="young">young</option>
-                            <option value="anime">anime</option>
-                            <option value="sci-fi">sci-fi</option>
-                            <option value="creature">creature</option>
-                            <option value="view">view</option>
+                            {cardSets?.get()
+                                .map((set: CardSet) => (
+                                    <option key={set.uid} value={set.uid}>{set.name}</option>)
+                                )}
                         </select>
                         <input type="text" placeholder="image" {...register('image', { required: true })} />
                         <input type="text" placeholder="description" {...register(

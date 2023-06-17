@@ -3,12 +3,14 @@ import CardSmallComponent from '@/components/CardSmallComponent';
 import Panel from '@/components/Panel';
 import Link from 'next/link';
 import CardSet from '@/models/CardSet';
+import CardSmallHiddenComponent from '@/components/CardSmallHiddenComponent';
 
 export default function CardsSetComponent ({
     cardSet,
     cards
 }: { cardSet: CardSet, cards: Card[] }) {
     const cardsInSet = cards.filter((card: Card) => card.cardSet === cardSet.uid);
+    const amountOfHiddenCards = cardSet.amountOfCards - cardsInSet.length;
 
     return (
         <Panel title={cardSet.name}>
@@ -17,8 +19,13 @@ export default function CardsSetComponent ({
                 {cardsInSet
                     .map((card: Card) => (
                         <Link href={`/collection/${card.uid}`} key={card.uid}>
-                            <CardSmallComponent card={card} className="shadow-card"/>
+                            <CardSmallComponent card={card}/>
                         </Link>
+                    ))
+                }
+                {
+                    Array(amountOfHiddenCards).fill(0).map((_, i) => (
+                        <CardSmallHiddenComponent key={i}/>
                     ))
                 }
             </div>
