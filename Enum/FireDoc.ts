@@ -4,4 +4,5 @@ export enum FireDoc {
     USERS__COLLECTED_CARDS = 'collectedCards',
     CARD = 'cards',
     CARD_SET = 'cardSets',
+    RANKING = 'ranking',
 }

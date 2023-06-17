@@ -8,6 +8,7 @@ export type User = {
     uid: string,
     username: string,
     score: number,
+    amountOfCollectedCards: number,
     role: UserRole
 }
 

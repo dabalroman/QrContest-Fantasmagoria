@@ -20,6 +20,10 @@ export default function Metatags({
             <meta property="og:title" content={title} />
             <meta property="og:description" content={description} />
             <meta property="og:image" content={image} />
+
+            <meta name="viewport" content="width=device-width, initial-scale=1"/>
+            <meta name="color-scheme" content="light only"/>
+            <link rel="icon" href="/favicon.ico"/>
         </Head>
     );
 }

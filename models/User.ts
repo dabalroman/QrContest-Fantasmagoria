@@ -1,5 +1,5 @@
 import FirebaseModel from '@/models/FirebaseModel';
-import { doc, getDoc, updateDoc, writeBatch } from '@firebase/firestore';
+import { doc, DocumentSnapshot, SnapshotOptions, writeBatch } from '@firebase/firestore';
 import { firestore } from '@/utils/firebase';
 import { isUserRole, UserRole } from '@/Enum/UserRole';
 import { FireDoc } from '@/Enum/FireDoc';
@@ -7,8 +7,10 @@ import { FireDoc } from '@/Enum/FireDoc';
 export default class User extends FirebaseModel {
     uid: string;
     username: string;
-    score: number = 0;
-    role: UserRole = UserRole.USER;
+    score: number;
+    amountOfCollectedCards: number;
+    role: UserRole;
+    updatedAt: Date;
 
     path = FireDoc.USERS;
 
@@ -16,47 +18,21 @@ export default class User extends FirebaseModel {
         uid: string,
         username: string = '',
         score: number = 0,
-        role: UserRole = UserRole.USER
+        amountOfCollectedCards: number = 0,
+        role: UserRole = UserRole.USER,
+        updatedAt: Date = new Date()
     ) {
         super();
 
         this.uid = uid;
         this.username = username;
         this.score = score;
+        this.amountOfCollectedCards = amountOfCollectedCards;
         this.role = role;
+        this.updatedAt = updatedAt;
     }
 
-    public static async fromUid (uid: string): Promise<User | null> {
-        const userDoc = doc(firestore, 'users', uid);
-        const snapshot = await getDoc(userDoc);
-
-        if(snapshot.data() === undefined) {
-            return null;
-        }
-
-        if(!isUserRole(snapshot.data()?.role)) {
-            throw new Error(`Invalid value '${snapshot.data()?.role}' for user.role`);
-        }
-
-        return new User(
-            uid,
-            snapshot.data()?.username,
-            snapshot.data()?.score,
-            snapshot.data()?.role
-        );
-    }
-
-    public async save(): Promise<void> {
-        const userDoc = doc(firestore, FireDoc.USERS, this.uid);
-
-        await updateDoc(userDoc, {
-            username: this.username,
-            score: this.score,
-            role: this.role
-        }).then(x => console.log(x)).catch((reason) => console.error(reason));
-    }
-
-    public static async createAccount(uid: string, username: string) {
+    public static async createAccount (uid: string, username: string) {
         const user = new User(uid, username);
 
         const userDoc = doc(firestore, FireDoc.USERS, user.uid);
@@ -66,6 +42,40 @@ export default class User extends FirebaseModel {
             .set(userDoc, { ...user })
             .set(usernameDoc, { uid: user.uid })
             .commit();
+    }
+
+    protected static toFirestore (data: User): object {
+        return {
+            uid: data.uid,
+            name: data.username,
+            score: data.score,
+            amountOfCollectedCards: data.amountOfCollectedCards,
+            role: data.role
+        };
+    }
+
+    protected static fromFirestore (
+        snapshot: DocumentSnapshot,
+        options: SnapshotOptions
+    ): User {
+        const data = snapshot.data(options);
+
+        if (data === undefined) {
+            throw new Error('Data undefined');
+        }
+
+        if (!isUserRole(data.role)) {
+            throw new Error(`Invalid value '${snapshot.data()?.role}' for user.role`);
+        }
+
+        return new User(
+            data.uid,
+            data.username,
+            data.score,
+            data.amountOfCollectedCards,
+            data.role,
+            data.updatedAt.toDate()
+        );
     }
 }
 

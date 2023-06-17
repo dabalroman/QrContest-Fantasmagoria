@@ -13,7 +13,7 @@ export default function Navbar () {
             <NavbarButton href={Page.COLLECT} icon={faMagnifyingGlassLocation}/>
             <NavbarButton href={Page.COLLECTION} icon={faImages}/>
             <NavbarSuperButton href={Page.COLLECT} icon={faHouse}/>
-            <NavbarButton href={Page.SCOREBOARD} icon={faTrophy}/>
+            <NavbarButton href={Page.RANKING} icon={faTrophy}/>
             <NavbarButton href={Page.ACCOUNT} icon={faUser}/>
         </div>
     );

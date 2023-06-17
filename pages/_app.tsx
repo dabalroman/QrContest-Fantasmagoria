@@ -6,13 +6,13 @@ import Navbar from '@/components/Navbar/Navbar';
 import { config } from '@fortawesome/fontawesome-svg-core';
 import '@fortawesome/fontawesome-svg-core/styles.css';
 import { Spectral, Trykker } from 'next/font/google';
-import Head from 'next/head';
-import useUserData from '@/hooks/useUserData';
 import AuthCheck from '@/components/AuthCheck';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import CollectionCache from '@/models/CollectionCache';
 import Card from '@/models/Card';
 import CardSet from '@/models/CardSet';
+import Metatags from '@/components/Metatags';
+import useUserData from '@/hooks/useUserData';
 
 config.autoAddCss = false;
 
@@ -35,6 +35,12 @@ export default function App ({
     const [cards, setCards] = useState<CollectionCache<Card> | null>(null);
     const [cardSets, setCardSets] = useState<CollectionCache<CardSet> | null>(null);
 
+    useEffect(() => {
+        if (userData.authUser === null) {
+            setCards(null);
+        }
+    }, [userData.authUser]);
+
     return (
         <UserContext.Provider value={userData}>
             <CardsCacheContext.Provider value={{
@@ -44,11 +50,7 @@ export default function App ({
                 setCardSets
             }}>
                 <>
-                    <Head>
-                        <meta name="viewport" content="width=device-width, initial-scale=1"/>
-                        <meta name="color-scheme" content="light only"/>
-                        <link rel="icon" href="/favicon.ico"/>
-                    </Head>
+                    <Metatags title="QrContest"/>
                     <div
                         className={
                             `${spectral.variable} ${trykker.variable} `

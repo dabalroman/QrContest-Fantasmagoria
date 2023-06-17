@@ -37,6 +37,7 @@ module.exports = {
                 'panel-solid': 'rgba(255,211,146,1)',
 
                 'text-dark': '#261500',
+                'text-half': '#6F3D00',
                 'text-light': '#F2EFEA',
 
                 'card-border': '#261500',

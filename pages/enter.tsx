@@ -7,23 +7,27 @@ import { AuthUser, UserContext, UserContextType } from '@/utils/context';
 import { auth, firestore, googleAuthProvider } from '@/utils/firebase';
 import User from '@/models/User';
 import toast from 'react-hot-toast';
+import Panel from '@/components/Panel';
+import ScreenTitle from '@/components/ScreenTitle';
 
 export default function EnterPage ({}) {
     const {
         authUser,
-        userReady,
-        fetchUser
+        userReady
     }: UserContextType = useContext(UserContext);
 
     return (
-        <main>
+        <main className="grid grid-rows-layout items-center min-h-screen p-4">
             <Metatags title="Login page"/>
-            {
-                authUser
-                    ? (!userReady ? <UsernameForm authUser={authUser} fetchUser={fetchUser}/> : null)
-                    : <SignInButton/>
-            }
-            <SignOutButton/>
+            <ScreenTitle>Sesja</ScreenTitle>
+            <Panel title="Session">
+                {
+                    authUser
+                        ? (!userReady ? <UsernameForm authUser={authUser}/> : null)
+                        : <SignInButton/>
+                }
+                <SignOutButton/>
+            </Panel>
         </main>
     );
 }
@@ -45,9 +49,8 @@ function SignOutButton () {
 }
 
 function UsernameForm ({
-    authUser,
-    fetchUser
-}: { authUser: AuthUser, fetchUser: () => void }) {
+    authUser
+}: { authUser: AuthUser }) {
     const [username, setUsername] = useState<string>('');
     const [isValid, setIsValid] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(false);
@@ -78,7 +81,6 @@ function UsernameForm ({
 
         try {
             await User.createAccount(authUser.uid, username);
-            await fetchUser();
             toast.success('Rejestracja przebiegła pomyślnie!');
         } catch (e) {
             toast.error('Rejestracja konta nie powiodła się, spróbuj ponownie.');

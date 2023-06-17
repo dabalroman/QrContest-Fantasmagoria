@@ -56,10 +56,11 @@ exports.collectcard = onCall(async (request) => {
     const collectedCardRef = userRef.collection('collectedCards')
         .doc(card.uid);
 
-    const rankingRef = db.collection('users-ranking')
+    const rankingRef = db.collection('ranking')
         .doc('ranking');
 
     const userScore = user.score + card.value;
+    const userCollectedCards = user.amountOfCollectedCards + 1;
 
     try {
         await db.runTransaction(async (transaction) => {
@@ -79,6 +80,7 @@ exports.collectcard = onCall(async (request) => {
 
             transaction.update(userRef, {
                 score: userScore,
+                amountOfCollectedCards: userCollectedCards,
                 updatedAt: FieldValue.serverTimestamp()
             });
 
@@ -93,6 +95,7 @@ exports.collectcard = onCall(async (request) => {
                 [`${uid}`]: {
                     username: user.username,
                     score: userScore,
+                    amountOfCollectedCards: userCollectedCards,
                     updatedAt: FieldValue.serverTimestamp()
                 }
             }, { merge: true });

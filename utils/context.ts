@@ -10,16 +10,14 @@ export type AuthUser = FirebaseUser;
 export interface UserContextType {
     authUser: AuthUser | null,
     user: User | null,
-    userReady: boolean,
-    fetchUser: () => void
+    userReady: boolean
 }
 
 // @ts-ignore
 export const UserContext: Context<UserContextType> = createContext({
     authUser: null,
     user: null,
-    userReady: false,
-    fetchUser: () => {}
+    userReady: false
 });
 
 export interface CardsCacheContextType {
