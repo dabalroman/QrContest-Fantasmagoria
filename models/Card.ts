@@ -1,5 +1,5 @@
 import FirebaseModel from '@/models/FirebaseModel';
-import { doc, DocumentSnapshot, getDoc, setDoc, SnapshotOptions } from '@firebase/firestore';
+import { doc, DocumentSnapshot, getDoc, setDoc, SnapshotOptions, Timestamp } from '@firebase/firestore';
 import { firestore } from '@/utils/firebase';
 import { FireDoc } from '@/Enum/FireDoc';
 import { CardTier, CardTierValue, getCardTierValue, isCardTier } from '@/Enum/CardTier';
@@ -61,6 +61,10 @@ export default class Card extends FirebaseModel {
     }
 
     public static fromRaw (rawCard: RawCard): Card {
+        if (rawCard.collectedAt['_seconds'] === undefined) {
+            console.error('Inconsistent collectedAt date format');
+        }
+
         return new Card(
             rawCard.uid,
             rawCard.name,
@@ -72,7 +76,8 @@ export default class Card extends FirebaseModel {
             rawCard.withQuestion,
             rawCard.isActive,
             rawCard.collectedBy,
-            rawCard.collectedAt.toDate()
+            Timestamp.fromMillis(rawCard.collectedAt._seconds * 1000)
+                .toDate()
         );
     }
 

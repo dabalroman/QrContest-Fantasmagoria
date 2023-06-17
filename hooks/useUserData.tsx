@@ -6,7 +6,7 @@ import { UserContextType } from '@/utils/context';
 import User from '@/models/User';
 import toast from 'react-hot-toast';
 
-export function useUserData (): UserContextType {
+export default function useUserData (): UserContextType {
     const [authUser] = useAuthState(auth) as any as [AuthUser | null];
     const [user, setUser] = useState<User | null>(null);
     const [userReady, setUserReady] = useState<boolean>(false);

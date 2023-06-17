@@ -1,10 +1,9 @@
 import { CardTier } from '@/Enum/CardTier';
 import { CardCollection } from '@/Enum/CardCollection';
-import { Timestamp } from '@firebase/firestore';
 
 export interface RawCard {
     code: string | undefined,
-    collectedAt: Timestamp
+    collectedAt: { _seconds: number, _nanoseconds: number }
     collectedBy: string[] | undefined,
     collection: CardCollection,
     description: string,

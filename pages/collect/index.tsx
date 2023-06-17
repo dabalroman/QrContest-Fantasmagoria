@@ -5,8 +5,10 @@ import ScreenTitle from '@/components/ScreenTitle';
 import LookForCodeComponent from '@/components/collect/LookForCodeComponent';
 import toast from 'react-hot-toast';
 import { useState } from 'react';
+import useCollectedCards from '@/hooks/useCollectedCards';
 
 export default function CollectPage ({ code = null }: { code?: string | null }) {
+    const { setCards } = useCollectedCards();
     const [card, setCard] = useState<Card | null>(null);
 
     const collectErrorsDictionary: { [key: string]: string } = {
@@ -16,6 +18,7 @@ export default function CollectPage ({ code = null }: { code?: string | null }) 
 
     const onCodeValid = (card: Card) => {
         setCard(card);
+        setCards(null);
         toast.success('Karta została pomyślnie zebrana!');
     };
 

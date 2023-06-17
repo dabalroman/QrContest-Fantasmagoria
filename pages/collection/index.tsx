@@ -1,37 +1,17 @@
 import ScreenTitle from '@/components/ScreenTitle';
-import { collection, onSnapshot, orderBy, query } from '@firebase/firestore';
-import { firestore } from '@/utils/firebase';
-import { FireDoc } from '@/Enum/FireDoc';
-import { useContext, useEffect, useState } from 'react';
-import { UserContext, UserContextType } from '@/utils/context';
-import Card from '@/models/Card';
+import { useEffect, useState } from 'react';
 import Loader from '@/components/Loader';
 import CardsGroupComponent from '@/components/collection/CardsGroupComponent';
 import Metatags from '@/components/Metatags';
+import useCollectedCards from '@/hooks/useCollectedCards';
 
 export default function CollectionPage ({}) {
-    const { user } = useContext<UserContextType>(UserContext);
-    const [loading, setLoading] = useState<boolean>(true);
-    const [cards, setCards] = useState<Card[]>([]);
+    const { cards } = useCollectedCards();
+    const [loading, setLoading] = useState<boolean>(!cards);
 
     useEffect(() => {
-        if (!user?.uid) {
-            return;
-        }
-
-        const collectedCardsQuery = query(
-            collection(firestore, FireDoc.USERS, user?.uid ?? '', FireDoc.COLLECTED_CARDS),
-            orderBy('collectedAt', 'desc')
-        )
-            .withConverter(Card.getConverter());
-
-        //TODO: Remove snapshot, one call is enough
-        return onSnapshot(collectedCardsQuery, (snapshot) => {
-            const cards = snapshot.docs.map((doc) => doc.data()) as Card[];
-            setLoading(false);
-            setCards(cards);
-        });
-    }, [user?.uid]);
+        setLoading(!cards);
+    }, [cards]);
 
     return (
         <main className="grid grid-rows-layout items-center min-h-screen p-4">
@@ -39,12 +19,12 @@ export default function CollectionPage ({}) {
             <ScreenTitle>Kolekcja</ScreenTitle>
             <div>
                 {loading && <Loader/>}
-                {!loading &&
+                {!loading && cards &&
                     <CardsGroupComponent
                         title="Mistyczne stworzenia"
                         description={'Te niezwykłe istoty, posiadające nadprzyrodzone moce i umiejętności,'
                             + ' były mi znane tylko z opowieści i legend, ale teraz mam je przed sobą.'}
-                        cards={cards}
+                        cards={cards.get()}
                     />
                 }
             </div>
