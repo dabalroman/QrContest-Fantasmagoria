@@ -21,20 +21,20 @@ Previous ones in short:
   - [ ] Register new user account
   - [ ] Log in
   - [ ] Providers
-    - [ ] Google
+    - [x] Google
     - [ ] Email
 - [ ] Sections
   - [ ] Navbar for each section 
-  - [ ] Codes
-  - [ ] My collection
-  - [ ] Rankings
-  - [ ] User account
+  - [x] Codes
+  - [x] My collection
+  - [x] Rankings
+  - [x] User account
 - [ ] Codes 
   - [ ] Collect code via QR scan (external apps, collect url)
     - One code can be collected only once
-  - [ ] Collect code via input on app main screen (enter code manually)
+  - [x] Collect code via input on app main screen (enter code manually)
     - Prevent spam, one code every 5 seconds on failure
-  - [ ] Acquire points on code collection
+  - [x] Acquire points on code collection
   - [ ] Closed questions on some codes
     - 4 possible answers
     - Random but unique (cannot repeat for given user)
@@ -43,10 +43,10 @@ Previous ones in short:
     - Ai generated images
     - Name of a code and acquired points on card screen
 - [ ] My collection
-  - [ ] List of collected codes
-- [ ] Rankings
-  - [ ] View user score
-  - [ ] View ranking (top 10, yourself)
+  - [x] List of collected codes
+- [x] Rankings
+  - [x] View user score
+  - [x] View ranking (all users, yourself)
 - [ ] User account
   - [ ] Notifications section
   - [ ] Contest status messages

@@ -24,7 +24,7 @@ export default function useCollectedCards() {
         if (!cards) {
             const collectedCardsQuery = query(
                 collection(firestore, FireDoc.USERS, user?.uid ?? '', FireDoc.USERS__COLLECTED_CARDS),
-                orderBy('collectedAt', 'desc')
+                orderBy('uid', 'desc')
             )
                 .withConverter(Card.getConverter());
 
@@ -32,13 +32,6 @@ export default function useCollectedCards() {
                 const cardsDocs = querySnapshot.docs.map((doc: any) => doc.data()) as Card[];
                 setCards(new CollectionCache<Card>(cardsDocs));
             });
-
-            //TODO: Remove snapshot, one call is enough
-            // return onSnapshot(collectedCardsQuery, (snapshot) => {
-            //     const cardDocs = snapshot.docs.map((doc) => doc.data()) as Card[];
-            //     setLoading(false);
-            //     setCardsCache(cardsCache.update(cardDocs));
-            // });
         }
 
         if (!cardSets) {

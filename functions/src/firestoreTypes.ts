@@ -43,3 +43,13 @@ export type Card = {
     isActive: boolean;
     collectedBy: CollectedBy;
 }
+
+export type QuestionAnswerValue = 'a' | 'b' | 'c' | 'd';
+
+export type Question = {
+    uid: string;
+    question: string;
+    answers: {[index in QuestionAnswerValue]: string},
+    correct: QuestionAnswerValue,
+    value: number
+}
