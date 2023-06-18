@@ -6,6 +6,9 @@ import { useRouter } from 'next/router';
 import Loader from '@/components/Loader';
 import CollectedCardComponent from '@/components/collection/CollectedCardComponent';
 import useCollectedCards from '@/hooks/useCollectedCards';
+import { Page } from '@/Enum/Page';
+import useDynamicNavbar from '@/hooks/useDynamicNavbar';
+import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 
 export default function CollectedCardPage () {
     const router = useRouter();
@@ -13,6 +16,11 @@ export default function CollectedCardPage () {
 
     const { cards } = useCollectedCards();
     const [loading, setLoading] = useState<boolean>(!cards);
+
+    useDynamicNavbar({
+        href: Page.COLLECTION,
+        icon: faArrowLeft
+    });
 
     useEffect(() => {
         setLoading(!cards);

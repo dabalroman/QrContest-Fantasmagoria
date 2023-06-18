@@ -16,10 +16,6 @@ export default function ScoreboardPage ({}) {
     const [ranking, setRanking] = useState<Ranking | null>(null);
 
     useEffect(() => {
-        if (!user?.uid) {
-            return;
-        }
-
         return onSnapshot(
             doc(firestore, FireDoc.RANKING, FireDoc.RANKING)
                 .withConverter(Ranking.getConverter()),
@@ -28,7 +24,7 @@ export default function ScoreboardPage ({}) {
                 setLoading(false);
             }
         );
-    }, [ranking, user?.uid]);
+    }, []);
 
     const currentUserPlace: number = ranking?.records.findIndex((record: Record) => record.uid === user?.uid) ?? 1;
 

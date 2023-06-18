@@ -4,20 +4,30 @@ import Link from 'next/link';
 
 export default function NavbarSuperButton ({
     href,
-    icon
-}: { href: string, icon: IconProp }) {
+    icon,
+    onClick = null
+}: { href: string, icon: IconProp, onClick?: (() => void) | null }) {
+    const className =
+        'p-4 text-4xl text-center text-button-brown border-4 border-button-brown rounded-full'
+        + ' shadow-panel bg-gradient-button bottom-2 h-24 w-24 absolute flex justify-center'
+        + ' content-center items-center';
+
+    const style = { 'background': 'linear-gradient(135deg, #C59251 25%, #FCCE8A 50%, #C59251 75%)' };
+
     return (
-        <Link href={href} className="relative w-24">
-            <div
-                className={
-                    'p-4 text-4xl text-center text-button-brown border-4 border-button-brown rounded-full'
-                    + ' shadow-panel bg-gradient-button bottom-2 h-24 w-24 absolute flex justify-center'
-                    + ' content-center items-center'
-                }
-                style={{ 'background': 'linear-gradient(135deg, #C59251 25%, #FCCE8A 50%, #C59251 75%)' }}
-            >
-                <FontAwesomeIcon icon={icon}/>
-            </div>
-        </Link>
+        <div onClick={(onClick) ? onClick : undefined} className="relative w-24">
+            {onClick && (
+                <div className={className} style={style}>
+                    <FontAwesomeIcon icon={icon}/>
+                </div>
+            )}
+            {!onClick && (
+                <Link href={!onClick ? href : '#'}>
+                    <div className={className} style={style}>
+                        <FontAwesomeIcon icon={icon}/>
+                    </div>
+                </Link>
+            )}
+        </div>
     );
 }

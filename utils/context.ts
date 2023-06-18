@@ -4,9 +4,13 @@ import { User as FirebaseUser } from '@firebase/auth';
 import CollectionCache from '@/models/CollectionCache';
 import Card from '@/models/Card';
 import CardSet from '@/models/CardSet';
+import { Page } from '@/Enum/Page';
+import { faHouse } from '@fortawesome/free-solid-svg-icons';
+import { NavbarCenterAction } from '@/components/Navbar/Navbar';
 
 export type AuthUser = FirebaseUser;
 
+// ---- USER ----
 export interface UserContextType {
     authUser: AuthUser | null,
     user: User | null,
@@ -20,6 +24,7 @@ export const UserContext: Context<UserContextType> = createContext({
     userReady: false
 });
 
+// ---- CARDS ----
 export interface CardsCacheContextType {
     cards: CollectionCache<Card> | null,
     setCards: (cardsCache: CollectionCache<Card> | null) => void,
@@ -33,4 +38,22 @@ export const CardsCacheContext: Context<CardsCacheContextType> = createContext({
     setCards: () => {},
     cardSets: null,
     setCardSets: () => {}
+});
+
+// ---- NAVBAR ----
+export const defaultNavbarCenterAction: NavbarCenterAction = {
+    icon: faHouse,
+    onClick: null,
+    href: Page.COLLECT
+};
+
+export interface NavbarCenterActionContextType {
+    navbarCenterAction: NavbarCenterAction,
+    setNavbarCenterAction: (navbarCenterAction: NavbarCenterAction) => void
+}
+
+// @ts-ignore
+export const NavbarCenterActionContext: Context<NavbarCenterActionContextType> = createContext({
+    navbarCenterAction: defaultNavbarCenterAction,
+    setNavbarCenterAction: () => {}
 });

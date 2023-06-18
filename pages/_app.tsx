@@ -1,8 +1,8 @@
 import '@/styles/globals.css';
 import type { AppProps } from 'next/app';
-import { CardsCacheContext, UserContext } from '@/utils/context';
+import { CardsCacheContext, defaultNavbarCenterAction, NavbarCenterActionContext, UserContext } from '@/utils/context';
 import { Toaster } from 'react-hot-toast';
-import Navbar from '@/components/Navbar/Navbar';
+import Navbar, { NavbarCenterAction } from '@/components/Navbar/Navbar';
 import { config } from '@fortawesome/fontawesome-svg-core';
 import '@fortawesome/fontawesome-svg-core/styles.css';
 import { Spectral, Trykker } from 'next/font/google';
@@ -34,6 +34,7 @@ export default function App ({
     const userData = useUserData();
     const [cards, setCards] = useState<CollectionCache<Card> | null>(null);
     const [cardSets, setCardSets] = useState<CollectionCache<CardSet> | null>(null);
+    const [navbarCenterAction, setNavbarCenterAction] = useState<NavbarCenterAction>(defaultNavbarCenterAction);
 
     useEffect(() => {
         if (userData.authUser === null) {
@@ -43,33 +44,38 @@ export default function App ({
 
     return (
         <UserContext.Provider value={userData}>
-            <CardsCacheContext.Provider value={{
-                cards,
-                setCards,
-                cardSets,
-                setCardSets
+            <NavbarCenterActionContext.Provider value={{
+                navbarCenterAction,
+                setNavbarCenterAction
             }}>
-                <>
-                    <Metatags title="QrContest"/>
-                    <div
-                        className={
-                            `${spectral.variable} ${trykker.variable} `
-                            + `font-serif bg-image-default bg-fixed min-h-screen bg-image-mobile-position`
-                        }
-                    >
-                        <Navbar/>
-                        <AuthCheck>
-                            <Component
-                                {...pageProps}
-                                className={
-                                    `${spectral.variable} ${trykker.variable} `
-                                    + `font-serif bg-image-default bg-center bg-cover bg-fixed min-h-screen`
-                                }/>
-                            <Toaster/>
-                        </AuthCheck>
-                    </div>
-                </>
-            </CardsCacheContext.Provider>
+                <CardsCacheContext.Provider value={{
+                    cards,
+                    setCards,
+                    cardSets,
+                    setCardSets
+                }}>
+                    <>
+                        <Metatags title="QrContest"/>
+                        <div
+                            className={
+                                `${spectral.variable} ${trykker.variable} `
+                                + `font-serif bg-image-default bg-fixed min-h-screen bg-image-mobile-position`
+                            }
+                        >
+                            <Navbar navbarCenterAction={navbarCenterAction}/>
+                            <AuthCheck>
+                                <Component
+                                    {...pageProps}
+                                    className={
+                                        `${spectral.variable} ${trykker.variable} `
+                                        + `font-serif bg-image-default bg-center bg-cover bg-fixed min-h-screen`
+                                    }/>
+                                <Toaster/>
+                            </AuthCheck>
+                        </div>
+                    </>
+                </CardsCacheContext.Provider>
+            </NavbarCenterActionContext.Provider>
         </UserContext.Provider>
     );
 }
