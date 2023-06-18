@@ -18,7 +18,7 @@ export default function CollectedCardPage () {
     const [loading, setLoading] = useState<boolean>(!cards);
 
     useDynamicNavbar({
-        href: Page.COLLECTION,
+        onClick: () => router.back(),
         icon: faArrowLeft
     });
 
