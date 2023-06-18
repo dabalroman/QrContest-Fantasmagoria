@@ -55,7 +55,7 @@ export default function AccountPage ({}) {
                 </Panel>
 
                 <Panel title="Wyloguj">
-                    <p className="pb-4 text-justify"><b>Uwaga!</b>
+                    <p className="pb-4 text-justify"><b>Uwaga! </b>
                         Jeżeli wybrałeś/aś logowanie anonimowe (bez konta Google lub maila),
                         to ponowne zalogowanie się nie będzie możliwe.
                     </p>

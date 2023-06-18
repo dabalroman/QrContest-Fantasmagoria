@@ -29,7 +29,7 @@ module.exports = {
                 'layout': 'max-content minmax(0,1fr) 100px'
             },
             gridTemplateColumns: {
-                'small-cards': 'repeat(3, minmax(96px, 1fr))'
+                'small-cards': 'repeat(3, minmax(80px, 1fr))'
             },
             colors: {
                 'panel-transparent': 'rgba(255,211,146,0.95)',

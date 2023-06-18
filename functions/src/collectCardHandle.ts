@@ -10,7 +10,7 @@ export default async function collectCardHandle(request: CallableRequest) {
     }
 
     const uid: string = request.auth.uid;
-    const codeAttempt: string | null = request.data.code ?? null;
+    let codeAttempt: string | null = request.data.code ?? null;
 
     if (typeof codeAttempt !== 'string' || codeAttempt.length !== 10) {
         logger.error('collectCardHandle', 'uid or code is null');
@@ -27,13 +27,14 @@ export default async function collectCardHandle(request: CallableRequest) {
         throw new HttpsError('not-found', 'user uid does not exist');
     }
 
+    codeAttempt = codeAttempt.toUpperCase();
     const cardSnapshot = await db.collection('cards')
         .where('code', '==', codeAttempt)
         .where('isActive', '==', true)
         .get();
 
     if (cardSnapshot.empty) {
-        logger.error('collectCardHandle', 'card code is invalid');
+        logger.error('collectCardHandle', 'card code is invalid', codeAttempt);
         throw new HttpsError('not-found', 'card code is invalid');
     }
 
