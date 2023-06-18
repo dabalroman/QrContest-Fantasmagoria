@@ -22,7 +22,7 @@ export default function LookForCodeComponent ({
     } = useForm({
         mode: 'onChange',
         defaultValues: {
-            'code': 'av'
+            'code': ''
         }
     });
 
@@ -35,6 +35,7 @@ export default function LookForCodeComponent ({
                 setLoading(false);
                 reset();
 
+                console.log(result.data);
                 onCodeValid(Card.fromRaw((result.data as any).card as RawCard));
             })
             .catch((error) => {

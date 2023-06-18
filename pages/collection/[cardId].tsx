@@ -6,7 +6,6 @@ import { useRouter } from 'next/router';
 import Loader from '@/components/Loader';
 import CollectedCardComponent from '@/components/collection/CollectedCardComponent';
 import useCollectedCards from '@/hooks/useCollectedCards';
-import { Page } from '@/Enum/Page';
 import useDynamicNavbar from '@/hooks/useDynamicNavbar';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 

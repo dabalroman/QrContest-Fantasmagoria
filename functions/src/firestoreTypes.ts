@@ -1,3 +1,7 @@
+import { firestore } from 'firebase-admin';
+import { FieldValue } from 'firebase-admin/firestore';
+import Timestamp = firestore.Timestamp;
+
 export enum UserRole {
     ADMIN = 'admin',
     USER = 'user',
@@ -49,7 +53,17 @@ export type QuestionAnswerValue = 'a' | 'b' | 'c' | 'd';
 export type Question = {
     uid: string;
     question: string;
-    answers: {[index in QuestionAnswerValue]: string},
+    answers: { [index in QuestionAnswerValue]: string },
     correct: QuestionAnswerValue,
-    value: number
+    value: number,
+    updatedAt: Timestamp | FieldValue;
+}
+
+export type CollectedQuestions = {
+    [uid: string]: {
+        answer: QuestionAnswerValue,
+        value: number,
+        correct: boolean,
+        collectedAt: Timestamp | FieldValue
+    }
 }

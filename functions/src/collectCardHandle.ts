@@ -1,14 +1,15 @@
 import { logger } from 'firebase-functions';
 import { CallableRequest, HttpsError } from 'firebase-functions/v2/https';
 import { FieldValue, getFirestore } from 'firebase-admin/firestore';
-import { Card, User } from './firestoreTypes';
+import { Card, CollectedQuestions, Question, User } from './firestoreTypes';
 
-export default async function collectCardHandle(request: CallableRequest) {
+export default async function collectCardHandle (request: CallableRequest) {
     if (!request.auth || !request.auth.uid) {
         logger.error('collectCardHandle', 'permission denied');
         throw new HttpsError('permission-denied', 'permission denied');
     }
 
+    // Does code looks right?
     const uid: string = request.auth.uid;
     let codeAttempt: string | null = request.data.code ?? null;
 
@@ -17,6 +18,7 @@ export default async function collectCardHandle(request: CallableRequest) {
         throw new HttpsError('invalid-argument', 'uid or code is null');
     }
 
+    // Does user exist?
     const db = getFirestore();
     const userRef = db.collection('users')
         .doc(uid);
@@ -27,6 +29,7 @@ export default async function collectCardHandle(request: CallableRequest) {
         throw new HttpsError('not-found', 'user uid does not exist');
     }
 
+    // Is card code valid?
     codeAttempt = codeAttempt.toUpperCase();
     const cardSnapshot = await db.collection('cards')
         .where('code', '==', codeAttempt)
@@ -38,6 +41,7 @@ export default async function collectCardHandle(request: CallableRequest) {
         throw new HttpsError('not-found', 'card code is invalid');
     }
 
+    // Was card already collected?
     const cardDoc = cardSnapshot.docs[0];
     const cardRef = cardDoc.ref;
 
@@ -51,6 +55,43 @@ export default async function collectCardHandle(request: CallableRequest) {
         throw new HttpsError('already-exists', 'card is already collected');
     }
 
+    // Question
+    let question: { uid: string, answers: { [uid: string]: string }, question: string, value: number } | null = null;
+    let questionRef: FirebaseFirestore.DocumentReference | null = null;
+    if (card.withQuestion || true) {
+        const collectedQuestionsDoc = await db.collection('users')
+            .doc(uid)
+            .collection('collectedQuestions')
+            .doc('collectedQuestions')
+            .get();
+
+        const collectedQuestions = collectedQuestionsDoc.data() as CollectedQuestions;
+        const alreadyCollected = collectedQuestions ? Object.keys(collectedQuestions) : [];
+
+        // Pseudorandom document fetch by sorting by last globally answered question
+        // on each access updatedAt timestamp must be updated
+        const questionDoc = await db.collection('questions')
+            .where('uid', 'not-in', alreadyCollected)
+            .orderBy('updatedAt', 'asc')
+            .limit(1)
+            .get();
+
+        if(questionDoc.docs[0]) {
+            const questionData = questionDoc.docs[0].data() as Question;
+            questionRef = questionDoc.docs[0].ref;
+
+            question = {
+                uid: questionData.uid,
+                answers: questionData.answers,
+                question: questionData.question,
+                value: questionData.value
+            };
+
+            logger.log(question);
+        }
+    }
+
+    // Collect the card
     const collectedCardRef = userRef.collection('collectedCards')
         .doc(card.uid);
 
@@ -97,6 +138,12 @@ export default async function collectCardHandle(request: CallableRequest) {
                     updatedAt: FieldValue.serverTimestamp()
                 }
             }, { merge: true });
+
+            if (question && questionRef) {
+                transaction.update(questionRef, {
+                    updatedAt: FieldValue.serverTimestamp()
+                });
+            }
         });
     } catch (error) {
         logger.error('collectCardHandle', 'error while collecting card: ' + error);
@@ -105,6 +152,7 @@ export default async function collectCardHandle(request: CallableRequest) {
 
     logger.log('collectCardHandle', user.username, `card code ${codeAttempt} is valid`);
     return {
-        card: (await collectedCardRef.get()).data()
+        card: (await collectedCardRef.get()).data(),
+        question: question
     };
 };
