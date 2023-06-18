@@ -9,6 +9,9 @@ import User from '@/models/User';
 import toast from 'react-hot-toast';
 import Panel from '@/components/Panel';
 import ScreenTitle from '@/components/ScreenTitle';
+import Button from '@/components/Button';
+import { router } from 'next/client';
+import { Page } from '@/Enum/Page';
 
 export default function EnterPage ({}) {
     const {
@@ -19,15 +22,32 @@ export default function EnterPage ({}) {
     return (
         <main className="grid grid-rows-layout items-center min-h-screen p-4">
             <Metatags title="Login page"/>
-            <ScreenTitle>Sesja</ScreenTitle>
-            <Panel title="Session">
-                {
-                    authUser
-                        ? (!userReady ? <UsernameForm authUser={authUser}/> : null)
-                        : <SignInButton/>
-                }
-                <SignOutButton/>
-            </Panel>
+            <ScreenTitle>Profil</ScreenTitle>
+            {
+                authUser && (
+                    <Panel title="Wyloguj">
+                        <p className="pb-4">Kliknij poniżej by wylogować się z aplikacji. Do zobaczenia!</p>
+                        {
+                            authUser
+                                ? (!userReady ? <UsernameForm authUser={authUser}/> : null)
+                                : <SignInButton/>
+                        }
+                        <Button onClick={() => auth.signOut()} className="w-full">Wyloguj</Button>
+                    </Panel>
+                )
+            }
+            {
+                !authUser && (
+                    <Panel title="Logowanie">
+                        <p className="pb-4">Wybierz metodę logowania.</p>
+                        {
+                            authUser
+                                ? (!userReady ? <UsernameForm authUser={authUser}/> : null)
+                                : <SignInButton/>
+                        }
+                    </Panel>
+                )
+            }
         </main>
     );
 }
@@ -35,17 +55,23 @@ export default function EnterPage ({}) {
 function SignInButton () {
     const signInWithGoogle = async () => {
         await signInWithPopup(auth, googleAuthProvider);
+        await router.push(Page.COLLECT);
     };
 
     return (
-        <button className="btn-google" onClick={signInWithGoogle}>
-            <img src={'/google.png'} alt="Google logo"/> Sign in with Google
-        </button>
+        <>
+            <Button onClick={signInWithGoogle} className="w-full mb-4">
+                <img src={'/google.png'} alt="Google logo" className="inline-block w-6 mr-2 relative bottom-0.5"/>
+                Zaloguj się kontem Google
+            </Button>
+            <Button className="w-full mb-4" disabled>
+                Zaloguj się adresem email
+            </Button>
+            <Button className="w-full" disabled>
+                Zaloguj się anonimowo
+            </Button>
+        </>
     );
-}
-
-function SignOutButton () {
-    return <button onClick={() => auth.signOut()}>Sign out</button>;
 }
 
 function UsernameForm ({

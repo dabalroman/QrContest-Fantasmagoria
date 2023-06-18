@@ -20,10 +20,11 @@ export default function LookForCodeComponent ({
         setValue,
         formState
     } = useForm({
-        mode: 'onChange'
+        mode: 'onChange',
+        defaultValues: {
+            'code': 'av'
+        }
     });
-
-    const { isValid } = formState;
 
     const collectCode = (data: any) => {
         setLoading(true);
@@ -83,7 +84,7 @@ export default function LookForCodeComponent ({
                     {formState.errors.code?.message && (
                         <p className="text-danger">{formState.errors.code?.message as string}</p>)}
 
-                    <Button type="submit" disabled={!isValid} className="w-full mt-3">
+                    <Button type="submit" className="w-full mt-3">
                         Potwierdź
                     </Button>
                 </form>
