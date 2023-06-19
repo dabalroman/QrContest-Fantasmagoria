@@ -6,6 +6,10 @@ const nextConfig = {
             {
                 source: '/collect/:code',
                 destination: '/collect'
+            },
+            {
+                source: '/collection/:cardId',
+                destination: '/collection'
             }
         ];
     }

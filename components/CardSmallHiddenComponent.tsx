@@ -11,7 +11,7 @@ export default function CardSmallHiddenComponent ({
                  + ' ' + className
              }
              style={{
-                 'backgroundImage': `url(cards/hidden.jpg)`,
+                 'backgroundImage': `url(/cards/hidden.jpg)`,
                  'height': '8.25rem',
                  'width': '5.5rem'
              }}

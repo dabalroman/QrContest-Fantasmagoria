@@ -3,7 +3,7 @@ import { Key } from 'react';
 
 export default function CardSmallComponent ({
     card,
-    key,
+    key = '',
     className = ''
 }: { card: Card, key?: Key, className?: string }) {
     return (
@@ -13,7 +13,7 @@ export default function CardSmallComponent ({
                  + ' ' + className
              }
              style={{
-                 'backgroundImage': `url(cards/${card.image}.png)`,
+                 'backgroundImage': `url(/cards/${card.image}.png)`,
                  'height': '8.25rem',
                  'width': '5.5rem'
              }}
