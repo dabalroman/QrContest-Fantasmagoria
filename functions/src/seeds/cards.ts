@@ -1,4 +1,4 @@
-import { Card, CardTier } from '../firestoreTypes';
+import { Card, CardTier, CardTierValue } from '../types/card';
 
 const cardsSeed: Card[] = [
     {
@@ -11,7 +11,7 @@ const cardsSeed: Card[] = [
         isActive: true,
         name: 'Azurnoctis',
         tier: CardTier.LEGENDARY,
-        value: 30,
+        value: CardTierValue.LEGENDARY,
         withQuestion: true
     }
 ];

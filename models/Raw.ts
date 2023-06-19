@@ -1,17 +1,27 @@
 import { CardTier } from '@/Enum/CardTier';
+import { StringMap, Uid } from '@/types/global';
+
+export type RawFirestoreTimestamp = { _seconds: number, _nanoseconds: number };
 
 export interface RawCard {
-    code: string | undefined,
-    collectedAt: { _seconds: number, _nanoseconds: number }
-    collectedBy: string[] | undefined,
     cardSet: string,
+    code: string | undefined,
+    collectedAt: RawFirestoreTimestamp,
+    collectedBy: string[] | undefined,
     description: string,
     image: string,
     isActive: boolean | undefined,
     name: string,
     score: number | undefined,
     tier: CardTier,
-    uid: string | undefined,
+    uid: Uid | undefined,
     value: number,
     withQuestion: boolean
+}
+
+export interface RawQuestion {
+    uid: string,
+    question: string,
+    answers: StringMap,
+    value: number
 }

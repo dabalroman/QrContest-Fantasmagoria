@@ -1,6 +1,6 @@
 import { useContext, useEffect } from 'react';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
-import { faHouse } from '@fortawesome/free-solid-svg-icons';
+import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 import { Page } from '@/Enum/Page';
 import { defaultNavbarCenterAction, NavbarCenterActionContext, NavbarCenterActionContextType } from '@/utils/context';
 
@@ -14,10 +14,12 @@ export default function useDynamicNavbar ({
     useEffect(() => {
         setNavbarCenterAction({
             href: href ?? Page.COLLECT,
-            icon: icon ?? faHouse,
+            icon: icon ?? faMagnifyingGlass,
             onClick: onClick ?? null
         });
 
         return () => setNavbarCenterAction(defaultNavbarCenterAction);
-    }, []);
+
+        // onClick in deps will cause infinite loop
+    }, [href, icon]);
 }

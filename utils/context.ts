@@ -5,7 +5,7 @@ import CollectionCache from '@/models/CollectionCache';
 import Card from '@/models/Card';
 import CardSet from '@/models/CardSet';
 import { Page } from '@/Enum/Page';
-import { faHouse } from '@fortawesome/free-solid-svg-icons';
+import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 import { NavbarCenterAction } from '@/components/Navbar/Navbar';
 
 export type AuthUser = FirebaseUser;
@@ -42,7 +42,7 @@ export const CardsCacheContext: Context<CardsCacheContextType> = createContext({
 
 // ---- NAVBAR ----
 export const defaultNavbarCenterAction: NavbarCenterAction = {
-    icon: faHouse,
+    icon: faMagnifyingGlass,
     onClick: null,
     href: Page.COLLECT
 };

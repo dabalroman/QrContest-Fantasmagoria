@@ -1,5 +1,5 @@
-import { Question } from '../firestoreTypes';
 import { FieldValue } from 'firebase-admin/firestore';
+import { Question } from '../types/question';
 
 const questionsSeed: Question[] = [
     {

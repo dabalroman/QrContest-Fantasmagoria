@@ -1,17 +1,15 @@
 import FirebaseModel from '@/models/FirebaseModel';
 import { DocumentSnapshot, SnapshotOptions } from '@firebase/firestore';
-import { FireDoc } from '@/Enum/FireDoc';
+import { Uid } from '@/types/global';
 
 export default class CardSet extends FirebaseModel {
-    path = FireDoc.CARD_SET;
-
-    uid: string;
+    uid: Uid;
     name: string;
     description: string;
     amountOfCards: number;
 
     constructor (
-        uid: string = '',
+        uid: Uid = '',
         name: string = '',
         description: string = '',
         amountOfCards: number = 0

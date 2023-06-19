@@ -5,11 +5,10 @@ import { FireDoc } from '@/Enum/FireDoc';
 import { CardTier, CardTierValue, getCardTierValue, isCardTier } from '@/Enum/CardTier';
 import kebabCase from 'lodash.kebabcase';
 import { RawCard } from '@/models/Raw';
+import { Uid } from '@/types/global';
 
 export default class Card extends FirebaseModel {
-    path = FireDoc.CARD;
-
-    uid: string;
+    uid: Uid;
     name: string;
     code: string | null;
     value: CardTierValue;
@@ -23,7 +22,7 @@ export default class Card extends FirebaseModel {
     collectedAt: Date | null;
 
     constructor (
-        uid: string | null = null,
+        uid: Uid | null = null,
         name: string = '',
         code: string | null = '',
         tier: CardTier = CardTier.COMMON,

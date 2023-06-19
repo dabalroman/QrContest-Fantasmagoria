@@ -1,7 +1,10 @@
 import { logger } from 'firebase-functions';
 import { CallableRequest, HttpsError } from 'firebase-functions/v2/https';
 import { FieldValue, getFirestore } from 'firebase-admin/firestore';
-import { Card, CollectedQuestions, Question, User } from './firestoreTypes';
+import { Card, CollectedCard } from './types/card';
+import { User } from './types/user';
+import { CollectedQuestions, PublicQuestion, Question } from './types/question';
+import { Ranking } from './types/ranking';
 
 export default async function collectCardHandle (request: CallableRequest) {
     if (!request.auth || !request.auth.uid) {
@@ -56,7 +59,7 @@ export default async function collectCardHandle (request: CallableRequest) {
     }
 
     // Question
-    let question: { uid: string, answers: { [uid: string]: string }, question: string, value: number } | null = null;
+    let question: PublicQuestion | null = null;
     let questionRef: FirebaseFirestore.DocumentReference | null = null;
     if (card.withQuestion || true) {
         const collectedQuestionsDoc = await db.collection('users')
@@ -86,8 +89,6 @@ export default async function collectCardHandle (request: CallableRequest) {
                 question: questionData.question,
                 value: questionData.value
             };
-
-            logger.log(question);
         }
     }
 
@@ -115,7 +116,7 @@ export default async function collectCardHandle (request: CallableRequest) {
                 question: null,
                 withQuestion: card.withQuestion,
                 collectedAt: FieldValue.serverTimestamp()
-            });
+            } as CollectedCard);
 
             transaction.update(userRef, {
                 score: userScore,
@@ -137,7 +138,7 @@ export default async function collectCardHandle (request: CallableRequest) {
                     amountOfCollectedCards: userCollectedCards,
                     updatedAt: FieldValue.serverTimestamp()
                 }
-            }, { merge: true });
+            } as Ranking, { merge: true });
 
             if (question && questionRef) {
                 transaction.update(questionRef, {
@@ -152,7 +153,7 @@ export default async function collectCardHandle (request: CallableRequest) {
 
     logger.log('collectCardHandle', user.username, `card code ${codeAttempt} is valid`);
     return {
-        card: (await collectedCardRef.get()).data(),
-        question: question
+        card: (await collectedCardRef.get()).data() as CollectedCard,
+        question: question as PublicQuestion
     };
 };

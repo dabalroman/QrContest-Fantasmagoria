@@ -12,8 +12,6 @@ export default class User extends FirebaseModel {
     role: UserRole;
     updatedAt: Date;
 
-    path = FireDoc.USERS;
-
     constructor (
         uid: string,
         username: string = '',

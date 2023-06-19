@@ -22,7 +22,10 @@ export default function AuthCheck ({ children }: { children: ReactNode }) {
             <Panel title="Zgubiłeś się, Potter?">
                 <div className={'w-full mt-2 mb-4 relative h-48'}>
                     <iframe src="https://giphy.com/embed/720g7C1jz13wI" width="100%" height="100%"
-                            style={{ 'position': 'absolute', 'border': 'none' }} className="giphy-embed"
+                            style={{
+                                'position': 'absolute',
+                                'border': 'none'
+                            }} className="giphy-embed"
                             allowFullScreen></iframe>
                 </div>
 

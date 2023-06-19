@@ -4,13 +4,17 @@ import { useEffect, useState } from 'react';
 import { collectCardFunction } from '@/utils/functions';
 import Button from '@/components/Button';
 import Card from '@/models/Card';
-import { RawCard } from '@/models/Raw';
+import Question from '@/models/Question';
 
 export default function LookForCodeComponent ({
     code = null,
     onCodeValid,
     onCodeInvalid
-}: { code?: string | null, onCodeValid: (card: Card) => void, onCodeInvalid: (error: Error) => void }) {
+}: {
+    code?: string | null,
+    onCodeValid: (card: Card, question: Question | null) => void,
+    onCodeInvalid: (error: Error) => void
+}) {
     const [loading, setLoading] = useState<boolean>(false);
 
     const {
@@ -28,15 +32,17 @@ export default function LookForCodeComponent ({
 
     const collectCode = (data: any) => {
         setLoading(true);
-        collectCardFunction({
-            code: data.code
-        })
+
+        collectCardFunction({ code: data.code })
             .then((result) => {
                 setLoading(false);
                 reset();
 
                 console.log(result.data);
-                onCodeValid(Card.fromRaw((result.data as any).card as RawCard));
+                onCodeValid(
+                    Card.fromRaw(result.data.card),
+                    result.data.question ? Question.fromRaw(result.data.question) : null
+                );
             })
             .catch((error) => {
                 setLoading(false);
@@ -60,11 +66,11 @@ export default function LookForCodeComponent ({
 
     return (
         <div>
-            <Panel title='Zeskanuj kod'>
+            <Panel title="Zeskanuj kod">
                 <p>Użyj aparatu lub aplikacji do skanowania i dołącz do pogoni za skarbami!</p>
             </Panel>
 
-            <Panel title='Wpisz kod ręcznie' loading={loading}>
+            <Panel title="Wpisz kod ręcznie" loading={loading}>
                 <p className="pb-2">Nie chcesz używać skanera skarbów? Wpisz kod tutaj.</p>
 
                 <form onSubmit={handleSubmit(collectCode)}>

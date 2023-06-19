@@ -1,9 +1,11 @@
 import { logger } from 'firebase-functions';
 import { CallableRequest, HttpsError } from 'firebase-functions/v2/https';
 import { getFirestore } from 'firebase-admin/firestore';
-import { Card, Question, User } from './firestoreTypes';
 import questionsSeed from './seeds/questions';
 import cardsSeed from './seeds/cards';
+import { Question } from './types/question';
+import { Card } from './types/card';
+import { User, UserRole } from './types/user';
 
 export default async function seedDatabaseHandle (request: CallableRequest) {
     if (!request.auth || !request.auth.uid) {
@@ -18,7 +20,7 @@ export default async function seedDatabaseHandle (request: CallableRequest) {
         .doc(uid);
     const userSnapshot = await userRef.get();
 
-    if (!userSnapshot.exists || (userSnapshot.data() as User).role !== 'admin') {
+    if (!userSnapshot.exists || (userSnapshot.data() as User).role !== UserRole.ADMIN) {
         logger.error('seedDatabaseHandle', 'permission denied');
         throw new HttpsError('permission-denied', 'permission denied');
     }
@@ -42,11 +44,11 @@ async function seedQuestions (db: FirebaseFirestore.Firestore) {
 }
 
 async function seedCards (db: FirebaseFirestore.Firestore) {
-    logger.log('seedDatabaseHandle', 'seeding questions');
+    logger.log('seedDatabaseHandle', 'seeding cards');
     cardsSeed.forEach((card: Card) => {
         db.collection('cards')
             .doc(card.uid)
             .set(card);
     });
-    logger.log('seedDatabaseHandle', 'seeding questions done');
+    logger.log('seedDatabaseHandle', 'seeding cards done');
 }

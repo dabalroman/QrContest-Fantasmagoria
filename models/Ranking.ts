@@ -1,9 +1,9 @@
 import FirebaseModel from '@/models/FirebaseModel';
 import { DocumentSnapshot, SnapshotOptions } from '@firebase/firestore';
-import { FireDoc } from '@/Enum/FireDoc';
+import { Uid } from '@/types/global';
 
 export type Record = {
-    uid: string,
+    uid: Uid,
     username: string,
     amountOfCollectedCards: number,
     score: number,
@@ -11,8 +11,6 @@ export type Record = {
 }
 
 export default class Ranking extends FirebaseModel {
-    path = FireDoc.RANKING;
-
     records: Record[] = [];
 
     constructor (
