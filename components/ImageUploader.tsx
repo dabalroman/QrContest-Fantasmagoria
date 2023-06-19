@@ -6,7 +6,7 @@ import { getDownloadURL, ref, uploadBytesResumable } from '@firebase/storage';
 export default function ImageUploader () {
     const [uploading, setUploading] = useState<boolean>(false);
     const [progress, setProgress] = useState<number>(0);
-    const [downloadURL, setDownloadURL] = useState<string|null>(null);
+    const [downloadURL, setDownloadURL] = useState<string | null>(null);
 
     //Upload image to firebase
     const uploadFile = async (e: ChangeEvent<HTMLInputElement>) => {
@@ -36,7 +36,7 @@ export default function ImageUploader () {
 
     return (
         <div className="box">
-            <Loader show={uploading}/>
+            {uploading && <Loader/>}
 
             {uploading && <h3>{progress}%</h3>}
 

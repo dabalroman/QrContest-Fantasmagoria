@@ -1,12 +1,13 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import Link from 'next/link';
+import { Page } from '@/Enum/Page';
 
 export default function NavbarSuperButton ({
     href,
     icon,
     onClick = null
-}: { href: string, icon: IconProp, onClick?: (() => void) | null }) {
+}: { href: Page | null, icon: IconProp, onClick?: (() => void) | null }) {
     const className =
         'p-4 text-4xl text-center text-button-brown border-4 border-button-brown rounded-full'
         + ' shadow-panel bg-gradient-button bottom-2 h-24 w-24 absolute flex justify-center'
@@ -22,7 +23,7 @@ export default function NavbarSuperButton ({
                 </div>
             )}
             {!onClick && (
-                <Link href={!onClick ? href : '#'}>
+                <Link href={href ? (href as string) : '#'}>
                     <div className={className} style={style}>
                         <FontAwesomeIcon icon={icon}/>
                     </div>
