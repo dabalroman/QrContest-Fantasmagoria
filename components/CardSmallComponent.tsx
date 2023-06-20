@@ -9,7 +9,7 @@ export default function CardSmallComponent ({
     return (
         <div key={key}
              className={
-                 'border-4 border-card-border rounded-xl bg-background relative bg-center bg-cover shadow-card'
+                 'border-4 border-card-border rounded-xl bg-background bg-center bg-cover shadow-card'
                  + ' ' + className
              }
              style={{

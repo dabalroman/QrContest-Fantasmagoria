@@ -6,7 +6,7 @@ import Button from '@/components/Button';
 import Card from '@/models/Card';
 import Question from '@/models/Question';
 
-export default function LookForCodeComponent ({
+export default function LookForCodeView ({
     code = null,
     onCodeValid,
     onCodeInvalid

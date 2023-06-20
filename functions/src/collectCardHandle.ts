@@ -69,7 +69,7 @@ export default async function collectCardHandle (request: CallableRequest) {
             .get();
 
         const collectedQuestions = collectedQuestionsDoc.data() as CollectedQuestions;
-        const alreadyCollected = collectedQuestions ? Object.keys(collectedQuestions) : [];
+        const alreadyCollected = collectedQuestions ? Object.keys(collectedQuestions) : ['empty-array'];
 
         // Pseudorandom document fetch by sorting by last globally answered question
         // on each access updatedAt timestamp must be updated

@@ -1,8 +1,6 @@
 import Metatags from '@/components/Metatags';
-import CollectCardComponent from '@/components/collect/CollectCardComponent';
 import Card from '@/models/Card';
 import ScreenTitle from '@/components/ScreenTitle';
-import LookForCodeComponent from '@/components/collect/LookForCodeComponent';
 import toast from 'react-hot-toast';
 import { useState } from 'react';
 import useCollectedCards from '@/hooks/useCollectedCards';
@@ -11,6 +9,9 @@ import Question from '@/models/Question';
 import { StringMap } from '@/types/global';
 import useDynamicNavbar from '@/hooks/useDynamicNavbar';
 import { faCheck, faMagnifyingGlass, faQuestion } from '@fortawesome/free-solid-svg-icons';
+import QuestionCardView from '@/components/collect/QuestionCardView';
+import LookForCodeView from '@/components/collect/LookForCodeView';
+import CollectCardView from '@/components/collect/CollectCardView';
 
 const collectErrorsDictionary: StringMap = {
     'card is already collected': 'Zebrałeś już tę kartę!',
@@ -53,10 +54,12 @@ export default function CollectPage () {
         <main className="grid grid-rows-layout items-center min-h-screen p-4">
             <Metatags title="Szukaj"/>
             <ScreenTitle>Szukaj</ScreenTitle>
+
             {!card &&
-                <LookForCodeComponent code={code} onCodeValid={onCodeValid} onCodeInvalid={onCodeInvalid}/>
+                <LookForCodeView code={code} onCodeValid={onCodeValid} onCodeInvalid={onCodeInvalid}/>
             }
-            {card && <CollectCardComponent card={card}/>}
+            {card && !question && <CollectCardView card={card}/>}
+            {card && question && <QuestionCardView card={card} question={question}/>}
         </main>
     );
 }
