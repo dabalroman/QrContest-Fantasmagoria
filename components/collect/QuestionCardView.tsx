@@ -1,20 +1,57 @@
 import Card from '@/models/Card';
 import Question from '@/models/Question';
-import Button from '@/components/Button';
+import Button, { ButtonState } from '@/components/Button';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDiceD6 } from '@fortawesome/free-solid-svg-icons';
 import CardSmallComponent from '@/components/CardSmallComponent';
 import { useState } from 'react';
+import { answerQuestionFunction } from '@/utils/functions';
+import { QuestionAnswerValue } from '@/functions/src/types/question';
 
 export default function QuestionCardView ({
     card,
-    question
-}: { card: Card, question: Question }) {
+    question,
+    onAnswerValid,
+    onAnswerInvalid
+}: {
+    card: Card,
+    question: Question,
+    onAnswerValid: (correct: boolean) => void,
+    onAnswerInvalid: (error: Error) => void
+}) {
+    const [loading, setLoading] = useState<boolean>(false);
+    const [answer, setAnswer] = useState<QuestionAnswerValue | null>(null);
+    const [correctAnswer, setCorrectAnswer] = useState<QuestionAnswerValue | null>(null);
+
     const [scrambledAnswers] = useState<string[][]>(
         Object.entries(question.answers)
             .sort(() => (Math.random() > 0.5 ? 1 : -1))
     );
-    const choice = (value: string) => console.log(value);
+
+    const answerQuestion = (selectedAnswer: QuestionAnswerValue) => {
+        if (answer !== null) {
+            return;
+        }
+
+        setLoading(true);
+        setAnswer(selectedAnswer);
+
+        answerQuestionFunction({
+            uid: question.uid,
+            answer: selectedAnswer
+        })
+            .then((result) => {
+                setLoading(false);
+                setCorrectAnswer(result.data.correctAnswer);
+                onAnswerValid(result.data.correct);
+            })
+            .catch((error) => {
+                setLoading(false);
+                onAnswerInvalid(error);
+            });
+    };
+
+    console.log(answer, correctAnswer);
 
     return (
         <div
@@ -41,10 +78,29 @@ export default function QuestionCardView ({
                     {question.question}
                 </p>
 
-                {scrambledAnswers.map(([value, answer]: string[]) => (
-                        <Button key={value} className="w-full mt-3" onClick={() => choice(value)}>{answer}</Button>
-                    )
-                )}
+                {scrambledAnswers.map(([answerKey, answerText]: string[]) => {
+                    let buttonState = loading ? ButtonState.DISABLED : ButtonState.ENABLED;
+
+                    console.log(answerKey, answerText, correctAnswer, answer);
+
+                    if (answerKey === correctAnswer) {
+                        buttonState = ButtonState.CORRECT;
+                    }
+
+                    if (answerKey === answer && answerKey !== correctAnswer) {
+                        buttonState = ButtonState.INCORRECT;
+                    }
+
+                    return (<Button
+                            key={answerKey}
+                            className={`w-full mt-3`}
+                            onClick={() => answerQuestion(answerKey as QuestionAnswerValue)}
+                            state={buttonState}
+                        >
+                            {answerText}
+                        </Button>
+                    );
+                })}
             </div>
         </div>
     );

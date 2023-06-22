@@ -7,19 +7,23 @@ import { defaultNavbarCenterAction, NavbarCenterActionContext, NavbarCenterActio
 export default function useDynamicNavbar ({
     href,
     icon,
-    onClick
-}: { href?: Page, icon?: IconProp, onClick?: () => void }) {
+    onClick,
+    disabled,
+    animate
+}: { href?: Page | string, icon?: IconProp, onClick?: () => void, disabled?: boolean, animate?: boolean }) {
     const { setNavbarCenterAction } = useContext<NavbarCenterActionContextType>(NavbarCenterActionContext);
 
     useEffect(() => {
         setNavbarCenterAction({
             href: href ?? Page.COLLECT,
             icon: icon ?? faMagnifyingGlass,
-            onClick: onClick ?? null
+            onClick: onClick ?? null,
+            disabled: disabled ?? false,
+            animate: animate ?? false
         });
 
         return () => setNavbarCenterAction(defaultNavbarCenterAction);
 
         // onClick in deps will cause infinite loop
-    }, [href, icon]);
+    }, [href, icon, disabled, animate]);
 }

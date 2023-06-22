@@ -18,15 +18,18 @@ export default function CardsSetComponent ({
             <div className="grid grid-cols-small-cards gap-4 justify-items-center py-4">
                 {cardsInSet
                     .map((card: Card) => (
-                        <Link href={`/collection/${card.uid}`} key={card.uid}>
+                        <Link href={`/collection/${card.uid}`} key={card.uid} id={card.uid}>
                             <CardSmallComponent card={card}/>
                         </Link>
                     ))
                 }
                 {
-                    Array(amountOfHiddenCards).fill(0).map((_, i) => (
-                        <CardSmallHiddenComponent key={i}/>
-                    ))
+                    amountOfHiddenCards > 0 &&
+                    Array(amountOfHiddenCards)
+                        .fill(0)
+                        .map((_, i) => (
+                            <CardSmallHiddenComponent key={i}/>
+                        ))
                 }
             </div>
             <p className="text-right">Zgromadzono {cardsInSet.length} z {cardSet.amountOfCards} kart</p>

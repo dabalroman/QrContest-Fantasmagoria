@@ -48,7 +48,7 @@ module.exports = {
                 background: '#C59251',
                 'background-transparent': 'rgba(197,146,81,0.9)',
                 'button-brown': '#4d2b00'
-            }
+            },
         }
     },
     plugins: []

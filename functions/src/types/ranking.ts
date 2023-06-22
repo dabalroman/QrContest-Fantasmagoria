@@ -7,6 +7,7 @@ export type Ranking = {
         username: string,
         score: number,
         amountOfCollectedCards: number,
+        amountOfAnsweredQuestions: number,
         updatedAt: Timestamp | FieldValue
     }
 }

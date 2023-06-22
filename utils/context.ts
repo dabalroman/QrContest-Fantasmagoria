@@ -44,7 +44,8 @@ export const CardsCacheContext: Context<CardsCacheContextType> = createContext({
 export const defaultNavbarCenterAction: NavbarCenterAction = {
     icon: faMagnifyingGlass,
     onClick: null,
-    href: Page.COLLECT
+    href: Page.COLLECT,
+    disabled: false
 };
 
 export interface NavbarCenterActionContextType {

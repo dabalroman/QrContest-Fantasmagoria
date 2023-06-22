@@ -14,6 +14,7 @@ service cloud.firestore {
                 && request.resource.data.uid == userId
                 && request.resource.data.score == 0
                 && request.resource.data.amountOfCollectedCards == 0
+                && request.resource.data.amountOfAnsweredQuestions == 0
                 && request.resource.data.role == 'user';
 
             allow update: if request.auth.uid == userId

@@ -61,12 +61,13 @@ export default async function collectCardHandle (request: CallableRequest) {
     // Question
     let question: PublicQuestion | null = null;
     let questionRef: FirebaseFirestore.DocumentReference | null = null;
+    let collectedQuestionsRef: FirebaseFirestore.DocumentReference = db.collection('users')
+        .doc(uid)
+        .collection('collectedQuestions')
+        .doc('collectedQuestions');
+
     if (card.withQuestion || true) {
-        const collectedQuestionsDoc = await db.collection('users')
-            .doc(uid)
-            .collection('collectedQuestions')
-            .doc('collectedQuestions')
-            .get();
+        const collectedQuestionsDoc = await collectedQuestionsRef.get();
 
         const collectedQuestions = collectedQuestionsDoc.data() as CollectedQuestions;
         const alreadyCollected = collectedQuestions ? Object.keys(collectedQuestions) : ['empty-array'];
@@ -79,7 +80,7 @@ export default async function collectCardHandle (request: CallableRequest) {
             .limit(1)
             .get();
 
-        if(questionDoc.docs[0]) {
+        if (questionDoc.docs[0]) {
             const questionData = questionDoc.docs[0].data() as Question;
             questionRef = questionDoc.docs[0].ref;
 
@@ -104,6 +105,7 @@ export default async function collectCardHandle (request: CallableRequest) {
 
     try {
         await db.runTransaction(async (transaction) => {
+            //Collect card
             transaction.create(collectedCardRef, {
                 cardSet: card.cardSet,
                 description: card.description,
@@ -118,12 +120,14 @@ export default async function collectCardHandle (request: CallableRequest) {
                 collectedAt: FieldValue.serverTimestamp()
             } as CollectedCard);
 
+            //Update user score and amount of collected cards
             transaction.update(userRef, {
                 score: userScore,
                 amountOfCollectedCards: userCollectedCards,
                 updatedAt: FieldValue.serverTimestamp()
             });
 
+            //Update card collectedBy
             transaction.update(cardRef, {
                 [`collectedBy.${uid}`]: {
                     username: user.username,
@@ -131,8 +135,9 @@ export default async function collectCardHandle (request: CallableRequest) {
                 }
             });
 
+            //Update ranking
             transaction.set(rankingRef, {
-                [`${uid}`]: {
+                [uid]: {
                     username: user.username,
                     score: userScore,
                     amountOfCollectedCards: userCollectedCards,
@@ -141,9 +146,19 @@ export default async function collectCardHandle (request: CallableRequest) {
             } as Ranking, { merge: true });
 
             if (question && questionRef) {
+                //Update question so the other users won't get it on next access
                 transaction.update(questionRef, {
                     updatedAt: FieldValue.serverTimestamp()
                 });
+
+                //Save that user tried to answer this question
+                transaction.set(collectedQuestionsRef, {
+                    [question.uid]: {
+                        answer: null,
+                        correct: false,
+                        value: 0
+                    }
+                }, { merge: true });
             }
         });
     } catch (error) {

@@ -7,7 +7,9 @@ import { IconProp } from '@fortawesome/fontawesome-svg-core';
 export type NavbarCenterAction = {
     icon: IconProp,
     onClick: (() => void) | null,
-    href: Page | null
+    href: Page | string | null,
+    disabled: boolean,
+    animate: boolean
 }
 
 export default function Navbar ({ navbarCenterAction }: { navbarCenterAction: NavbarCenterAction }) {
@@ -23,6 +25,8 @@ export default function Navbar ({ navbarCenterAction }: { navbarCenterAction: Na
                 href={navbarCenterAction.href}
                 icon={navbarCenterAction.icon}
                 onClick={navbarCenterAction.onClick}
+                disabled={navbarCenterAction.disabled}
+                animate={navbarCenterAction.animate}
             />
             <NavbarButton href={Page.RANKING} icon={faTrophy}/>
             <NavbarButton href={Page.ACCOUNT} icon={faUser}/>

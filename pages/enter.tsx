@@ -9,7 +9,7 @@ import User from '@/models/User';
 import toast from 'react-hot-toast';
 import Panel from '@/components/Panel';
 import ScreenTitle from '@/components/ScreenTitle';
-import Button from '@/components/Button';
+import Button, { ButtonState } from '@/components/Button';
 import { router } from 'next/client';
 import { Page } from '@/Enum/Page';
 
@@ -64,10 +64,10 @@ function SignInButton () {
                 <img src={'/google.png'} alt="Google logo" className="inline-block w-6 mr-2 relative bottom-0.5"/>
                 Zaloguj się kontem Google
             </Button>
-            <Button className="w-full mb-4" disabled>
+            <Button className="w-full mb-4" state={ButtonState.DISABLED}>
                 Zaloguj się adresem email
             </Button>
-            <Button className="w-full" disabled>
+            <Button className="w-full" state={ButtonState.DISABLED}>
                 Zaloguj się anonimowo
             </Button>
         </>

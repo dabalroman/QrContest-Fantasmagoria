@@ -9,5 +9,6 @@ export type User = {
     username: string,
     score: number,
     amountOfCollectedCards: number,
+    amountOfAnsweredQuestions: number,
     role: UserRole
 }
