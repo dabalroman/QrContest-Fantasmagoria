@@ -4,29 +4,45 @@ import Panel from '@/components/Panel';
 import { useContext, useEffect, useState } from 'react';
 import { UserContext, UserContextType } from '@/utils/context';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faDiceD6, faImagePortrait } from '@fortawesome/free-solid-svg-icons';
-import { doc, onSnapshot } from '@firebase/firestore';
+import { faDiceD6 } from '@fortawesome/free-solid-svg-icons';
+import { collection, onSnapshot, orderBy, query } from '@firebase/firestore';
 import { firestore } from '@/utils/firebase';
 import { FireDoc } from '@/Enum/FireDoc';
-import Ranking, { Record } from '@/models/Ranking';
+import RankingRound, { UserRankingRecord } from '@/models/RankingRound';
+import CurrentRoundPanel from '@/components/ranking/CurrentRoundPanel';
+import Button from '@/components/Button';
+import RoundRankingTable from '@/components/ranking/RoundRankingTable';
 
 export default function ScoreboardPage ({}) {
     const { user } = useContext<UserContextType>(UserContext);
     const [loading, setLoading] = useState(true);
-    const [ranking, setRanking] = useState<Ranking | null>(null);
+    const [rankingRounds, setRankingRounds] = useState<RankingRound[]>([]);
+    const [currentRound, setCurrentRound] = useState<RankingRound | null>(null);
 
     useEffect(() => {
+        const q = query(collection(firestore, FireDoc.RANKING), orderBy('from', 'asc'))
+            .withConverter(RankingRound.getConverter());
+
         return onSnapshot(
-            doc(firestore, FireDoc.RANKING, `${FireDoc.RANKING}-2`)
-                .withConverter(Ranking.getConverter()),
+            q,
             (snapshot) => {
-                setRanking(snapshot.data() as Ranking);
+                const rounds = snapshot.docs.map((doc) => doc.data() as RankingRound);
+                const currentRoundIndex =
+                    rounds.findIndex((round: RankingRound) => (round.to.getTime() >= (new Date()).getTime()));
+
+                setRankingRounds(rounds);
+                setCurrentRound(rounds[currentRoundIndex] ?? rounds[rounds.length - 1]);
                 setLoading(false);
             }
         );
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    const currentUserPlace: number = ranking?.records.findIndex((record: Record) => record.uid === user?.uid) ?? 1;
+    const currentUserPlace: number = currentRound?.users
+        .findIndex((record: UserRankingRecord) => record.uid === user?.uid) ?? -1;
+
+    const isCurrentRoundOver = currentRound && currentRound?.to.getTime() < (new Date()).getTime();
 
     return (
         <main className="grid grid-rows-layout items-center min-h-screen p-4">
@@ -34,35 +50,40 @@ export default function ScoreboardPage ({}) {
             <ScreenTitle>Ranking</ScreenTitle>
             <div>
                 <Panel title={user?.username ?? '...'} loading={loading} className="text-center">
-                    <p className="text-2xl">
+                    <p className="text-2xl mt-1">
                         <FontAwesomeIcon className="px-1" icon={faDiceD6} size="sm"/>{user?.score}
                     </p>
-                    <p>Zajmujesz {currentUserPlace + 1}. miejsce</p>
+                    <p className='mt-2'>
+                    {currentUserPlace !== -1
+                        ? `Jesteś na ${currentUserPlace + 1}. miejscu!`
+                        : `Nie brałeś/aś udziału w tej rundzie.`
+                    }
+                    </p>
                 </Panel>
-                <Panel title="Ranking" loading={loading}>
-                    <table className="w-full text-left">
-                        <thead>
-                            <tr className="text-text-half">
-                                <th>#</th>
-                                <th>Poszukiwacz</th>
-                                <th>Kolekcja</th>
-                                <th>Rubiki</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {ranking && ranking.records.map((record: Record, index: number) => (
-                                <tr key={index} className={record.uid === user?.uid ? 'font-bold' : ''}>
-                                    <td className="text-left">{index + 1}.</td>
-                                    <td>{record.username}</td>
-                                    <td>{record.amountOfCollectedCards}
-                                        <FontAwesomeIcon className="px-1" icon={faImagePortrait} size="sm"/>
-                                    </td>
-                                    <td><FontAwesomeIcon className="px-1" icon={faDiceD6} size="sm"/>{record.score}</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </Panel>
+
+                {currentRound &&
+                    <CurrentRoundPanel currentRound={currentRound} loading={loading}/>
+                }
+
+                <div className="flex justify-center gap-4">
+                    {rankingRounds.map((round: RankingRound) => (
+                        <Button key={round.uid} className="w-full" onClick={() => setCurrentRound(round)}>
+                            Runda {round.name}
+                        </Button>)
+                    )}
+                </div>
+
+                {currentRound && isCurrentRoundOver &&
+                    <Panel title="Zwycięzcy rundy" loading={loading}>
+                        <RoundRankingTable user={user} currentRound={currentRound} top3={true}/>
+                    </Panel>
+                }
+
+                {currentRound &&
+                    <Panel title="Ranking rundy" loading={loading}>
+                        <RoundRankingTable user={user} currentRound={currentRound}/>
+                    </Panel>
+                }
             </div>
         </main>
     );

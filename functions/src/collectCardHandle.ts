@@ -3,7 +3,7 @@ import { CallableRequest, HttpsError } from 'firebase-functions/v2/https';
 import { FieldValue, getFirestore } from 'firebase-admin/firestore';
 import { Card, CollectedCard } from './types/card';
 import { CollectedQuestions, PublicQuestion, Question } from './types/question';
-import prepareRankingRoundToUpdate from './actions/prepareRankingRoundToUpdate';
+import getRankingUpdateArray from './actions/getRankingUpdateArray';
 import getCurrentUser from './actions/getCurrentUser';
 
 export default async function collectCardHandle (request: CallableRequest) {
@@ -92,7 +92,7 @@ export default async function collectCardHandle (request: CallableRequest) {
     user.score += card.value;
     user.amountOfCollectedCards += 1;
 
-    const [rankingRoundRef, rankingRound] = await prepareRankingRoundToUpdate(db, user);
+    const rankingUpdateArray = await getRankingUpdateArray(db, user);
 
     try {
         await db.runTransaction(async (transaction) => {
@@ -127,7 +127,9 @@ export default async function collectCardHandle (request: CallableRequest) {
             });
 
             //Update ranking
-            transaction.set(rankingRoundRef, rankingRound, { merge: true });
+            rankingUpdateArray.forEach((rankingRound) => {
+                transaction.set(rankingRound.ref, rankingRound.round, { merge: true });
+            });
 
             //Questions
             if (question && questionRef) {

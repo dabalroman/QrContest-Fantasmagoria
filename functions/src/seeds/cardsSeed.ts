@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import { Card, CardTier, CardTierValue } from '../types/card';
 
 const cardsSeed: Card[] = [

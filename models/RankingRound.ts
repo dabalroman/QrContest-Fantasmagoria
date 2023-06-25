@@ -2,50 +2,64 @@ import FirebaseModel from '@/models/FirebaseModel';
 import { DocumentSnapshot, SnapshotOptions } from '@firebase/firestore';
 import { Uid } from '@/types/global';
 
-export type Record = {
+export type UserRankingRecord = {
     uid: Uid,
     username: string,
-    amountOfCollectedCards: number,
     score: number,
+    amountOfCollectedCards: number,
+    amountOfAnsweredQuestions: number,
     updatedAt: Date,
 }
 
-export default class Ranking extends FirebaseModel {
-    records: Record[] = [];
+export default class RankingRound extends FirebaseModel {
+    uid: Uid;
+    name: string;
+    from: Date;
+    to: Date;
+    users: UserRankingRecord[];
 
     constructor (
-        records: Record[]
+        uid: Uid,
+        name: string,
+        from: Date,
+        to: Date,
+        users: UserRankingRecord[]
     ) {
         super();
 
-        this.records = records;
+        this.uid = uid;
+        this.name = name;
+        this.from = from;
+        this.to = to;
+        this.users = users;
     }
 
-    protected static toFirestore (data: Ranking): object {
+    protected static toFirestore (data: RankingRound): object {
         throw new Error('Ranking is immutable.');
     }
 
     protected static fromFirestore (
         snapshot: DocumentSnapshot,
         options: SnapshotOptions
-    ): Ranking {
+    ): RankingRound {
         const data = snapshot.data(options);
 
         if (data === undefined) {
             throw new Error('Data undefined');
         }
 
-        const rankingEntries: Record[] = Object.entries(data.users)
-            .map(([uid, record]: [string, any]): Record => {
+        const rankingEntries: UserRankingRecord[] = Object.entries(data.users)
+            .map(([uid, record]: [string, any]): UserRankingRecord => {
                 return {
-                    uid: uid,
+                    uid,
                     username: record.username,
                     amountOfCollectedCards: record.amountOfCollectedCards,
+                    amountOfAnsweredQuestions: record.amountOfAnsweredQuestions,
                     score: record.score,
                     updatedAt: record.updatedAt.toDate()
                 };
             })
-            .sort((a: Record, b: Record) => {
+            .sort((a: UserRankingRecord, b: UserRankingRecord) => {
                 if (a.score > b.score) {
                     return -1;
                 }
@@ -65,7 +79,13 @@ export default class Ranking extends FirebaseModel {
                 return 0;
             });
 
-        return new Ranking(rankingEntries);
+        return new RankingRound(
+            data.uid,
+            data.name,
+            data.from.toDate(),
+            data.to.toDate(),
+            rankingEntries
+        );
     }
 }
 
