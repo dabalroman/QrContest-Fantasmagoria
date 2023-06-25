@@ -1,12 +1,13 @@
 import { logger } from 'firebase-functions';
 import { CallableRequest, HttpsError } from 'firebase-functions/v2/https';
 import { getFirestore } from 'firebase-admin/firestore';
-import questionsSeed from './seeds/questions';
-import cardsSeed from './seeds/cards';
+import questionsSeed from './seeds/questionsSeed';
+import cardsSeed from './seeds/cardsSeed';
 import { Question } from './types/question';
 import { Card } from './types/card';
 import { User, UserRole } from './types/user';
-import roundsSeed from './seeds/rounds';
+import rankingRoundsSeed from './seeds/rankingRoundsSeed';
+import { RankingRound } from './types/rankingRound';
 
 export default async function seedDatabaseHandle (request: CallableRequest) {
     if (!request.auth || !request.auth.uid) {
@@ -57,8 +58,10 @@ async function seedCards (db: FirebaseFirestore.Firestore) {
 
 async function seedRounds (db: FirebaseFirestore.Firestore) {
     logger.log('seedDatabaseHandle', 'seeding rounds');
-    await db.collection('ranking')
-        .doc('rounds')
-        .set(roundsSeed);
+    rankingRoundsSeed.forEach((round: RankingRound) => {
+        db.collection('ranking')
+            .doc(round.uid)
+            .set(round, { merge: true });
+    });
     logger.log('seedDatabaseHandle', 'seeding rounds done');
 }

@@ -2,7 +2,7 @@ import { logger } from 'firebase-functions';
 import { CallableRequest, HttpsError } from 'firebase-functions/v2/https';
 import { FieldValue, getFirestore } from 'firebase-admin/firestore';
 import { CollectedQuestions, Question } from './types/question';
-import prepareRankingToUpdate from './actions/prepareRankingToUpdate';
+import prepareRankingRoundToUpdate from './actions/prepareRankingRoundToUpdate';
 import getCurrentUser from './actions/getCurrentUser';
 
 export default async function answerQuestionHandle (request: CallableRequest) {
@@ -54,7 +54,7 @@ export default async function answerQuestionHandle (request: CallableRequest) {
     user.score += questionValue;
     user.amountOfAnsweredQuestions += 1;
 
-    const [rankingRef, ranking] = await prepareRankingToUpdate(db, user);
+    const [rankingRoundRef, rankingRound] = await prepareRankingRoundToUpdate(db, user);
 
     try {
         await db.runTransaction(async (transaction) => {
@@ -66,7 +66,7 @@ export default async function answerQuestionHandle (request: CallableRequest) {
             });
 
             //Update ranking
-            transaction.set(rankingRef, ranking, { merge: true });
+            transaction.set(rankingRoundRef, rankingRound, { merge: true });
 
             //Save user answered question
             transaction.set(collectedQuestionsRef, {
