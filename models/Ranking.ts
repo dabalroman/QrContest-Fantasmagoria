@@ -35,8 +35,8 @@ export default class Ranking extends FirebaseModel {
             throw new Error('Data undefined');
         }
 
-        const rankingEntries: Record[] = Object.entries(data)
-            .map(([uid, record]) => {
+        const rankingEntries: Record[] = Object.entries(data.users)
+            .map(([uid, record]: [string, any]): Record => {
                 return {
                     uid: uid,
                     username: record.username,

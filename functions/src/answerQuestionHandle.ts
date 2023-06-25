@@ -1,9 +1,9 @@
 import { logger } from 'firebase-functions';
 import { CallableRequest, HttpsError } from 'firebase-functions/v2/https';
 import { FieldValue, getFirestore } from 'firebase-admin/firestore';
-import { User } from './types/user';
 import { CollectedQuestions, Question } from './types/question';
-import { Ranking } from './types/ranking';
+import prepareRankingToUpdate from './actions/prepareRankingToUpdate';
+import getCurrentUser from './actions/getCurrentUser';
 
 export default async function answerQuestionHandle (request: CallableRequest) {
     if (!request.auth || !request.auth.uid) {
@@ -23,14 +23,7 @@ export default async function answerQuestionHandle (request: CallableRequest) {
 
     // Does user exist?
     const db = getFirestore();
-    const userRef = db.collection('users')
-        .doc(uid);
-    const userSnapshot = await userRef.get();
-
-    if (!userSnapshot.exists) {
-        logger.error('answerQuestionHandle', 'user uid does not exist');
-        throw new HttpsError('not-found', 'user uid does not exist');
-    }
+    const [userRef, user] = await getCurrentUser(db, uid);
 
     const collectedQuestionsRef: FirebaseFirestore.DocumentReference = db.collection('users')
         .doc(uid)
@@ -58,31 +51,22 @@ export default async function answerQuestionHandle (request: CallableRequest) {
     const questionCorrect = questionCorrectAnswer === questionAnswer;
     const questionValue = questionCorrect ? questionDoc.value : 0;
 
-    const user: User = userSnapshot.data() as User;
-    const userScore = user.score + questionValue;
-    const amountOfAnsweredQuestions = user.amountOfAnsweredQuestions + 1;
+    user.score += questionValue;
+    user.amountOfAnsweredQuestions += 1;
 
-    const rankingRef = db.collection('ranking')
-        .doc('ranking');
+    const [rankingRef, ranking] = await prepareRankingToUpdate(db, user);
 
     try {
         await db.runTransaction(async (transaction) => {
             //Update user score and amount of collected cards
             transaction.update(userRef, {
-                score: userScore,
-                amountOfAnsweredQuestions: amountOfAnsweredQuestions,
+                score: user.score,
+                amountOfAnsweredQuestions: user.amountOfAnsweredQuestions,
                 updatedAt: FieldValue.serverTimestamp()
             });
 
             //Update ranking
-            transaction.set(rankingRef, {
-                [uid]: {
-                    username: user.username,
-                    score: userScore,
-                    amountOfAnsweredQuestions: amountOfAnsweredQuestions,
-                    updatedAt: FieldValue.serverTimestamp()
-                }
-            } as Ranking, { merge: true });
+            transaction.set(rankingRef, ranking, { merge: true });
 
             //Save user answered question
             transaction.set(collectedQuestionsRef, {

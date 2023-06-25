@@ -2,9 +2,9 @@ import { logger } from 'firebase-functions';
 import { CallableRequest, HttpsError } from 'firebase-functions/v2/https';
 import { FieldValue, getFirestore } from 'firebase-admin/firestore';
 import { Card, CollectedCard } from './types/card';
-import { User } from './types/user';
 import { CollectedQuestions, PublicQuestion, Question } from './types/question';
-import { Ranking } from './types/ranking';
+import prepareRankingToUpdate from './actions/prepareRankingToUpdate';
+import getCurrentUser from './actions/getCurrentUser';
 
 export default async function collectCardHandle (request: CallableRequest) {
     if (!request.auth || !request.auth.uid) {
@@ -23,14 +23,7 @@ export default async function collectCardHandle (request: CallableRequest) {
 
     // Does user exist?
     const db = getFirestore();
-    const userRef = db.collection('users')
-        .doc(uid);
-    const userSnapshot = await userRef.get();
-
-    if (!userSnapshot.exists) {
-        logger.error('collectCardHandle', 'user uid does not exist');
-        throw new HttpsError('not-found', 'user uid does not exist');
-    }
+    const [userRef, user] = await getCurrentUser(db, uid);
 
     // Is card code valid?
     codeAttempt = codeAttempt.toUpperCase();
@@ -44,12 +37,11 @@ export default async function collectCardHandle (request: CallableRequest) {
         throw new HttpsError('not-found', 'card code is invalid');
     }
 
-    // Was card already collected?
+    // Is card already collected?
     const cardDoc = cardSnapshot.docs[0];
     const cardRef = cardDoc.ref;
 
     const card: Card = cardDoc.data() as Card;
-    const user: User = userSnapshot.data() as User;
 
     const isAlreadyCollected = card.collectedBy && uid in card.collectedBy;
 
@@ -97,11 +89,10 @@ export default async function collectCardHandle (request: CallableRequest) {
     const collectedCardRef = userRef.collection('collectedCards')
         .doc(card.uid);
 
-    const rankingRef = db.collection('ranking')
-        .doc('ranking');
+    user.score += card.value;
+    user.amountOfCollectedCards += 1;
 
-    const userScore = user.score + card.value;
-    const userCollectedCards = user.amountOfCollectedCards + 1;
+    const [rankingRef, ranking] = await prepareRankingToUpdate(db, user);
 
     try {
         await db.runTransaction(async (transaction) => {
@@ -122,8 +113,8 @@ export default async function collectCardHandle (request: CallableRequest) {
 
             //Update user score and amount of collected cards
             transaction.update(userRef, {
-                score: userScore,
-                amountOfCollectedCards: userCollectedCards,
+                score: user.score,
+                amountOfCollectedCards: user.amountOfCollectedCards,
                 updatedAt: FieldValue.serverTimestamp()
             });
 
@@ -136,15 +127,9 @@ export default async function collectCardHandle (request: CallableRequest) {
             });
 
             //Update ranking
-            transaction.set(rankingRef, {
-                [uid]: {
-                    username: user.username,
-                    score: userScore,
-                    amountOfCollectedCards: userCollectedCards,
-                    updatedAt: FieldValue.serverTimestamp()
-                }
-            } as Ranking, { merge: true });
+            transaction.set(rankingRef, ranking, { merge: true });
 
+            //Questions
             if (question && questionRef) {
                 //Update question so the other users won't get it on next access
                 transaction.update(questionRef, {

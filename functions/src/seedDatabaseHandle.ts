@@ -6,6 +6,7 @@ import cardsSeed from './seeds/cards';
 import { Question } from './types/question';
 import { Card } from './types/card';
 import { User, UserRole } from './types/user';
+import roundsSeed from './seeds/rounds';
 
 export default async function seedDatabaseHandle (request: CallableRequest) {
     if (!request.auth || !request.auth.uid) {
@@ -27,6 +28,7 @@ export default async function seedDatabaseHandle (request: CallableRequest) {
 
     await seedQuestions(db);
     await seedCards(db);
+    await seedRounds(db);
 
     return {
         status: 'ok'
@@ -51,4 +53,12 @@ async function seedCards (db: FirebaseFirestore.Firestore) {
             .set(card);
     });
     logger.log('seedDatabaseHandle', 'seeding cards done');
+}
+
+async function seedRounds (db: FirebaseFirestore.Firestore) {
+    logger.log('seedDatabaseHandle', 'seeding rounds');
+    await db.collection('ranking')
+        .doc('rounds')
+        .set(roundsSeed);
+    logger.log('seedDatabaseHandle', 'seeding rounds done');
 }

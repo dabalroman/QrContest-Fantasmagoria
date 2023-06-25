@@ -17,7 +17,7 @@ export default function ScoreboardPage ({}) {
 
     useEffect(() => {
         return onSnapshot(
-            doc(firestore, FireDoc.RANKING, FireDoc.RANKING)
+            doc(firestore, FireDoc.RANKING, `${FireDoc.RANKING}-2`)
                 .withConverter(Ranking.getConverter()),
             (snapshot) => {
                 setRanking(snapshot.data() as Ranking);

@@ -57,7 +57,7 @@ service cloud.firestore {
             allow delete: if false;
         }
 
-        match /ranking/ranking {
+        match /ranking/{ranking} {
             allow read: if request.auth != null;
 
             allow write: if false;
