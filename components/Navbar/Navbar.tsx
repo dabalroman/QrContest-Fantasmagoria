@@ -9,10 +9,29 @@ export type NavbarCenterAction = {
     onClick: (() => void) | null,
     href: Page | string | null,
     disabled: boolean,
-    animate: boolean
+    animate: boolean,
+    onlyCenter: boolean
 }
 
 export default function Navbar ({ navbarCenterAction }: { navbarCenterAction: NavbarCenterAction }) {
+    if (navbarCenterAction.onlyCenter) {
+        return (
+            <div
+                className={'grid align-center justify-items-center text-3xl'
+                    + ' bg-background-transparent bottom-0 fixed w-screen z-50'}
+            >
+                <NavbarSuperButton
+                    href={navbarCenterAction.href}
+                    icon={navbarCenterAction.icon}
+                    onClick={navbarCenterAction.onClick}
+                    disabled={navbarCenterAction.disabled}
+                    animate={navbarCenterAction.animate}
+                    onlyCenter={navbarCenterAction.onlyCenter}
+                />
+            </div>
+        );
+    }
+
     return (
         <div
             className={'grid align-center justify-items-center text-3xl'

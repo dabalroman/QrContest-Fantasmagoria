@@ -26,7 +26,7 @@ module.exports = {
                 'inner-input': 'inset 0 4px 4px rgba(0,0,0,0.15)'
             },
             gridTemplateRows: {
-                'layout': 'max-content minmax(0,1fr) 100px'
+                'layout': 'max-content minmax(0,1fr) 100px',
             },
             gridTemplateColumns: {
                 'small-cards': 'repeat(3, minmax(80px, 1fr))'

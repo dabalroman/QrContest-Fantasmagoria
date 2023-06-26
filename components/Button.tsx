@@ -40,14 +40,14 @@ export default function Button ({
 }: {
     children: ReactNode,
     onClick?: MouseEventHandler<HTMLButtonElement>,
+    className?: string
     type?: React.ButtonHTMLAttributes<HTMLButtonElement>['type'],
     state?: ButtonState,
-    className?: string
 }) {
     return (
         <button
             className={
-                'p-3 block text-center text-button-brown border-4 rounded-xl shadow-panel'
+                'p-2 block text-center text-button-brown border-4 rounded-xl shadow-panel'
                 + ' ' + stateToLookMap[state].class
                 + ' ' + className
             }

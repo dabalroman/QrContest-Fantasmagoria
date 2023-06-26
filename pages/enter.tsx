@@ -12,6 +12,8 @@ import ScreenTitle from '@/components/ScreenTitle';
 import Button, { ButtonState } from '@/components/Button';
 import { router } from 'next/client';
 import { Page } from '@/Enum/Page';
+import useDynamicNavbar from '@/hooks/useDynamicNavbar';
+import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 
 export default function EnterPage ({}) {
     const {
@@ -19,26 +21,35 @@ export default function EnterPage ({}) {
         userReady
     }: UserContextType = useContext(UserContext);
 
+    useDynamicNavbar({
+        onlyCenter: true,
+        icon: faArrowLeft,
+        onClick: () => router.back()
+    });
+
     return (
         <main className="grid grid-rows-layout items-center min-h-screen p-4">
             <Metatags title="Login page"/>
-            <ScreenTitle>Profil</ScreenTitle>
+            <ScreenTitle>{!authUser ? 'Zaloguj' : 'Wyloguj'}</ScreenTitle>
             {
                 authUser && (
-                    <Panel title="Wyloguj">
-                        <p className="pb-4">Kliknij poniżej by wylogować się z aplikacji. Do zobaczenia!</p>
+                    <Panel>
+                        <p className="pb-4">Kliknij by wylogować się z aplikacji. Do zobaczenia!</p>
                         {
                             authUser
                                 ? (!userReady ? <UsernameForm authUser={authUser}/> : null)
                                 : <SignInButton/>
                         }
-                        <Button onClick={() => auth.signOut()} className="w-full">Wyloguj</Button>
+                        <Button onClick={async () => {
+                            await router.push(Page.MAIN);
+                            await auth.signOut();
+                        }} className="w-full">Wyloguj</Button>
                     </Panel>
                 )
             }
             {
                 !authUser && (
-                    <Panel title="Logowanie">
+                    <Panel>
                         <p className="pb-4">Wybierz metodę logowania.</p>
                         {
                             authUser

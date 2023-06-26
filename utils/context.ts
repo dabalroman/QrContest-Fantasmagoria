@@ -45,7 +45,9 @@ export const defaultNavbarCenterAction: NavbarCenterAction = {
     icon: faMagnifyingGlass,
     onClick: null,
     href: Page.COLLECT,
-    disabled: false
+    disabled: false,
+    animate: false,
+    onlyCenter: false
 };
 
 export interface NavbarCenterActionContextType {

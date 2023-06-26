@@ -9,8 +9,16 @@ export default function useDynamicNavbar ({
     icon,
     onClick,
     disabled,
-    animate
-}: { href?: Page | string, icon?: IconProp, onClick?: () => void, disabled?: boolean, animate?: boolean }) {
+    animate,
+    onlyCenter
+}: {
+    href?: Page | string,
+    icon?: IconProp,
+    onClick?: () => void,
+    disabled?: boolean,
+    animate?: boolean,
+    onlyCenter?: boolean
+}) {
     const { setNavbarCenterAction } = useContext<NavbarCenterActionContextType>(NavbarCenterActionContext);
 
     useEffect(() => {
@@ -19,11 +27,12 @@ export default function useDynamicNavbar ({
             icon: icon ?? faMagnifyingGlass,
             onClick: onClick ?? null,
             disabled: disabled ?? false,
-            animate: animate ?? false
+            animate: animate ?? false,
+            onlyCenter: onlyCenter ?? false
         });
 
         return () => setNavbarCenterAction(defaultNavbarCenterAction);
 
         // onClick in deps will cause infinite loop
-    }, [href, icon, disabled, animate]);
+    }, [href, icon, disabled, animate, onlyCenter]);
 }

@@ -8,13 +8,15 @@ export default function NavbarSuperButton ({
     icon,
     onClick = null,
     disabled = false,
-    animate = false
+    animate = false,
+    onlyCenter = false
 }: {
     href: Page | string | null,
     icon: IconProp,
     onClick?: (() => void) | null,
     disabled?: boolean,
-    animate?: boolean
+    animate?: boolean,
+    onlyCenter?: boolean
 }) {
     const className =
         'p-4 text-4xl text-center border-4 rounded-full shadow-panel bg-gradient-button bottom-2 h-24 w-24'
@@ -26,27 +28,32 @@ export default function NavbarSuperButton ({
         + (animate ? ' animate-bounce' : '');
 
     const style = {
-        'background': (!disabled
+        background: (!disabled
             ? 'linear-gradient(135deg, #C59251 25%, #FCCE8A 50%, #C59251 75%)'
-            : 'linear-gradient(135deg, #8C8C8C 25%, #C2C2C2 50%, #8C8C8C 75%)')
+            : 'linear-gradient(135deg, #8C8C8C 25%, #C2C2C2 50%, #8C8C8C 75%)'),
+        bottom: (onlyCenter ? '-3rem' : '0'),
     };
+
+    const iconElement = onlyCenter
+        ? <FontAwesomeIcon className='relative bottom-5' icon={icon} size={'sm'}/>
+        : <FontAwesomeIcon icon={icon}/>;
 
     return (
         <div onClick={(onClick && !disabled) ? onClick : undefined} className="relative w-24">
             {disabled && (
                 <div className={className} style={style}>
-                    <FontAwesomeIcon icon={icon}/>
+                    {iconElement}
                 </div>
             )}
             {!disabled && onClick && (
                 <div className={className} style={style}>
-                    <FontAwesomeIcon icon={icon}/>
+                    {iconElement}
                 </div>
             )}
             {!disabled && !onClick && (
                 <Link href={href ? (href as string) : '#'}>
                     <div className={className} style={style}>
-                        <FontAwesomeIcon icon={icon}/>
+                        {iconElement}
                     </div>
                 </Link>
             )}
