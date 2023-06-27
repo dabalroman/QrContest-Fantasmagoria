@@ -1,14 +1,17 @@
 import Metatags from '@/components/Metatags';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import Button from '@/components/Button';
 import useDynamicNavbar from '@/hooks/useDynamicNavbar';
 import { faArrowDown, faArrowUp } from '@fortawesome/free-solid-svg-icons';
 import Panel from '@/components/Panel';
 import LinkButton from '@/components/LinkButton';
 import { Page } from '@/Enum/Page';
+import { UserContext, UserContextType } from '@/utils/context';
 
 export default function Home () {
     const [isTopOfThePage, setIsTopOfThePage] = useState<boolean>(true);
+
+    const { user } = useContext<UserContextType>(UserContext);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -28,6 +31,10 @@ export default function Home () {
         href: isTopOfThePage ? '#readme' : '#top'
     });
 
+    const actionButton = user
+        ? <LinkButton href={Page.COLLECT} className="w-full my-2">Przejdź do gry</LinkButton>
+        : <LinkButton href={Page.ENTER} className="w-full my-2">Zaloguj</LinkButton>;
+
     return (
         <main>
             <Metatags/>
@@ -37,7 +44,7 @@ export default function Home () {
                 id="top"
             >
                 <div className="p-4">
-                    <img src="/fantasmagoria-logo.svg" className="text-text-half" alt='Fantasmagoria Logo'/>
+                    <img src="/fantasmagoria-logo.svg" className="text-text-half" alt="Fantasmagoria Logo"/>
                 </div>
                 <div className={
                     'font-fancy text-center flex flex-col justify-center items-center h-64 p-4'
@@ -49,7 +56,7 @@ export default function Home () {
                     </h2>
                 </div>
                 <div className="absolute bottom-11 w-full p-4">
-                    <LinkButton href={Page.ENTER} className="w-full my-2">Zaloguj</LinkButton>
+                    {actionButton}
                 </div>
             </div>
             <div

@@ -1,4 +1,4 @@
-import { signInWithPopup } from '@firebase/auth';
+import { createUserWithEmailAndPassword, signInWithPopup } from '@firebase/auth';
 import { ChangeEvent, FormEvent, useCallback, useContext, useEffect, useState } from 'react';
 import { doc, getDoc } from '@firebase/firestore';
 import debounce from 'lodash.debounce';
@@ -13,7 +13,8 @@ import Button, { ButtonState } from '@/components/Button';
 import { router } from 'next/client';
 import { Page } from '@/Enum/Page';
 import useDynamicNavbar from '@/hooks/useDynamicNavbar';
-import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft, faEnvelope } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 export default function EnterPage ({}) {
     const {
@@ -27,61 +28,64 @@ export default function EnterPage ({}) {
         onClick: () => router.back()
     });
 
-    return (
-        <main className="grid grid-rows-layout items-center min-h-screen p-4">
-            <Metatags title="Login page"/>
-            <ScreenTitle>{!authUser ? 'Zaloguj' : 'Wyloguj'}</ScreenTitle>
-            {
-                authUser && (
-                    <Panel>
-                        <p className="pb-4">Kliknij by wylogować się z aplikacji. Do zobaczenia!</p>
-                        {
-                            authUser
-                                ? (!userReady ? <UsernameForm authUser={authUser}/> : null)
-                                : <SignInButton/>
-                        }
-                        <Button onClick={async () => {
-                            await router.push(Page.MAIN);
-                            await auth.signOut();
-                        }} className="w-full">Wyloguj</Button>
-                    </Panel>
-                )
-            }
-            {
-                !authUser && (
-                    <Panel>
-                        <p className="pb-4">Wybierz metodę logowania.</p>
-                        {
-                            authUser
-                                ? (!userReady ? <UsernameForm authUser={authUser}/> : null)
-                                : <SignInButton/>
-                        }
-                    </Panel>
-                )
-            }
-        </main>
-    );
-}
-
-function SignInButton () {
     const signInWithGoogle = async () => {
-        await signInWithPopup(auth, googleAuthProvider);
-        await router.push(Page.COLLECT);
+        try {
+            await signInWithPopup(auth, googleAuthProvider);
+        } catch (e) {
+            toast.error('Wystąpił błąd podczas logowania. Spróbuj ponownie.');
+        }
     };
 
-    return (
-        <>
+    const signInWithEmail = async () => {
+        try {
+            await createUserWithEmailAndPassword(auth, 'xxx@xx.xx', 'xxxxxx');
+        } catch (e) {
+            toast.error('Niepoprawny login lub hasło. Spróbuj ponownie.');
+            console.log(e);
+        }
+    };
+
+    const loginPanel = (
+        <Panel title={'Zaloguj się'}>
+            <p className="pb-2">Wybierz metodę logowania:</p>
             <Button onClick={signInWithGoogle} className="w-full mb-4">
                 <img src={'/google.png'} alt="Google logo" className="inline-block w-6 mr-2 relative bottom-0.5"/>
-                Zaloguj się kontem Google
+                Konto Google
             </Button>
-            <Button className="w-full mb-4" state={ButtonState.DISABLED}>
-                Zaloguj się adresem email
+            <Button onClick={signInWithEmail} className="w-full mb-4">
+                <FontAwesomeIcon icon={faEnvelope} className="mr-2"/>
+                Adres Email
             </Button>
-            <Button className="w-full" state={ButtonState.DISABLED}>
-                Zaloguj się anonimowo
-            </Button>
-        </>
+            <p className="text-center">Adres email nie wymaga potwierdzenia.</p>
+            <p className="mt-2">Biorąc udział w konkursie akceptujesz warunki regulaminu uczestnictwa.</p>
+        </Panel>
+    );
+
+    const logoutPanel = (
+        <Panel>
+            <p className="pb-4">Kliknij by wylogować się z aplikacji. <br/> Do zobaczenia!</p>
+            <Button onClick={async () => {
+                await router.push(Page.MAIN);
+                await auth.signOut();
+            }} className="w-full">Wyloguj</Button>
+        </Panel>
+    );
+
+    const nicknamePanel = (
+        <UsernameForm authUser={authUser as AuthUser}/>
+    );
+
+    return (
+        <main className="grid grid-rows-layout items-center min-h-screen p-4">
+            <Metatags title="Logowanie"/>
+            <ScreenTitle>{!(authUser && userReady) ? 'Zaloguj' : 'Wyloguj'}</ScreenTitle>
+
+            {authUser && userReady && logoutPanel}
+
+            {authUser && !userReady && nicknamePanel}
+
+            {!authUser && loginPanel}
+        </main>
     );
 }
 
@@ -92,13 +96,9 @@ function UsernameForm ({
     const [isValid, setIsValid] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(false);
 
-    const {
-        user
-    }: UserContextType = useContext(UserContext);
-
     const onChange = (e: ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value.toLowerCase();
-        const validation = /^[a-z0-9-.]{3,15}$/;
+        const validation = /^[a-z0-9-.]{3,20}$/;
 
         if (value.length < 3) {
             setUsername(value);
@@ -118,9 +118,10 @@ function UsernameForm ({
 
         try {
             await User.createAccount(authUser.uid, username);
+            await router.push(Page.COLLECT);
             toast.success('Rejestracja przebiegła pomyślnie!');
         } catch (e) {
-            toast.error('Rejestracja konta nie powiodła się, spróbuj ponownie.');
+            toast.error('Rejestracja nie powiodła się, spróbuj ponownie.');
         }
     };
 
@@ -141,22 +142,38 @@ function UsernameForm ({
     }, [checkUsername, username]);
 
     return (
-        (!user?.username || true) && (
+        <Panel title={'Wybierz swój nick'}>
             <section>
-                <h3>Choose username</h3>
+                <p className='text-justify'>
+                    Twój nick będzie widoczny dla innych.
+                    Użycie wulgarnego lub niecenzuralnego nicku spowoduje usunięcie konta.
+                </p>
                 <form onSubmit={onSubmit}>
-                    <input name="username" placeholder="username" value={username} onChange={onChange}/>
-                    <UsernameMessage username={username} isValid={isValid} loading={loading}/>
-                    <button type="submit" className="btn-green">Register</button>
+                    <input
+                        name="username"
+                        placeholder="Morning-Angel"
+                        value={username}
+                        onChange={onChange}
+                        className={'rounded block w-full p-1 border-2 border-input-border text-center mt-4' +
+                            ' bg-input-background text-text-light uppercase text-xl shadow-inner-input tracking-wider'}
+                    />
+                    <p className="py-2 text-center">
+                        {UsernameMessage({
+                            username,
+                            isValid,
+                            loading
+                        })}
+                    </p>
+                    <Button
+                        type="submit"
+                        className="w-full mt-2"
+                        state={isValid ? ButtonState.ENABLED : ButtonState.DISABLED}
+                    >
+                        Gotowe
+                    </Button>
                 </form>
-
-                <br/>
-                <p>Form value: {username}</p>
-                <p>Valid: {isValid.toString()}</p>
-                <p>Loading: {loading.toString()}</p>
             </section>
-        )
-        || <p>No.</p>
+        </Panel>
     );
 }
 
@@ -166,12 +183,12 @@ function UsernameMessage ({
     loading
 }: { username: string, isValid: boolean, loading: boolean }) {
     if (loading) {
-        return <p>Checking...</p>;
+        return 'Sprawdzanie...';
     } else if (isValid) {
-        return <p className="text-success">{username} is available!</p>;
+        return 'Ten nick jest dostępny!';
     } else if (username) {
-        return <p className="text-danger">That username is already taken!</p>;
+        return 'Ktoś już używa tego nick\'a!';
     }
 
-    return <p></p>;
+    return 'Wpisz swój nick.';
 }
