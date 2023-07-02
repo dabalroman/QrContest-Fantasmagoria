@@ -33,7 +33,12 @@ export default function Home () {
 
     const actionButton = user
         ? <LinkButton href={Page.COLLECT} className="w-full my-2">Przejdź do gry</LinkButton>
-        : <LinkButton href={Page.ENTER} className="w-full my-2">Zaloguj</LinkButton>;
+        : (
+            <div>
+                <LinkButton href={Page.LOGIN} className="w-full my-2">Zaloguj</LinkButton>
+                <LinkButton href={Page.REGISTER} className="w-full my-2">Zarejestruj</LinkButton>
+            </div>
+        );
 
     return (
         <main>

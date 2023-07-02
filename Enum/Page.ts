@@ -3,6 +3,10 @@ export enum Page {
     ACCOUNT = '/account',
     COLLECTION = '/collection',
     RANKING = '/ranking',
-    ENTER = '/enter',
-    MAIN = '/'
+    MAIN = '/',
+    LOGIN = '/auth/login',
+    LOGIN_EMAIL = '/auth/login-email',
+    REGISTER = '/auth/register',
+    REGISTER_EMAIL = '/auth/register-email',
+    ACCOUNT_SETUP = '/auth/account-setup'
 }

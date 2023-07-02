@@ -11,6 +11,9 @@ import Button from '@/components/Button';
 import { seedDatabaseFunction } from '@/utils/functions';
 import toast from 'react-hot-toast';
 import { HttpsCallableResult } from '@firebase/functions';
+import { Page } from '@/Enum/Page';
+import { router } from 'next/client';
+import { auth } from '@/utils/firebase';
 
 export default function AccountPage ({}) {
     const { user } = useContext<UserContextType>(UserContext);
@@ -55,11 +58,19 @@ export default function AccountPage ({}) {
                 </Panel>
 
                 <Panel title="Wyloguj">
-                    <p className="pb-4 text-justify"><b>Uwaga! </b>
-                        Jeżeli wybrałeś/aś logowanie anonimowe (bez konta Google lub maila),
-                        to ponowne zalogowanie się nie będzie możliwe.
+                    <p className="pb-4 text-justify">
+                        Kliknij tutaj, by wylogować się z aplikacji. Do zobaczenia!
                     </p>
-                    <LinkButton href={'/enter'}>Wyloguj</LinkButton>
+                    <Button
+                        onClick={async () => {
+                            await router.push(Page.MAIN);
+                            await auth.signOut();
+                            toast.success('Wylogowano pomyślnie.');
+                        }}
+                        className="w-full"
+                    >
+                        Wyloguj
+                    </Button>
                 </Panel>
             </div>
         </main>

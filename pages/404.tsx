@@ -1,8 +1,17 @@
 import ScreenTitle from '@/components/ScreenTitle';
 import Panel from '@/components/Panel';
 import LinkButton from '@/components/LinkButton';
+import useDynamicNavbar from '@/hooks/useDynamicNavbar';
+import { Page } from '@/Enum/Page';
+import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 
 export default function Custom404 () {
+    useDynamicNavbar({
+        href: Page.MAIN,
+        onlyCenter: true,
+        icon: faArrowLeft
+    });
+
     return (
         <main className="grid grid-rows-layout items-center min-h-screen p-4">
             <ScreenTitle>Ślepa uliczka</ScreenTitle>
@@ -16,7 +25,7 @@ export default function Custom404 () {
                             allowFullScreen></iframe>
                 </div>
 
-                <LinkButton href={'/'}>Uciekaj</LinkButton>
+                <LinkButton href={Page.MAIN}>Uciekaj</LinkButton>
             </Panel>
         </main>
     );
