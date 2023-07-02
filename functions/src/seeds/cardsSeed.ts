@@ -4,7 +4,7 @@ import { Card, CardTier, CardTierValue } from '../types/card';
 const cardsSeed: Card[] = [
     {
         uid: 'azurnoctis',
-        cardSet: 'mystic_creatures',
+        cardSet: 'magic-creatures',
         code: 'QWERTY1234',
         collectedBy: {},
         description: 'Fioletowy smok, o rogach niczym szafirowe obeliski, skrzydła rozpostarte szeroko jak północne zorze, tchnienie zimne jak najgłębsze odmęty oceanu, spoglądający na świat z tajemniczą łagodnością.',
@@ -17,7 +17,7 @@ const cardsSeed: Card[] = [
     },
     {
         uid: '0000000000',
-        cardSet: 'mystic_creatures',
+        cardSet: 'magic-creatures',
         code: '0000000000',
         collectedBy: {},
         description: '0000000000 Lorem ipsum dolor sit amet.',
@@ -30,7 +30,7 @@ const cardsSeed: Card[] = [
     },
     {
         uid: '0000000001',
-        cardSet: 'mystic_creatures',
+        cardSet: 'magic-creatures',
         code: '0000000001',
         collectedBy: {},
         description: '0000000001 Lorem ipsum dolor sit amet.',
@@ -43,7 +43,7 @@ const cardsSeed: Card[] = [
     },
     {
         uid: '0000000002',
-        cardSet: 'mystic_creatures',
+        cardSet: 'magic-creatures',
         code: '0000000002',
         collectedBy: {},
         description: '0000000002 Lorem ipsum dolor sit amet.',
@@ -56,7 +56,7 @@ const cardsSeed: Card[] = [
     },
     {
         uid: '0000000003',
-        cardSet: 'mystic_creatures',
+        cardSet: 'magic-creatures',
         code: '0000000003',
         collectedBy: {},
         description: '0000000003 Lorem ipsum dolor sit amet.',
@@ -69,7 +69,7 @@ const cardsSeed: Card[] = [
     },
     {
         uid: '0000000004',
-        cardSet: 'mystic_creatures',
+        cardSet: 'magic-creatures',
         code: '0000000004',
         collectedBy: {},
         description: '0000000004 Lorem ipsum dolor sit amet.',
@@ -82,7 +82,7 @@ const cardsSeed: Card[] = [
     },
     {
         uid: '0000000005',
-        cardSet: 'mystic_creatures',
+        cardSet: 'magic-creatures',
         code: '0000000005',
         collectedBy: {},
         description: '0000000005 Lorem ipsum dolor sit amet.',
@@ -95,7 +95,7 @@ const cardsSeed: Card[] = [
     },
     {
         uid: '0000000006',
-        cardSet: 'mystic_creatures',
+        cardSet: 'magic-creatures',
         code: '0000000006',
         collectedBy: {},
         description: '0000000006 Lorem ipsum dolor sit amet.',
@@ -108,7 +108,7 @@ const cardsSeed: Card[] = [
     },
     {
         uid: '0000000007',
-        cardSet: 'mystic_creatures',
+        cardSet: 'magic-creatures',
         code: '0000000007',
         collectedBy: {},
         description: '0000000007 Lorem ipsum dolor sit amet.',
@@ -121,7 +121,7 @@ const cardsSeed: Card[] = [
     },
     {
         uid: '0000000008',
-        cardSet: 'mystic_creatures',
+        cardSet: 'magic-creatures',
         code: '0000000008',
         collectedBy: {},
         description: '0000000008 Lorem ipsum dolor sit amet.',
@@ -134,7 +134,7 @@ const cardsSeed: Card[] = [
     },
     {
         uid: '0000000009',
-        cardSet: 'mystic_creatures',
+        cardSet: 'magic-creatures',
         code: '0000000009',
         collectedBy: {},
         description: '0000000009 Lorem ipsum dolor sit amet.',

@@ -8,6 +8,8 @@ import { Card } from './types/card';
 import { User, UserRole } from './types/user';
 import rankingRoundsSeed from './seeds/rankingRoundsSeed';
 import { RankingRound } from './types/rankingRound';
+import { CardSet } from './types/cardSet';
+import cardSetsSeed from './seeds/cardSetsSeed';
 
 export default async function seedDatabaseHandle (request: CallableRequest) {
     if (!request.auth || !request.auth.uid) {
@@ -29,6 +31,7 @@ export default async function seedDatabaseHandle (request: CallableRequest) {
 
     await seedQuestions(db);
     await seedCards(db);
+    await seedCardSets(db);
     await seedRounds(db);
 
     return {
@@ -54,6 +57,16 @@ async function seedCards (db: FirebaseFirestore.Firestore) {
             .set(card);
     });
     logger.log('seedDatabaseHandle', 'seeding cards done');
+}
+
+async function seedCardSets (db: FirebaseFirestore.Firestore) {
+    logger.log('seedDatabaseHandle', 'seeding card sets');
+    cardSetsSeed.forEach((cardSet: CardSet) => {
+        db.collection('cardSets')
+            .doc(cardSet.uid)
+            .set(cardSet);
+    });
+    logger.log('seedDatabaseHandle', 'seeding card sets done');
 }
 
 async function seedRounds (db: FirebaseFirestore.Firestore) {
