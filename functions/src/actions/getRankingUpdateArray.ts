@@ -3,6 +3,7 @@ import { firestore } from 'firebase-admin';
 import { User } from '../types/user';
 import { FieldValue } from 'firebase-admin/firestore';
 import Timestamp = firestore.Timestamp;
+import { logger } from 'firebase-functions';
 
 export type RankingUpdateObject = {
     ref: firestore.DocumentReference,
@@ -18,7 +19,7 @@ export default async function getRankingUpdateArray (
         .get();
 
     if (roundsSnapshot.docs.length == 0) {
-        throw new Error('No rounds found. Seed the database.');
+        logger.error('No rounds found. Seed the database.');
     }
 
     const roundsSnapshotsToUpdate = roundsSnapshot.docs.filter((roundSnapshot) => {

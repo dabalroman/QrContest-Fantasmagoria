@@ -13,4 +13,9 @@ export const answerQuestionFunction: HttpsCallable<
     { correct: boolean, correctAnswer: QuestionAnswerValue }
 > = httpsCallable(functions, 'answerquestion');
 
+export const setupAccountFunction: HttpsCallable<
+    { username: string },
+    {}
+> = httpsCallable(functions, 'setupaccount');
+
 export const seedDatabaseFunction = httpsCallable(functions, 'seeddatabase');

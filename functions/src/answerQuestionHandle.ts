@@ -80,14 +80,14 @@ export default async function answerQuestionHandle (request: CallableRequest) {
                 }
             }, { merge: true });
         });
+
+        logger.log('answerQuestionHandle', user.username, `question answer ${questionUid} registered`);
+        return {
+            correct: questionCorrect,
+            correctAnswer: questionCorrectAnswer
+        };
     } catch (error) {
         logger.error('answerQuestionHandle', 'error while answering the question: ' + error);
         throw new HttpsError('aborted', 'error while answering the question');
     }
-
-    logger.log('answerQuestionHandle', user.username, `question answer ${questionUid} registered`);
-    return {
-        correct: questionCorrect,
-        correctAnswer: questionCorrectAnswer
-    };
 };

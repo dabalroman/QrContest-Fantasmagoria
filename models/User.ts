@@ -1,8 +1,6 @@
 import FirebaseModel from '@/models/FirebaseModel';
-import { doc, DocumentSnapshot, SnapshotOptions, writeBatch } from '@firebase/firestore';
-import { firestore } from '@/utils/firebase';
+import { DocumentSnapshot, SnapshotOptions } from '@firebase/firestore';
 import { isUserRole, UserRole } from '@/Enum/UserRole';
-import { FireDoc } from '@/Enum/FireDoc';
 
 export default class User extends FirebaseModel {
     uid: string;
@@ -33,26 +31,8 @@ export default class User extends FirebaseModel {
         this.updatedAt = updatedAt;
     }
 
-    public static async createAccount (uid: string, username: string) {
-        const user = new User(uid, username);
-
-        const userDoc = doc(firestore, FireDoc.USERS, user.uid);
-        const usernameDoc = doc(firestore, FireDoc.USERS_USERNAMES, username);
-
-        return await writeBatch(firestore)
-            .set(userDoc, { ...user })
-            .set(usernameDoc, { uid: user.uid })
-            .commit();
-    }
-
     protected static toFirestore (data: User): object {
-        return {
-            uid: data.uid,
-            name: data.username,
-            score: data.score,
-            amountOfCollectedCards: data.amountOfCollectedCards,
-            role: data.role
-        };
+        throw new Error('User is immutable.');
     }
 
     protected static fromFirestore (

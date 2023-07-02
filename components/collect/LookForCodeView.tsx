@@ -67,11 +67,11 @@ export default function LookForCodeView ({
     return (
         <div>
             <Panel title="Zeskanuj kod">
-                <p>Użyj aparatu lub aplikacji do skanowania i dołącz do pogoni za skarbami!</p>
+                <p>Użyj aparatu lub aplikacji do skanowania kodów QR i zgarnij kartę do swojej kolekcji!</p>
             </Panel>
 
             <Panel title="Wpisz kod ręcznie" loading={loading}>
-                <p className="pb-2">Nie chcesz używać skanera skarbów? Wpisz kod tutaj.</p>
+                <p className="pb-2">Tutaj możesz wpisać znaleziony kod.</p>
 
                 <form onSubmit={handleSubmit(collectCode)}>
                     <input type="text" placeholder="ABCDEFGHIJ" maxLength={10}

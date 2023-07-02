@@ -10,6 +10,9 @@ import { faArrowLeft, faMagnifyingGlass } from '@fortawesome/free-solid-svg-icon
 import { useRouter } from 'next/router';
 import Card from '@/models/Card';
 import CollectedCardComponent from '@/components/collection/CollectedCardComponent';
+import Panel from '@/components/Panel';
+import LinkButton from '@/components/LinkButton';
+import { Page } from '@/Enum/Page';
 
 export default function CollectionPage ({}) {
     const {
@@ -37,6 +40,26 @@ export default function CollectionPage ({}) {
         icon: card ? faArrowLeft : faMagnifyingGlass
     });
 
+    const cardsToShow = cards && cardSets && cardSets?.get().length !== 0
+        ? (cardSets.get()
+            .map((cardSet: CardSet) =>
+                <CardsSetComponent
+                    key={cardSet.uid}
+                    cardSet={cardSet}
+                    cards={cards.get()}
+                />
+            ))
+        : (
+            <Panel title="Kolekcja jest pusta">
+                <p className="my-2">By zebrać kartę, zeskanuj kod QR lub przejdź do ekranu &quot;Szukaj&quot; i tam
+                    wpisz jej kod.</p>
+                <p className="my-2">Skąd wziąć kod? To dobre pytanie.</p>
+                <p>Kody zostały ukryte w różnych miejscach w budynku konwentu. Wciel się w rolę poszukiwacza, i spróbuj
+                    znaleźć je wszystkie!</p>
+                <LinkButton className='mt-4' href={Page.COLLECT}>Szukaj</LinkButton>
+            </Panel>
+        );
+
     return (
         <main className="grid grid-rows-layout items-center min-h-screen p-4">
             <Metatags title="Kolekcja"/>
@@ -45,17 +68,7 @@ export default function CollectionPage ({}) {
             {!loading && cards && cardSets && (
                 card
                     ? <CollectedCardComponent card={card}/>
-                    : <div>
-                        {cardSets.get()
-                            .map((cardSet: CardSet) =>
-                                <CardsSetComponent
-                                    key={cardSet.uid}
-                                    cardSet={cardSet}
-                                    cards={cards.get()}
-                                />
-                            )
-                        }
-                    </div>
+                    : <div>{cardsToShow}</div>
             )
             }
         </main>

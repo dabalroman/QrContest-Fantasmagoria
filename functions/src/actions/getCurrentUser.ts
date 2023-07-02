@@ -11,7 +11,7 @@ export default async function getCurrentUser (
     const userSnapshot = await userRef.get();
 
     if (!userSnapshot.exists) {
-        logger.error('collectCardHandle', 'user uid does not exist');
+        logger.error('getCurrentUser', 'user uid does not exist');
         throw new HttpsError('not-found', 'user uid does not exist');
     }
 

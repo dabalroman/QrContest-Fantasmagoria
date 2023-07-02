@@ -4,7 +4,6 @@ import debounce from 'lodash.debounce';
 import Metatags from '@/components/Metatags';
 import { UserContext, UserContextType } from '@/utils/context';
 import { auth, firestore } from '@/utils/firebase';
-import User from '@/models/User';
 import toast from 'react-hot-toast';
 import Panel from '@/components/Panel';
 import ScreenTitle from '@/components/ScreenTitle';
@@ -15,6 +14,7 @@ import useDynamicNavbar from '@/hooks/useDynamicNavbar';
 import { faArrowLeft, faCheck, faDiceD6, faX } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useForm } from 'react-hook-form';
+import { setupAccountFunction } from '@/utils/functions';
 
 export default function AccountSetupPage () {
     const [loading, setLoading] = useState<boolean>(false);
@@ -75,7 +75,7 @@ export default function AccountSetupPage () {
 
         setLoading(true);
         try {
-            await User.createAccount(authUser.uid, data.username);
+            await setupAccountFunction({ username: data.username });
             toast.success('Rejestracja przebiegła pomyślnie!');
             await router.push(Page.COLLECT);
             setLoading(false);

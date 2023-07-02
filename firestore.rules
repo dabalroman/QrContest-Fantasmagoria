@@ -9,21 +9,7 @@ service cloud.firestore {
         match /users/{userId} {
             allow read: if request.auth != null && request.auth.uid == userId;
 
-            allow create: if request.auth.uid == userId
-                && !exists(/databases/$(database)/documents/users/$(userId))
-                && request.resource.data.uid == userId
-                && request.resource.data.score == 0
-                && request.resource.data.amountOfCollectedCards == 0
-                && request.resource.data.amountOfAnsweredQuestions == 0
-                && request.resource.data.role == 'user';
-
-            allow update: if request.auth.uid == userId
-                && request.resource.data.uid == userId
-                && request.resource.data.score == resource.data.score
-                && request.resource.data.role == resource.data.role
-                && request.resource.data.username == resource.data.username;
-
-            allow delete: if false;
+            allow write: if false;
 
             match /collectedCards/{cardId} {
                 allow read: if request.auth != null
@@ -36,10 +22,7 @@ service cloud.firestore {
         match /users-usernames/{username} {
             allow read: if request.auth != null;
 
-            allow create: if request.resource.data.uid == request.auth.uid
-                && !exists(/databases/$(database)/documents/users-usernames/$(username));
-
-            allow update, delete: if false;
+            allow write: if false;
         }
 
         match /cards/{cardId} {
@@ -52,9 +35,7 @@ service cloud.firestore {
         match /cardSets/{cardSet} {
             allow read: if request.auth != null;
 
-            allow create, update: if request.auth != null && isUserAdmin();
-
-            allow delete: if false;
+            allow write: if false;
         }
 
         match /ranking/{ranking} {
@@ -62,29 +43,5 @@ service cloud.firestore {
 
             allow write: if false;
         }
-
-        //   function immutableFields(documentType) {
-        //     let fieldConfigs = {
-        //       'user': ['role'],
-        //       'card': [],
-        //       'card-user': []
-        //     };
-
-        //     return fieldConfigs[documentType];
-        //   }
-
-        //   function immutableUserCheck() {
-        //   	return request.resource.data['role'] != resource.data['role'];
-        //   }
-
-        //     match /cards/{cardId} {
-        //       allow read, write: if immutableSecurityCheck('card') &&
-        //                          allowedFieldsCheck('card', request.resource.data);
-        //     }
-
-        //     match /card-user/{relationId} {
-        //       allow read, write: if immutableSecurityCheck('card-user') &&
-        //                          allowedFieldsCheck('card-user', request.resource.data);
-        //     }
     }
 }

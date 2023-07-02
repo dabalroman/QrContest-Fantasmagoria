@@ -148,14 +148,14 @@ export default async function collectCardHandle (request: CallableRequest) {
                 }, { merge: true });
             }
         });
+
+        logger.log('collectCardHandle', user.username, `card code ${codeAttempt} is valid`);
+        return {
+            card: (await collectedCardRef.get()).data() as CollectedCard,
+            question: question as PublicQuestion
+        };
     } catch (error) {
         logger.error('collectCardHandle', 'error while collecting card: ' + error);
         throw new HttpsError('aborted', 'error while collecting card');
     }
-
-    logger.log('collectCardHandle', user.username, `card code ${codeAttempt} is valid`);
-    return {
-        card: (await collectedCardRef.get()).data() as CollectedCard,
-        question: question as PublicQuestion
-    };
 };
