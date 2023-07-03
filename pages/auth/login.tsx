@@ -7,14 +7,15 @@ import toast from 'react-hot-toast';
 import Panel from '@/components/Panel';
 import ScreenTitle from '@/components/ScreenTitle';
 import Button from '@/components/Button';
-import { router } from 'next/client';
 import { Page } from '@/Enum/Page';
 import useDynamicNavbar from '@/hooks/useDynamicNavbar';
 import { faArrowLeft, faEnvelope } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import LinkButton from '@/components/LinkButton';
+import { useRouter } from 'next/router';
 
 export default function LoginPage () {
+    const router = useRouter();
     const [loading, setLoading] = useState<boolean>(false);
 
     const {
@@ -46,7 +47,7 @@ export default function LoginPage () {
             router.push(userReady ? Page.COLLECT : Page.ACCOUNT_SETUP)
                 .then();
         }
-    }, [userReady, authUser]);
+    }, [userReady, authUser, router]);
 
     return (
         <main className="grid grid-rows-layout items-center min-h-screen p-4">

@@ -12,10 +12,11 @@ import { seedDatabaseFunction } from '@/utils/functions';
 import toast from 'react-hot-toast';
 import { HttpsCallableResult } from '@firebase/functions';
 import { Page } from '@/Enum/Page';
-import { router } from 'next/client';
 import { auth } from '@/utils/firebase';
+import { useRouter } from 'next/router';
 
-export default function AccountPage ({}) {
+export default function AccountPage () {
+    const router = useRouter();
     const { user } = useContext<UserContextType>(UserContext);
 
     const AdminSection = () => (

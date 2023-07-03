@@ -1,49 +1,50 @@
 {
-  "firestore": {
-    "rules": "firestore.rules",
-    "indexes": "firestore.indexes.json"
-  },
-  "emulators": {
-    "singleProjectMode": true,
-    "auth": {
-      "port": 9099,
-      "host": "0.0.0.0"
-    },
     "firestore": {
-      "port": 8080,
-      "host": "0.0.0.0"
+        "rules": "firestore.rules",
+        "indexes": "firestore.indexes.json"
     },
-    "functions": {
-      "host": "0.0.0.0"
+    "emulators": {
+        "singleProjectMode": true,
+        "auth": {
+            "port": 9099,
+            "host": "0.0.0.0"
+        },
+        "firestore": {
+            "port": 8080,
+            "host": "0.0.0.0"
+        },
+        "functions": {
+            "host": "0.0.0.0"
+        },
+        "ui": {
+            "enabled": true
+        }
     },
-    "ui": {
-      "enabled": true
-    }
-  },
-  "functions": [
-    {
-      "source": "functions",
-      "codebase": "default",
-      "ignore": [
-        "node_modules",
-        ".git",
-        "firebase-debug.log",
-        "firebase-debug.*.log"
-      ],
-      "predeploy": [
-        "npm --prefix \"$RESOURCE_DIR\" run build"
-      ]
-    }
-  ],
-  "hosting": {
-    "source": ".",
-    "ignore": [
-      "firebase.json",
-      "**/.*",
-      "**/node_modules/**"
+    "functions": [
+        {
+            "source": "functions",
+            "codebase": "default",
+            "ignore": [
+                "node_modules",
+                ".git",
+                "firebase-debug.log",
+                "firebase-debug.*.log"
+            ],
+            "predeploy": [
+                "npm --prefix \"$RESOURCE_DIR\" run build"
+            ]
+        }
     ],
-    "frameworksBackend": {
-      "region": "europe-west1"
+    "hosting": {
+        "source": ".",
+        "ignore": [
+            "firebase.json",
+            "**/.*",
+            "**/node_modules/**"
+        ],
+        "frameworksBackend": {
+            "region": "europe-west1",
+            "maxInstances": 10
+        }
     }
-  }
 }

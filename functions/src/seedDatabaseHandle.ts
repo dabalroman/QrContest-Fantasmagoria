@@ -1,23 +1,25 @@
-import { logger } from 'firebase-functions';
-import { CallableRequest, HttpsError } from 'firebase-functions/v2/https';
+import { https, logger } from 'firebase-functions';
 import { getFirestore } from 'firebase-admin/firestore';
-import questionsSeed from './seeds/questionsSeed';
-import cardsSeed from './seeds/cardsSeed';
 import { Question } from './types/question';
 import { Card } from './types/card';
 import { User, UserRole } from './types/user';
-import rankingRoundsSeed from './seeds/rankingRoundsSeed';
 import { RankingRound } from './types/rankingRound';
 import { CardSet } from './types/cardSet';
+import rankingRoundsSeed from './seeds/rankingRoundsSeed';
 import cardSetsSeed from './seeds/cardSetsSeed';
+import questionsSeed from './seeds/questionsSeed';
+import cardsSeed from './seeds/cardsSeed';
 
-export default async function seedDatabaseHandle (request: CallableRequest) {
-    if (!request.auth || !request.auth.uid) {
+export default async function seedDatabaseHandle (
+    data: any,
+    context: https.CallableContext
+): Promise<{}> {
+    if (!context.auth || !context.auth.uid) {
         logger.error('seedDatabaseHandle', 'permission denied');
-        throw new HttpsError('permission-denied', 'permission denied');
+        throw new https.HttpsError('permission-denied', 'permission denied');
     }
 
-    const uid: string = request.auth.uid;
+    const uid: string = context.auth.uid;
 
     const db = getFirestore();
     const userRef = db.collection('users')
@@ -26,7 +28,7 @@ export default async function seedDatabaseHandle (request: CallableRequest) {
 
     if (!userSnapshot.exists || (userSnapshot.data() as User).role !== UserRole.ADMIN) {
         logger.error('seedDatabaseHandle', 'permission denied');
-        throw new HttpsError('permission-denied', 'permission denied');
+        throw new https.HttpsError('permission-denied', 'permission denied');
     }
 
     await seedQuestions(db);

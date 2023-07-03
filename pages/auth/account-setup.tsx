@@ -8,20 +8,21 @@ import toast from 'react-hot-toast';
 import Panel from '@/components/Panel';
 import ScreenTitle from '@/components/ScreenTitle';
 import Button from '@/components/Button';
-import { router } from 'next/client';
 import { Page } from '@/Enum/Page';
 import useDynamicNavbar from '@/hooks/useDynamicNavbar';
 import { faArrowLeft, faCheck, faDiceD6, faX } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useForm } from 'react-hook-form';
 import { setupAccountFunction } from '@/utils/functions';
+import { useRouter } from 'next/router';
 
 export default function AccountSetupPage () {
+    const router = useRouter();
+    const { authUser }: UserContextType = useContext(UserContext);
+
     const [loading, setLoading] = useState<boolean>(false);
     const [checking, setChecking] = useState<boolean>(false);
     const [isValid, setIsValid] = useState<boolean>(false);
-
-    const { authUser }: UserContextType = useContext(UserContext);
 
     useDynamicNavbar({
         onlyCenter: true,
@@ -29,10 +30,12 @@ export default function AccountSetupPage () {
         onClick: () => router.back()
     });
 
-    if (!authUser) {
-        router.push(Page.MAIN)
-            .then();
-    }
+    useEffect(() => {
+        if (!authUser) {
+            router.push(Page.MAIN)
+                .then();
+        }
+    }, [authUser, router]);
 
     const {
         register,

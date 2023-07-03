@@ -1,15 +1,13 @@
-import { initializeApp } from 'firebase-admin/app';
-import { onCall } from 'firebase-functions/v2/https';
-import collectCardHandle from './collectCardHandle';
+import * as functions from 'firebase-functions';
+import * as admin from 'firebase-admin';
 import seedDatabaseHandle from './seedDatabaseHandle';
-import answerQuestionHandle from './answerQuestionHandle';
-import setupAccountHandle from './setupAccountHandle';
 
-initializeApp();
+admin.initializeApp();
 
-exports.collectcard = onCall(collectCardHandle);
-exports.answerquestion = onCall(answerQuestionHandle);
-exports.setupaccount = onCall(setupAccountHandle);
-
-exports.seeddatabase = onCall(seedDatabaseHandle);
-
+// exports.collectcard = onCall(collectCardHandle);
+// exports.answerquestion = onCall(answerQuestionHandle);
+// exports.setupaccount = functions.region('europe-west1').https.onCall(setupAccountHandle);
+exports.seeddatabase =
+    functions.region('europe-west1')
+        .https
+        .onCall(seedDatabaseHandle);

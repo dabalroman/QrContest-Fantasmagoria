@@ -9,11 +9,12 @@ import Metatags from '@/components/Metatags';
 import ScreenTitle from '@/components/ScreenTitle';
 import useDynamicNavbar from '@/hooks/useDynamicNavbar';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
-import { router } from 'next/client';
 import { Page } from '@/Enum/Page';
 import { UserContext, UserContextType } from '@/utils/context';
+import { useRouter } from 'next/router';
 
 export default function LoginEmail () {
+    const router = useRouter();
     const [loading, setLoading] = useState<boolean>(false);
 
     useDynamicNavbar({
@@ -59,7 +60,7 @@ export default function LoginEmail () {
         if(authUser) {
             router.push(userReady ? Page.COLLECT : Page.ACCOUNT_SETUP).then();
         }
-    }, [userReady, authUser]);
+    }, [userReady, authUser, router]);
 
     return (
         <main className="grid grid-rows-layout items-center min-h-screen p-4">
