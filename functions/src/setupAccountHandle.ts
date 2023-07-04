@@ -1,22 +1,24 @@
-import { logger } from 'firebase-functions';
-import { CallableRequest, HttpsError } from 'firebase-functions/v2/https';
+import { https, logger } from 'firebase-functions';
 import { FieldValue, getFirestore } from 'firebase-admin/firestore';
 import { User, UserRole } from './types/user';
 import getRankingUpdateArray from './actions/getRankingUpdateArray';
 
-export default async function setupAccountHandle (request: CallableRequest) {
-    if (!request.auth || !request.auth.uid) {
+export default async function setupAccountHandle (
+    data: any,
+    context: https.CallableContext
+): Promise<{user: User}> {
+    if (!context.auth || !context.auth.uid) {
         logger.error('setupAccountHandle', 'permission denied');
-        throw new HttpsError('permission-denied', 'permission denied');
+        throw new https.HttpsError('permission-denied', 'permission denied');
     }
 
     // Does username looks right?
-    const uid: string = request.auth.uid;
-    let username: string | null = request.data.username ?? null;
+    const uid: string = context.auth.uid;
+    let username: string | null = data.username ?? null;
 
     if (typeof username !== 'string' || username.length < 3) {
         logger.error('setupAccountHandle', 'username does not meet requirements');
-        throw new HttpsError('invalid-argument', 'username does not meet requirements');
+        throw new https.HttpsError('invalid-argument', 'username does not meet requirements');
     }
 
     // Does user exist?
@@ -27,7 +29,7 @@ export default async function setupAccountHandle (request: CallableRequest) {
 
     if (userExist) {
         logger.error('setupAccountHandle', 'user uid exist already');
-        throw new HttpsError('invalid-argument', 'user uid exist already');
+        throw new https.HttpsError('invalid-argument', 'user uid exist already');
     }
 
     // Is username free to take?
@@ -37,7 +39,7 @@ export default async function setupAccountHandle (request: CallableRequest) {
 
     if (usernameTaken) {
         logger.error('setupAccountHandle', 'nickname already taken');
-        throw new HttpsError('invalid-argument', 'nickname already taken');
+        throw new https.HttpsError('invalid-argument', 'nickname already taken');
     }
 
     const user: User = {
@@ -68,6 +70,6 @@ export default async function setupAccountHandle (request: CallableRequest) {
         return { user };
     } catch (error) {
         logger.error('setupAccountHandle', 'error while registering the user: ' + error);
-        throw new HttpsError('aborted', 'error while registering the user');
+        throw new https.HttpsError('aborted', 'error while registering the user');
     }
 };

@@ -19,7 +19,7 @@ export const auth: Auth = getAuth(firebaseApp);
 export const googleAuthProvider: GoogleAuthProvider = new GoogleAuthProvider();
 export const firestore: Firestore = getFirestore(firebaseApp);
 export const storage: FirebaseStorage = getStorage(firebaseApp);
-export const functions = getFunctions(firebaseApp);
+export const functions = getFunctions(firebaseApp, configuration.firebase.region);
 
 if (configuration.emulator) {
     console.log(configuration.emulatorHost + ':' + configuration.emulatorAuthPort);

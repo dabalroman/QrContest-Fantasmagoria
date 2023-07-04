@@ -1,24 +1,27 @@
-import { logger } from 'firebase-functions';
-import { CallableRequest, HttpsError } from 'firebase-functions/v2/https';
+import { https, logger } from 'firebase-functions';
+
 import { FieldValue, getFirestore } from 'firebase-admin/firestore';
 import { Card, CollectedCard } from './types/card';
 import { CollectedQuestions, PublicQuestion, Question } from './types/question';
 import getRankingUpdateArray from './actions/getRankingUpdateArray';
 import getCurrentUser from './actions/getCurrentUser';
 
-export default async function collectCardHandle (request: CallableRequest) {
-    if (!request.auth || !request.auth.uid) {
+export default async function collectCardHandle (
+    data: any,
+    context: https.CallableContext
+): Promise<{card: CollectedCard, question: PublicQuestion | null}> {
+    if (!context.auth || !context.auth.uid) {
         logger.error('collectCardHandle', 'permission denied');
-        throw new HttpsError('permission-denied', 'permission denied');
+        throw new https.HttpsError('permission-denied', 'permission denied');
     }
 
     // Does code looks right?
-    const uid: string = request.auth.uid;
-    let codeAttempt: string | null = request.data.code ?? null;
+    const uid: string = context.auth.uid;
+    let codeAttempt: string | null = data.code ?? null;
 
     if (typeof codeAttempt !== 'string' || codeAttempt.length !== 10) {
         logger.error('collectCardHandle', 'uid or code is null');
-        throw new HttpsError('invalid-argument', 'uid or code is null');
+        throw new https.HttpsError('invalid-argument', 'uid or code is null');
     }
 
     // Does user exist?
@@ -34,7 +37,7 @@ export default async function collectCardHandle (request: CallableRequest) {
 
     if (cardSnapshot.empty) {
         logger.error('collectCardHandle', 'card code is invalid', codeAttempt);
-        throw new HttpsError('not-found', 'card code is invalid');
+        throw new https.HttpsError('not-found', 'card code is invalid');
     }
 
     // Is card already collected?
@@ -47,7 +50,7 @@ export default async function collectCardHandle (request: CallableRequest) {
 
     if (isAlreadyCollected) {
         logger.error('collectCardHandle', 'card is already collected');
-        throw new HttpsError('already-exists', 'card is already collected');
+        throw new https.HttpsError('already-exists', 'card is already collected');
     }
 
     // Question
@@ -66,7 +69,9 @@ export default async function collectCardHandle (request: CallableRequest) {
 
         // Pseudorandom document fetch by sorting by last globally answered question
         // on each access updatedAt timestamp must be updated
+        // TODO: FIX RANDOMNESS
         const questionDoc = await db.collection('questions')
+            .orderBy('uid', 'asc')
             .where('uid', 'not-in', alreadyCollected)
             .orderBy('updatedAt', 'asc')
             .limit(1)
@@ -156,6 +161,6 @@ export default async function collectCardHandle (request: CallableRequest) {
         };
     } catch (error) {
         logger.error('collectCardHandle', 'error while collecting card: ' + error);
-        throw new HttpsError('aborted', 'error while collecting card');
+        throw new https.HttpsError('aborted', 'error while collecting card');
     }
 };

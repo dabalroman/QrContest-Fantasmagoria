@@ -31,8 +31,8 @@ ui-debug.log
 functions/firebase-debug.log
 
 # local env files
-.env*.local
-.env
+.env.development
+.env.production
 .emulators
 .firebase
 firebase-export-*

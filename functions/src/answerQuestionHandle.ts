@@ -1,20 +1,23 @@
-import { logger } from 'firebase-functions';
-import { CallableRequest, HttpsError } from 'firebase-functions/v2/https';
+import { https, logger } from 'firebase-functions';
+import { HttpsError } from 'firebase-functions/v2/https';
 import { FieldValue, getFirestore } from 'firebase-admin/firestore';
-import { CollectedQuestions, Question } from './types/question';
+import { CollectedQuestions, Question, QuestionAnswerValue } from './types/question';
 import getRankingUpdateArray from './actions/getRankingUpdateArray';
 import getCurrentUser from './actions/getCurrentUser';
 
-export default async function answerQuestionHandle (request: CallableRequest) {
-    if (!request.auth || !request.auth.uid) {
+export default async function answerQuestionHandle (
+    data: any,
+    context: https.CallableContext
+): Promise<{ correct: boolean, correctAnswer: QuestionAnswerValue }> {
+    if (!context.auth || !context.auth.uid) {
         logger.error('collectCardHandle', 'permission denied');
         throw new HttpsError('permission-denied', 'permission denied');
     }
 
     // Does request looks right?
-    const uid: string = request.auth.uid;
-    const questionUid: string | any = request.data.uid;
-    const questionAnswer: string | any = request.data.answer;
+    const uid: string = context.auth.uid;
+    const questionUid: string | any = data.uid;
+    const questionAnswer: string | any = data.answer;
 
     if (typeof questionUid !== 'string' || typeof questionAnswer !== 'string' || questionAnswer.length !== 1) {
         logger.error('answerQuestionHandle', 'uid or code is null');
