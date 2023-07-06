@@ -26,7 +26,7 @@ module.exports = {
                 'inner-input': 'inset 0 4px 4px rgba(0,0,0,0.15)'
             },
             gridTemplateRows: {
-                'layout': 'max-content minmax(0,1fr) 100px',
+                'layout': 'max-content minmax(0,1fr) 100px'
             },
             gridTemplateColumns: {
                 'small-cards': 'repeat(3, minmax(80px, 1fr))'
@@ -49,6 +49,17 @@ module.exports = {
                 'background-transparent': 'rgba(197,146,81,0.9)',
                 'button-brown': '#4d2b00'
             },
+            keyframes: {
+                pointsAdded: {
+                    '0%': { opacity: 0, transform: 'translateY(0)' },
+                    '30%': { opacity: 1, transform: 'translateY(-2.5rem)' },
+                    '80%': { opacity: 1, transform: 'translateY(-2.5rem)' },
+                    '100%': { opacity: 0, transform: 'translateY(-2.5rem)' }
+                }
+            },
+            animation: {
+                'pointsAdded': 'pointsAdded 4s ease-in-out 0s 1 normal forwards'
+            }
         }
     },
     plugins: []

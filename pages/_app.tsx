@@ -1,8 +1,8 @@
 import '@/styles/globals.css';
 import type { AppProps } from 'next/app';
-import { CardsCacheContext, defaultNavbarCenterAction, NavbarCenterActionContext, UserContext } from '@/utils/context';
+import { CardsCacheContext, defaultNavbarConfig, NavbarConfigContext, UserContext } from '@/utils/context';
 import { Toaster } from 'react-hot-toast';
-import Navbar, { NavbarCenterAction } from '@/components/Navbar/Navbar';
+import Navbar, { NavbarConfig } from '@/components/Navbar/Navbar';
 import { config } from '@fortawesome/fontawesome-svg-core';
 import '@fortawesome/fontawesome-svg-core/styles.css';
 import { Spectral, Trykker } from 'next/font/google';
@@ -34,7 +34,7 @@ export default function App ({
     const userData = useUserData();
     const [cards, setCards] = useState<CollectionCache<Card> | null>(null);
     const [cardSets, setCardSets] = useState<CollectionCache<CardSet> | null>(null);
-    const [navbarCenterAction, setNavbarCenterAction] = useState<NavbarCenterAction>(defaultNavbarCenterAction);
+    const [navbarCenterAction, setNavbarCenterAction] = useState<NavbarConfig>(defaultNavbarConfig);
 
     useEffect(() => {
         if (userData.authUser === null) {
@@ -44,8 +44,8 @@ export default function App ({
 
     return (
         <UserContext.Provider value={userData}>
-            <NavbarCenterActionContext.Provider value={{
-                navbarCenterAction,
+            <NavbarConfigContext.Provider value={{
+                navbarConfig: navbarCenterAction,
                 setNavbarCenterAction
             }}>
                 <CardsCacheContext.Provider value={{
@@ -62,7 +62,7 @@ export default function App ({
                                 + `font-serif bg-image-default bg-fixed min-h-screen bg-image-mobile-position`
                             }
                         >
-                            <Navbar navbarCenterAction={navbarCenterAction}/>
+                            <Navbar navbarConfig={navbarCenterAction}/>
                             <AuthCheck>
                                 <Component
                                     {...pageProps}
@@ -75,7 +75,7 @@ export default function App ({
                         </div>
                     </>
                 </CardsCacheContext.Provider>
-            </NavbarCenterActionContext.Provider>
+            </NavbarConfigContext.Provider>
         </UserContext.Provider>
     );
 }

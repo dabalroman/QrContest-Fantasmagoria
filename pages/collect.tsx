@@ -19,7 +19,8 @@ enum CollectPageState {
     CARD_FOUND,
     CARD_FOUND_WITH_QUESTION,
     QUESTION,
-    QUESTION_ANSWERED
+    QUESTION_ANSWERED_OK,
+    QUESTION_ANSWERED_MISTAKE
 }
 
 const collectErrorsDictionary: StringMap = {
@@ -36,24 +37,31 @@ export default function CollectPage () {
     const stateToNavbarConfigMap = {
         [CollectPageState.LOOK_FOR_CODE]: {
             icon: faMagnifyingGlass,
-            animate: false
         },
         [CollectPageState.CARD_FOUND]: {
             icon: faCheck,
             href: Page.COLLECTION + `#${card?.uid}`,
-            animate: false
+            animatePointsAdded: card?.value,
+            animate: true
         },
         [CollectPageState.CARD_FOUND_WITH_QUESTION]: {
             icon: faQuestion,
             onClick: () => setState(CollectPageState.QUESTION),
-            animate: true
+            animate: true,
+            animatePointsAdded: card?.value,
+            disabledSides: true,
         },
         [CollectPageState.QUESTION]: {
             icon: faQuestion,
-            disabled: true,
-            animate: false
+            disabledAll: true,
         },
-        [CollectPageState.QUESTION_ANSWERED]: {
+        [CollectPageState.QUESTION_ANSWERED_OK]: {
+            icon: faCheck,
+            href: Page.COLLECTION + `#${card?.uid}`,
+            animate: true,
+            animatePointsAdded: question?.value
+        },
+        [CollectPageState.QUESTION_ANSWERED_MISTAKE]: {
             icon: faCheck,
             href: Page.COLLECTION + `#${card?.uid}`,
             animate: true
@@ -83,17 +91,17 @@ export default function CollectPage () {
         console.error(error.message);
     };
 
-    const onAnswerValid = (correct: boolean) => {
-        setState(CollectPageState.QUESTION_ANSWERED);
-
+    const onQuestionAnswer = (correct: boolean) => {
         if (correct) {
+            setState(CollectPageState.QUESTION_ANSWERED_OK);
             toast.success('Poprawna odpowiedź!');
         } else {
+            setState(CollectPageState.QUESTION_ANSWERED_MISTAKE);
             toast.error('Błędna odpowiedź!');
         }
     };
 
-    const onAnswerInvalid = (error: Error) => {
+    const onQuestionError = (error: Error) => {
         setState(CollectPageState.LOOK_FOR_CODE);
         toast.error(collectErrorsDictionary[error.message] ?? 'Błąd aplikacji, spróbuj ponownie.');
         console.error(error.message);
@@ -113,15 +121,19 @@ export default function CollectPage () {
             }
             {(state === CollectPageState.CARD_FOUND || state === CollectPageState.CARD_FOUND_WITH_QUESTION)
                 && card &&
-                <CollectCardView card={card}/>
+                <CollectCardView card={card} question={question}/>
             }
-            {(state === CollectPageState.QUESTION || state === CollectPageState.QUESTION_ANSWERED)
+            {
+                (state === CollectPageState.QUESTION
+                    || state === CollectPageState.QUESTION_ANSWERED_OK
+                    || state === CollectPageState.QUESTION_ANSWERED_MISTAKE
+                )
                 && card && question &&
                 <QuestionCardView
                     card={card}
                     question={question}
-                    onAnswerValid={onAnswerValid}
-                    onAnswerInvalid={onAnswerInvalid}
+                    onAnswer={onQuestionAnswer}
+                    onError={onQuestionError}
                 />
             }
         </main>

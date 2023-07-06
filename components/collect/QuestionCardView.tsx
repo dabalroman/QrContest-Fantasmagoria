@@ -11,13 +11,13 @@ import { QuestionAnswerValue } from '@/functions/src/types/question';
 export default function QuestionCardView ({
     card,
     question,
-    onAnswerValid,
-    onAnswerInvalid
+    onAnswer,
+    onError
 }: {
     card: Card,
     question: Question,
-    onAnswerValid: (correct: boolean) => void,
-    onAnswerInvalid: (error: Error) => void
+    onAnswer: (correct: boolean) => void,
+    onError: (error: Error) => void
 }) {
     const [loading, setLoading] = useState<boolean>(false);
     const [answer, setAnswer] = useState<QuestionAnswerValue | null>(null);
@@ -43,11 +43,11 @@ export default function QuestionCardView ({
             .then((result) => {
                 setLoading(false);
                 setCorrectAnswer(result.data.correctAnswer);
-                onAnswerValid(result.data.correct);
+                onAnswer(result.data.correct);
             })
             .catch((error) => {
                 setLoading(false);
-                onAnswerInvalid(error);
+                onError(error);
             });
     };
 
@@ -70,7 +70,7 @@ export default function QuestionCardView ({
             <div className="bg-card-border text-text-light text-2xl font-fancy p-4 pl-24 flex justify-between">
                 <span>Wyzwanie</span>
                 <span>
-                        <FontAwesomeIcon icon={faDiceD6} size="xs" className="relative top-1"/> {card.value}
+                     <FontAwesomeIcon icon={faDiceD6} size="xs" className="relative top-1"/> {card.value}
                 </span>
             </div>
             <div className="p-4 mt-20">
@@ -81,8 +81,6 @@ export default function QuestionCardView ({
                 {scrambledAnswers.map(([answerKey, answerText]: string[]) => {
                     let buttonState = loading ? ButtonState.DISABLED : ButtonState.ENABLED;
 
-                    console.log(answerKey, answerText, correctAnswer, answer);
-
                     if (answerKey === correctAnswer) {
                         buttonState = ButtonState.CORRECT;
                     }
@@ -91,7 +89,8 @@ export default function QuestionCardView ({
                         buttonState = ButtonState.INCORRECT;
                     }
 
-                    return (<Button
+                    return (
+                        <Button
                             key={answerKey}
                             className={`w-full mt-3`}
                             onClick={() => answerQuestion(answerKey as QuestionAnswerValue)}

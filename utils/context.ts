@@ -6,7 +6,7 @@ import Card from '@/models/Card';
 import CardSet from '@/models/CardSet';
 import { Page } from '@/Enum/Page';
 import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
-import { NavbarCenterAction } from '@/components/Navbar/Navbar';
+import { NavbarConfig } from '@/components/Navbar/Navbar';
 
 export type AuthUser = FirebaseUser;
 
@@ -41,22 +41,24 @@ export const CardsCacheContext: Context<CardsCacheContextType> = createContext({
 });
 
 // ---- NAVBAR ----
-export const defaultNavbarCenterAction: NavbarCenterAction = {
+export const defaultNavbarConfig: NavbarConfig = {
     icon: faMagnifyingGlass,
     onClick: null,
     href: Page.COLLECT,
-    disabled: false,
+    disabledAll: false,
+    disabledSides: false,
     animate: false,
+    animatePointsAdded: null,
     onlyCenter: false
 };
 
-export interface NavbarCenterActionContextType {
-    navbarCenterAction: NavbarCenterAction,
-    setNavbarCenterAction: (navbarCenterAction: NavbarCenterAction) => void
+export interface NavbarConfigContextType {
+    navbarConfig: NavbarConfig,
+    setNavbarCenterAction: (navbarCenterAction: NavbarConfig) => void
 }
 
 // @ts-ignore
-export const NavbarCenterActionContext: Context<NavbarCenterActionContextType> = createContext({
-    navbarCenterAction: defaultNavbarCenterAction,
+export const NavbarConfigContext: Context<NavbarConfigContextType> = createContext({
+    navbarConfig: defaultNavbarConfig,
     setNavbarCenterAction: () => {}
 });

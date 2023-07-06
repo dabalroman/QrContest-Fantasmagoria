@@ -52,8 +52,7 @@ export default function Home () {
                     <img src="/fantasmagoria-logo.svg" className="text-text-half" alt="Fantasmagoria Logo"/>
                 </div>
                 <div className={
-                    'font-fancy text-center flex flex-col justify-center items-center h-64 p-4'
-                    + ' bg-gradient-radial from-20% from-panel-transparent-end to-75% to-transparent'
+                    'font-fancy text-center flex flex-col justify-center items-center h-64 p-4 bg-overlay-gradient'
                 }>
                     <h1 className="text-4xl p-0.5" style={{ textShadow: '0 4px 4px rgba(0,0,0,0.25)' }}>QrContest</h1>
                     <h2 className="text-lg p-0.5" style={{ textShadow: '0 4px 4px rgba(0,0,0,0.25)' }}>

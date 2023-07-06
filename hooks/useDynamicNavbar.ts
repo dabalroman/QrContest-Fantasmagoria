@@ -2,37 +2,43 @@ import { useContext, useEffect } from 'react';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 import { Page } from '@/Enum/Page';
-import { defaultNavbarCenterAction, NavbarCenterActionContext, NavbarCenterActionContextType } from '@/utils/context';
+import { defaultNavbarConfig, NavbarConfigContext, NavbarConfigContextType } from '@/utils/context';
 
 export default function useDynamicNavbar ({
     href,
     icon,
     onClick,
-    disabled,
+    disabledAll,
+    disabledSides,
     animate,
-    onlyCenter
+    onlyCenter,
+    animatePointsAdded
 }: {
     href?: Page | string,
     icon?: IconProp,
     onClick?: () => void,
-    disabled?: boolean,
+    disabledAll?: boolean,
+    disabledSides?: boolean,
     animate?: boolean,
-    onlyCenter?: boolean
+    onlyCenter?: boolean,
+    animatePointsAdded?: number
 }) {
-    const { setNavbarCenterAction } = useContext<NavbarCenterActionContextType>(NavbarCenterActionContext);
+    const { setNavbarCenterAction } = useContext<NavbarConfigContextType>(NavbarConfigContext);
 
     useEffect(() => {
         setNavbarCenterAction({
             href: href ?? Page.COLLECT,
             icon: icon ?? faMagnifyingGlass,
             onClick: onClick ?? null,
-            disabled: disabled ?? false,
+            disabledAll: disabledAll ?? false,
+            disabledSides: disabledSides ?? false,
             animate: animate ?? false,
-            onlyCenter: onlyCenter ?? false
+            onlyCenter: onlyCenter ?? false,
+            animatePointsAdded: animatePointsAdded ?? null
         });
 
-        return () => setNavbarCenterAction(defaultNavbarCenterAction);
+        return () => setNavbarCenterAction(defaultNavbarConfig);
 
         // onClick in deps will cause infinite loop
-    }, [href, icon, disabled, animate, onlyCenter]);
+    }, [href, icon, disabledAll, animate, onlyCenter]);
 }
