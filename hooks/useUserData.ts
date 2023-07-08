@@ -1,6 +1,5 @@
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth, firestore } from '@/utils/firebase';
-import { User as AuthUser } from '@firebase/auth';
 import { useEffect, useState } from 'react';
 import { UserContextType } from '@/utils/context';
 import User from '@/models/User';
@@ -9,7 +8,7 @@ import { doc, onSnapshot } from '@firebase/firestore';
 import { FireDoc } from '@/Enum/FireDoc';
 
 export default function useUserData (): UserContextType {
-    const [authUser] = useAuthState(auth) as any as [AuthUser | null];
+    const [authUser, loading]: [any, boolean, Error | undefined] = useAuthState(auth);
     const [user, setUser] = useState<User | null>(null);
     const [userReady, setUserReady] = useState<boolean>(false);
 
@@ -26,7 +25,6 @@ export default function useUserData (): UserContextType {
                 const restoredUser = snapshot.data() as User;
                 if (user === null && restoredUser) {
                     console.log('Restored:', restoredUser);
-
                 }
 
                 setUser(restoredUser);
@@ -36,6 +34,8 @@ export default function useUserData (): UserContextType {
             console.error(e);
             toast.error('Nie udało się zalogować!');
         }
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [authUser]);
 
     useEffect(() => {
@@ -44,6 +44,7 @@ export default function useUserData (): UserContextType {
 
     return {
         authUser,
+        loading,
         user,
         userReady
     };

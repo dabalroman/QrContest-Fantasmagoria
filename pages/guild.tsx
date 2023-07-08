@@ -105,7 +105,7 @@ export default function GuildPage () {
                             <div
                                 className={
                                     `bg-${guild.uid}`
-                                    + ' absolute bottom-0 w-full text-center p-1 text-white uppercase text-'
+                                    + ' absolute -bottom-1 w-full text-center p-1 text-white uppercase text-'
                                 }
                             >
                                 <div>{guild.name}</div>
@@ -115,8 +115,8 @@ export default function GuildPage () {
                             </div>
                             <FontAwesomeIcon
                                 icon={getGuildIcon(guild.uid)}
-                                size='xl'
-                                className="text-gray-100 p-3 absolute top-0 right-0"
+                                size="xl"
+                                className={`text-gray-100 p-3 absolute top-0 right-0`}
                             />
                         </div>
                     ))}

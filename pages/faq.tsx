@@ -6,11 +6,12 @@ import React, { useContext } from 'react';
 import Panel from '@/components/Panel';
 import useDynamicNavbar from '@/hooks/useDynamicNavbar';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
-import { router } from 'next/client';
+import { useRouter } from 'next/router';
 import { UserContext, UserContextType } from '@/utils/context';
 
 export default function FaqPage () {
     const { user } = useContext<UserContextType>(UserContext);
+    const router = useRouter();
 
     useDynamicNavbar({
         icon: faArrowLeft,

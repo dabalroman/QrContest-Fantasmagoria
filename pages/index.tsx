@@ -1,6 +1,5 @@
 import Metatags from '@/components/Metatags';
 import React, { useContext, useEffect, useState } from 'react';
-import Button from '@/components/Button';
 import useDynamicNavbar from '@/hooks/useDynamicNavbar';
 import { faArrowDown, faArrowUp } from '@fortawesome/free-solid-svg-icons';
 import Panel from '@/components/Panel';
@@ -79,8 +78,9 @@ export default function Home () {
                     <p className="pt-4">Udział w konkursie jest całkowicie darmowy. Wszystko, czego potrzebujesz, to
                         smartfon z dostępem
                         do internetu.</p>
-                    <p className="pt-4">Pytania? Kliknij tutaj.</p>
-                    <Button className="w-full mt-4">Pytania i odpowiedzi</Button>
+                    <p className="pt-4">Poniżej znajdziesz dodatkowe informacje o konkursie.</p>
+                    <LinkButton href={Page.FAQ} className="w-full mt-4">Pytania i odpowiedzi</LinkButton>
+                    <LinkButton href={Page.RULEBOOK} className="w-full mt-3">Regulamin konkursu</LinkButton>
                 </Panel>
             </div>
         </main>

@@ -13,6 +13,7 @@ export type AuthUser = FirebaseUser;
 // ---- USER ----
 export interface UserContextType {
     authUser: AuthUser | null,
+    loading: boolean,
     user: User | null,
     userReady: boolean
 }

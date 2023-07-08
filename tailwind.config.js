@@ -53,8 +53,8 @@ module.exports = {
                 'button-brown': '#4d2b00',
 
                 'guild-desert': '#C29233',
-                'guild-void': '#332E73',
-                'guild-water': '#BE3838',
+                'guild-void': '#7036b6',
+                'guild-water': '#3e75be',
                 'guild-steel': '#4B4B4B'
             },
             keyframes: {

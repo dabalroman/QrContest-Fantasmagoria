@@ -83,8 +83,11 @@ export default function AccountPage () {
                 )}
 
                 <Panel title="Regulamin i pytania">
-                    <p className='mb-3'>Masz pytania o sposób działania konkursu? Sprawdź sekcję &quot;Pytania i odpowiedzi&quot;.</p>
-                    <LinkButton href={Page.FAQ}>Pytania i odpowiedzi</LinkButton>
+                    <p>
+                        Masz pytania o sposób działania konkursu? Sprawdź sekcję &quot;Pytania i odpowiedzi&quot;.
+                    </p>
+                    <LinkButton className='mt-3' href={Page.FAQ}>Pytania i odpowiedzi</LinkButton>
+                    <LinkButton className='mt-3' href={Page.RULEBOOK}>Regulamin konkursu</LinkButton>
                 </Panel>
 
                 <Panel title="Wyloguj">
