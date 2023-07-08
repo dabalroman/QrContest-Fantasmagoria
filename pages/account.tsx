@@ -76,20 +76,15 @@ export default function AccountPage () {
 
                 {user.memberOf !== null && (
                     <Panel title="Zdrada Gildii">
-                        <p className={'mb-3'}>Możesz zdradzić swoich towarzyszy by dołączyć do innej gildii. Tego
+                        <p className='mb-3'>Możesz zdradzić swoich towarzyszy by dołączyć do innej gildii. Tego
                             haniebnego czynu możesz dokonać tylko raz.</p>
                         <LinkButton href={Page.GUILD}>Zdradź Gildię</LinkButton>
                     </Panel>
                 )}
 
-                <Panel title="Regulamin">
-                    <ol className="list-decimal list-inside">
-                        <li>Nie będziesz miał konkursów cudzych przede mną</li>
-                        <li>Nie będziesz Glidii swej wyzywał na daremno</li>
-                        <li>Pamiętaj, być skarb złoty czyścił</li>
-                        <li>Czcij konwent swój</li>
-                        <li>Nie łam regulaminu</li>
-                    </ol>
+                <Panel title="Regulamin i pytania">
+                    <p className='mb-3'>Masz pytania o sposób działania konkursu? Sprawdź sekcję &quot;Pytania i odpowiedzi&quot;.</p>
+                    <LinkButton href={Page.FAQ}>Pytania i odpowiedzi</LinkButton>
                 </Panel>
 
                 <Panel title="Wyloguj">
