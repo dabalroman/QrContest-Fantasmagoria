@@ -17,19 +17,6 @@ const questionsSeed: Question[] = [
         value: 5
     },
     {
-        uid: 'ile-razy-zginela-postac',
-        question: 'Ile razy zginęła postać Kenny\'iego we wszystkich sezonach South Park\'u?',
-        answers: {
-            a: '98',
-            b: '128',
-            c: '117',
-            d: '122'
-        },
-        correct: 'a',
-        updatedAt: FieldValue.serverTimestamp(),
-        value: 15
-    },
-    {
         uid: 'kiedy-zostala-zbudowana-slynna',
         question: 'Kiedy została zbudowana słynna Maszyna Turinga?',
         answers: {
