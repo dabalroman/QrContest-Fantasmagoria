@@ -1,7 +1,7 @@
 import Panel from '@/components/Panel';
 import ScreenTitle from '@/components/ScreenTitle';
 import LinkButton from '@/components/LinkButton';
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { UserContext, UserContextType } from '@/utils/context';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDiceD6 } from '@fortawesome/free-solid-svg-icons';
@@ -12,12 +12,36 @@ import { seedDatabaseFunction } from '@/utils/functions';
 import toast from 'react-hot-toast';
 import { HttpsCallableResult } from '@firebase/functions';
 import { Page } from '@/Enum/Page';
-import { auth } from '@/utils/firebase';
+import { auth, firestore } from '@/utils/firebase';
 import { useRouter } from 'next/router';
+import Guild from '@/models/Guild';
+import { doc, onSnapshot } from '@firebase/firestore';
+import { FireDoc } from '@/Enum/FireDoc';
+import AccountGuildPanel from '@/components/account/AccountGuildPanel';
 
 export default function AccountPage () {
     const router = useRouter();
     const { user } = useContext<UserContextType>(UserContext);
+
+    const [guild, setGuild] = useState<Guild | null>(null);
+    const [guildLoading, setGuildLoading] = useState<boolean>(false);
+
+    useEffect(() => {
+        if (user?.memberOf === null) {
+            return;
+        }
+
+        setGuildLoading(true);
+
+        return onSnapshot(
+            doc(firestore, FireDoc.GUILDS, user?.memberOf as string),
+            (snapshot) => {
+                const guild = snapshot.data() as Guild;
+                setGuild(guild);
+                setGuildLoading(false);
+            }
+        );
+    }, [user?.memberOf]);
 
     const AdminSection = () => (
         <Panel title="Admin">
@@ -35,18 +59,28 @@ export default function AccountPage () {
         </Panel>
     );
 
-    return (
+    return user && (
         <main className="grid grid-rows-layout items-center min-h-screen p-4">
             <ScreenTitle>Profil</ScreenTitle>
             <Metatags title="Profil"/>
             <div>
-                <Panel title={user?.username ?? '...'} className="text-center">
+                <Panel title={user.username ?? '...'} className="text-center">
                     <p className="text-2xl">
-                        <FontAwesomeIcon className="px-1" icon={faDiceD6} size="sm"/>{user?.score}
+                        <FontAwesomeIcon className="px-1" icon={faDiceD6} size="sm"/>{user.score}
                     </p>
                 </Panel>
 
-                {user?.role === UserRole.ADMIN && <AdminSection/>}
+                {user.role === UserRole.ADMIN && <AdminSection/>}
+
+                <AccountGuildPanel user={user} guild={guild} loading={guildLoading}/>
+
+                {user.memberOf !== null && (
+                    <Panel title="Zdrada Gildii">
+                        <p className={'mb-3'}>Możesz zdradzić swoich towarzyszy by dołączyć do innej gildii. Tego
+                            haniebnego czynu możesz dokonać tylko raz.</p>
+                        <LinkButton href={Page.GUILD}>Zdradź Gildię</LinkButton>
+                    </Panel>
+                )}
 
                 <Panel title="Regulamin">
                     <ol className="list-decimal list-inside">

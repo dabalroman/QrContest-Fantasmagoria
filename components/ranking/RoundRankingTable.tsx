@@ -2,6 +2,8 @@ import RankingRound, { UserRankingRecord } from '@/models/RankingRound';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faDiceD6, faImagePortrait } from '@fortawesome/free-solid-svg-icons';
 import User from '@/models/User';
+import getGuildIcon from '@/utils/getGuildIcon';
+import { GuildUid } from '@/models/Guild';
 
 export default function RoundRankingTable ({
     user,
@@ -14,8 +16,8 @@ export default function RoundRankingTable ({
                 <tr className="text-text-half">
                     <th>#</th>
                     <th>Poszukiwacz</th>
-                    <th>Kolekcja</th>
-                    <th>Rubiki</th>
+                    <th>Karty</th>
+                    <th className='text-right'>Rubiki</th>
                 </tr>
             </thead>
             <tbody>
@@ -29,11 +31,24 @@ export default function RoundRankingTable ({
                             (record.uid === user?.uid ? 'font-bold' : '')
                         }>
                             <td className="text-left">{index + 1}.</td>
-                            <td>{record.username}</td>
+                            <td>
+                                {
+                                    record?.memberOf
+                                        ? <FontAwesomeIcon
+                                            className={`w-5 text-${record.memberOf}`}
+                                            icon={getGuildIcon(record?.memberOf as GuildUid)}
+                                            size="xs"
+                                        />
+                                        : <span className='w-5 inline-block'></span>
+                                }
+                                {record.username}
+                            </td>
                             <td>{record.amountOfCollectedCards}
                                 <FontAwesomeIcon className="px-1" icon={faImagePortrait} size="sm"/>
                             </td>
-                            <td><FontAwesomeIcon className="px-1" icon={faDiceD6} size="sm"/>{record.score}</td>
+                            <td className='text-right'>
+                                <FontAwesomeIcon className="px-1" icon={faDiceD6} size="sm"/>{record.score}
+                            </td>
                         </tr>
                     ))}
             </tbody>

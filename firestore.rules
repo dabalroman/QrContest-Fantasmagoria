@@ -43,5 +43,11 @@ service cloud.firestore {
 
             allow write: if false;
         }
+
+        match /guilds/{guild} {
+            allow read: if request.auth != null;
+
+            allow write: if false;
+        }
     }
 }

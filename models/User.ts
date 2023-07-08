@@ -8,6 +8,7 @@ export default class User extends FirebaseModel {
     score: number;
     amountOfCollectedCards: number;
     amountOfAnsweredQuestions: number;
+    memberOf: string | null;
     role: UserRole;
     updatedAt: Date;
 
@@ -17,6 +18,7 @@ export default class User extends FirebaseModel {
         score: number = 0,
         amountOfCollectedCards: number = 0,
         amountOfAnsweredQuestions: number = 0,
+        memberOf: string | null = null,
         role: UserRole = UserRole.USER,
         updatedAt: Date = new Date()
     ) {
@@ -27,6 +29,7 @@ export default class User extends FirebaseModel {
         this.score = score;
         this.amountOfCollectedCards = amountOfCollectedCards;
         this.amountOfAnsweredQuestions = amountOfAnsweredQuestions;
+        this.memberOf = memberOf;
         this.role = role;
         this.updatedAt = updatedAt;
     }
@@ -55,6 +58,7 @@ export default class User extends FirebaseModel {
             data.score,
             data.amountOfCollectedCards,
             data.amountOfAnsweredQuestions,
+            data.memberOf,
             data.role,
             data.updatedAt.toDate()
         );

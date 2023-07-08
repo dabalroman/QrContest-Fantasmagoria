@@ -8,7 +8,7 @@ export default function useDynamicNavbar ({
     href,
     icon,
     onClick,
-    disabledAll,
+    disabledCenter,
     disabledSides,
     animate,
     onlyCenter,
@@ -17,7 +17,7 @@ export default function useDynamicNavbar ({
     href?: Page | string,
     icon?: IconProp,
     onClick?: () => void,
-    disabledAll?: boolean,
+    disabledCenter?: boolean,
     disabledSides?: boolean,
     animate?: boolean,
     onlyCenter?: boolean,
@@ -30,7 +30,7 @@ export default function useDynamicNavbar ({
             href: href ?? Page.COLLECT,
             icon: icon ?? faMagnifyingGlass,
             onClick: onClick ?? null,
-            disabledAll: disabledAll ?? false,
+            disabledCenter: disabledCenter ?? false,
             disabledSides: disabledSides ?? false,
             animate: animate ?? false,
             onlyCenter: onlyCenter ?? false,
@@ -40,5 +40,5 @@ export default function useDynamicNavbar ({
         return () => setNavbarCenterAction(defaultNavbarConfig);
 
         // onClick in deps will cause infinite loop
-    }, [href, icon, disabledAll, animate, onlyCenter]);
+    }, [href, icon, disabledCenter, animate, onlyCenter]);
 }

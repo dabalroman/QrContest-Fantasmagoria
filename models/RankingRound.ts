@@ -1,6 +1,7 @@
 import FirebaseModel from '@/models/FirebaseModel';
 import { DocumentSnapshot, SnapshotOptions } from '@firebase/firestore';
 import { Uid } from '@/types/global';
+import { GuildUid } from '@/models/Guild';
 
 export type UserRankingRecord = {
     uid: Uid,
@@ -8,6 +9,7 @@ export type UserRankingRecord = {
     score: number,
     amountOfCollectedCards: number,
     amountOfAnsweredQuestions: number,
+    memberOf: GuildUid | null,
     updatedAt: Date,
 }
 
@@ -55,6 +57,7 @@ export default class RankingRound extends FirebaseModel {
                     username: record.username,
                     amountOfCollectedCards: record.amountOfCollectedCards,
                     amountOfAnsweredQuestions: record.amountOfAnsweredQuestions,
+                    memberOf: record.memberOf,
                     score: record.score,
                     updatedAt: record.updatedAt.toDate()
                 };

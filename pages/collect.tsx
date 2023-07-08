@@ -53,7 +53,8 @@ export default function CollectPage () {
         },
         [CollectPageState.QUESTION]: {
             icon: faQuestion,
-            disabledAll: true,
+            disabledCenter: true,
+            disabledSides: true,
         },
         [CollectPageState.QUESTION_ANSWERED_OK]: {
             icon: faCheck,

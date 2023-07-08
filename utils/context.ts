@@ -45,7 +45,7 @@ export const defaultNavbarConfig: NavbarConfig = {
     icon: faMagnifyingGlass,
     onClick: null,
     href: Page.COLLECT,
-    disabledAll: false,
+    disabledCenter: false,
     disabledSides: false,
     animate: false,
     animatePointsAdded: null,

@@ -2,7 +2,7 @@ import { firestore } from 'firebase-admin';
 import { FieldValue } from 'firebase-admin/firestore';
 import Timestamp = firestore.Timestamp;
 
-export type GuildUid = 'gildia-otchlani' | 'gildia-pustyni' | 'gildia-slonca' | 'gildia-stali';
+export type GuildUid = 'guild-water' | 'guild-desert' | 'guild-steel' | 'guild-void';
 
 export type GuildMember = {
     username: string,

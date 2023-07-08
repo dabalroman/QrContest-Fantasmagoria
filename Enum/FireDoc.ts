@@ -5,4 +5,5 @@ export enum FireDoc {
     CARD = 'cards',
     CARD_SET = 'cardSets',
     RANKING = 'ranking',
+    GUILDS = 'guilds',
 }

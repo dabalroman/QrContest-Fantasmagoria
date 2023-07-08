@@ -9,8 +9,15 @@ export type GuildMember = {
     joinedAt: Date;
 }
 
+export enum GuildUid {
+    desert = 'guild-desert',
+    steel = 'guild-steel',
+    water = 'guild-water',
+    void = 'guild-void'
+}
+
 export default class Guild extends FirebaseModel {
-    uid: string;
+    uid: GuildUid;
     name: string;
     score: number;
     amountOfMembers: number;
@@ -20,7 +27,7 @@ export default class Guild extends FirebaseModel {
     updatedAt: Date;
 
     constructor (
-        uid: string,
+        uid: GuildUid,
         name: string = '',
         score: number = 0,
         amountOfMembers: number,
@@ -61,7 +68,7 @@ export default class Guild extends FirebaseModel {
                     uid,
                     username: record.username,
                     score: record.score,
-                    joinedAt: record.updatedAt.toDate()
+                    joinedAt: record.joinedAt.toDate()
                 };
             });
 

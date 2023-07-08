@@ -13,6 +13,8 @@ export default async function joinGuildHandle (
         throw new https.HttpsError('permission-denied', 'permission denied');
     }
 
+    logger.info(data);
+
     const uid: string = context.auth.uid;
     const guildToJoin: string | null = data.guild;
 
@@ -41,7 +43,7 @@ export default async function joinGuildHandle (
 
     // Previous guild
     let previousGuildRef: FirebaseFirestore.DocumentReference | null = null;
-    if (user.memberOf !== null) {
+    if (user.memberOf) {
         previousGuildRef = db.collection('guilds')
             .doc(user.memberOf);
         if (!(await previousGuildRef.get()).exists) {
@@ -69,7 +71,7 @@ export default async function joinGuildHandle (
 
             if (previousGuildRef) {
                 transaction.update(previousGuildRef, {
-                    [`members.${user.uid}`]: undefined,
+                    [`members.${user.uid}`]: FieldValue.delete(),
                     score: FieldValue.increment(-user.score),
                     amountOfCollectedCards: FieldValue.increment(-user.amountOfCollectedCards),
                     amountOfAnsweredQuestions: FieldValue.increment(-user.amountOfAnsweredQuestions),

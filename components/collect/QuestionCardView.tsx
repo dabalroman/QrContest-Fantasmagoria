@@ -70,7 +70,7 @@ export default function QuestionCardView ({
             <div className="bg-card-border text-text-light text-2xl font-fancy p-4 pl-24 flex justify-between">
                 <span>Wyzwanie</span>
                 <span>
-                     <FontAwesomeIcon icon={faDiceD6} size="xs" className="relative top-1"/> {card.value}
+                     <FontAwesomeIcon icon={faDiceD6} size="xs" className="relative top-1"/> {question.value}
                 </span>
             </div>
             <div className="p-4 mt-20">

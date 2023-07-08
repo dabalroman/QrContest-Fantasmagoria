@@ -9,7 +9,7 @@ export type NavbarConfig = {
     icon: IconProp,
     onClick: (() => void) | null,
     href: Page | string | null,
-    disabledAll: boolean,
+    disabledCenter: boolean,
     disabledSides: boolean,
     animate: boolean,
     animatePointsAdded: number | null,
@@ -27,7 +27,7 @@ export default function Navbar ({ navbarConfig }: { navbarConfig: NavbarConfig }
                     href={navbarConfig.href}
                     icon={navbarConfig.icon}
                     onClick={navbarConfig.onClick}
-                    disabled={navbarConfig.disabledAll}
+                    disabled={navbarConfig.disabledCenter}
                     animate={navbarConfig.animate}
                     onlyCenter={navbarConfig.onlyCenter}
                 />
@@ -43,24 +43,24 @@ export default function Navbar ({ navbarConfig }: { navbarConfig: NavbarConfig }
         >
             <NavbarButton
                 href={Page.COLLECT} icon={faMagnifyingGlassLocation}
-                disabled={navbarConfig.disabledAll || navbarConfig.disabledSides}
+                disabled={navbarConfig.disabledSides}
             />
             <NavbarButton
                 href={Page.COLLECTION} icon={faImages}
-                disabled={navbarConfig.disabledAll || navbarConfig.disabledSides}
+                disabled={navbarConfig.disabledSides}
             />
             <NavbarSuperButton
                 href={navbarConfig.href}
                 icon={navbarConfig.icon}
                 onClick={navbarConfig.onClick}
-                disabled={navbarConfig.disabledAll}
+                disabled={navbarConfig.disabledCenter}
                 animate={navbarConfig.animate}
             />
             <div className="relative">
                 <NavbarButton
                     href={Page.RANKING}
                     icon={faTrophy}
-                    disabled={navbarConfig.disabledAll || navbarConfig.disabledSides}
+                    disabled={navbarConfig.disabledSides}
                     className={navbarConfig.animatePointsAdded ? 'animate-[pulse_1s_ease-in-out_4]' : ''}
                 />
                 {navbarConfig.animatePointsAdded &&
@@ -78,7 +78,7 @@ export default function Navbar ({ navbarConfig }: { navbarConfig: NavbarConfig }
             </div>
             <NavbarButton
                 href={Page.ACCOUNT} icon={faUser}
-                disabled={navbarConfig.disabledAll || navbarConfig.disabledSides}
+                disabled={navbarConfig.disabledSides}
             />
         </div>
     );

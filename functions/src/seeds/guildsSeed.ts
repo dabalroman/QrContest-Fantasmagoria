@@ -3,7 +3,7 @@ import { Guild } from '../types/guild';
 
 const guildsSeed: Guild[] = [
     {
-        uid: 'gildia-otchlani',
+        uid: 'guild-void',
         name: 'Gildia Otchłani',
         score: 0,
         amountOfMembers: 0,
@@ -13,8 +13,8 @@ const guildsSeed: Guild[] = [
         updatedAt: FieldValue.serverTimestamp()
     },
     {
-        uid: 'gildia-slonca',
-        name: 'Gildia Słońca',
+        uid: 'guild-water',
+        name: 'Gildia Wody',
         score: 0,
         amountOfMembers: 0,
         amountOfCollectedCards: 0,
@@ -23,7 +23,7 @@ const guildsSeed: Guild[] = [
         updatedAt: FieldValue.serverTimestamp()
     },
     {
-        uid: 'gildia-pustyni',
+        uid: 'guild-desert',
         name: 'Gildia Pustyni',
         score: 0,
         amountOfMembers: 0,
@@ -33,7 +33,7 @@ const guildsSeed: Guild[] = [
         updatedAt: FieldValue.serverTimestamp()
     },
     {
-        uid: 'gildia-stali',
+        uid: 'guild-steel',
         name: 'Gildia Stali',
         score: 0,
         amountOfMembers: 0,
