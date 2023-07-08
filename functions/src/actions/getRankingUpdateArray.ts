@@ -36,6 +36,7 @@ export default async function getRankingUpdateArray (
                 score: user.score,
                 amountOfCollectedCards: user.amountOfCollectedCards,
                 amountOfAnsweredQuestions: user.amountOfAnsweredQuestions,
+                memberOf: user.memberOf,
                 updatedAt: FieldValue.serverTimestamp()
             };
 

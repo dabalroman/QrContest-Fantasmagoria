@@ -9,6 +9,8 @@ import rankingRoundsSeed from './seeds/rankingRoundsSeed';
 import cardSetsSeed from './seeds/cardSetsSeed';
 import questionsSeed from './seeds/questionsSeed';
 import cardsSeed from './seeds/cardsSeed';
+import guildsSeed from './seeds/guildsSeed';
+import { Guild } from './types/guild';
 
 export default async function seedDatabaseHandle (
     data: any,
@@ -35,6 +37,7 @@ export default async function seedDatabaseHandle (
     await seedCards(db);
     await seedCardSets(db);
     await seedRounds(db);
+    await seedGuilds(db);
 
     return {
         status: 'ok'
@@ -79,4 +82,14 @@ async function seedRounds (db: FirebaseFirestore.Firestore) {
             .set(round, { merge: true });
     });
     logger.log('seedDatabaseHandle', 'seeding rounds done');
+}
+
+async function seedGuilds (db: FirebaseFirestore.Firestore) {
+    logger.log('seedDatabaseHandle', 'seeding guilds');
+    guildsSeed.forEach((guild: Guild) => {
+        db.collection('guilds')
+            .doc(guild.uid)
+            .set(guild, { merge: true });
+    });
+    logger.log('seedDatabaseHandle', 'seeding guilds done');
 }

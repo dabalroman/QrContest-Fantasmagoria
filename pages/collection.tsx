@@ -45,7 +45,7 @@ export default function CollectionPage ({}) {
             <p className="my-2">By zebrać kartę, zeskanuj kod QR lub przejdź do ekranu &quot;Szukaj&quot; i tam
                 wpisz jej kod.</p>
             <p className="my-2">Skąd wziąć kod? To dobre pytanie.</p>
-            <p>Kody zostały ukryte w różnych miejscach w budynku konwentu. Wciel się w rolę poszukiwacza, i
+            <p>Kody zostały ukryte w różnych miejscach w budynku konwentu. Wciel się w rolę poszukiwacza i
                 spróbuj
                 znaleźć je wszystkie!</p>
             <LinkButton className="mt-4" href={Page.COLLECT}>Szukaj</LinkButton>

@@ -12,7 +12,7 @@ export default async function setupAccountHandle (
         throw new https.HttpsError('permission-denied', 'permission denied');
     }
 
-    // Does username looks right?
+    // Does username look right?
     const uid: string = context.auth.uid;
     let username: string | null = data.username ?? null;
 
@@ -49,6 +49,7 @@ export default async function setupAccountHandle (
         amountOfCollectedCards: 0,
         amountOfAnsweredQuestions: 0,
         role: UserRole.USER,
+        memberOf: null,
         updatedAt: FieldValue.serverTimestamp()
     };
 

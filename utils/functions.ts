@@ -18,4 +18,9 @@ export const setupAccountFunction: HttpsCallable<
     {}
 > = httpsCallable(functions, 'setupaccount');
 
+export const joinGuildFunction: HttpsCallable<
+    { guild: string },
+    {}
+> = httpsCallable(functions, 'joinguild');
+
 export const seedDatabaseFunction = httpsCallable(functions, 'seeddatabase');

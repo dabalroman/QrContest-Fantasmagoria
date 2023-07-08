@@ -4,25 +4,33 @@ import seedDatabaseHandle from './seedDatabaseHandle';
 import answerQuestionHandle from './answerQuestionHandle';
 import collectCardHandle from './collectCardHandle';
 import setupAccountHandle from './setupAccountHandle';
+import joinGuildHandle from './joinGuildHandle';
+
+const region = 'europe-west1';
 
 admin.initializeApp();
 
 exports.collectcard =
-    functions.region('europe-west1')
+    functions.region(region)
         .https
         .onCall(collectCardHandle);
 
 exports.answerquestion =
-    functions.region('europe-west1')
+    functions.region(region)
         .https
         .onCall(answerQuestionHandle);
 
 exports.setupaccount =
-    functions.region('europe-west1')
+    functions.region(region)
         .https
         .onCall(setupAccountHandle);
 
 exports.seeddatabase =
-    functions.region('europe-west1')
+    functions.region(region)
         .https
         .onCall(seedDatabaseHandle);
+
+exports.joinguild =
+    functions.region(region)
+        .https
+        .onCall(joinGuildHandle);

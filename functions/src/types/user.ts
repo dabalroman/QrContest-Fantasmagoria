@@ -1,6 +1,7 @@
 import { FieldValue } from 'firebase-admin/firestore';
 import { firestore } from 'firebase-admin';
 import Timestamp = firestore.Timestamp;
+import { GuildUid } from './guild';
 
 export enum UserRole {
     ADMIN = 'admin',
@@ -15,5 +16,6 @@ export type User = {
     amountOfCollectedCards: number,
     amountOfAnsweredQuestions: number,
     role: UserRole,
+    memberOf: GuildUid | null,
     updatedAt: Timestamp | FieldValue,
 }
