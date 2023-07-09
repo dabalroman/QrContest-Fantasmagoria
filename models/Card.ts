@@ -83,11 +83,9 @@ export default class Card extends FirebaseModel {
     }
 
     public async save (): Promise<void> {
-        console.log(this.uid);
         try {
             await setDoc(doc(firestore, FireDoc.CARD, this.uid)
                 .withConverter(Card.getConverter()), this);
-            console.log('Document written');
         } catch (e) {
             console.error('Error adding document: ', e);
         }

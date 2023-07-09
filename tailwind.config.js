@@ -52,7 +52,7 @@ module.exports = {
                 'background-transparent': 'rgba(197,146,81,0.9)',
                 'button-brown': '#4d2b00',
 
-                'guild-desert': '#C29233',
+                'guild-desert': '#be8d23',
                 'guild-void': '#7036b6',
                 'guild-water': '#3e75be',
                 'guild-steel': '#4B4B4B'

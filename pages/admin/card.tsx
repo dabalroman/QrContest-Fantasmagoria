@@ -36,7 +36,6 @@ export default function CardAdminPage ({}) {
             content.isActive
         );
 
-        console.log('save', card);
         await card.save();
 
         reset();

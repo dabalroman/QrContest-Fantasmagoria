@@ -57,7 +57,6 @@ export default function LoginEmail () {
             }
 
             setLoading(false);
-            console.log(e.message);
         }
     };
 

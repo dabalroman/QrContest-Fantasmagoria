@@ -7,7 +7,9 @@ export type GuildUid = 'guild-water' | 'guild-desert' | 'guild-steel' | 'guild-v
 export type GuildMember = {
     username: string,
     score: number,
-    joinedAt: Timestamp | FieldValue | Date;
+    amountOfCollectedCards: number,
+    amountOfAnsweredQuestions: number,
+    joinedAt: Timestamp | FieldValue | Date
 }
 
 export type Guild = {

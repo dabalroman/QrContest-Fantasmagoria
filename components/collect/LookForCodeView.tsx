@@ -38,7 +38,6 @@ export default function LookForCodeView ({
                 setLoading(false);
                 reset();
 
-                console.log(result.data);
                 onCodeValid(
                     Card.fromRaw(result.data.card),
                     result.data.question ? Question.fromRaw(result.data.question) : null

@@ -51,8 +51,6 @@ export default function QuestionCardView ({
             });
     };
 
-    console.log(answer, correctAnswer);
-
     return (
         <div
             className={

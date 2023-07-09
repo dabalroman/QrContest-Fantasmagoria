@@ -1,7 +1,7 @@
 import { https, logger } from 'firebase-functions';
 import { FieldValue, getFirestore } from 'firebase-admin/firestore';
 import { User, UserRole } from './types/user';
-import getRankingUpdateArray from './actions/getRankingUpdateArray';
+import updateRanking from './actions/updateRanking';
 
 export default async function setupAccountHandle (
     data: any,
@@ -53,7 +53,10 @@ export default async function setupAccountHandle (
         updatedAt: FieldValue.serverTimestamp()
     };
 
-    const rankingUpdateArray = await getRankingUpdateArray(db, user);
+    let collectedQuestionsRef: FirebaseFirestore.DocumentReference = db.collection('users')
+        .doc(uid)
+        .collection('collectedQuestions')
+        .doc('collectedQuestions');
 
     try {
         await db.runTransaction(async (transaction) => {
@@ -61,10 +64,9 @@ export default async function setupAccountHandle (
 
             transaction.create(usernameRef, { uid: uid });
 
-            //Update ranking
-            rankingUpdateArray.forEach((rankingRound) => {
-                transaction.set(rankingRound.ref, rankingRound.round, { merge: true });
-            });
+            transaction.create(collectedQuestionsRef, {});
+
+            await updateRanking(db, transaction, user);
         });
 
         logger.log('setupAccountHandle', `User ${user.username} registered.`);

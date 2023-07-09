@@ -3,13 +3,14 @@ import { https, logger } from 'firebase-functions';
 import { FieldValue, getFirestore } from 'firebase-admin/firestore';
 import { Card, CollectedCard } from './types/card';
 import { CollectedQuestions, PublicQuestion, Question } from './types/question';
-import getRankingUpdateArray from './actions/getRankingUpdateArray';
+import updateRanking from './actions/updateRanking';
 import getCurrentUser from './actions/getCurrentUser';
+import updateGuild from './actions/updateGuild';
 
 export default async function collectCardHandle (
     data: any,
     context: https.CallableContext
-): Promise<{card: CollectedCard, question: PublicQuestion | null}> {
+): Promise<{ card: CollectedCard, question: PublicQuestion | null }> {
     if (!context.auth || !context.auth.uid) {
         logger.error('collectCardHandle', 'permission denied');
         throw new https.HttpsError('permission-denied', 'permission denied');
@@ -65,17 +66,26 @@ export default async function collectCardHandle (
         const collectedQuestionsDoc = await collectedQuestionsRef.get();
 
         const collectedQuestions = collectedQuestionsDoc.data() as CollectedQuestions;
-        const alreadyCollected = collectedQuestions ? Object.keys(collectedQuestions) : ['empty-array'];
+        logger.log('collected: ', typeof collectedQuestions);
+        const alreadyCollected = (collectedQuestions && Object.keys(collectedQuestions).length !== 0)
+            ? Object.keys(collectedQuestions)
+            : ['empty-array'];
+        logger.log('ac: ', alreadyCollected);
 
-        // Pseudorandom document fetch by sorting by last globally answered question
-        // on each access updatedAt timestamp must be updated
-        // TODO: FIX RANDOMNESS
-        const questionDoc = await db.collection('questions')
-            .orderBy('uid', 'asc')
-            .where('uid', 'not-in', alreadyCollected)
+        // Pseudorandom document fetch by querying random question. If not collected use it, if collected use first one.
+        // This clunky implementation tries to mitigate the problem of same-inequity-sort Firebase restriction
+        let questionDoc = await db.collection('questions')
             .orderBy('updatedAt', 'asc')
             .limit(1)
             .get();
+
+        if(!questionDoc.docs[0] || alreadyCollected.includes(questionDoc.docs[0].data().uid)) {
+            questionDoc = await db.collection('questions')
+                .orderBy('uid', 'asc')
+                .where('uid', 'not-in', alreadyCollected)
+                .limit(1)
+                .get();
+        }
 
         if (questionDoc.docs[0]) {
             const questionData = questionDoc.docs[0].data() as Question;
@@ -97,8 +107,6 @@ export default async function collectCardHandle (
     user.score += card.value;
     user.amountOfCollectedCards += 1;
 
-    const rankingUpdateArray = await getRankingUpdateArray(db, user);
-
     try {
         await db.runTransaction(async (transaction) => {
             //Collect card
@@ -118,8 +126,8 @@ export default async function collectCardHandle (
 
             //Update user score and amount of collected cards
             transaction.update(userRef, {
-                score: user.score,
-                amountOfCollectedCards: user.amountOfCollectedCards,
+                score: FieldValue.increment(card.value),
+                amountOfCollectedCards: FieldValue.increment(1),
                 updatedAt: FieldValue.serverTimestamp()
             });
 
@@ -131,11 +139,6 @@ export default async function collectCardHandle (
                 }
             });
 
-            //Update ranking
-            rankingUpdateArray.forEach((rankingRound) => {
-                transaction.set(rankingRound.ref, rankingRound.round, { merge: true });
-            });
-
             //Questions
             if (question && questionRef) {
                 //Update question so the other users won't get it on next access
@@ -144,14 +147,17 @@ export default async function collectCardHandle (
                 });
 
                 //Save that user tried to answer this question
-                transaction.set(collectedQuestionsRef, {
+                transaction.update(collectedQuestionsRef, {
                     [question.uid]: {
                         answer: null,
                         correct: false,
                         value: 0
                     }
-                }, { merge: true });
+                });
             }
+
+            await updateRanking(db, transaction, user);
+            await updateGuild(db, transaction, user);
         });
 
         logger.log('collectCardHandle', user.username, `card code ${codeAttempt} is valid`);

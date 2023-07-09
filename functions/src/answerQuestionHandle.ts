@@ -2,8 +2,9 @@ import { https, logger } from 'firebase-functions';
 import { HttpsError } from 'firebase-functions/v2/https';
 import { FieldValue, getFirestore } from 'firebase-admin/firestore';
 import { CollectedQuestions, Question, QuestionAnswerValue } from './types/question';
-import getRankingUpdateArray from './actions/getRankingUpdateArray';
+import updateRanking from './actions/updateRanking';
 import getCurrentUser from './actions/getCurrentUser';
+import updateGuild from './actions/updateGuild';
 
 export default async function answerQuestionHandle (
     data: any,
@@ -57,31 +58,27 @@ export default async function answerQuestionHandle (
     user.score += questionValue;
     user.amountOfAnsweredQuestions += 1;
 
-    const rankingUpdateArray = await getRankingUpdateArray(db, user);
-
     try {
         await db.runTransaction(async (transaction) => {
             //Update user score and amount of collected cards
             transaction.update(userRef, {
-                score: user.score,
-                amountOfAnsweredQuestions: user.amountOfAnsweredQuestions,
+                score: FieldValue.increment(questionValue),
+                amountOfAnsweredQuestions: FieldValue.increment(1),
                 updatedAt: FieldValue.serverTimestamp()
             });
 
-            //Update ranking
-            rankingUpdateArray.forEach((rankingRound) => {
-                transaction.set(rankingRound.ref, rankingRound.round, { merge: true });
-            });
-
             //Save user answered question
-            transaction.set(collectedQuestionsRef, {
+            transaction.update(collectedQuestionsRef, {
                 [questionUid]: {
                     answer: questionAnswer,
                     correct: questionCorrect,
                     value: questionValue,
                     collectedAt: FieldValue.serverTimestamp()
                 }
-            }, { merge: true });
+            });
+
+            await updateRanking(db, transaction, user);
+            await updateGuild(db, transaction, user);
         });
 
         logger.log('answerQuestionHandle', user.username, `question answer ${questionUid} registered`);

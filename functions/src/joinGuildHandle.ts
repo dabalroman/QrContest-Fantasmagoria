@@ -2,7 +2,8 @@ import { https, logger } from 'firebase-functions';
 import { FieldValue, getFirestore } from 'firebase-admin/firestore';
 import { User } from './types/user';
 import getCurrentUser from './actions/getCurrentUser';
-import getRankingUpdateArray from './actions/getRankingUpdateArray';
+import updateRanking from './actions/updateRanking';
+import { GuildUid } from './types/guild';
 
 export default async function joinGuildHandle (
     data: any,
@@ -52,7 +53,7 @@ export default async function joinGuildHandle (
         }
     }
 
-    const rankingUpdateArray = await getRankingUpdateArray(db, user);
+    user.memberOf = guildToJoin as GuildUid;
 
     try {
         await db.runTransaction(async (transaction) => {
@@ -60,6 +61,8 @@ export default async function joinGuildHandle (
                 [`members.${user.uid}`]: {
                     username: user.username,
                     score: user.score,
+                    amountOfAnsweredQuestions: user.amountOfAnsweredQuestions,
+                    amountOfCollectedCards: user.amountOfCollectedCards,
                     joinedAt: FieldValue.serverTimestamp()
                 },
                 score: FieldValue.increment(user.score),
@@ -85,10 +88,7 @@ export default async function joinGuildHandle (
                 updatedAt: FieldValue.serverTimestamp()
             } as User);
 
-            //Update ranking
-            rankingUpdateArray.forEach((rankingRound) => {
-                transaction.set(rankingRound.ref, rankingRound.round, { merge: true });
-            });
+            await updateRanking(db, transaction, user);
         });
 
         logger.log('joinGuildHandle', `User ${user.username} joined ${guildToJoin}.`);
