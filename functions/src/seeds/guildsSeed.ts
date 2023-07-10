@@ -4,7 +4,7 @@ import { Guild } from '../types/guild';
 const guildsSeed: Guild[] = [
     {
         uid: 'guild-void',
-        name: 'Gildia Otchłani',
+        name: 'Gildia Mroku',
         score: 0,
         amountOfMembers: 0,
         amountOfCollectedCards: 0,

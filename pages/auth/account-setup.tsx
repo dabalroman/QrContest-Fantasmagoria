@@ -18,7 +18,7 @@ import { useRouter } from 'next/router';
 
 export default function AccountSetupPage () {
     const router = useRouter();
-    const { authUser }: UserContextType = useContext(UserContext);
+    const { authUser, userReady }: UserContextType = useContext(UserContext);
 
     const [loading, setLoading] = useState<boolean>(false);
     const [checking, setChecking] = useState<boolean>(false);
@@ -29,6 +29,14 @@ export default function AccountSetupPage () {
         icon: faArrowLeft,
         onClick: () => router.back()
     });
+
+    useEffect(() => {
+        if (userReady) {
+            router.push(Page.COLLECT)
+                .then();
+        }
+    }, [userReady, router]);
+
 
     useEffect(() => {
         if (!authUser) {

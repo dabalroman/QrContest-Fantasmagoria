@@ -22,13 +22,13 @@ export default function AuthCheck ({ children }: { children: ReactNode }) {
 
     const {
         authUser,
-        loading,
+        authLoading,
         user
     } = useContext<UserContextType>(UserContext);
 
     // The page COLLECT should not display 404 when user is not logged in to allow new users to register into the app.
     useEffect(() => {
-        if (!router.pathname.includes(Page.COLLECT) || loading) {
+        if (!router.pathname.includes(Page.COLLECT) || authLoading) {
             return;
         }
 
@@ -37,10 +37,10 @@ export default function AuthCheck ({ children }: { children: ReactNode }) {
         }
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [loading]);
+    }, [authLoading]);
 
     // Wait a moment for the device to load the auth state
-    if (loading) {
+    if (authLoading) {
         return <Loader/>;
     }
 

@@ -1,10 +1,13 @@
 import Panel from '../Panel';
-import { useForm } from 'react-hook-form';
+import { SubmitErrorHandler, useForm } from 'react-hook-form';
 import { useEffect, useState } from 'react';
 import { collectCardFunction } from '@/utils/functions';
-import Button from '@/components/Button';
 import Card from '@/models/Card';
 import Question from '@/models/Question';
+import useDynamicNavbar from '@/hooks/useDynamicNavbar';
+import { faCheck, faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
+import { Page } from '@/Enum/Page';
+import toast from 'react-hot-toast';
 
 export default function LookForCodeView ({
     code = null,
@@ -22,7 +25,8 @@ export default function LookForCodeView ({
         handleSubmit,
         reset,
         setValue,
-        formState
+        formState,
+        watch
     } = useForm({
         mode: 'onChange',
         defaultValues: {
@@ -49,6 +53,19 @@ export default function LookForCodeView ({
             });
     };
 
+    const onInvalidInput: SubmitErrorHandler<{ code: string }> = ({ code }) => {
+        toast.error(code?.message ?? 'Błąd kodu.');
+    };
+
+    const currentInput = watch('code');
+    const showScanner = currentInput.length === 0;
+    useDynamicNavbar({
+        icon: showScanner ? faMagnifyingGlass : faCheck,
+        animate: showScanner || formState.isValid || currentInput === code,
+        href: showScanner ? Page.SCANNER : undefined,
+        onClick: !showScanner ? handleSubmit(collectCode, onInvalidInput) : undefined
+    });
+
     useEffect(() => {
         if (code !== null) {
             setValue(
@@ -66,7 +83,8 @@ export default function LookForCodeView ({
     return (
         <div>
             <Panel title="Zeskanuj kod">
-                <p>Użyj aparatu lub aplikacji do skanowania kodów QR i zgarnij kartę do swojej kolekcji!</p>
+                <p>Kliknij w przycisk z lupą i zeskanuj kod!</p>
+                <p>Możesz też użyć aparatu lub aplikacji do skanowania.</p>
             </Panel>
 
             <Panel title="Wpisz kod ręcznie" loading={loading}>
@@ -75,7 +93,7 @@ export default function LookForCodeView ({
                 <form onSubmit={handleSubmit(collectCode)}>
                     <input type="text" placeholder="ABCDEFGHIJ" maxLength={10}
                            className="rounded block w-full p-1 border-2 border-input-border text-center
-                               bg-input-background text-text-light uppercase text-xl shadow-inner-input tracking-wider"
+                               bg-input-background text-text-light uppercase text-2xl shadow-inner-input tracking-wider"
                            {...register(
                                'code',
                                {
@@ -90,9 +108,9 @@ export default function LookForCodeView ({
                     {formState.errors.code?.message && (
                         <p className="text-danger">{formState.errors.code?.message as string}</p>)}
 
-                    <Button type="submit" className="w-full mt-3">
-                        Potwierdź
-                    </Button>
+                    {/* <Button type="submit" className="w-full mt-3"> */}
+                    {/*     Potwierdź */}
+                    {/* </Button> */}
                 </form>
             </Panel>
         </div>

@@ -8,8 +8,9 @@ import { doc, onSnapshot } from '@firebase/firestore';
 import { FireDoc } from '@/Enum/FireDoc';
 
 export default function useUserData (): UserContextType {
-    const [authUser, loading]: [any, boolean, Error | undefined] = useAuthState(auth);
+    const [authUser, authLoading]: [any, boolean, Error | undefined] = useAuthState(auth);
     const [user, setUser] = useState<User | null>(null);
+    const [userLoading, setUserLoading] = useState<boolean>(false);
     const [userReady, setUserReady] = useState<boolean>(false);
 
     useEffect(() => {
@@ -18,6 +19,8 @@ export default function useUserData (): UserContextType {
                 setUser(null);
                 return;
             }
+
+            setUserLoading(true);
 
             return onSnapshot(doc(firestore, FireDoc.USERS, authUser?.uid ?? '')
                 .withConverter(User.getConverter()), (snapshot) => {
@@ -28,6 +31,7 @@ export default function useUserData (): UserContextType {
                 }
 
                 setUser(restoredUser);
+                setUserLoading(false);
             });
         } catch (e) {
             setUser(null);
@@ -44,8 +48,9 @@ export default function useUserData (): UserContextType {
 
     return {
         authUser,
-        loading,
+        authLoading,
         user,
+        userLoading,
         userReady
     };
 }

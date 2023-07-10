@@ -36,6 +36,7 @@
         }
     ],
     "hosting": {
+        "site": "fantas",
         "source": ".",
         "ignore": [
             "firebase.json",

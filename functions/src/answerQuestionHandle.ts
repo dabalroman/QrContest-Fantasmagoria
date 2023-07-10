@@ -38,8 +38,6 @@ export default async function answerQuestionHandle (
         const collectedQuestionsDoc = await collectedQuestionsRef.get();
         const collectedQuestions = collectedQuestionsDoc.data() as CollectedQuestions;
 
-        logger.log(collectedQuestions);
-
         if (!collectedQuestions[questionUid] || collectedQuestions[questionUid].answer !== null) {
             throw new Error();
         }

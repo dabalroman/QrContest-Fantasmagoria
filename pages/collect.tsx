@@ -7,12 +7,9 @@ import useCollectedCards from '@/hooks/useCollectedCards';
 import { useRouter } from 'next/router';
 import Question from '@/models/Question';
 import { StringMap } from '@/types/global';
-import useDynamicNavbar from '@/hooks/useDynamicNavbar';
-import { faCheck, faMagnifyingGlass, faQuestion } from '@fortawesome/free-solid-svg-icons';
 import QuestionCardView from '@/components/collect/QuestionCardView';
-import LookForCodeView from '@/components/collect/LookForCodeView';
 import CollectCardView from '@/components/collect/CollectCardView';
-import { Page } from '@/Enum/Page';
+import LookForCodeView from '@/components/collect/LookForCodeView';
 
 enum CollectPageState {
     LOOK_FOR_CODE,
@@ -33,43 +30,6 @@ export default function CollectPage () {
     const [state, setState] = useState<CollectPageState>(CollectPageState.LOOK_FOR_CODE);
     const [card, setCard] = useState<Card | null>(null);
     const [question, setQuestion] = useState<Question | null>(null);
-
-    const stateToNavbarConfigMap = {
-        [CollectPageState.LOOK_FOR_CODE]: {
-            icon: faMagnifyingGlass,
-        },
-        [CollectPageState.CARD_FOUND]: {
-            icon: faCheck,
-            href: Page.COLLECTION + `#${card?.uid}`,
-            animatePointsAdded: card?.value,
-            animate: true
-        },
-        [CollectPageState.CARD_FOUND_WITH_QUESTION]: {
-            icon: faQuestion,
-            onClick: () => setState(CollectPageState.QUESTION),
-            animate: true,
-            animatePointsAdded: card?.value,
-            disabledSides: true,
-        },
-        [CollectPageState.QUESTION]: {
-            icon: faQuestion,
-            disabledCenter: true,
-            disabledSides: true,
-        },
-        [CollectPageState.QUESTION_ANSWERED_OK]: {
-            icon: faCheck,
-            href: Page.COLLECTION + `#${card?.uid}`,
-            animate: true,
-            animatePointsAdded: question?.value
-        },
-        [CollectPageState.QUESTION_ANSWERED_MISTAKE]: {
-            icon: faCheck,
-            href: Page.COLLECTION + `#${card?.uid}`,
-            animate: true
-        }
-    };
-
-    useDynamicNavbar(stateToNavbarConfigMap[state]);
 
     const router = useRouter();
     let { code } = router.query as { code: string | string[] | undefined | null };
@@ -122,7 +82,11 @@ export default function CollectPage () {
             }
             {(state === CollectPageState.CARD_FOUND || state === CollectPageState.CARD_FOUND_WITH_QUESTION)
                 && card &&
-                <CollectCardView card={card} question={question}/>
+                <CollectCardView
+                    card={card}
+                    question={question}
+                    goToQuestion={() => setState(CollectPageState.QUESTION)}
+                />
             }
             {
                 (state === CollectPageState.QUESTION

@@ -13,15 +13,18 @@ export type AuthUser = FirebaseUser;
 // ---- USER ----
 export interface UserContextType {
     authUser: AuthUser | null,
-    loading: boolean,
+    authLoading: boolean,
     user: User | null,
+    userLoading: boolean,
     userReady: boolean
 }
 
 // @ts-ignore
 export const UserContext: Context<UserContextType> = createContext({
     authUser: null,
+    authLoading: false,
     user: null,
+    userLoading: false,
     userReady: false
 });
 

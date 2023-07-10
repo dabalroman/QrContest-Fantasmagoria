@@ -14,8 +14,6 @@ export default async function joinGuildHandle (
         throw new https.HttpsError('permission-denied', 'permission denied');
     }
 
-    logger.info(data);
-
     const uid: string = context.auth.uid;
     const guildToJoin: string | null = data.guild;
 

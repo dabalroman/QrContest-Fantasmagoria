@@ -66,11 +66,9 @@ export default async function collectCardHandle (
         const collectedQuestionsDoc = await collectedQuestionsRef.get();
 
         const collectedQuestions = collectedQuestionsDoc.data() as CollectedQuestions;
-        logger.log('collected: ', typeof collectedQuestions);
         const alreadyCollected = (collectedQuestions && Object.keys(collectedQuestions).length !== 0)
             ? Object.keys(collectedQuestions)
             : ['empty-array'];
-        logger.log('ac: ', alreadyCollected);
 
         // Pseudorandom document fetch by querying random question. If not collected use it, if collected use first one.
         // This clunky implementation tries to mitigate the problem of same-inequity-sort Firebase restriction

@@ -40,5 +40,5 @@ export default function useDynamicNavbar ({
         return () => setNavbarCenterAction(defaultNavbarConfig);
 
         // onClick in deps will cause infinite loop
-    }, [href, icon, disabledCenter, animate, onlyCenter]);
+    }, [href, icon, disabledCenter, disabledSides, animate, onlyCenter, animatePointsAdded]);
 }

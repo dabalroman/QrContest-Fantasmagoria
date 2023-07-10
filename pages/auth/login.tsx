@@ -20,6 +20,8 @@ export default function LoginPage () {
 
     const {
         authUser,
+        authLoading,
+        userLoading,
         userReady
     }: UserContextType = useContext(UserContext);
 
@@ -43,11 +45,15 @@ export default function LoginPage () {
     };
 
     useEffect(() => {
-        if (authUser) {
+        setLoading(authLoading || userLoading);
+    }, [authLoading, userLoading]);
+
+    useEffect(() => {
+        if (!authLoading && !userLoading && authUser) {
             router.push(userReady ? Page.COLLECT : Page.ACCOUNT_SETUP)
                 .then();
         }
-    }, [userReady, authUser, router]);
+    }, [userReady, authUser, router, userLoading, authLoading]);
 
     return (
         <main className="grid grid-rows-layout items-center min-h-screen p-4">

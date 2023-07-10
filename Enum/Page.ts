@@ -3,6 +3,7 @@ export enum Page {
     ACCOUNT = '/account',
     COLLECTION = '/collection',
     RANKING = '/ranking',
+    SCANNER = '/scanner',
     FAQ = '/faq',
     RULEBOOK = '/rulebook',
     GUILD = '/guild',

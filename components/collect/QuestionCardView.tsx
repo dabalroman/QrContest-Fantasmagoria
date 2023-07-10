@@ -2,11 +2,13 @@ import Card from '@/models/Card';
 import Question from '@/models/Question';
 import Button, { ButtonState } from '@/components/Button';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faDiceD6 } from '@fortawesome/free-solid-svg-icons';
+import { faCheck, faDiceD6, faQuestion } from '@fortawesome/free-solid-svg-icons';
 import CardSmallComponent from '@/components/CardSmallComponent';
 import { useState } from 'react';
 import { answerQuestionFunction } from '@/utils/functions';
 import { QuestionAnswerValue } from '@/functions/src/types/question';
+import useDynamicNavbar from '@/hooks/useDynamicNavbar';
+import { Page } from '@/Enum/Page';
 
 export default function QuestionCardView ({
     card,
@@ -22,6 +24,15 @@ export default function QuestionCardView ({
     const [loading, setLoading] = useState<boolean>(false);
     const [answer, setAnswer] = useState<QuestionAnswerValue | null>(null);
     const [correctAnswer, setCorrectAnswer] = useState<QuestionAnswerValue | null>(null);
+
+    useDynamicNavbar({
+        icon: correctAnswer ? faCheck : faQuestion,
+        href: Page.COLLECTION + `#${card?.uid}`,
+        disabledCenter: !correctAnswer,
+        disabledSides: !correctAnswer,
+        animate: correctAnswer !== null,
+        animatePointsAdded: answer === correctAnswer ? question.value : undefined
+    });
 
     const [scrambledAnswers] = useState<string[][]>(
         Object.entries(question.answers)
