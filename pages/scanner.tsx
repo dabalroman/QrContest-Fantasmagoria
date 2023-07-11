@@ -13,6 +13,7 @@ export default function ScannerPage () {
     const [code, setCode] = useState<string | null>(null);
 
     const router = useRouter();
+    const qrScannerRef = useRef<QrScanner | null>(null);
 
     useDynamicNavbar({
         icon: code ? faCheck : faArrowLeft,
@@ -37,7 +38,7 @@ export default function ScannerPage () {
     useEffect(() => {
         let init = false;
 
-        const qrScanner = ref.current ? new QrScanner(
+        qrScannerRef.current = ref.current ? new QrScanner(
             ref.current,
             (result) => handleCodeDetection(result.data),
             {
@@ -50,15 +51,15 @@ export default function ScannerPage () {
         ) : null;
 
         const interval = setInterval(() => {
-            if (!init && ref.current && qrScanner !== null) {
-                qrScanner?.start();
+            if (!init && ref.current && qrScannerRef.current !== null) {
+                qrScannerRef.current?.start();
                 init = true;
                 clearInterval(interval);
             }
         }, 1000);
 
         return () => {
-            qrScanner?.destroy();
+            qrScannerRef.current?.destroy();
             clearInterval(interval);
         };
     }, []);
@@ -68,29 +69,40 @@ export default function ScannerPage () {
             <Metatags title="Skaner"/>
             <ScreenTitle>Skaner</ScreenTitle>
 
-            <div className="fixed top-0 left-0 flex w-screen h-screen justify-center items-center z-0">
+            <div className="fixed bottom-0 left-0 flex w-screen h-screen justify-center items-center z-0">
                 <div style={{
                     width: '80vw',
                     maxWidth: '800px'
                 }}
-                     className="relative flex flex-col-reverse"
+                     className="relative flex flex-col-reverse pb-10"
                 >
                     <Panel margin={false} className="text-center relative bottom-4 z-0 rounded-b-2xl w-full">
                         {!code && <p className="pt-3">Gdy kod zostanie wykryty, ramka karty zrobi się zielona.</p>}
                         {code && <p className="pt-3">Wykryto kod!<br/><b>{code}</b></p>}
                     </Panel>
-                    <div
-                        style={{
-                            height: '50vh',
-                            maxHeight: '800px'
-                        }}
-                        className={
-                            'bg-background flex justify-center items-center overflow-hidden w-full'
-                            + ' box-border border-8 border-card-border rounded-2xl z-50'
-                            + (code !== null ? ' border-lime-700' : '')
-                        }
-                    >
-                        <video ref={ref} className="w-full"></video>
+                    <div className={'z-50 relative text-center'}>
+                        <div className='absolute top-0 left-0 w-full h-full flex flex-col justify-center px-5'>
+                            <p className='pb-2'>Aby skorzystać ze skanera, musisz zezwolić na wykorzystanie aparatu.</p>
+                            <p>
+                                Jeżeli zapytanie o dostęp nie wyświetla się, to twoje urządzenie nie jest
+                                kompatybilne lub jego ustawienia odmawiają dostępu do kamery.
+                                W takim wypadku wpisz kod ręcznie na ekranie &quot;Szukaj&quot;.
+                            </p>
+                        </div>
+                        <div
+                            style={{
+                                height: '50vh',
+                                maxHeight: '800px'
+                            }}
+                            className={
+                                'bg-background flex justify-center items-center overflow-hidden w-full'
+                                + ' box-border border-8 border-card-border rounded-2xl z-10'
+                                + (code !== null ? ' border-lime-700' : '')
+                                + (code !== null ? ' animate-flash' : '')
+                            }
+                        >
+                            <video ref={ref} className="w-full"></video>
+                        </div>
                     </div>
                 </div>
             </div>

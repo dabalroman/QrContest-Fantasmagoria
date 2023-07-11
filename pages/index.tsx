@@ -53,12 +53,12 @@ export default function Home () {
                 <div className={
                     'font-fancy text-center flex flex-col justify-center items-center h-64 p-4 bg-overlay-gradient'
                 }>
-                    <h1 className="text-4xl p-0.5" style={{ textShadow: '0 4px 4px rgba(0,0,0,0.25)' }}>QrContest</h1>
-                    <h2 className="text-lg p-0.5" style={{ textShadow: '0 4px 4px rgba(0,0,0,0.25)' }}>
+                    <h1 className="text-4xl p-1" style={{ textShadow: '0 4px 4px rgba(0,0,0,0.25)' }}>QrContest</h1>
+                    <h2 className="text-lg pb-20" style={{ textShadow: '0 4px 4px rgba(0,0,0,0.25)' }}>
                         Zbierz je wszystkie!
                     </h2>
                 </div>
-                <div className="absolute bottom-11 w-full p-4">
+                <div className="absolute bottom-20 w-full p-4">
                     {actionButton}
                 </div>
             </div>

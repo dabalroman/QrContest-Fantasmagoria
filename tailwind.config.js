@@ -75,10 +75,22 @@ module.exports = {
                         opacity: 0,
                         transform: 'translateY(-2.5rem)'
                     }
+                },
+                flash: {
+                    '0%': {
+                        filter: 'brightness(1)',
+                    },
+                    '5%': {
+                        filter: 'brightness(5)',
+                    },
+                    '100%': {
+                        filter: 'brightness(1)',
+                    }
                 }
             },
             animation: {
-                'pointsAdded': 'pointsAdded 4s ease-in-out 0s 1 normal forwards'
+                'pointsAdded': 'pointsAdded 4s ease-in-out 0s 1 normal forwards',
+                'flash': 'flash 0.8s ease-out 0s 1 normal forwards'
             }
         }
     },

@@ -1,6 +1,6 @@
 import Panel from '../Panel';
 import { SubmitErrorHandler, useForm } from 'react-hook-form';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { collectCardFunction } from '@/utils/functions';
 import Card from '@/models/Card';
 import Question from '@/models/Question';
@@ -19,6 +19,8 @@ export default function LookForCodeView ({
     onCodeInvalid: (error: Error) => void
 }) {
     const [loading, setLoading] = useState<boolean>(false);
+    const typingAnimationIntervalRef = useRef<number | null>(null);
+    const [typingAnimationText, setTypingAnimationText] = useState<string>('');
 
     const {
         register,
@@ -67,18 +69,35 @@ export default function LookForCodeView ({
     });
 
     useEffect(() => {
-        if (code !== null) {
-            setValue(
-                'code',
-                code,
-                {
-                    shouldValidate: true,
-                    shouldDirty: true,
-                    shouldTouch: true
-                }
-            );
+        if (code === null || code.length !== 10) {
+            return;
         }
-    }, [code, setValue]);
+
+        if (typingAnimationText.length >= 10 && typingAnimationIntervalRef.current !== null) {
+            window.clearInterval(typingAnimationIntervalRef.current);
+            return;
+        }
+
+        if (typingAnimationIntervalRef.current !== null) {
+            return;
+        }
+
+        typingAnimationIntervalRef.current = window.setInterval(() => {
+            setTypingAnimationText((value) => code.slice(0, value.length + 1));
+        }, 150);
+    }, [code, currentInput, setValue, typingAnimationText]);
+
+    useEffect(() => {
+        setValue(
+            'code',
+            typingAnimationText,
+            {
+                shouldValidate: true,
+                shouldDirty: true,
+                shouldTouch: true
+            }
+        );
+    }, [setValue, typingAnimationText]);
 
     return (
         <div>
@@ -105,12 +124,13 @@ export default function LookForCodeView ({
                                }
                            )} />
 
-                    {formState.errors.code?.message && (
-                        <p className="text-danger">{formState.errors.code?.message as string}</p>)}
-
-                    {/* <Button type="submit" className="w-full mt-3"> */}
-                    {/*     Potwierdź */}
-                    {/* </Button> */}
+                    <p className="text-center pt-2">
+                        {
+                            formState.errors.code?.message || currentInput.length === 0
+                                ? formState.errors.code?.message
+                                : 'Kliknij, by potwierdzić kod!'
+                        }
+                    </p>
                 </form>
             </Panel>
         </div>
