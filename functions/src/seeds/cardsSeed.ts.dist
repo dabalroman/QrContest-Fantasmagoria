@@ -3,19 +3,6 @@ import { Card, CardTier, CardTierValue } from '../types/card';
 
 const cardsSeed: Card[] = [
     {
-        uid: 'azurnoctis',
-        cardSet: 'magic-creatures',
-        code: 'QWERTY1234',
-        collectedBy: {},
-        description: 'Fioletowy smok, o rogach niczym szafirowe obeliski, skrzydła rozpostarte szeroko jak północne zorze, tchnienie zimne jak najgłębsze odmęty oceanu, spoglądający na świat z tajemniczą łagodnością.',
-        image: 'azurnoctis',
-        isActive: true,
-        name: 'Azurnoctis',
-        tier: CardTier.LEGENDARY,
-        value: CardTierValue.LEGENDARY,
-        withQuestion: true
-    },
-    {
         uid: '0000000000',
         cardSet: 'magic-creatures',
         code: '0000000000',
@@ -145,6 +132,7 @@ const cardsSeed: Card[] = [
         value: CardTierValue.LEGENDARY,
         withQuestion: true
     },
+    // (...)
 ];
 
 export default cardsSeed;

@@ -7,3 +7,7 @@ typings/
 
 # Node.js dependency directory
 node_modules/
+
+src/seeds/questionsSeed.ts
+src/seeds/cardsSeed.ts
+src/seeds/codesSeed.ts
