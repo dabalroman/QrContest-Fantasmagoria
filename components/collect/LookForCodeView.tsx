@@ -102,8 +102,8 @@ export default function LookForCodeView ({
     return (
         <div>
             <Panel title="Zeskanuj kod">
-                <p>Kliknij w przycisk z lupą i zeskanuj kod!</p>
-                <p>Możesz też użyć aparatu lub aplikacji do skanowania.</p>
+                <p>Kliknij w przycisk aparatu i zeskanuj kod!</p>
+                <p>Możesz również użyć innej aplikacji do skanowania.</p>
             </Panel>
 
             <Panel title="Wpisz kod ręcznie" loading={loading}>

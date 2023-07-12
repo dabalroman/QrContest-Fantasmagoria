@@ -91,10 +91,14 @@ export default function AccountSetupPage () {
             await router.push(Page.COLLECT);
             setLoading(false);
             reset();
-        } catch (e) {
-            toast.error('Rejestracja nie powiodła się, spróbuj ponownie.');
-            await router.push(Page.MAIN);
-            await auth.signOut();
+        } catch (error) {
+            if((error as Error).message === 'username does not meet requirements') {
+                toast.error('Ten nick nie spełnia wymagań.');
+            } else {
+                toast.error('Rejestracja nie powiodła się, spróbuj ponownie.');
+                await router.push(Page.MAIN);
+                await auth.signOut();
+            }
             setLoading(false);
         }
     };
@@ -125,6 +129,14 @@ export default function AccountSetupPage () {
                                     minLength: {
                                         value: 3,
                                         message: 'Nick musi mieć co najmniej 3 znaki!'
+                                    },
+                                    maxLength: {
+                                        value: 20,
+                                        message: 'Spróbuj zmieścić się w 20 znakach.'
+                                    },
+                                    pattern: {
+                                        value: /^[A-z0-9ąćęłóśźż\-\s&$#@.<>(){}:;+]+$/i,
+                                        message: 'Możesz użyć znaków alfabetu i cyfry.'
                                     }
                                 }
                             )}
