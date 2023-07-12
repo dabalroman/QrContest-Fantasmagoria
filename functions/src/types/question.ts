@@ -32,3 +32,7 @@ export type CollectedQuestions = {
         collectedAt: Timestamp | FieldValue
     }
 }
+
+export type QuestionsDoc = {
+    [uid: string] : Question;
+}

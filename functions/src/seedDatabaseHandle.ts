@@ -1,6 +1,5 @@
 import { https, logger } from 'firebase-functions';
 import { getFirestore } from 'firebase-admin/firestore';
-import { Question } from './types/question';
 import { Card } from './types/card';
 import { User, UserRole } from './types/user';
 import { RankingRound } from './types/rankingRound';
@@ -46,11 +45,9 @@ export default async function seedDatabaseHandle (
 
 async function seedQuestions (db: FirebaseFirestore.Firestore) {
     logger.log('seedDatabaseHandle', 'seeding questions');
-    questionsSeed.forEach((question: Question) => {
-        db.collection('questions')
-            .doc(question.uid)
-            .set(question);
-    });
+    await db.collection('questions')
+        .doc('questions')
+        .set(questionsSeed);
     logger.log('seedDatabaseHandle', 'seeding questions done');
 }
 

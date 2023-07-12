@@ -2,7 +2,7 @@ import { https, logger } from 'firebase-functions';
 
 import { FieldValue, getFirestore } from 'firebase-admin/firestore';
 import { Card, CollectedCard } from './types/card';
-import { CollectedQuestions, PublicQuestion, Question } from './types/question';
+import { CollectedQuestions, PublicQuestion, Question, QuestionsDoc } from './types/question';
 import updateRanking from './actions/updateRanking';
 import getCurrentUser from './actions/getCurrentUser';
 import updateGuild from './actions/updateGuild';
@@ -56,38 +56,30 @@ export default async function collectCardHandle (
 
     // Question
     let question: PublicQuestion | null = null;
-    let questionRef: FirebaseFirestore.DocumentReference | null = null;
-    let collectedQuestionsRef: FirebaseFirestore.DocumentReference = db.collection('users')
+    const questionsRef: FirebaseFirestore.DocumentReference  = await db.collection('questions')
+        .doc('questions');
+
+    const collectedQuestionsRef: FirebaseFirestore.DocumentReference = db.collection('users')
         .doc(uid)
         .collection('collectedQuestions')
         .doc('collectedQuestions');
 
-    if (card.withQuestion || true) {
-        const collectedQuestionsDoc = await collectedQuestionsRef.get();
+    if (card.withQuestion) {
+        const questionsDoc = await questionsRef.get();
+        const questionsData = questionsDoc.data() as QuestionsDoc;
+        const questions = Object.values(questionsData) as Question[];
 
+        const collectedQuestionsDoc = await collectedQuestionsRef.get();
         const collectedQuestions = collectedQuestionsDoc.data() as CollectedQuestions;
         const alreadyCollected = (collectedQuestions && Object.keys(collectedQuestions).length !== 0)
             ? Object.keys(collectedQuestions)
             : ['empty-array'];
 
-        // Pseudorandom document fetch by querying random question. If not collected use it, if collected use first one.
-        // This clunky implementation tries to mitigate the problem of same-inequity-sort Firebase restriction
-        let questionDoc = await db.collection('questions')
-            .orderBy('updatedAt', 'asc')
-            .limit(1)
-            .get();
+        const unansweredQuestions = questions.filter((question: Question) => !alreadyCollected.includes(question.uid));
 
-        if(!questionDoc.docs[0] || alreadyCollected.includes(questionDoc.docs[0].data().uid)) {
-            questionDoc = await db.collection('questions')
-                .orderBy('uid', 'asc')
-                .where('uid', 'not-in', alreadyCollected)
-                .limit(1)
-                .get();
-        }
-
-        if (questionDoc.docs[0]) {
-            const questionData = questionDoc.docs[0].data() as Question;
-            questionRef = questionDoc.docs[0].ref;
+        if(unansweredQuestions.length > 0) {
+            const randomQuestionIndex = Math.floor(Math.random() * unansweredQuestions.length);
+            const questionData = unansweredQuestions[randomQuestionIndex];
 
             question = {
                 uid: questionData.uid,
@@ -138,12 +130,7 @@ export default async function collectCardHandle (
             });
 
             //Questions
-            if (question && questionRef) {
-                //Update question so the other users won't get it on next access
-                transaction.update(questionRef, {
-                    updatedAt: FieldValue.serverTimestamp()
-                });
-
+            if (question) {
                 //Save that user tried to answer this question
                 transaction.update(collectedQuestionsRef, {
                     [question.uid]: {

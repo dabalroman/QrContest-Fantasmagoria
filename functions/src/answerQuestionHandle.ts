@@ -1,7 +1,7 @@
 import { https, logger } from 'firebase-functions';
 import { HttpsError } from 'firebase-functions/v2/https';
 import { FieldValue, getFirestore } from 'firebase-admin/firestore';
-import { CollectedQuestions, Question, QuestionAnswerValue } from './types/question';
+import { CollectedQuestions, Question, QuestionAnswerValue, QuestionsDoc } from './types/question';
 import updateRanking from './actions/updateRanking';
 import getCurrentUser from './actions/getCurrentUser';
 import updateGuild from './actions/updateGuild';
@@ -46,12 +46,21 @@ export default async function answerQuestionHandle (
         throw new HttpsError('aborted', 'error while getting collected questions');
     }
 
-    const questionDoc = (await db.collection('questions')
-        .doc(questionUid)
-        .get()).data() as Question;
-    const questionCorrectAnswer = questionDoc.correct;
+    const questionsRef: FirebaseFirestore.DocumentReference  = await db.collection('questions')
+        .doc('questions');
+    const questionsDoc = await questionsRef.get();
+    const questionsData = questionsDoc.data() as QuestionsDoc;
+    const questions = Object.values(questionsData) as Question[];
+    const question = questions.find((question) => question.uid === questionUid);
+
+    if (!question) {
+        logger.error('answerQuestionHandle', 'unknown question');
+        throw new HttpsError('invalid-argument', 'unknown question');
+    }
+
+    const questionCorrectAnswer = question.correct;
     const questionCorrect = questionCorrectAnswer === questionAnswer;
-    const questionValue = questionCorrect ? questionDoc.value : 0;
+    const questionValue = questionCorrect ? question.value : 0;
 
     user.score += questionValue;
     user.amountOfAnsweredQuestions += 1;

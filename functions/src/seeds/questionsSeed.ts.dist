@@ -1,9 +1,9 @@
 /* eslint-disable max-len */
 import { FieldValue } from 'firebase-admin/firestore';
-import { Question } from '../types/question';
+import { QuestionsDoc } from '../types/question';
 
-const questionsSeed: Question[] = [
-    {
+const questionsSeed: QuestionsDoc = {
+    'jak-nazywa-sie-gra': {
         uid: 'jak-nazywa-sie-gra',
         question: 'Jak nazywa się gra, w której zapisujesz słowo flamastrem na tabliczce?',
         answers: {
@@ -16,7 +16,7 @@ const questionsSeed: Question[] = [
         updatedAt: FieldValue.serverTimestamp(),
         value: 5
     },
-    // (...)
-];
+    // ...
+};
 
 export default questionsSeed;
