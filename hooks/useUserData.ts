@@ -26,9 +26,9 @@ export default function useUserData (): UserContextType {
                 .withConverter(User.getConverter()), (snapshot) => {
 
                 const restoredUser = snapshot.data() as User;
-                if (user === null && restoredUser) {
-                    console.log('Restored:', restoredUser);
-                }
+                // if (user === null && restoredUser) {
+                //     console.log('Restored:', restoredUser);
+                // }
 
                 setUser(restoredUser);
                 setUserLoading(false);

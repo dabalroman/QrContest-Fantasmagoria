@@ -4,6 +4,7 @@ import { User } from './types/user';
 import getCurrentUser from './actions/getCurrentUser';
 import updateRanking from './actions/updateRanking';
 import { GuildUid } from './types/guild';
+import updateGuild from './actions/updateGuild';
 
 export default async function joinGuildHandle (
     data: any,
@@ -85,8 +86,11 @@ export default async function joinGuildHandle (
                 memberOf: guildToJoin,
                 updatedAt: FieldValue.serverTimestamp()
             } as User);
+        });
 
+        await db.runTransaction(async (transaction) => {
             await updateRanking(db, transaction, user);
+            await updateGuild(db, transaction, user);
         });
 
         logger.log('joinGuildHandle', `User ${user.username} joined ${guildToJoin}.`);

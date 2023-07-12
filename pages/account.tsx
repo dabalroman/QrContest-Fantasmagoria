@@ -34,7 +34,7 @@ export default function AccountPage () {
         setGuildLoading(true);
 
         return onSnapshot(
-            doc(firestore, FireDoc.GUILDS, user?.memberOf as string),
+            doc(firestore, FireDoc.GUILDS, user?.memberOf as string).withConverter(Guild.getConverter()),
             (snapshot) => {
                 const guild = snapshot.data() as Guild;
                 setGuild(guild);

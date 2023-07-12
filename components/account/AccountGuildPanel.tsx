@@ -4,7 +4,7 @@ import User from '@/models/User';
 import LinkButton from '@/components/LinkButton';
 import { Page } from '@/Enum/Page';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faDiceD6, faUser } from '@fortawesome/free-solid-svg-icons';
+import { faBolt, faDiceD6, faUser } from '@fortawesome/free-solid-svg-icons';
 import React from 'react';
 import getGuildIcon from '@/utils/getGuildIcon';
 import Panel from '@/components/Panel';
@@ -18,7 +18,7 @@ export default function AccountGuildPanel ({
     if (user.memberOf === null) {
         return (
             <Panel title="Gildia">
-                <p className='mb-3'>
+                <p className="mb-3">
                     Nie jesteś członkiem żadnej gildii. Dołącz do towarzyszy i wspólnie wyruszcie w przygodę!
                 </p>
                 <LinkButton href={Page.GUILD}>Dołącz do gildii</LinkButton>
@@ -39,12 +39,13 @@ export default function AccountGuildPanel ({
                 <div className="w-full grid grid-cols-[1fr_7rem]">
                     <div className="p-4">
                         <h2 className="text-2xl font-fancy pb-2">{title}</h2>
-                        <div className="flex justify-evenly text-2xl mb-2">
-                            <span><FontAwesomeIcon icon={faDiceD6} size="xs"/> {guild?.score}</span>
-                            <span><FontAwesomeIcon icon={faUser} size="xs"/> {guild?.amountOfMembers}</span>
+                        <div className="text-xl grid grid-cols-3 pt-0.5 mb-2 text-center">
+                            <span><FontAwesomeIcon icon={faBolt}/> {guild?.power}</span>
+                            <span><FontAwesomeIcon icon={faUser}/> {guild?.amountOfMembers}</span>
+                            <span><FontAwesomeIcon icon={faDiceD6}/> {guild?.score}</span>
                         </div>
                         <p className="text-sm text-text-half">
-                            Wesprzyj gildię przez zdobywanie rubików lub rekrutację nowych towarzyszy!
+                            Wesprzyj gildię przez zdobywanie Rubików lub rekrutację nowych członków!
                         </p>
                     </div>
                     {guild !== null && (
@@ -59,7 +60,8 @@ export default function AccountGuildPanel ({
                         >
                             <FontAwesomeIcon
                                 icon={getGuildIcon(guild.uid)}
-                                className="text-white p-2 absolute top-0 right-0"
+                                className={`bg-${guild.uid} p-2 pb-3 pl-3 absolute top-0 right-0 text-white`
+                                    + ' rounded-bl-2xl'}
                             />
                         </div>
                     )}

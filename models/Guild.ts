@@ -20,6 +20,7 @@ export default class Guild extends FirebaseModel {
     uid: GuildUid;
     name: string;
     score: number;
+    power: number;
     amountOfMembers: number;
     amountOfCollectedCards: number;
     amountOfAnsweredQuestions: number;
@@ -46,6 +47,7 @@ export default class Guild extends FirebaseModel {
         this.amountOfAnsweredQuestions = amountOfAnsweredQuestions;
         this.members = members;
         this.updatedAt = updatedAt;
+        this.power = amountOfMembers !== 0 ? Math.round(score / amountOfMembers) : 0;
     }
 
     protected static toFirestore (data: Guild): object {

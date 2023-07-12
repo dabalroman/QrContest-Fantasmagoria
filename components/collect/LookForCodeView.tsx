@@ -5,7 +5,7 @@ import { collectCardFunction } from '@/utils/functions';
 import Card from '@/models/Card';
 import Question from '@/models/Question';
 import useDynamicNavbar from '@/hooks/useDynamicNavbar';
-import { faCheck, faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
+import { faCamera, faCheck } from '@fortawesome/free-solid-svg-icons';
 import { Page } from '@/Enum/Page';
 import toast from 'react-hot-toast';
 
@@ -62,7 +62,7 @@ export default function LookForCodeView ({
     const currentInput = watch('code');
     const showScanner = currentInput.length === 0;
     useDynamicNavbar({
-        icon: showScanner ? faMagnifyingGlass : faCheck,
+        icon: showScanner ? faCamera : faCheck,
         animate: showScanner || formState.isValid || currentInput === code,
         href: showScanner ? Page.SCANNER : undefined,
         onClick: !showScanner ? handleSubmit(collectCode, onInvalidInput) : undefined

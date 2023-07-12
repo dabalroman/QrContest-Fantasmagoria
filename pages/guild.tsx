@@ -116,7 +116,7 @@ export default function GuildPage () {
                             <FontAwesomeIcon
                                 icon={getGuildIcon(guild.uid)}
                                 size="xl"
-                                className={`text-gray-100 p-3 absolute top-0 right-0`}
+                                className={`bg-${guild.uid} p-3 pl-4 absolute top-0 right-0 text-white rounded-bl-2xl`}
                             />
                         </div>
                     ))}

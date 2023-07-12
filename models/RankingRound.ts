@@ -13,19 +13,32 @@ export type UserRankingRecord = {
     updatedAt: Date,
 }
 
+export type GuildRankingRecord = {
+    uid: GuildUid,
+    name: string,
+    score: number,
+    power: number,
+    amountOfAnsweredQuestions: number,
+    amountOfCollectedCards: number,
+    amountOfMembers: number,
+    updatedAt: Date,
+}
+
 export default class RankingRound extends FirebaseModel {
     uid: Uid;
     name: string;
     from: Date;
     to: Date;
     users: UserRankingRecord[];
+    guilds: GuildRankingRecord[];
 
     constructor (
         uid: Uid,
         name: string,
         from: Date,
         to: Date,
-        users: UserRankingRecord[]
+        users: UserRankingRecord[],
+        guilds: GuildRankingRecord[]
     ) {
         super();
 
@@ -34,6 +47,7 @@ export default class RankingRound extends FirebaseModel {
         this.from = from;
         this.to = to;
         this.users = users;
+        this.guilds = guilds;
     }
 
     protected static toFirestore (data: RankingRound): object {
@@ -82,12 +96,46 @@ export default class RankingRound extends FirebaseModel {
                 return 0;
             });
 
+        const guildEntries: GuildRankingRecord[] = Object.entries(data.guilds)
+            .map(([uid, record]: [string, any]): GuildRankingRecord => {
+                return <GuildRankingRecord>{
+                    uid,
+                    name: record.name,
+                    amountOfCollectedCards: record.amountOfCollectedCards,
+                    amountOfAnsweredQuestions: record.amountOfAnsweredQuestions,
+                    amountOfMembers: record.amountOfMembers,
+                    score: record.score,
+                    power: record.amountOfMembers !== 0 ? Math.round(record.score / record.amountOfMembers) : 0,
+                    updatedAt: record.updatedAt.toDate()
+                };
+            })
+            .sort((a: GuildRankingRecord, b: GuildRankingRecord) => {
+                if (a.power > b.power) {
+                    return -1;
+                }
+
+                if (a.power < b.power) {
+                    return 1;
+                }
+
+                if (a.updatedAt > b.updatedAt) {
+                    return -1;
+                }
+
+                if (a.updatedAt < b.updatedAt) {
+                    return 1;
+                }
+
+                return 0;
+            });
+
         return new RankingRound(
             data.uid,
             data.name,
             data.from.toDate(),
             data.to.toDate(),
-            rankingEntries
+            rankingEntries,
+            guildEntries
         );
     }
 }
