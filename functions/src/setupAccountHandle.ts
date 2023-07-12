@@ -24,7 +24,7 @@ export default async function setupAccountHandle (
 
     if (
         typeof username !== 'string'
-        || username.length < 3 || username.length >= 20
+        || username.length < 3 || username.length > 20
         || username.match(/^[A-z0-9ąćęłóśźż\-\s&$#@.<>(){}:;+]+$/i) === null
     ) {
         logger.error('setupAccountHandle', 'username does not meet requirements');

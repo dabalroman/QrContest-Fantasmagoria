@@ -17,7 +17,7 @@ module.exports = {
                 fancy: ['var(--font-trykker)']
             },
             backgroundImage: {
-                'image-default': 'url(\'/backgrounds/bg.jpg\')',
+                'image-default': 'url(\'/backgrounds/bg.webp\')',
                 'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))'
             },
             borderWidth: {
@@ -81,7 +81,7 @@ module.exports = {
                         filter: 'brightness(1)',
                     },
                     '5%': {
-                        filter: 'brightness(5)',
+                        filter: 'brightness(7)',
                     },
                     '100%': {
                         filter: 'brightness(1)',

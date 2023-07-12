@@ -2,7 +2,7 @@ import { FirebaseApp, getApp, initializeApp } from 'firebase/app';
 import { Auth, connectAuthEmulator, getAuth, GoogleAuthProvider } from '@firebase/auth';
 import { connectFirestoreEmulator, Firestore, getFirestore } from '@firebase/firestore';
 import { FirebaseStorage, getStorage } from '@firebase/storage';
-import { getAnalytics, isSupported } from '@firebase/analytics';
+import { initializeAnalytics, isSupported } from '@firebase/analytics';
 import configuration from '@/configuration';
 import { connectFunctionsEmulator, getFunctions } from '@firebase/functions';
 
@@ -23,7 +23,7 @@ export const storage: FirebaseStorage = getStorage(firebaseApp);
 export const functions = getFunctions(firebaseApp, configuration.firebase.region);
 
 isSupported()
-    .then((value) => (value ? getAnalytics(firebaseApp) : null));
+    .then((value) => (value ? initializeAnalytics(firebaseApp) : null));
 
 if (configuration.emulator) {
     console.log(configuration.emulatorHost + ':' + configuration.emulatorAuthPort);
