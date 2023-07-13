@@ -38,6 +38,12 @@
     "hosting": {
         "site": "fantas",
         "source": ".",
+        "rewrites": [
+            {
+                "source": "**",
+                "destination": "/index.html"
+            }
+        ],
         "ignore": [
             "firebase.json",
             "**/.*",

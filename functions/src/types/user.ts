@@ -12,9 +12,9 @@ export enum UserRole {
 export type User = {
     uid: string,
     username: string,
-    score: number | FieldValue,
-    amountOfCollectedCards: number | FieldValue,
-    amountOfAnsweredQuestions: number | FieldValue,
+    score: number,
+    amountOfCollectedCards: number,
+    amountOfAnsweredQuestions: number,
     role: UserRole,
     memberOf: GuildUid | null,
     updatedAt: Timestamp | FieldValue,

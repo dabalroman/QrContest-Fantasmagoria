@@ -69,7 +69,7 @@ export default function ScoreboardPage ({}) {
                         {!user?.memberOf && (
                             <>
                                 <span>Nie jesteś członkiem żadnej gildii.</span>
-                                <LinkButton className="mt-2" href={Page.GUILD}>Wybierz gildię</LinkButton>
+                                <LinkButton className="mt-2" href={Page.GUILD}>Dołącz do gildii</LinkButton>
                             </>
                         )}
                         {user?.memberOf && currentRound?.guilds[currentGuildPlace] && (

@@ -35,13 +35,13 @@ export default async function updateGuild (
         amountOfMembers
     } = memberUids.reduce(
         (acc, uid) => {
-            acc.score += (uid === user.uid ? user.score as number : guild.members[uid].score);
+            acc.score += (uid === user.uid ? user.score : guild.members[uid].score);
             acc.amountOfAnsweredQuestions += (uid === user.uid
-                    ? user.amountOfAnsweredQuestions as number
+                    ? user.amountOfAnsweredQuestions
                     : guild.members[uid].amountOfAnsweredQuestions
             );
             acc.amountOfCollectedCards += (uid === user.uid
-                    ? user.amountOfCollectedCards as number
+                    ? user.amountOfCollectedCards
                     : guild.members[uid].amountOfCollectedCards
             );
             acc.amountOfMembers += 1;

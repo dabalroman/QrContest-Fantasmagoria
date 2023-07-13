@@ -27,9 +27,9 @@ export default async function updateRanking (
     roundsSnapshotsToUpdate.forEach((snapshot) => {
         const record: RankingRoundUser = {
             username: user.username,
-            score: user.score as number,
-            amountOfCollectedCards: user.amountOfCollectedCards as number,
-            amountOfAnsweredQuestions: user.amountOfAnsweredQuestions as number,
+            score: user.score,
+            amountOfCollectedCards: user.amountOfCollectedCards,
+            amountOfAnsweredQuestions: user.amountOfAnsweredQuestions,
             memberOf: user.memberOf,
             updatedAt: FieldValue.serverTimestamp()
         };

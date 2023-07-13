@@ -76,9 +76,9 @@ export default async function joinGuildHandle (
                     amountOfCollectedCards: user.amountOfCollectedCards,
                     joinedAt: FieldValue.serverTimestamp()
                 },
-                score: FieldValue.increment(user.score as number),
-                amountOfCollectedCards: FieldValue.increment(user.amountOfCollectedCards as number),
-                amountOfAnsweredQuestions: FieldValue.increment(user.amountOfAnsweredQuestions as number),
+                score: FieldValue.increment(user.score),
+                amountOfCollectedCards: FieldValue.increment(user.amountOfCollectedCards),
+                amountOfAnsweredQuestions: FieldValue.increment(user.amountOfAnsweredQuestions),
                 amountOfMembers: FieldValue.increment(1),
                 updatedAt: FieldValue.serverTimestamp()
             });
