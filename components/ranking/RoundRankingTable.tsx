@@ -55,7 +55,7 @@ export default function RoundRankingTable ({
                             </tr>
                         ))}
                     {(!currentRound.users || currentRound.users.length === 0) &&
-                        <td colSpan={4} className="text-center">Ranking jest pusty.</td>
+                        <tr><td colSpan={4} className="text-center">Ranking jest pusty.</td></tr>
                     }
                 </tbody>
             </table>

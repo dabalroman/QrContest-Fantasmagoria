@@ -1,13 +1,13 @@
 import Head from 'next/head';
 
 export default function Metatags({
-    title = 'QrContest - Fantasmagoria 13',
+    title = '',
     description = 'QrContest - Fantasmagoria 13',
     image = '',
 }) {
     return (
         <Head>
-            <title>{`${title} - QrContest - Fantasmagoria 13`}</title>
+            <title>{title ? `${title} - QrContest - Fantasmagoria 13` : 'QrContest - Fantasmagoria 13'}</title>
 
             <meta name="description" content={description}/>
 
