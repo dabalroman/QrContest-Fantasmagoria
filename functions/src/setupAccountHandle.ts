@@ -3,6 +3,8 @@ import { FieldValue, getFirestore } from 'firebase-admin/firestore';
 import { User, UserRole } from './types/user';
 import updateRanking from './actions/updateRanking';
 import forbiddenPhrases from './data/forbiddenPhrases';
+import { firestore } from 'firebase-admin';
+import Timestamp = firestore.Timestamp;
 
 function checkForForbiddenPhrases (username: string): boolean {
     const text = username.toLowerCase();
@@ -65,7 +67,8 @@ export default async function setupAccountHandle (
         amountOfAnsweredQuestions: 0,
         role: UserRole.USER,
         memberOf: null,
-        updatedAt: FieldValue.serverTimestamp()
+        updatedAt: FieldValue.serverTimestamp(),
+        lastGuildChangeAt: Timestamp.fromMillis(0)
     };
 
     let collectedQuestionsRef: FirebaseFirestore.DocumentReference = db.collection('users')

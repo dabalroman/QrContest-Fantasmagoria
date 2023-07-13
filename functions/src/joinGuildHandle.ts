@@ -5,6 +5,10 @@ import getCurrentUser from './actions/getCurrentUser';
 import updateRanking from './actions/updateRanking';
 import { GuildUid } from './types/guild';
 import updateGuild from './actions/updateGuild';
+import { firestore } from 'firebase-admin';
+import Timestamp = firestore.Timestamp;
+
+const TIME_BETWEEN_GUILD_CHANGES_MS = 4 * 60 * 60 * 1000;
 
 export default async function joinGuildHandle (
     data: any,
@@ -41,6 +45,14 @@ export default async function joinGuildHandle (
         throw new https.HttpsError('invalid-argument', 'already member of this guild');
     }
 
+    const timestampNow = (new Date()).getTime();
+    const timestampLastChange = (user.lastGuildChangeAt as Timestamp)?.toMillis() ?? 0;
+
+    if (timestampNow - timestampLastChange < TIME_BETWEEN_GUILD_CHANGES_MS) {
+        logger.error('joinGuildHandle', 'cooldown');
+        throw new https.HttpsError('invalid-argument', 'cooldown');
+    }
+
     // Previous guild
     let previousGuildRef: FirebaseFirestore.DocumentReference | null = null;
     if (user.memberOf) {
@@ -64,9 +76,9 @@ export default async function joinGuildHandle (
                     amountOfCollectedCards: user.amountOfCollectedCards,
                     joinedAt: FieldValue.serverTimestamp()
                 },
-                score: FieldValue.increment(user.score),
-                amountOfCollectedCards: FieldValue.increment(user.amountOfCollectedCards),
-                amountOfAnsweredQuestions: FieldValue.increment(user.amountOfAnsweredQuestions),
+                score: FieldValue.increment(user.score as number),
+                amountOfCollectedCards: FieldValue.increment(user.amountOfCollectedCards as number),
+                amountOfAnsweredQuestions: FieldValue.increment(user.amountOfAnsweredQuestions as number),
                 amountOfMembers: FieldValue.increment(1),
                 updatedAt: FieldValue.serverTimestamp()
             });
@@ -84,6 +96,7 @@ export default async function joinGuildHandle (
 
             transaction.update(userRef, {
                 memberOf: guildToJoin,
+                lastGuildChangeAt: FieldValue.serverTimestamp(),
                 updatedAt: FieldValue.serverTimestamp()
             } as User);
         });

@@ -23,7 +23,7 @@ export default function GuildPage () {
 
     const [loading, setLoading] = useState<boolean>(true);
     const [guilds, setGuilds] = useState<Guild[] | null>(null);
-    const [selectedGuild, setSelectedGuild] = useState<string | null>(user?.memberOf ?? null);
+    const [selectedGuildUid, setSelectedGuildUid] = useState<string | null>(user?.memberOf ?? null);
 
     const joinGuild = (guildUid: string | null) => {
         if (typeof guildUid !== 'string') {
@@ -43,19 +43,23 @@ export default function GuildPage () {
                     router.push(Page.ACCOUNT);
                 }
             )
-            .catch(() => {
+            .catch((error) => {
+                    if (error.message === 'cooldown') {
+                        toast.error('Nie możesz jeszcze zmienić gildii. Spróbuj później.');
+                    } else {
+                        toast.error('Nie udało się dołączyć do gildii. Spróbuj ponownie.');
+                    }
                     setLoading(false);
-                    toast.error('Nie udało się dołączyć do gildii. Spróbuj ponownie.');
                 }
             );
     };
 
-    const selectionValid = selectedGuild !== null && selectedGuild !== user?.memberOf;
+    const selectionValid = selectedGuildUid !== null && selectedGuildUid !== user?.memberOf;
     useDynamicNavbar({
         icon: selectionValid ? faCheck : faArrowLeft,
         animate: selectionValid,
         href: !selectionValid ? Page.COLLECT : undefined,
-        onClick: selectionValid ? () => joinGuild(selectedGuild) : undefined
+        onClick: selectionValid ? () => joinGuild(selectedGuildUid) : undefined
     });
 
     useEffect(() => {
@@ -73,23 +77,33 @@ export default function GuildPage () {
         );
     }, []);
 
+    const selectedGuild: Guild | undefined = guilds?.find((guild: Guild) => guild.uid === selectedGuildUid);
+
     return (
         <main className="grid grid-rows-layout items-center min-h-screen p-4">
             <ScreenTitle>GILDIA</ScreenTitle>
             <Metatags title="Gildia"/>
             <div>
                 {loading && <Loader/>}
-                <Panel title="Wybór Gildii" className="text-center">
-                    <p>Gildia to twoja rodzina, gildia to twój dom. <br/> Wybierz tę, która bliska jest twemu sercu.</p>
-                    <p className="text-sm text-text-half mt-2">Wybór gildii nie wpływa na Twoje szanse na wygraną, ma
-                        charakter kosmetyczny.</p>
+
+                <Panel title={selectedGuild?.name ?? 'Wybór Gildii'} className="text-center">
+                    {selectedGuild
+                        ? (<p className='text-justify'>{selectedGuild.description}</p>)
+                        : (
+                            <>
+                                <p>Gildia to twoja rodzina, gildia to twój dom.
+                                    <br/> Wybierz tę, która bliska jest twemu sercu.</p>
+                                <p className="text-sm text-text-half mt-2">
+                                    Wybór gildii nie wpływa na Twoje szanse na wygraną, ma charakter kosmetyczny.</p>
+                            </>
+                        )}
                 </Panel>
 
                 <div className="grid grid-cols-2 gap-4">
                     {guilds?.map((guild: Guild) => (
                         <div
                             key={guild.uid}
-                            onClick={() => setSelectedGuild(guild.uid)}
+                            onClick={() => setSelectedGuildUid(guild.uid)}
                             className={
                                 'relative border-6 rounded-xl bg-background bg-center bg-cover shadow-card'
                                 + ' w-full cursor-pointer'
@@ -98,8 +112,8 @@ export default function GuildPage () {
                             style={{
                                 'backgroundImage': `url(/guilds/${guild.uid}.webp)`,
                                 'minHeight': '14rem',
-                                'filter': (guild.uid === selectedGuild ? 'contrast(1)' : 'contrast(0.8)'),
-                                'transform': (guild.uid === selectedGuild ? 'scale(1)' : 'scale(0.9)')
+                                'filter': (guild.uid === selectedGuildUid ? 'contrast(1)' : 'contrast(0.8)'),
+                                'transform': (guild.uid === selectedGuildUid ? 'scale(1)' : 'scale(0.9)')
                             }}
                         >
                             <div

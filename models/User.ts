@@ -11,6 +11,7 @@ export default class User extends FirebaseModel {
     memberOf: string | null;
     role: UserRole;
     updatedAt: Date;
+    lastGuildChangeAt: Date;
 
     constructor (
         uid: string,
@@ -20,7 +21,8 @@ export default class User extends FirebaseModel {
         amountOfAnsweredQuestions: number = 0,
         memberOf: string | null = null,
         role: UserRole = UserRole.USER,
-        updatedAt: Date = new Date()
+        updatedAt: Date = new Date(),
+        lastGuildChangeAt: Date = new Date(),
     ) {
         super();
 
@@ -32,6 +34,7 @@ export default class User extends FirebaseModel {
         this.memberOf = memberOf;
         this.role = role;
         this.updatedAt = updatedAt;
+        this.lastGuildChangeAt = lastGuildChangeAt;
     }
 
     protected static toFirestore (data: User): object {
@@ -60,7 +63,8 @@ export default class User extends FirebaseModel {
             data.amountOfAnsweredQuestions,
             data.memberOf,
             data.role,
-            data.updatedAt.toDate()
+            data.updatedAt.toDate(),
+            data.lastGuildChangeAt.toDate()
         );
     }
 }

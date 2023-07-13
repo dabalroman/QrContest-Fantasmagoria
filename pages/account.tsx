@@ -17,7 +17,9 @@ import { useRouter } from 'next/router';
 import Guild from '@/models/Guild';
 import { doc, onSnapshot } from '@firebase/firestore';
 import { FireDoc } from '@/Enum/FireDoc';
-import AccountGuildPanel from '@/components/account/AccountGuildPanel';
+import CurrentGuildPanel from '@/components/account/CurrentGuildPanel';
+import JoinGuildPanel from '@/components/account/JoinGuildPanel';
+import BetrayGuildPanel from '@/components/account/BetrayGuildPanel';
 
 export default function AccountPage () {
     const router = useRouter();
@@ -34,7 +36,8 @@ export default function AccountPage () {
         setGuildLoading(true);
 
         return onSnapshot(
-            doc(firestore, FireDoc.GUILDS, user?.memberOf as string).withConverter(Guild.getConverter()),
+            doc(firestore, FireDoc.GUILDS, user?.memberOf as string)
+                .withConverter(Guild.getConverter()),
             (snapshot) => {
                 const guild = snapshot.data() as Guild;
                 setGuild(guild);
@@ -72,22 +75,16 @@ export default function AccountPage () {
 
                 {user.role === UserRole.ADMIN && <AdminSection/>}
 
-                <AccountGuildPanel user={user} guild={guild} loading={guildLoading}/>
-
-                {user.memberOf !== null && (
-                    <Panel title="Zdrada Gildii">
-                        <p className='mb-3'>Możesz zdradzić swoich towarzyszy by dołączyć do innej gildii. Tego
-                            haniebnego czynu możesz dokonać tylko raz.</p>
-                        <LinkButton href={Page.GUILD}>Zdradź Gildię</LinkButton>
-                    </Panel>
-                )}
+                {user.memberOf === null && <JoinGuildPanel/>}
+                {user.memberOf && guild && <CurrentGuildPanel guild={guild} loading={guildLoading}/>}
+                {user.memberOf && guild && <BetrayGuildPanel user={user} guild={guild}/>}
 
                 <Panel title="Regulamin i pytania">
                     <p>
                         Masz pytania o sposób działania konkursu? Sprawdź sekcję &quot;Pytania i odpowiedzi&quot;.
                     </p>
-                    <LinkButton className='mt-3' href={Page.FAQ}>Pytania i odpowiedzi</LinkButton>
-                    <LinkButton className='mt-3' href={Page.RULEBOOK}>Regulamin konkursu</LinkButton>
+                    <LinkButton className="mt-3" href={Page.FAQ}>Pytania i odpowiedzi</LinkButton>
+                    <LinkButton className="mt-3" href={Page.RULEBOOK}>Regulamin konkursu</LinkButton>
                 </Panel>
 
                 <Panel title="Wyloguj">

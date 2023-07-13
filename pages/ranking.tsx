@@ -56,7 +56,8 @@ export default function ScoreboardPage ({}) {
             <div>
                 <Panel loading={loading} className="text-center">
                     <p className="text-2xl">
-                        {user?.username} <FontAwesomeIcon className="px-1" icon={faDiceD6} size="sm"/>{user?.score}
+                        {user?.username} <br/>
+                        <FontAwesomeIcon className="px-1" icon={faDiceD6} size="sm"/>{user?.score}
                     </p>
                     <p className="mt-1">
                         {currentUserPlace !== -1
@@ -68,7 +69,7 @@ export default function ScoreboardPage ({}) {
                         {!user?.memberOf && (
                             <>
                                 <span>Nie jesteś członkiem żadnej gildii.</span>
-                                <LinkButton className='mt-2' href={Page.GUILD}>Wybierz gildię</LinkButton>
+                                <LinkButton className="mt-2" href={Page.GUILD}>Wybierz gildię</LinkButton>
                             </>
                         )}
                         {user?.memberOf && currentRound?.guilds[currentGuildPlace] && (

@@ -15,6 +15,7 @@ export type GuildMember = {
 export type Guild = {
     uid: GuildUid;
     name: string;
+    description: string;
     score: number | FieldValue;
     amountOfMembers: number | FieldValue;
     amountOfCollectedCards: number | FieldValue;

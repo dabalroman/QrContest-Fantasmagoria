@@ -16,9 +16,12 @@ export enum GuildUid {
     void = 'guild-void'
 }
 
+const TIME_BETWEEN_GUILD_CHANGES_MS = 4 * 60 * 60 * 1000;
+
 export default class Guild extends FirebaseModel {
     uid: GuildUid;
     name: string;
+    description: string;
     score: number;
     power: number;
     amountOfMembers: number;
@@ -30,6 +33,7 @@ export default class Guild extends FirebaseModel {
     constructor (
         uid: GuildUid,
         name: string = '',
+        description: string = '',
         score: number = 0,
         amountOfMembers: number,
         amountOfCollectedCards: number = 0,
@@ -41,6 +45,7 @@ export default class Guild extends FirebaseModel {
 
         this.uid = uid;
         this.name = name;
+        this.description = description;
         this.score = score;
         this.amountOfMembers = amountOfMembers;
         this.amountOfCollectedCards = amountOfCollectedCards;
@@ -77,6 +82,7 @@ export default class Guild extends FirebaseModel {
         return new Guild(
             data.uid,
             data.name,
+            data.description,
             data.score,
             data.amountOfMembers,
             data.amountOfCollectedCards,
@@ -84,5 +90,9 @@ export default class Guild extends FirebaseModel {
             members,
             data.updatedAt.toDate()
         );
+    }
+
+    public canGuildBeChanged(lastChangeDate: Date): boolean {
+        return (new Date()).getTime() - lastChangeDate.getTime() >= TIME_BETWEEN_GUILD_CHANGES_MS;
     }
 }
