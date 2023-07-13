@@ -10,7 +10,6 @@ import { UserRole } from '@/Enum/UserRole';
 import Button from '@/components/Button';
 import { seedDatabaseFunction } from '@/utils/functions';
 import toast from 'react-hot-toast';
-import { HttpsCallableResult } from '@firebase/functions';
 import { Page } from '@/Enum/Page';
 import { auth, firestore } from '@/utils/firebase';
 import { useRouter } from 'next/router';
@@ -48,16 +47,18 @@ export default function AccountPage () {
 
     const AdminSection = () => (
         <Panel title="Admin">
-            <LinkButton href={'/admin/card'}>Card</LinkButton>
-            <Button className="w-full mt-4" onClick={() => {
-                seedDatabaseFunction()
-                    .then((data: HttpsCallableResult) => {
-                        if ((data.data as any).status === 'ok') {
-                            toast.success('DB seed succeed.');
-                        } else {
-                            toast.error('DB seed failed');
-                        }
-                    });
+            <p>Dangerous.</p>
+            <Button className="w-full mt-2" onClick={() => {
+                const password = prompt('Password?') ?? '';
+
+                if (!password) {
+                    return;
+                }
+
+                seedDatabaseFunction({ password: password })
+                    .then(() => toast.success('DB seed succeed.'))
+                    .catch((error) => toast.error('DB seed failed: ' + error.message));
+
             }}>Seed database</Button>
         </Panel>
     );
@@ -72,8 +73,6 @@ export default function AccountPage () {
                         <FontAwesomeIcon className="px-1" icon={faDiceD6} size="sm"/>{user.score}
                     </p>
                 </Panel>
-
-                {user.role === UserRole.ADMIN && <AdminSection/>}
 
                 {user.memberOf === null && <JoinGuildPanel/>}
                 {user.memberOf && guild && <CurrentGuildPanel guild={guild} loading={guildLoading}/>}
@@ -102,6 +101,8 @@ export default function AccountPage () {
                         Wyloguj
                     </Button>
                 </Panel>
+
+                {user.role === UserRole.ADMIN && <AdminSection/>}
             </div>
         </main>
     );

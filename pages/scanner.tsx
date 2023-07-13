@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import QrScanner from 'qr-scanner';
 import Panel from '@/components/Panel';
 import useDynamicNavbar from '@/hooks/useDynamicNavbar';
@@ -7,12 +7,15 @@ import { useRouter } from 'next/router';
 import { Page } from '@/Enum/Page';
 import Metatags from '@/components/Metatags';
 import ScreenTitle from '@/components/ScreenTitle';
+import { UserContext, UserContextType } from '@/utils/context';
+import LinkButton from '@/components/LinkButton';
 
 export default function ScannerPage () {
     const ref = useRef<HTMLVideoElement>(null);
     const [code, setCode] = useState<string | null>(null);
 
     const router = useRouter();
+    const { user } = useContext<UserContextType>(UserContext);
     const qrScannerRef = useRef<QrScanner | null>(null);
 
     useDynamicNavbar({
@@ -78,11 +81,21 @@ export default function ScannerPage () {
                 >
                     <Panel margin={false} className="text-center relative bottom-4 z-0 rounded-b-2xl w-full">
                         {!code && <p className="pt-3">Gdy kod zostanie wykryty, ramka karty zrobi się zielona.</p>}
-                        {code && <p className="pt-3">Wykryto kod!<br/><b>{code}</b></p>}
+                        {code && (
+                            <>
+                                <p className="pt-3">Wykryto kod!<br/><b>{code}</b></p>
+                                {user?.isAdmin() &&
+                                    <LinkButton
+                                        className="mt-2"
+                                        href={`${Page.ADMIN_EDIT_CARD}/${code}`}
+                                    >Edytuj kod</LinkButton>
+                                }
+                            </>
+                        )}
                     </Panel>
                     <div className={'z-50 relative text-center'}>
-                        <div className='absolute top-0 left-0 w-full h-full flex flex-col justify-center px-5'>
-                            <p className='pb-2'>Aby skorzystać ze skanera, musisz zezwolić na wykorzystanie aparatu.</p>
+                        <div className="absolute top-0 left-0 w-full h-full flex flex-col justify-center px-5">
+                            <p className="pb-2">Aby skorzystać ze skanera, musisz zezwolić na wykorzystanie aparatu.</p>
                             <p>
                                 Jeżeli zapytanie o dostęp nie wyświetla się, to twoje urządzenie nie jest
                                 kompatybilne lub jego ustawienia odmawiają dostępu do kamery.

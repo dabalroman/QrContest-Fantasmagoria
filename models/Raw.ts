@@ -9,6 +9,7 @@ export interface RawCard {
     collectedAt: RawFirestoreTimestamp,
     collectedBy: string[] | undefined,
     description: string,
+    comment: string,
     image: string,
     isActive: boolean | undefined,
     name: string,

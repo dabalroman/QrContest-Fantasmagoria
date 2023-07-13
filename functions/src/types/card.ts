@@ -25,6 +25,7 @@ export type Card = {
     code: string;
     collectedBy: CollectedBy;
     description: string;
+    comment: string;
     image: string;
     isActive: boolean;
     name: string;

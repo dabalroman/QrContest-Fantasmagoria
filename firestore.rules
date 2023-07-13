@@ -26,10 +26,10 @@ service cloud.firestore {
         }
 
         match /cards/{cardId} {
-            allow read, create, update: if request.auth != null
+            allow read, update: if request.auth != null
                 && isUserAdmin();
 
-            allow update, delete: if false;
+            allow write: if false;
         }
 
         match /cardSets/{cardSet} {

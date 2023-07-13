@@ -1,5 +1,5 @@
 import FirebaseModel from '@/models/FirebaseModel';
-import { doc, DocumentSnapshot, getDoc, setDoc, SnapshotOptions, Timestamp } from '@firebase/firestore';
+import { doc, DocumentSnapshot, setDoc, SnapshotOptions, Timestamp } from '@firebase/firestore';
 import { firestore } from '@/utils/firebase';
 import { FireDoc } from '@/Enum/FireDoc';
 import { CardTier, CardTierValue, getCardTierValue, isCardTier } from '@/Enum/CardTier';
@@ -16,6 +16,7 @@ export default class Card extends FirebaseModel {
     cardSet: string;
     image: string;
     description: string;
+    comment: string;
     withQuestion: boolean;
     isActive: boolean;
     collectedBy: string[];
@@ -29,6 +30,7 @@ export default class Card extends FirebaseModel {
         cardSet: string = '',
         image: string = '',
         description: string = '',
+        comment: string = '',
         withQuestion: boolean = false,
         isActive: boolean = false,
         collectedBy: string[] = [],
@@ -48,6 +50,7 @@ export default class Card extends FirebaseModel {
         this.cardSet = cardSet;
         this.image = image;
         this.description = description;
+        this.comment = comment;
         this.withQuestion = withQuestion;
         this.isActive = isActive;
         this.collectedBy = collectedBy;
@@ -67,6 +70,7 @@ export default class Card extends FirebaseModel {
             rawCard.cardSet,
             rawCard.image,
             rawCard.description,
+            rawCard.comment ?? '',
             rawCard.withQuestion,
             rawCard.isActive,
             rawCard.collectedBy,
@@ -75,16 +79,9 @@ export default class Card extends FirebaseModel {
         );
     }
 
-    public static async fromUid (uid: string): Promise<Card | undefined> {
-        const cardDoc = doc(firestore, FireDoc.CARD, uid)
-            .withConverter(this.getConverter());
-        const snapshot = await getDoc(cardDoc);
-        return snapshot.data() as Card | undefined;
-    }
-
     public async save (): Promise<void> {
         try {
-            await setDoc(doc(firestore, FireDoc.CARD, this.uid)
+            await setDoc(doc(firestore, FireDoc.CARDS, this.uid)
                 .withConverter(Card.getConverter()), this);
         } catch (e) {
             console.error('Error adding document: ', e);
@@ -95,18 +92,10 @@ export default class Card extends FirebaseModel {
 
     protected static toFirestore (data: Card): object {
         return {
-            uid: data.uid,
-            name: data.name,
             code: data.code,
-            value: data.value,
-            tier: data.tier,
-            cardSet: data.cardSet,
-            image: data.image,
-            description: data.description,
+            comment: data.comment,
             withQuestion: data.withQuestion,
             isActive: data.isActive,
-            collectedBy: data.collectedBy,
-            collectedAt: data.collectedAt
         };
     }
 
@@ -128,10 +117,11 @@ export default class Card extends FirebaseModel {
             data.cardSet,
             data.image,
             data.description,
+            data.comment,
             data.withQuestion,
             data.isActive,
             data.collectedBy,
-            data.collectedAt.toDate()
+            data.collectedAt?.toDate() ?? null
         );
     }
 }

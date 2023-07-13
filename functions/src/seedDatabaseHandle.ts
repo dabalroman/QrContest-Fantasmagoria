@@ -20,6 +20,11 @@ export default async function seedDatabaseHandle (
         throw new https.HttpsError('permission-denied', 'permission denied');
     }
 
+    if(!data.password || data.password !== '4064') {
+        logger.error('seedDatabaseHandle', 'permission denied');
+        throw new https.HttpsError('permission-denied', 'permission denied');
+    }
+
     const uid: string = context.auth.uid;
 
     const db = getFirestore();

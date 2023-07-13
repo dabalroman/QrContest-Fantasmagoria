@@ -67,6 +67,14 @@ export default class User extends FirebaseModel {
             data.lastGuildChangeAt.toDate()
         );
     }
+
+    public isAdmin() {
+        return this.role === UserRole.ADMIN;
+    }
+
+    public isDashboard() {
+        return this.role === UserRole.DASHBOARD;
+    }
 }
 
 
