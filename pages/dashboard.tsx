@@ -184,7 +184,7 @@ export default function DashboardPage () {
             setScreenId(getRandomScreenId());
             setCurrentEntry(getNextEntryToShow(programEntries));
             setCurrentTheme(getRandomArrayElement(colorThemes) as string);
-        }, 5000);
+        }, 30000);
 
         return () => clearInterval(timeout);
     }, [programEntries]);
