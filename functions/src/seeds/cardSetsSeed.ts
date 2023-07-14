@@ -10,7 +10,7 @@ const cardSetsSeed: CardSet[] = [
     },
     {
         uid: 'steam-city',
-        amountOfCards: 0,
+        amountOfCards: 6,
         name: 'Miasto pary',
         description: 'Moją podróż zakończyłem w cudownym miaście, gdzie zetknąłem się z niesamowitymi mechanizmami i wszechobecną parą. Stalowe konstrukcje pulsują życiem, tworząc mistyczną symfonię industrii i marzeń.'
     },
@@ -22,9 +22,9 @@ const cardSetsSeed: CardSet[] = [
     },
     {
         uid: 'from-the-past',
-        amountOfCards: 0,
-        name: 'Postaci z przeszłości',
-        description: 'Oto legendy w czasach, gdy byli jeszcze młodzi i nieświadomi swojego przeznaczenia i sławy.'
+        amountOfCards: 5,
+        name: 'Początki',
+        description: 'To pięć kart, pięć różnych ścieżek, które z dzieciństwa prowadziły do bohaterskich legend. Każda z nich to dowód na to, że wielkość zaczyna się małością.'
     },
     {
         uid: 'postcards-from-far-away',
@@ -34,7 +34,7 @@ const cardSetsSeed: CardSet[] = [
     },
     {
         uid: 'nebula',
-        amountOfCards: 0,
+        amountOfCards: 5,
         name: 'Nebula',
         description: 'W mgławicowym tańcu moich wspomnień odsłaniają się postacie światła, kolorów i tęczy. Ich mieniące się barwy i neonowe wzornictwo tworzą magiczną symfonię dla oczu.'
     },
@@ -43,6 +43,18 @@ const cardSetsSeed: CardSet[] = [
         amountOfCards: 9,
         name: 'Znajomi z podróży',
         description: 'Portrety bohaterów spotkanych w mej wędrówce ożywają na kartach tej kolekcji. Ich twarze przenikają serce i umysł, niosąc ze sobą historie pełne niesamowitych przygód. To w ich towarzystwie uczyniłem krok ku nieznanemu.'
+    },
+    {
+        uid: 'galaxy',
+        amountOfCards: 6,
+        name: 'Galaktyczne sny',
+        description: 'Kolekcja ta to podróż przez ukryte zakątki wszechświata. Tajemnice Azury-9, stalowe bramy New Theta, monumentalny Ziggurat - to jedyne takie opowieści, które trzymam w swoich rękach.'
+    },
+    {
+        uid: 'secret',
+        amountOfCards: 0,
+        name: 'Tajemnica',
+        description: 'Ta tajna kolekcja zostanie poznana tylko przez szczególnie dociekliwych.'
     }
 ];
 
