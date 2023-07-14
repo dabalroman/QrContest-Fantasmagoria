@@ -93,16 +93,16 @@ export default function FaqPage () {
             answer: 'System gildii to społeczny element konkursu, który pozwala uczestnikom na dołączanie do jednej z czterech dostępnych gildii. Wybierzesz jedną z nich przy rejestracji swojego konta. Wybór gildii jest czysto kosmetyczny i nie wpływa na Twoje szanse na wygraną.'
         },
         {
+            question: 'Czy w sekcji FAQ kryje się kod?',
+            answer: 'Skoro pytasz, to proszę. Brzmi on "mampytanie". Możesz wpisać go na ekranie "Szukaj" w aplikacji.'
+        },
+        {
             question: 'Czy mogę zmienić gildię?',
-            answer: 'Tak, aplikacja umożliwia jednorazową "zdradę" gildii. Możesz skorzystać z tej opcji, jeśli zdecydujesz, że chciałbyś należeć do innej gildii.'
+            answer: 'Tak, możesz zmienić gildię raz na 4 godziny. Możesz skorzystać z tej opcji, jeśli zdecydujesz, że chciałbyś należeć do innej gildii.'
         },
         {
             question: 'Jak jest wyliczany wynik gildii?',
-            answer: 'Wynik gildii jest obliczany jako średnia punktów wszystkich jej członków. To oznacza, że każdy uczestnik ma wkład w sukces swojej gildii, niezależnie od tego, ile punktów zdobył.'
-        },
-        {
-            question: 'Czy w sekcji FAQ kryje się kod?',
-            answer: 'Tak, a brzmi on MAMPYTANIE. Możesz go wpisać na ekranie "Szukaj".'
+            answer: 'Wynik gildii (siła) jest obliczany jako średnia punktów wszystkich jej członków. To oznacza, że każdy uczestnik ma wkład w sukces swojej gildii, niezależnie od tego, ile punktów zdobył.'
         }
     ];
 

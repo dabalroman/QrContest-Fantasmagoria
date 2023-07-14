@@ -67,14 +67,68 @@ export default function Home () {
                 style={{ gridTemplateRows: '1fr' }}
                 id="readme"
             >
+                <Panel title="Nagrody i rundy">
+                    <p className="text-center text-lg">
+                        1. miejsce – 50 fantów <br/>
+                        2. miejsce – 35 fantów <br/>
+                        3. miejsce – 20 fantów <br/>
+                    </p>
+                    <p className="mt-2 text-justify">
+                        Konkurs podzielony jest na dwie rundy. Daty rozpoczęcia i zakończenia każdej z nich znajdziesz
+                        w zakładce &quot;Ranking&quot;. Punkty z rundy pierwszej przechodzą do rundy drugiej,
+                        <b> masz dwie szanse na wygraną!</b> Każda runda to troje zwycięzców.
+                    </p>
+                    <p className="mt-2 text-justify">
+                        Zwycięzców zapraszamy po odbiór nagród w punkcie informacyjnym konwentu w momencie
+                        zakończenia trwającej rundy.
+                    </p>
+                </Panel>
+
+                <Panel title="Karty">
+                    <p className="mb-2">
+                        Każdy zebrany kod pozwoli Ci na okrycie karty kolekcjonerskiej.
+                        Karty te przedstawią Ci historię krainy Erindar. Czy uda Ci się zebrać je wszystkie?
+                    </p>
+
+                    <div className="grid grid-cols-3 gap-4">
+                        <div
+                            className={
+                                'border-4 border-card-border rounded-xl bg-background bg-center bg-cover shadow-card'
+                            }
+                            style={{
+                                'backgroundImage': `url(/cards/erindar.webp)`,
+                                'height': '8.25rem',
+                            }}
+                        >
+                        </div>
+                        <div
+                            className={
+                                'border-4 border-card-border rounded-xl bg-background bg-center bg-cover shadow-card'
+                            }
+                            style={{
+                                'backgroundImage': `url(/cards/flordraak.webp)`,
+                                'height': '8.25rem',
+                            }}
+                        >
+                        </div>
+                        <div
+                            className={
+                                'border-4 border-card-border rounded-xl bg-background bg-center bg-cover shadow-card'
+                            }
+                            style={{
+                                'backgroundImage': `url(/cards/zorza.webp)`,
+                                'height': '8.25rem',
+                            }}
+                        >
+                        </div>
+                    </div>
+                </Panel>
+
                 <Panel title="Czym jest QrContest?" className="text-justify mb-12">
                     <p className="pt-1">QrContest to konkurs, który polega na odkrywaniu i skanowaniu kodów QR
                         rozsianych po terenie konwentu. Za każdy zebrany kod otrzymasz punkty, a im więcej punktów
                         zgromadzisz, tym wyżej znajdziesz się w rankingu. Miejsce na podium gwarantuje fantastyczną
                         nagrodę!</p>
-                    <p className="pt-4">Konkurs składa się z dwóch etapów, a punkty zdobyte w pierwszym etapie przenoszą
-                        się do drugiego. Troje uczestników z największą ilością punktów na koniec każdego etapu otrzyma
-                        cenne nagrody!</p>
                     <p className="pt-4">Udział w konkursie jest całkowicie darmowy. Wszystko, czego potrzebujesz, to
                         smartfon z dostępem
                         do internetu.</p>

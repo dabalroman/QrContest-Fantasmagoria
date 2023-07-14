@@ -103,6 +103,16 @@ export default function AccountPage () {
                     <LinkButton className="mt-3" href={Page.RULEBOOK}>Regulamin konkursu</LinkButton>
                 </Panel>
 
+                <Panel title={'Kontakt'}>
+                    <p className="text-justify">
+                        Coś nie działa? Masz więcej pytań? <br/>
+                        W razie potrzeby możesz skontaktować się bezpośrednio z organizatorem konkursu przez
+                        email <a href="mailto:dabalroman@gmail.com" className="underline">dabalroman@gmail.com</a> lub
+                        na Facebook przez <a href="https://m.me/roman.dabal" className="underline">messenger</a>.
+                        Możesz również zapytać w Punkcie Informacyjnym konwentu.
+                    </p>
+                </Panel>
+
                 <Panel title="Wyloguj">
                     <p className="pb-4 text-justify">
                         Kliknij tutaj, by wylogować się z aplikacji. Do zobaczenia!

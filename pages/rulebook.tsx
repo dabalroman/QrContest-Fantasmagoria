@@ -38,7 +38,7 @@ export default function RulebookPage () {
         'W przypadku zauważenia, że któryś z konkursowych kodów został uszkodzony, uczestnicy są proszeni o kontakt z organizatorem. Sposoby kontaktu opisane są w sekcji "Pytania i odpowiedzi" aplikacji konkursowej.',
         'Aplikacja do celów realizacji konkursu zbiera dane takie jak: adres email lub Google ID uczestnika (zależnie od wybranej metody logowania), Imię/Pseudonim, informacje o zgromadzonych kodach, informacje o odpowiedziach na pytania.',
         'Aplikacja korzysta z plików cookie w celu identyfikacji uczestników gry (logowanie / rejestracja), zakładając konto w aplikacji zgadzasz się na ich używanie.',
-        'Każda osoba, która przeczytała regulamin może użyć kodu "MAMPYTANIE" by zyskać dodatkowe punkty w konkursie.',
+        'Każda osoba, która przeczytała regulamin może użyć kodu "2regulamin" by zyskać dodatkowe punkty w konkursie.',
         'Organizator zobowiązuje się do przyłożenia wszelkich możliwych starań do zapewnienia bezpieczeństwa i stabilności działania aplikacji konkursowej. Ewentualne błędy w jej działaniu, czasowa niedostępność lub długie czasy ładowania nie są podstawą do roszczeń. W razie wykrycia nieprawidłowości uczestnicy są proszeni o kontakt z organizatorem.',
         'Organizator zastrzega sobie prawo do rozstrzygnięcia spraw, które nie są jednoznacznie określone w regulaminie.'
     ];
