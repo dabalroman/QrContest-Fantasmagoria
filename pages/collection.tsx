@@ -36,7 +36,7 @@ export default function CollectionPage ({}) {
         .find((card: Card) => card.uid === cardId) ?? null;
 
     useDynamicNavbar({
-        onClick: card ? (() => router.back()) : undefined,
+        href: card ? `${Page.COLLECTION}#${card.cardSet}` : Page.COLLECT,
         icon: card ? faArrowLeft : faMagnifyingGlass
     });
 

@@ -14,7 +14,7 @@ export default function CollectCardView ({
 }: { card: Card, question?: Question | null, goToQuestion: () => void }) {
     useDynamicNavbar({
         icon: question ? faQuestion : faCheck,
-        href: !question ? Page.COLLECTION + `#${card?.uid}` : undefined,
+        href: !question ? Page.COLLECTION + `/${card?.uid}` : undefined,
         onClick: question ? goToQuestion : undefined,
         animatePointsAdded: card?.value,
         animate: true,

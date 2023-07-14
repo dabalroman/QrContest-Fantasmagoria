@@ -9,6 +9,7 @@ import { answerQuestionFunction } from '@/utils/functions';
 import { QuestionAnswerValue } from '@/functions/src/types/question';
 import useDynamicNavbar from '@/hooks/useDynamicNavbar';
 import { Page } from '@/Enum/Page';
+import Loader from '@/components/Loader';
 
 export default function QuestionCardView ({
     card,
@@ -22,16 +23,16 @@ export default function QuestionCardView ({
     onError: (error: Error) => void
 }) {
     const [loading, setLoading] = useState<boolean>(false);
-    const [answer, setAnswer] = useState<QuestionAnswerValue | null>(null);
+    const [selectedAnswer, setSelectedAnswer] = useState<QuestionAnswerValue | null>(null);
     const [correctAnswer, setCorrectAnswer] = useState<QuestionAnswerValue | null>(null);
 
     useDynamicNavbar({
         icon: correctAnswer ? faCheck : faQuestion,
-        href: Page.COLLECTION + `#${card?.uid}`,
+        href: Page.COLLECTION + `/${card?.uid}`,
         disabledCenter: !correctAnswer,
         disabledSides: !correctAnswer,
         animate: correctAnswer !== null,
-        animatePointsAdded: answer === correctAnswer ? question.value : undefined
+        animatePointsAdded: selectedAnswer === correctAnswer ? question.value : undefined
     });
 
     const [scrambledAnswers] = useState<string[][]>(
@@ -39,17 +40,17 @@ export default function QuestionCardView ({
             .sort(() => (Math.random() > 0.5 ? 1 : -1))
     );
 
-    const answerQuestion = (selectedAnswer: QuestionAnswerValue) => {
-        if (answer !== null) {
+    const answerQuestion = (userAnswer: QuestionAnswerValue) => {
+        if (selectedAnswer !== null) {
             return;
         }
 
         setLoading(true);
-        setAnswer(selectedAnswer);
+        setSelectedAnswer(userAnswer);
 
         answerQuestionFunction({
             uid: question.uid,
-            answer: selectedAnswer
+            answer: userAnswer
         })
             .then((result) => {
                 setLoading(false);
@@ -94,7 +95,7 @@ export default function QuestionCardView ({
                         buttonState = ButtonState.CORRECT;
                     }
 
-                    if (answerKey === answer && answerKey !== correctAnswer) {
+                    if (answerKey === selectedAnswer && answerKey !== correctAnswer) {
                         buttonState = ButtonState.INCORRECT;
                     }
 
@@ -104,12 +105,19 @@ export default function QuestionCardView ({
                             className={`w-full mt-3`}
                             onClick={() => answerQuestion(answerKey as QuestionAnswerValue)}
                             state={buttonState}
+                            style={{
+                                'filter':
+                                    (!selectedAnswer || answerKey === selectedAnswer ? 'contrast(1)' : 'contrast(0.8)'),
+                                'transform':
+                                    (!selectedAnswer || answerKey === selectedAnswer ? 'scale(1)' : 'scale(0.9)')
+                            }}
                         >
                             {answerText}
                         </Button>
                     );
                 })}
             </div>
+            {loading && <Loader/>}
         </div>
     );
 }

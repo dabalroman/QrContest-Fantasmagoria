@@ -74,6 +74,23 @@ export default function AccountPage () {
                     </p>
                 </Panel>
 
+                <Panel title="Nagrody i rundy">
+                    <p className='text-center text-lg'>
+                        1. miejsce – 50 fantów <br/>
+                        2. miejsce – 35 fantów <br/>
+                        3. miejsce – 20 fantów <br/>
+                    </p>
+                    <p className='mt-2 text-justify'>
+                        Konkurs podzielony jest na dwie rundy. Daty rozpoczęcia i zakończenia każdej z nich znajdziesz
+                        w zakładce &quot;Ranking&quot;. Punkty z rundy pierwszej przechodzą do rundy drugiej,
+                        <b> masz dwie szanse na wygraną!</b> Każda runda to troje zwycięzców.
+                    </p>
+                    <p className='mt-2 text-justify'>
+                        Zwycięzców zapraszamy po odbiór nagród w punkcie informacyjnym konwentu w momencie
+                        zakończenia trwającej rundy.
+                    </p>
+                </Panel>
+
                 {user.memberOf === null && <JoinGuildPanel/>}
                 {user.memberOf && guild && <CurrentGuildPanel guild={guild} loading={guildLoading}/>}
                 {user.memberOf && guild && <BetrayGuildPanel user={user} guild={guild}/>}

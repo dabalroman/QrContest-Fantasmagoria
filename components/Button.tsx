@@ -35,12 +35,14 @@ export default function Button ({
     children,
     onClick,
     className,
+    style,
     type = 'button',
     state = ButtonState.ENABLED
 }: {
     children: ReactNode,
     onClick?: MouseEventHandler<HTMLButtonElement>,
     className?: string
+    style?: object,
     type?: React.ButtonHTMLAttributes<HTMLButtonElement>['type'],
     state?: ButtonState,
 }) {
@@ -51,7 +53,7 @@ export default function Button ({
                 + ' ' + stateToLookMap[state].class
                 + ' ' + className
             }
-            style={{ 'background': (stateToLookMap[state].gradient) }}
+            style={{ 'background': (stateToLookMap[state].gradient), ...style}}
             type={type}
             onClick={onClick}
             disabled={state === ButtonState.DISABLED}
