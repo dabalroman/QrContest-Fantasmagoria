@@ -8,7 +8,7 @@ import FantasmagoriaProgramEntry, { RawFantasmagoriaProgramEntry } from '@/model
 import getRandomArrayElement from '@/utils/randomArrayElement';
 import toast from 'react-hot-toast';
 
-enum Screens{
+enum Screens {
     FantasmagoriaSplash,
     Program,
     News,
@@ -63,7 +63,7 @@ const getRandomNextHoursEntry = (
 };
 
 const getNextEntryToShow = (allEntries: FantasmagoriaProgramEntry[]): FantasmagoriaProgramEntry | null => {
-    const showRandom = Math.random() >= 0.8;
+    const showRandom = Math.random() <= 0.2;
 
     if (showRandom) {
         return getRandomNextEntry(allEntries);
@@ -146,7 +146,7 @@ const colorThemes = [
 const getRandomScreenId = () => {
     const rand = Math.random();
 
-    if(rand <= 0.1) {
+    if (rand <= 0.1) {
         return Screens.FantasmagoriaSplash;
     }
 
@@ -200,15 +200,19 @@ export default function DashboardPage () {
     }, []);
 
     const iterateFontSize = () => {
-        const size = Math.floor(((currentSize + 0.05) % 1.6 + 0.05) * 100) / 100;
+        const size = currentSize >= 2 ? 0.1 : Math.floor(((currentSize + 0.1) * 100)) / 100;
         setCurrentSize(size);
         toast.success(`Skala ${Math.floor(size * 100)}%`);
     };
 
     return (
         <div
-            className="fixed top-0 left-0 w-screen h-screen z-50 text-white font-sans font-bold"
-            style={{ fontSize: `${currentSize}em`, backgroundColor: currentTheme }}
+            className={'fixed top-0 left-0 w-screen h-screen z-50 text-white font-sans font-bold'
+                + ' transition-colors duration-1000'}
+            style={{
+                fontSize: `${currentSize}em`,
+                backgroundColor: currentTheme
+            }}
         >
             {screenId === Screens.FantasmagoriaSplash &&
                 <div
@@ -224,13 +228,12 @@ export default function DashboardPage () {
             {/*     </div> */}
             {/* } */}
             {screenId === Screens.Program && currentEntry &&
-                <div className="w-full h-full flex flex-col justify-center p-20 transition-colors duration-1000">
+                <div className="w-full h-full flex flex-col justify-center p-20">
                     <p style={{
-                        paddingBottom: '0.2em',
                         fontSize: '1.8em'
                     }}>{currentEntry.name}</p>
                     <p style={{
-                        paddingBottom: '0.2em',
+                        padding: '0.3em 0',
                         fontSize: '4.5em'
                     }}>{currentEntry.title}</p>
                     <p style={{
@@ -244,7 +247,7 @@ export default function DashboardPage () {
                 </div>
             }
             <button
-                className='fixed bottom-0 right-0 h-32 w-32'
+                className="fixed bottom-0 right-0 h-32 w-32"
                 onClick={() => iterateFontSize()}
             ></button>
         </div>
