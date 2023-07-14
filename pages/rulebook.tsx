@@ -22,7 +22,7 @@ export default function RulebookPage () {
     const topics: string[] = [
         'Biorąc udział w konkursie „QrContest - Zbierz je wszystkie!”, dalej określanym jako „konkurs”, akceptujesz warunki tego regulaminu.',
         'Organizatorem konkursu jest Roman Dąbal, dalej określany jako „organizator”.',
-        'Warunkiem udziału w konkursie jest zarejestrowanie się w aplikacji konkursowej, dostępnej pod adresem https://www.qrcontest.gniezno.pl.',
+        'Warunkiem udziału w konkursie jest zarejestrowanie się w aplikacji konkursowej, dostępnej pod adresem https://fantas.wep.app.',
         'W konkursie może wziąć udział każdy uczestnik konwentu Fantasmagoria 13.',
         'Zwycięzca to osoba, która uzyskała odpowiednią ilość punktów do momentu zakończenia danej tury konkursu. W każdej turze troje uczestników z największą ilością punktów uzyska tytuł zwycięzcy oraz nagrody o wartości zależnej od uzyskanego miejsca.',
         'W konkursie nagrodzonych zostanie sumarycznie 6 osób.',
@@ -30,7 +30,7 @@ export default function RulebookPage () {
         'Nagrody to waluta konwentowa (Fanty), którą uczestnicy mogą wymienić na dowolny przedmiot w sklepiku konwentowym.',
         'Nagrody będzie można odebrać w punkcie informacyjnym konwentu po zakończeniu każdej z tur konkursu.',
         'By odebrać nagrodę należy potwierdzić, że jest się właścicielem konta, które znalazło się w gronie zwycięzców. Można to osiągnąć przez pokazanie aplikacji zalogowanej na konto uczestnika, na ekranie musi być widoczne imię/pseudonim uczestnika oraz ilość uzyskanych punktów.',
-        'Konkurs podzielony jest na dwie tury. Pierwsza tura trwa od 17:00 14/07/2023 do 14:00 15/07/2023, druga od 14:00 15/07/2023 do 12:00 16/07/2023.',
+        'Konkurs podzielony jest na dwie tury. Pierwsza tura trwa od 15:00 14/07/2023 do 14:00 15/07/2023, druga od 14:00 15/07/2023 do 12:00 16/07/2023.',
         'Uczestnicy nagrodzeni w turze pierwszej nie będą brani pod uwagę przy wyłanianiu zwycięzców w turze drugiej, jednak mogą nadal brać udział w konkursie w celu uzupełnienia swojej kolekcji kart.',
         'Konto użytkownika może zostać zablokowane, gdy uczestnik korzysta z pseudonimu, który może zostać uznany za niecenzuralny lub nieodpowiedni.',
         'Konto użytkownika może zostać zablokowane, gdy uczestnik jest podejrzany o podejmowanie działań niezgodnych z regulaminem.',
