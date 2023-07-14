@@ -2,6 +2,7 @@ export enum Page {
     COLLECT = '/collect',
     ACCOUNT = '/account',
     COLLECTION = '/collection',
+    DASHBOARD = '/dashboard',
     RANKING = '/ranking',
     SCANNER = '/scanner',
     FAQ = '/faq',

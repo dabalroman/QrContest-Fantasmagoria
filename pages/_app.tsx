@@ -13,6 +13,9 @@ import Card from '@/models/Card';
 import CardSet from '@/models/CardSet';
 import Metatags from '@/components/Metatags';
 import useUserData from '@/hooks/useUserData';
+import { UserRole } from '@/Enum/UserRole';
+import { useRouter } from 'next/router';
+import { Page } from '@/Enum/Page';
 
 config.autoAddCss = false;
 
@@ -32,6 +35,7 @@ export default function App ({
     pageProps
 }: AppProps) {
     const userData = useUserData();
+    const router = useRouter();
     const [cards, setCards] = useState<CollectionCache<Card> | null>(null);
     const [cardSets, setCardSets] = useState<CollectionCache<CardSet> | null>(null);
     const [navbarCenterAction, setNavbarCenterAction] = useState<NavbarConfig>(defaultNavbarConfig);
@@ -41,6 +45,12 @@ export default function App ({
             setCards(null);
         }
     }, [userData.authUser]);
+
+    useEffect(() => {
+        if(userData.user?.role === UserRole.DASHBOARD && router.pathname !== Page.DASHBOARD) {
+            router.push(Page.DASHBOARD).then();
+        }
+    }, [router, userData.user]);
 
     return (
         <UserContext.Provider value={userData}>
