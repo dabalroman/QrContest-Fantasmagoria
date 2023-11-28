@@ -85,11 +85,13 @@ const formatDateFromTo = (dateFrom: Date, dateTo: Date): string => {
         dateText += formatDate(dateFrom) + ', ';
     }
 
-    if (dateFrom.getDate() === dateTo.getDate()) {
-        dateText += formatTime(dateFrom) + ' - ' + formatTime(dateTo);
-    } else {
-        dateText += formatTime(dateFrom) + ' - ' + formatDate(dateTo) + ',  ' + formatTime(dateTo);
-    }
+    dateText += formatTime(dateFrom) + ' - ' + formatTime(dateTo);
+
+    // if (dateFrom.getDate() === dateTo.getDate()) {
+    //
+    // } else {
+    //     dateText += formatTime(dateFrom) + ' - ' + formatDate(dateTo) + ',  ' + formatTime(dateTo);
+    // }
 
     return dateText;
 };
@@ -117,7 +119,9 @@ const formatDate = (date: Date): string => {
         return 'pojutrze';
     }
 
-    return date.toLocaleDateString('pl-PL');
+    return '';
+
+    // return date.toLocaleDateString('pl-PL');
 };
 
 const formatTime = (date: Date): string => {

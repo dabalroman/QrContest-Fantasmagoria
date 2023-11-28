@@ -47,8 +47,9 @@ export default function AccountPage () {
 
     const AdminSection = () => (
         <Panel title="Admin">
-            <p>Dangerous.</p>
-            <Button className="w-full mt-2" onClick={() => {
+            <LinkButton href={Page.ADMIN_CARDS}>Lista kart</LinkButton>
+
+            <Button className="w-full mt-10" onClick={() => {
                 const password = prompt('Password?') ?? '';
 
                 if (!password) {

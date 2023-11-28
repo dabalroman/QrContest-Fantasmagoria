@@ -14,5 +14,6 @@ export enum Page {
     REGISTER = '/auth/register',
     REGISTER_EMAIL = '/auth/register-email',
     ACCOUNT_SETUP = '/auth/account-setup',
-    ADMIN_EDIT_CARD = '/admin/edit-card'
+    ADMIN_EDIT_CARD = '/admin/edit-card',
+    ADMIN_CARDS = '/admin/cards'
 }
