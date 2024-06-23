@@ -84,11 +84,11 @@ export default function AccountPage () {
                     <p className='mt-2 text-justify'>
                         Konkurs podzielony jest na dwie rundy. Daty rozpoczęcia i zakończenia każdej z nich znajdziesz
                         w zakładce &quot;Ranking&quot;. Punkty z rundy pierwszej przechodzą do rundy drugiej,
-                        <b> masz dwie szanse na wygraną!</b> Każda runda to troje zwycięzców.
+                        więc masz aż dwie szanse na wygraną! Każda runda to troje zwycięzców.
                     </p>
                     <p className='mt-2 text-justify'>
-                        Zwycięzców zapraszamy po odbiór nagród w punkcie informacyjnym konwentu w momencie
-                        zakończenia trwającej rundy.
+                        Zwycięzców zapraszamy po odbiór nagród do punktu informacyjnego konwentu w momencie
+                        zakończenia rundy.
                     </p>
                 </Panel>
 

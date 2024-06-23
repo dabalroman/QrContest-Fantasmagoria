@@ -9,7 +9,7 @@ export default function LinkButton ({
     return (
         <Link
             className={
-                'p-2 block text-center text-text-base border-4 border-button-base rounded-xl'
+                'p-2 block text-center text-text-base border-4 border-button-base rounded-xl text-lg'
                 + ' shadow-panel bg-button-gradient'
                 + ' ' + className
             }

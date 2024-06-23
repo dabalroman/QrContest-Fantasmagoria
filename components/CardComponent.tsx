@@ -15,7 +15,10 @@ export default function CardComponent ({
             }
             style={{
                 'backgroundImage': `url(/cards/${card.image}.webp)`,
-                'minHeight': '200px'
+                'minHeight': '200px',
+                'maxHeight': '70vh',
+                'aspectRatio': '2/3',
+                'objectFit': 'contain'
             }}
         >
             <div

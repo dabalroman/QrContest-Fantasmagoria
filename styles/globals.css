@@ -28,7 +28,3 @@ body {
     background-position: center 0;
     background-repeat: no-repeat;
 }
-
-.bg-overlay-gradient {
-    @apply bg-gradient-radial from-20% from-panel-transparent-end to-75% to-transparent;
-}

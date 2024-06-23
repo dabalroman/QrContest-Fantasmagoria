@@ -101,12 +101,12 @@ export default function LookForCodeView ({
 
     return (
         <div>
-            <Panel title="Zeskanuj kod">
+            <Panel title="Zeskanuj kod karty">
                 <p>Kliknij w przycisk aparatu i zeskanuj kod!</p>
                 <p>Możesz również użyć innej aplikacji do skanowania.</p>
             </Panel>
 
-            <Panel title="Wpisz kod ręcznie" loading={loading}>
+            <Panel title="Wpisz kod karty" loading={loading}>
                 <p className="pb-2">Tutaj możesz wpisać znaleziony kod.</p>
 
                 <form onSubmit={handleSubmit(collectCode)}>
@@ -116,10 +116,10 @@ export default function LookForCodeView ({
                            {...register(
                                'code',
                                {
-                                   required: 'Wpisz kod',
+                                   required: 'Wpisz kod karty',
                                    pattern: {
                                        value: /^[A-z0-9]{10}$/,
-                                       message: 'Kod musi składać się z 10 znaków.'
+                                       message: 'Kod karty składa się z 10 znaków.'
                                    }
                                }
                            )} />

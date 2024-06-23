@@ -99,7 +99,7 @@ export default function ScannerPage () {
                             <p>
                                 Jeżeli zapytanie o dostęp nie wyświetla się, to twoje urządzenie nie jest
                                 kompatybilne lub jego ustawienia odmawiają dostępu do kamery.
-                                W takim wypadku wpisz kod ręcznie na ekranie &quot;Szukaj&quot;.
+                                W takim wypadku wpisz kod na ekranie &quot;Szukaj&quot;.
                             </p>
                         </div>
                         <div

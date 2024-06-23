@@ -30,7 +30,7 @@ export default function RulebookPage () {
         'Nagrody to waluta konwentowa (Fanty), którą uczestnicy mogą wymienić na dowolny przedmiot w sklepiku konwentowym.',
         'Nagrody będzie można odebrać w punkcie informacyjnym konwentu po zakończeniu każdej z tur konkursu.',
         'By odebrać nagrodę należy potwierdzić, że jest się właścicielem konta, które znalazło się w gronie zwycięzców. Można to osiągnąć przez pokazanie aplikacji zalogowanej na konto uczestnika, na ekranie musi być widoczne imię/pseudonim uczestnika oraz ilość uzyskanych punktów.',
-        'Konkurs podzielony jest na dwie tury. Pierwsza tura trwa od 15:00 14/07/2023 do 14:00 15/07/2023, druga od 14:00 15/07/2023 do 12:00 16/07/2023.',
+        'Konkurs podzielony jest na dwie tury. Pierwsza tura trwa od 15:00 12/07/2024 do 14:00 13/07/2024, druga od 14:00 13/07/2024 do 12:00 14/07/2024.',
         'Uczestnicy nagrodzeni w turze pierwszej nie będą brani pod uwagę przy wyłanianiu zwycięzców w turze drugiej, jednak mogą nadal brać udział w konkursie w celu uzupełnienia swojej kolekcji kart.',
         'Konto użytkownika może zostać zablokowane, gdy uczestnik korzysta z pseudonimu, który może zostać uznany za niecenzuralny lub nieodpowiedni.',
         'Konto użytkownika może zostać zablokowane, gdy uczestnik jest podejrzany o podejmowanie działań niezgodnych z regulaminem.',
@@ -38,7 +38,7 @@ export default function RulebookPage () {
         'W przypadku zauważenia, że któryś z konkursowych kodów został uszkodzony, uczestnicy są proszeni o kontakt z organizatorem. Sposoby kontaktu opisane są w sekcji "Pytania i odpowiedzi" aplikacji konkursowej.',
         'Aplikacja do celów realizacji konkursu zbiera dane takie jak: adres email lub Google ID uczestnika (zależnie od wybranej metody logowania), Imię/Pseudonim, informacje o zgromadzonych kodach, informacje o odpowiedziach na pytania.',
         'Aplikacja korzysta z plików cookie w celu identyfikacji uczestników gry (logowanie / rejestracja), zakładając konto w aplikacji zgadzasz się na ich używanie.',
-        'Każda osoba, która przeczytała regulamin może użyć kodu "2regulamin" by zyskać dodatkowe punkty w konkursie.',
+        'Każda osoba, która przeczytała regulamin może użyć kodu "2REGULAMIN" by zyskać dodatkowe punkty w konkursie.',
         'Organizator zobowiązuje się do przyłożenia wszelkich możliwych starań do zapewnienia bezpieczeństwa i stabilności działania aplikacji konkursowej. Ewentualne błędy w jej działaniu, czasowa niedostępność lub długie czasy ładowania nie są podstawą do roszczeń. W razie wykrycia nieprawidłowości uczestnicy są proszeni o kontakt z organizatorem.',
         'Organizator zastrzega sobie prawo do rozstrzygnięcia spraw, które nie są jednoznacznie określone w regulaminie.'
     ];
@@ -48,15 +48,7 @@ export default function RulebookPage () {
             <ScreenTitle>Regulamin</ScreenTitle>
             <Metatags title="Regulamin"/>
             <div>
-                <Panel title={'Pytania i odpowiedzi'}>
-                    <p className="text-justify">
-                        Tu znajdziesz listę pytań i odpowiedzi na różne aspekty konkursu
-                        &quot;QrContest - Zbierz je wszystkie!&quot;
-                        W razie potrzeby możesz skontaktować się bezpośrednio z organizatorem konkursu przez
-                        email <a href="mailto:dabalroman@gmail.com" className="underline">dabalroman@gmail.com</a> lub
-                        na Facebook przez <a href="https://m.me/roman.dabal" className="underline">messenger</a>.
-                        Możesz również zapytać w Punkcie Informacyjnym konwentu.
-                    </p>
+                <Panel title={'Regulamin QrContest - Zbierz je wszystkie!'}>
                     <ol className='list-decimal list-outside pl-6'>
                         {topics.map((entry, index) => <li key={index} className='pt-1'>{entry}</li>)}
                     </ol>

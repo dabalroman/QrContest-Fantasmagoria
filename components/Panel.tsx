@@ -18,7 +18,7 @@ export default function Panel ({
             }
         >
             <div className={loading ? 'blur-sm pointer-events-none' : ''}>
-                {title && <h2 className="text-2xl font-fancy-capitals pb-2">{title}</h2>}
+                {title && <h2 className="text-3xl font-fancy-capitals pb-2">{title}</h2>}
                 {children}
             </div>
             {loading && <Loader/>}

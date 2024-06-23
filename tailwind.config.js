@@ -35,7 +35,7 @@ module.exports = {
                 'layout': 'max-content minmax(0,1fr) 100px'
             },
             gridTemplateColumns: {
-                'small-cards': 'repeat(3, minmax(80px, 1fr))'
+                'small-cards': 'repeat(auto-fit, minmax(88px, 1fr));'
             },
             colors: {
                 'panel-transparent': 'rgba(39,50,58,0.95)',

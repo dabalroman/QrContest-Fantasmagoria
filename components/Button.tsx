@@ -44,7 +44,7 @@ export default function Button ({
     return (
         <button
             className={
-                'p-2 block text-center text-text-base border-4 rounded-xl shadow-panel'
+                'p-2 block text-center text-text-base border-4 rounded-xl shadow-panel text-lg'
                 + ' ' + stateToLookMap[state].class
                 + ' ' + className
             }

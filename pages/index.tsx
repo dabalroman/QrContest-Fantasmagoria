@@ -51,7 +51,7 @@ export default function Home () {
                     <img src="/fantasmagoria-logo.svg" className="text-text-base" alt="Fantasmagoria Logo"/>
                 </div>
                 <div className={
-                    'text-center flex flex-col justify-center items-center h-64 p-4 bg-overlay-gradient'
+                    'text-center flex flex-col justify-center items-center h-64 p-4'
                 }>
                     <h1 className="text-5xl font-fancy-capitals p-1" style={{ textShadow: '0 4px 4px rgba(0,0,0,0.25)' }}>QrContest</h1>
                     <h2 className="text-2xl font-fancy pb-20" style={{ textShadow: '0 4px 4px rgba(0,0,0,0.25)' }}>
@@ -75,8 +75,8 @@ export default function Home () {
                     </p>
                     <p className="mt-2 text-justify">
                         Konkurs podzielony jest na dwie rundy. Daty rozpoczęcia i zakończenia każdej z nich znajdziesz
-                        w zakładce &quot;Ranking&quot;. Punkty z rundy pierwszej przechodzą do rundy drugiej,
-                        <b> masz dwie szanse na wygraną!</b> Każda runda to troje zwycięzców.
+                        w zakładce &quot;Ranking&quot;. Punkty z rundy pierwszej przechodzą do rundy drugiej,&nbsp;
+                        <span className={'underline'}>masz dwie szanse na wygraną!</span> Każda runda to troje zwycięzców.
                     </p>
                     <p className="mt-2 text-justify">
                         Zwycięzców zapraszamy po odbiór nagród w punkcie informacyjnym konwentu w momencie
