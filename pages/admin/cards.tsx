@@ -47,27 +47,7 @@ export default function CardsPage () {
                                 ) as any;
 
                         return card;
-                    })
-                    .sort((a, b) => {
-                            console.log(a);
-                            console.log(b);
-
-                            if (a.collectedBy.length === 0) {
-                                return 1;
-                            }
-
-                            if (b.collectedBy.length === 0) {
-                                return -1;
-                            }
-
-                            return (a.collectedBy[0] as any).collectedAt > (b.collectedBy[0] as any).collectedAt
-                                ? -1
-                                : ((a.collectedBy[0] as any).collectedAt < (b.collectedBy[0] as any).collectedAt
-                                        ? 1
-                                        : 0
-                                );
-                        }
-                    );
+                    }).sort((a: Card, b: Card) => a.name.localeCompare(b.name, 'pl'));
 
                 setCards(cards as Card[]);
             }
@@ -82,27 +62,27 @@ export default function CardsPage () {
                 <table className="table-auto whitespace-nowrap">
                     <thead>
                         <tr className="text-left">
-                            <th className="px-2">UID</th>
-                            <th className="px-2">Nazwa</th>
-                            <th className="px-2">Wartość</th>
-                            <th className="px-2">Ilość osób</th>
-                            <th className="px-2">Ostatnio zebrano</th>
-                            <th className="px-2">Ostatnia osoba</th>
-                            <th className="px-2">Komentarz</th>
+                            <th className="p-2">N</th>
+                            <th className="p-2">PKT</th>
+                            <th className="p-2">Nazwa</th>
+                            <th className="p-2">Ostatnia osoba</th>
+                            <th className="p-2">Ostatnio zebrano</th>
+                            <th className="p-2">Komentarz</th>
                         </tr>
                     </thead>
                     <tbody>
                         {cards.map((card, index) => (
-                            <tr key={card.uid} className={index % 2 ? 'bg-amber-100' : ''}>
-                                <td className="px-2">{card.uid}</td>
-                                <td className="px-2">{card.name}</td>
-                                <td className="px-2">{card.value}</td>
-                                <td className="px-2">{card.collectedBy.length}</td>
-                                <td className="px-2">
+                            <tr key={card.uid} className={index % 2 ? 'bg-background' : ''}>
+                                <td className="p-2">{card.collectedBy.length}</td>
+                                <td className="p-2">{card.value}</td>
+                                <td className="p-2">
+                                    <a href={`${Page.ADMIN_EDIT_CARD}/${card.code}`}>{card.name}</a>
+                                </td>
+                                <td className="p-2">{(card.collectedBy[0] as any)?.username}</td>
+                                <td className="p-2">
                                     {(card.collectedBy[0] as any)?.collectedAt.toLocaleString('pl-PL')}
                                 </td>
-                                <td className="px-2">{(card.collectedBy[0] as any)?.username}</td>
-                                <td className="px-2">{card.comment}</td>
+                                <td className="p-2">{card.comment}</td>
                             </tr>
                         ))}
                     </tbody>

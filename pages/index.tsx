@@ -53,7 +53,11 @@ export default function Home () {
                 <div className={
                     'text-center flex flex-col justify-center items-center h-64 p-4'
                 }>
-                    <h1 className="text-5xl font-fancy-capitals p-1" style={{ textShadow: '0 4px 4px rgba(0,0,0,0.25)' }}>QrContest</h1>
+                    <h1 className="text-5xl font-fancy-capitals p-1"
+                        style={{ textShadow: '0 4px 4px rgba(0,0,0,0.25)' }}
+                    >
+                        QrContest
+                    </h1>
                     <h2 className="text-2xl font-fancy pb-20" style={{ textShadow: '0 4px 4px rgba(0,0,0,0.25)' }}>
                         Zbierz je wszystkie!
                     </h2>
@@ -76,7 +80,8 @@ export default function Home () {
                     <p className="mt-2 text-justify">
                         Konkurs podzielony jest na dwie rundy. Daty rozpoczęcia i zakończenia każdej z nich znajdziesz
                         w zakładce &quot;Ranking&quot;. Punkty z rundy pierwszej przechodzą do rundy drugiej,&nbsp;
-                        <span className={'underline'}>masz dwie szanse na wygraną!</span> Każda runda to troje zwycięzców.
+                        <span className={'underline'}>masz dwie szanse na wygraną!</span>&nbsp;
+                        Każda runda to troje zwycięzców.
                     </p>
                     <p className="mt-2 text-justify">
                         Zwycięzców zapraszamy po odbiór nagród w punkcie informacyjnym konwentu w momencie
@@ -97,7 +102,7 @@ export default function Home () {
                             }
                             style={{
                                 'backgroundImage': `url(/cards/erindar.webp)`,
-                                'height': '8.25rem',
+                                'height': '8.25rem'
                             }}
                         >
                         </div>
@@ -107,7 +112,7 @@ export default function Home () {
                             }
                             style={{
                                 'backgroundImage': `url(/cards/flordraak.webp)`,
-                                'height': '8.25rem',
+                                'height': '8.25rem'
                             }}
                         >
                         </div>
@@ -117,7 +122,7 @@ export default function Home () {
                             }
                             style={{
                                 'backgroundImage': `url(/cards/zorza.webp)`,
-                                'height': '8.25rem',
+                                'height': '8.25rem'
                             }}
                         >
                         </div>
@@ -134,7 +139,7 @@ export default function Home () {
                         do internetu.</p>
                     <p className="pt-4">Poniżej znajdziesz dodatkowe informacje o konkursie.</p>
                     <LinkButton href={Page.FAQ} className="w-full mt-4">Pytania i odpowiedzi</LinkButton>
-                    <LinkButton href={Page.RULEBOOK} className="w-full mt-3">Regulamin konkursu</LinkButton>
+                    <LinkButton href={Page.RULEBOOK} className="w-full mt-4">Regulamin konkursu</LinkButton>
                 </Panel>
             </div>
         </main>

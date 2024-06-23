@@ -73,7 +73,8 @@ export default function App ({
                         <Metatags title="QrContest"/>
                         <div
                             className={
-                                `${spectral.variable} ${imFellDoublePica.variable} ${imFellDoublePicaSC.variable} text-text-base `
+                                `${spectral.variable} ${imFellDoublePica.variable} ${imFellDoublePicaSC.variable} `
+                                + `text-text-base `
                                 + `font-serif bg-image-default bg-fixed min-h-screen bg-image-mobile-position`
                             }
                         >

@@ -47,9 +47,17 @@ export default function AccountPage () {
 
     const AdminSection = () => (
         <Panel title="Admin">
-            <LinkButton href={Page.ADMIN_CARDS}>Lista kart</LinkButton>
+            <LinkButton href={Page.ADMIN_CARDS} className={'mt-4'}>Lista kart</LinkButton>
+            <LinkButton href={Page.ADMIN_RECENTLY_COLLECTED} className={'mt-4'}>Ostatnio zebrane karty</LinkButton>
 
-            <Button className="w-full mt-10" onClick={() => {
+            <p className={'py-2 mt-20'}>Niebezpiecznie tutaj schodzić!</p>
+            <Button className="w-full" style={{background: '#660000', borderColor: '#BB0000'}} onClick={() => {
+                const proceed = confirm('Are you sure?') ?? false;
+
+                if (!proceed) {
+                    return;
+                }
+
                 const password = prompt('Password?') ?? '';
 
                 if (!password) {
@@ -100,8 +108,8 @@ export default function AccountPage () {
                     <p>
                         Masz pytania o sposób działania konkursu? Sprawdź sekcję &quot;Pytania i odpowiedzi&quot;.
                     </p>
-                    <LinkButton className="mt-3" href={Page.FAQ}>Pytania i odpowiedzi</LinkButton>
-                    <LinkButton className="mt-3" href={Page.RULEBOOK}>Regulamin konkursu</LinkButton>
+                    <LinkButton className="mt-4" href={Page.FAQ}>Pytania i odpowiedzi</LinkButton>
+                    <LinkButton className="mt-4" href={Page.RULEBOOK}>Regulamin konkursu</LinkButton>
                 </Panel>
 
                 <Panel title={'Kontakt'}>

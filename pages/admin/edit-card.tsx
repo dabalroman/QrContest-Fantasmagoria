@@ -81,8 +81,6 @@ export default function EditCardAdminPage () {
     }, [card, setValue]);
 
     const updatePost = async (content: any) => {
-        console.log(content);
-
         if (!cardRef) {
             toast.error('Błąd aplikacji.');
             return;

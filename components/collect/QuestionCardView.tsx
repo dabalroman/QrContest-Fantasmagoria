@@ -77,7 +77,9 @@ export default function QuestionCardView ({
             }}>
                 <CardSmallComponent card={card} className="border-4 rounded-tl-3xl"/>
             </div>
-            <div className="bg-card-border text-text-accent text-2xl font-fancy-capitals p-4 pl-24 flex justify-between">
+            <div
+                className="bg-card-border text-text-accent text-2xl font-fancy-capitals p-4 pl-24 flex justify-between"
+            >
                 <span>Wyzwanie</span>
                 <span>
                      <FontAwesomeIcon icon={faDiceD6} size="xs" className="relative top-1"/> {question.value}
@@ -102,7 +104,7 @@ export default function QuestionCardView ({
                     return (
                         <Button
                             key={answerKey}
-                            className={`w-full mt-3`}
+                            className={`w-full mt-4`}
                             onClick={() => answerQuestion(answerKey as QuestionAnswerValue)}
                             state={buttonState}
                             style={{

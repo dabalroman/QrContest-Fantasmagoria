@@ -10,7 +10,7 @@ import { collection, onSnapshot, query } from '@firebase/firestore';
 import { firestore } from '@/utils/firebase';
 import { FireDoc } from '@/Enum/FireDoc';
 
-type RecentlyCollectedEntry = {uid: string, name: string, username: string, collectedAt: Date}
+type RecentlyCollectedEntry = { uid: string, name: string, code: string, username: string, collectedAt: Date }
 
 export default function RecentlyCollectedCardsPage () {
     const router = useRouter();
@@ -43,10 +43,10 @@ export default function RecentlyCollectedCardsPage () {
                                 }) => ({
                                     uid: card.uid,
                                     name: card.name,
+                                    code: card.code,
                                     username,
                                     collectedAt: collectedAt.toDate() ?? ''
-                                })) as any[] as RecentlyCollectedEntry[];
-
+                                })) as RecentlyCollectedEntry[];
 
                         listOfEntries.push(...localEntries);
 
@@ -54,13 +54,12 @@ export default function RecentlyCollectedCardsPage () {
                     });
 
                 listOfEntries.sort((a, b) => {
-                            return a.collectedAt > b.collectedAt
-                                ? -1
-                                : (a.collectedAt < b.collectedAt ? 1 : 0);
-                        }
-                    );
+                        return a.collectedAt > b.collectedAt
+                            ? -1
+                            : (a.collectedAt < b.collectedAt ? 1 : 0);
+                    }
+                );
 
-                console.log(listOfEntries);
                 setListOfEntries(listOfEntries);
             }
         );
@@ -74,17 +73,21 @@ export default function RecentlyCollectedCardsPage () {
                 <table className="table-auto whitespace-nowrap">
                     <thead>
                         <tr className="text-left">
-                            <th className="px-2">Karta</th>
-                            <th className="px-2">Osoba</th>
-                            <th className="px-2">Data</th>
+                            <th className="p-2">Karta</th>
+                            <th className="p-2">Osoba</th>
+                            <th className="p-2">Data</th>
+                            <th className="p-2"></th>
                         </tr>
                     </thead>
                     <tbody>
                         {listOfEntries.map((entry, index) => (
                             <tr key={entry.uid + entry.collectedAt} className={index % 2 ? 'bg-background' : ''}>
-                                <td className="px-2">{entry.name}</td>
-                                <td className="px-2">{entry.username}</td>
-                                <td className="px-2">{entry.collectedAt.toLocaleString('pl-PL')}</td>
+                                <td className="p-2">
+                                    <a href={`${Page.ADMIN_EDIT_CARD}/${entry.code}`}>{entry.name}</a>
+                                </td>
+                                <td className="p-2">{entry.username}</td>
+                                <td className="p-2">{entry.collectedAt.toLocaleString('pl-PL')}</td>
+                                <td></td>
                             </tr>
                         ))}
                     </tbody>
