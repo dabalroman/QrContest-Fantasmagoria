@@ -10,24 +10,19 @@ export enum ButtonState {
 
 const stateToLookMap = {
     [ButtonState.DISABLED]: {
-        gradient: 'linear-gradient(175deg, #8C8C8C 10%, #C2C2C2 50%, #8C8C8C 90%)',
-        class: 'border-gray-600'
+        class: 'border-gray-600 bg-button-gradient'
     },
     [ButtonState.ENABLED]: {
-        gradient: 'linear-gradient(175deg, #C59251 10%, #FCCE8A 50%, #C59251 90%)',
-        class: 'border-button-brown'
+        class: 'border-button-base bg-button-gradient'
     },
     [ButtonState.PENDING]: {
-        gradient: 'linear-gradient(175deg, #C59251 10%, #FCCE8A 50%, #C59251 90%)',
-        class: 'border-yellow-500'
+        class: 'border-yellow-500 bg-button-gradient'
     },
     [ButtonState.CORRECT]: {
-        gradient: 'linear-gradient(175deg, #C59251 10%, #FCCE8A 50%, #C59251 90%)',
-        class: ' border-lime-400'
+        class: ' border-lime-400 bg-button-gradient'
     },
     [ButtonState.INCORRECT]: {
-        gradient: 'linear-gradient(175deg, #C59251 10%, #FCCE8A 50%, #C59251 90%)',
-        class: ' border-red-600'
+        class: ' border-red-600 bg-button-gradient'
     }
 };
 
@@ -49,11 +44,11 @@ export default function Button ({
     return (
         <button
             className={
-                'p-2 block text-center text-button-brown border-4 rounded-xl shadow-panel'
+                'p-2 block text-center text-text-base border-4 rounded-xl shadow-panel'
                 + ' ' + stateToLookMap[state].class
                 + ' ' + className
             }
-            style={{ 'background': (stateToLookMap[state].gradient), ...style}}
+            style={{ ...style}}
             type={type}
             onClick={onClick}
             disabled={state === ButtonState.DISABLED}

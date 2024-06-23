@@ -15,7 +15,7 @@ export default function RoundRankingTable ({
         <div>
             <table className="w-full text-left">
                 <thead>
-                    <tr className="text-text-half">
+                    <tr className="text-text-dim">
                         <th>#</th>
                         <th>Poszukiwacz</th>
                         <th>Karty</th>

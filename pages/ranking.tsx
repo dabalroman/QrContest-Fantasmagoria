@@ -55,8 +55,10 @@ export default function ScoreboardPage ({}) {
             <ScreenTitle>Ranking</ScreenTitle>
             <div>
                 <Panel loading={loading} className="text-center">
-                    <p className="text-2xl">
+                    <p className="text-2xl font-fancy-capitals">
                         {user?.username} <br/>
+                    </p>
+                    <p className="text-2xl">
                         <FontAwesomeIcon className="px-1" icon={faDiceD6} size="sm"/>{user?.score}
                     </p>
                     <p className="mt-1">

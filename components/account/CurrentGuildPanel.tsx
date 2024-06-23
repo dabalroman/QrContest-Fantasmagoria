@@ -21,7 +21,7 @@ export default function CurrentGuildPanel ({
             <div className={loading ? 'blur-sm pointer-events-none' : ''}>
                 <div className="w-full grid grid-cols-[1fr_6rem]">
                     <div className="p-4 pt-8 pb-7">
-                        <h2 className="text-2xl font-fancy pb-2 text-center">{title}</h2>
+                        <h2 className="text-2xl font-fancy-capitals pb-2 text-center">{title}</h2>
                         <div className="text-xl grid grid-cols-3 pt-0.5 text-center">
                             <span><FontAwesomeIcon icon={faBolt}/> {guild.power}</span>
                             <span><FontAwesomeIcon icon={faUser}/> {guild.amountOfMembers}</span>

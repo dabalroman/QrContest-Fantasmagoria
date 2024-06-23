@@ -9,11 +9,10 @@ export default function LinkButton ({
     return (
         <Link
             className={
-                'p-2 block text-center text-button-brown border-4 border-button-brown rounded-xl'
-                + ' shadow-panel bg-gradient-button'
+                'p-2 block text-center text-text-base border-4 border-button-base rounded-xl'
+                + ' shadow-panel bg-button-gradient'
                 + ' ' + className
             }
-            style={{ 'background': 'linear-gradient(175deg, #C59251 10%, #FCCE8A 50%, #C59251 90%)' }}
             href={href}
         >
             {children}

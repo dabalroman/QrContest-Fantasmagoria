@@ -14,11 +14,14 @@ module.exports = {
         extend: {
             fontFamily: {
                 serif: ['var(--font-spectral)'],
-                fancy: ['var(--font-trykker)']
+                fancy: ['var(--font-imFellDoublePica)'],
+                'fancy-capitals': ['var(--font-imFellDoublePicaSC)']
             },
             backgroundImage: {
                 'image-default': 'url(\'/backgrounds/bg.webp\')',
-                'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))'
+                'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+                'button-gradient': 'linear-gradient(175deg, #254455 10%, #253C4B 50%, #2B4455 90%)',
+                'button-gradient-disabled': 'linear-gradient(175deg, #171d21 10%, #1b2329 50%, #171d21 90%)'
             },
             borderWidth: {
                 '6': '6px'
@@ -35,22 +38,23 @@ module.exports = {
                 'small-cards': 'repeat(3, minmax(80px, 1fr))'
             },
             colors: {
-                'panel-transparent': 'rgba(255,211,146,0.95)',
-                'panel-transparent-end': 'rgba(255,211,146,0.85)',
-                'panel-solid': 'rgba(255,211,146,1)',
+                'panel-transparent': 'rgba(39,50,58,0.95)',
+                'panel-transparent-end': 'rgba(39,50,58,0.85)',
+                'panel-solid': 'rgba(39,50,58,1)',
 
-                'text-dark': '#261500',
-                'text-half': '#6F3D00',
-                'text-light': '#F2EFEA',
+                'text-base': '#eee',
+                'text-dim': '#bfbfbf',
+                'text-accent': '#eee',
 
-                'card-border': '#261500',
+                'card-border': '#273F4F',
 
-                'input-border': '#261500',
-                'input-background': '#97784B',
+                'input-border': '#273F4F',
+                'input-background': '#4C6962',
 
-                background: '#C59251',
-                'background-transparent': 'rgba(197,146,81,0.9)',
-                'button-brown': '#4d2b00',
+                // Whole app and images
+                background: '#273F4F',
+                'navbar-background': 'rgba(26,40,51,0.95)',
+                'button-base': '#8da8b1',
 
                 'guild-desert': '#be8d23',
                 'guild-void': '#7036b6',
@@ -78,13 +82,13 @@ module.exports = {
                 },
                 flash: {
                     '0%': {
-                        filter: 'brightness(1)',
+                        filter: 'brightness(1)'
                     },
                     '5%': {
-                        filter: 'brightness(7)',
+                        filter: 'brightness(7)'
                     },
                     '100%': {
-                        filter: 'brightness(1)',
+                        filter: 'brightness(1)'
                     }
                 }
             },

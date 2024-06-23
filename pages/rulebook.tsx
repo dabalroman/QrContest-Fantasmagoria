@@ -23,7 +23,7 @@ export default function RulebookPage () {
         'Biorąc udział w konkursie „QrContest - Zbierz je wszystkie!”, dalej określanym jako „konkurs”, akceptujesz warunki tego regulaminu.',
         'Organizatorem konkursu jest Roman Dąbal, dalej określany jako „organizator”.',
         'Warunkiem udziału w konkursie jest zarejestrowanie się w aplikacji konkursowej, dostępnej pod adresem https://fantas.wep.app.',
-        'W konkursie może wziąć udział każdy uczestnik konwentu Fantasmagoria 13.',
+        'W konkursie może wziąć udział każdy uczestnik konwentu Fantasmagoria 14.',
         'Zwycięzca to osoba, która uzyskała odpowiednią ilość punktów do momentu zakończenia danej tury konkursu. W każdej turze troje uczestników z największą ilością punktów uzyska tytuł zwycięzcy oraz nagrody o wartości zależnej od uzyskanego miejsca.',
         'W konkursie nagrodzonych zostanie sumarycznie 6 osób.',
         'W razie uzyskania przez dwoje uczestników tej samej ilości punktów, osoba która pierwsza zdobyła decydujące punkty jest uznawana za mającą przewagę. Kto pierwszy, ten lepszy.',

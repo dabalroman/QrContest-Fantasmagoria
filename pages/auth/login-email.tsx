@@ -73,7 +73,7 @@ export default function LoginEmail () {
                     <p>Adres email</p>
                     <input type="text"
                            className="rounded block w-full p-1 border-2 border-input-border my-2
-                               bg-input-background text-text-light text-xl shadow-inner-input"
+                               bg-input-background text-text-accent text-xl shadow-inner-input"
                            {...register(
                                'email',
                                {
@@ -91,7 +91,7 @@ export default function LoginEmail () {
                     <p className="mt-4">Hasło</p>
                     <input type="password"
                            className="rounded block w-full p-1 border-2 border-input-border my-2
-                               bg-input-background text-text-light text-xl shadow-inner-input"
+                               bg-input-background text-text-accent text-xl shadow-inner-input"
                            {...register(
                                'password',
                                {

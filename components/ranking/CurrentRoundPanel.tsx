@@ -48,9 +48,9 @@ export default function CurrentRoundPanel ({
                             {notStartedYet &&
                                 <span className="z-10">Runda jeszcze się nie rozpoczęła</span>}
                             {alreadyFinished &&
-                                <span className="text-text-light z-10">Runda została zakończona</span>}
+                                <span className="text-text-accent z-10">Runda została zakończona</span>}
                             {!(notStartedYet || alreadyFinished) &&
-                                <span className={"z-10" + (progressValue >= 50 ? ' text-text-light' : '')}>
+                                <span className={"z-10" + (progressValue >= 50 ? ' text-text-accent' : '')}>
                                     {progressValue.toFixed(0)}%
                                 </span>
                             }

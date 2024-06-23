@@ -47,14 +47,14 @@ export default function Home () {
                 style={{ gridTemplateRows: '100px 1fr 100px' }}
                 id="top"
             >
-                <div className="p-4">
-                    <img src="/fantasmagoria-logo.svg" className="text-text-half" alt="Fantasmagoria Logo"/>
+                <div className="p-4 pt-16 max-w-xl">
+                    <img src="/fantasmagoria-logo.svg" className="text-text-base" alt="Fantasmagoria Logo"/>
                 </div>
                 <div className={
-                    'font-fancy text-center flex flex-col justify-center items-center h-64 p-4 bg-overlay-gradient'
+                    'text-center flex flex-col justify-center items-center h-64 p-4 bg-overlay-gradient'
                 }>
-                    <h1 className="text-4xl p-1" style={{ textShadow: '0 4px 4px rgba(0,0,0,0.25)' }}>QrContest</h1>
-                    <h2 className="text-lg pb-20" style={{ textShadow: '0 4px 4px rgba(0,0,0,0.25)' }}>
+                    <h1 className="text-5xl font-fancy-capitals p-1" style={{ textShadow: '0 4px 4px rgba(0,0,0,0.25)' }}>QrContest</h1>
+                    <h2 className="text-2xl font-fancy pb-20" style={{ textShadow: '0 4px 4px rgba(0,0,0,0.25)' }}>
                         Zbierz je wszystkie!
                     </h2>
                 </div>

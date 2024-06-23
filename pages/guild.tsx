@@ -93,7 +93,7 @@ export default function GuildPage () {
                             <>
                                 <p>Gildia to twoja rodzina, gildia to twój dom.
                                     <br/> Wybierz tę, która bliska jest twemu sercu.</p>
-                                <p className="text-sm text-text-half mt-2">
+                                <p className="text-sm text-text-dim mt-2">
                                     Wybór gildii nie wpływa na Twoje szanse na wygraną, ma charakter kosmetyczny.</p>
                             </>
                         )}

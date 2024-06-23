@@ -121,7 +121,7 @@ export default function AccountSetupPage () {
                         <input
                             placeholder="Morning-Angel"
                             className={'rounded block w-full p-1 border-2 border-input-border text-center mt-4' +
-                                ' bg-input-background text-text-light text-xl shadow-inner-input'}
+                                ' bg-input-background text-text-accent text-xl shadow-inner-input'}
                             {...register(
                                 'username',
                                 {

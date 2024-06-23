@@ -8,7 +8,7 @@ export default function Loader () {
             + ' bg-gradient-radial from-panel-transparent-end to-transparent z-20'
         }>
             <FontAwesomeIcon className="p-2" icon={faDiceD6} size="3x" spin/>
-            <p className="p-2 font-fancy">Ładowanie...</p>
+            <p className="p-2 font-fancy-capitals">Ładowanie...</p>
         </div>
     );
 }

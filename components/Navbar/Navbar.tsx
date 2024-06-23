@@ -21,7 +21,7 @@ export default function Navbar ({ navbarConfig }: { navbarConfig: NavbarConfig }
         return (
             <div
                 className={'grid align-center justify-items-center text-3xl'
-                    + ' bg-background-transparent bottom-0 fixed w-screen z-50'}
+                    + ' bg-navbar-background bottom-0 fixed w-screen z-50'}
             >
                 <NavbarSuperButton
                     href={navbarConfig.href}
@@ -38,7 +38,7 @@ export default function Navbar ({ navbarConfig }: { navbarConfig: NavbarConfig }
     return (
         <div
             className={'grid align-center justify-items-center text-3xl'
-                + ' bg-background-transparent fixed bottom-0 w-screen z-50'}
+                + ' bg-navbar-background fixed bottom-0 w-screen z-50'}
             style={{ gridTemplateColumns: 'repeat(2, 1fr) 100px repeat(2, 1fr)' }}
         >
             <NavbarButton
@@ -71,7 +71,7 @@ export default function Navbar ({ navbarConfig }: { navbarConfig: NavbarConfig }
                             left: '-0.4rem'
                         }}
                     >
-                        <p className="p-2 font-fancy text-xl">
+                        <p className="p-2 font-fancy-capitals text-xl">
                             + <FontAwesomeIcon icon={faDiceD6} size="xs"/> {navbarConfig.animatePointsAdded}</p>
                     </div>
                 }

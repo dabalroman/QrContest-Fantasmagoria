@@ -5,7 +5,7 @@ import { Toaster } from 'react-hot-toast';
 import Navbar, { NavbarConfig } from '@/components/Navbar/Navbar';
 import { config } from '@fortawesome/fontawesome-svg-core';
 import '@fortawesome/fontawesome-svg-core/styles.css';
-import { Spectral, Trykker } from 'next/font/google';
+import { IM_Fell_Double_Pica, IM_Fell_Double_Pica_SC, Spectral } from 'next/font/google';
 import AuthCheck from '@/components/AuthCheck';
 import { useEffect, useState } from 'react';
 import CollectionCache from '@/models/CollectionCache';
@@ -19,10 +19,15 @@ import { Page } from '@/Enum/Page';
 
 config.autoAddCss = false;
 
-const trykker = Trykker({
+const imFellDoublePica = IM_Fell_Double_Pica({
     weight: '400',
     subsets: ['latin'],
-    variable: '--font-trykker'
+    variable: '--font-imFellDoublePica'
+});
+const imFellDoublePicaSC = IM_Fell_Double_Pica_SC({
+    weight: '400',
+    subsets: ['latin'],
+    variable: '--font-imFellDoublePicaSC'
 });
 const spectral = Spectral({
     weight: '400',
@@ -68,7 +73,7 @@ export default function App ({
                         <Metatags title="QrContest"/>
                         <div
                             className={
-                                `${spectral.variable} ${trykker.variable} `
+                                `${spectral.variable} ${imFellDoublePica.variable} ${imFellDoublePicaSC.variable} text-text-base `
                                 + `font-serif bg-image-default bg-fixed min-h-screen bg-image-mobile-position`
                             }
                         >
@@ -77,8 +82,7 @@ export default function App ({
                                 <Component
                                     {...pageProps}
                                     className={
-                                        `${spectral.variable} ${trykker.variable} `
-                                        + `font-serif bg-image-default bg-center bg-cover bg-fixed min-h-screen`
+                                        `font-serif bg-image-default bg-center bg-cover bg-fixed min-h-screen`
                                     }/>
                                 <Toaster/>
                             </AuthCheck>
