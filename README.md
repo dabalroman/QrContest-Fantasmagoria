@@ -24,6 +24,7 @@ npm run dev
 
 ## Emulator
 ```bash
+npm install -g firebase-tools
 npm run emulators
 ```
 
