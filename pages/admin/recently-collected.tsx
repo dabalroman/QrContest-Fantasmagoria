@@ -2,27 +2,27 @@ import Card from '@/models/Card';
 import ScreenTitle from '@/components/ScreenTitle';
 import Panel from '@/components/Panel';
 import { useRouter } from 'next/router';
-import { useContext, useEffect, useState } from 'react';
-import { UserContext, UserContextType } from '@/utils/context';
-import { UserRole } from '@/Enum/UserRole';
+import { useEffect, useState } from 'react';
 import { Page } from '@/Enum/Page';
 import { collection, onSnapshot, query } from '@firebase/firestore';
 import { firestore } from '@/utils/firebase';
 import { FireDoc } from '@/Enum/FireDoc';
+import useDynamicNavbar from '@/hooks/useDynamicNavbar';
+import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
+import useAdminOnly from '@/hooks/useAdminOnly';
 
 type RecentlyCollectedEntry = { uid: string, name: string, code: string, username: string, collectedAt: Date }
 
-export default function RecentlyCollectedCardsPage () {
+export default function RecentlyCollectedCardsAdminPage () {
+    useAdminOnly();
+
     const router = useRouter();
-    const { user } = useContext<UserContextType>(UserContext);
     const [listOfEntries, setListOfEntries] = useState<RecentlyCollectedEntry[]>([]);
 
-    useEffect(() => {
-        if (!user || user?.role !== UserRole.ADMIN) {
-            router.push(Page.COLLECT)
-                .then();
-        }
-    }, [router, user]);
+    useDynamicNavbar({
+        icon: faArrowLeft,
+        onClick: () => router.back()
+    });
 
     useEffect(() => {
         const q = query(collection(firestore, FireDoc.CARDS))

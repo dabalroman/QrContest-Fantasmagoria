@@ -35,8 +35,10 @@ export default function CardComponent ({
             const xRotation = -((xTilt + 90) / 180 - 0.5) * maxTilt;
             const yRotation = ((yTilt + 180) / 360 - 0.5) * maxTilt * 2;
 
+            // @ts-ignore
             cardRef.current.style.transform =
                 `perspective(600px) rotateX(${yRotation}deg) rotateY(${xRotation}deg) scale(0.9)`;
+            // @ts-ignore
             cardRef.current.style.setProperty('--glare-left', `${xRotation / 10 * 50 - 50}%`);
         };
 
@@ -61,10 +63,11 @@ export default function CardComponent ({
                 'maxHeight': '70vh',
                 'aspectRatio': '2/3',
                 'objectFit': 'contain',
-                '--glare-left': '-50%',
                 'overflow': 'hidden',
                 'transformStyle': 'preserve-3d',
-                'transform': 'scale(0.9)'
+                'transform': 'scale(0.9)',
+                // @ts-ignore
+                '--glare-left': '-50%'
             }}
         >
             <div
