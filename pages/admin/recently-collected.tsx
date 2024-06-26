@@ -70,7 +70,7 @@ export default function RecentlyCollectedCardsAdminPage () {
             <ScreenTitle>Ostatnio zebrane karty</ScreenTitle>
 
             <Panel title="" loading={!listOfEntries} className={'overflow-scroll'}>
-                <table className="table-auto whitespace-nowrap">
+                <table className="table-auto whitespace-nowrap min-w-full">
                     <thead>
                         <tr className="text-left">
                             <th className="p-2">Karta</th>

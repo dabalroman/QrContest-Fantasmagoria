@@ -27,13 +27,13 @@ export default function CardComponent ({
                 });
             }
 
-            const xTilt = event.gamma ?? 0 - initialOrientation.gamma; // range [-90,90]
-            const yTilt = event.beta ?? 0 - initialOrientation.beta; // range [-180,180]
+            const xTilt = (event.gamma ?? 0) - initialOrientation.gamma; // range [-90,90]
+            const yTilt = (event.beta ?? 0) - initialOrientation.beta; // range [-180,180]
 
             const maxTilt = 45;
 
             const xRotation = -((xTilt + 90) / 180 - 0.5) * maxTilt;
-            const yRotation = ((yTilt + 180) / 360 - 0.5) * maxTilt * 2;
+            const yRotation = ((yTilt + 180) / 360 - 0.5) * maxTilt;
 
             // @ts-ignore
             cardRef.current.style.transform =
@@ -47,14 +47,14 @@ export default function CardComponent ({
         return () => {
             window.removeEventListener('deviceorientation', handleOrientation);
         };
-    }, [initialOrientation]);
+    }, [initialOrientation, setInitialOrientation]);
 
     return (
         <div
             ref={cardRef}
             className={
                 'rounded-3xl bg-background relative bg-center bg-cover '
-                + 'ring-8 ring-inset ring-card-border shadow-card-border duration-150 ease-in-out'
+                + 'ring-8 ring-inset ring-card-border duration-150 ease-in-out'
                 + ' ' + className
             }
             style={{
@@ -66,6 +66,7 @@ export default function CardComponent ({
                 'overflow': 'hidden',
                 'transformStyle': 'preserve-3d',
                 'transform': 'scale(0.9)',
+                'filter': 'drop-shadow(8px 8px 10px rgba(0,0,0,0.5))',
                 // @ts-ignore
                 '--glare-left': '-50%'
             }}

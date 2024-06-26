@@ -60,7 +60,7 @@ export default function CardsAdminPage () {
             <ScreenTitle>Lista Kart</ScreenTitle>
 
             <Panel title="Karty" loading={!cards} className={'overflow-scroll'}>
-                <table className="table-auto whitespace-nowrap">
+                <table className="table-auto whitespace-nowrap min-w-full">
                     <thead>
                         <tr className="text-left">
                             <th className="p-2">N</th>
@@ -69,6 +69,7 @@ export default function CardsAdminPage () {
                             <th className="p-2">Ostatnia osoba</th>
                             <th className="p-2">Ostatnio zebrano</th>
                             <th className="p-2">Komentarz</th>
+                            <th className="p-2">Kod</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -84,6 +85,7 @@ export default function CardsAdminPage () {
                                     {(card.collectedBy[0] as any)?.collectedAt.toLocaleString('pl-PL')}
                                 </td>
                                 <td className="p-2">{card.comment}</td>
+                                <td className="p-2 font-mono">{card.code}</td>
                             </tr>
                         ))}
                     </tbody>

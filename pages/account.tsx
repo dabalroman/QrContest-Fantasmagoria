@@ -47,8 +47,9 @@ export default function AccountPage () {
 
     const AdminSection = () => (
         <Panel title="Admin">
-            <LinkButton href={Page.ADMIN_CARDS} className={'mt-4'}>Lista kart</LinkButton>
             <LinkButton href={Page.ADMIN_RECENTLY_COLLECTED} className={'mt-4'}>Ostatnio zebrane karty</LinkButton>
+            <LinkButton href={Page.ADMIN_CARDS} className={'mt-4'}>Lista kart</LinkButton>
+            <LinkButton href={Page.ADMIN_USERS} className={'mt-4'}>Lista użytkowników</LinkButton>
 
             <p className={'py-2 mt-20'}>Niebezpiecznie tutaj schodzić!</p>
             <Button className="w-full" style={{background: '#660000', borderColor: '#BB0000'}} onClick={() => {

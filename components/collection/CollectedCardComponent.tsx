@@ -7,7 +7,7 @@ export default function CollectedCardComponent ({ card }: { card: Card }) {
     return (
         <div className="relative h-full flex flex-col">
             <CardComponent card={card} className="z-50 relative top-3 grow w-full"/>
-            <Panel margin={false} className="text-justify pt-10 relative bottom-3 z-0 rounded-b-2xl">
+            <Panel margin={false} className="text-justify relative top-6 z-0 rounded-3xl">
                 <p>{card.description}</p>
                 {card.collectedAt &&
                     <p className="text-right mt-4">Karta zdobyta {formatTimeFromNow(card.collectedAt)}</p>

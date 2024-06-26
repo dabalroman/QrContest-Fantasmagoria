@@ -16,5 +16,6 @@ export enum Page {
     ACCOUNT_SETUP = '/auth/account-setup',
     ADMIN_EDIT_CARD = '/admin/edit-card',
     ADMIN_CARDS = '/admin/cards',
-    ADMIN_RECENTLY_COLLECTED = '/admin/recently-collected'
+    ADMIN_RECENTLY_COLLECTED = '/admin/recently-collected',
+    ADMIN_USERS = '/admin/users'
 }
