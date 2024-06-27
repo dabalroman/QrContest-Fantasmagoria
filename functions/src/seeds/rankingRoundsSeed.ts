@@ -1,4 +1,4 @@
-import { RankingRound } from '../types/rankingRound';
+import {RankingRound, RankingRoundGuilds, RankingRoundUsers} from '../types/rankingRound';
 
 const rankingRoundsSeed: RankingRound[] = [
     {
@@ -6,16 +6,16 @@ const rankingRoundsSeed: RankingRound[] = [
         name: 'pierwsza',
         from: new Date('2024-06-23 00:00:00 GMT+0200'),
         to: new Date('2024-07-13 13:59:59 GMT+0200'),
-        users: {},
-        guilds: {}
+        users: {} as RankingRoundUsers,
+        guilds: {} as RankingRoundGuilds
     },
     {
         uid: '2',
         name: 'druga',
         from: new Date('2024-07-14 14:00:00 GMT+0200'),
         to: new Date('2024-07-15 12:00:00 GMT+0200'),
-        users: {},
-        guilds: {}
+        users: {} as RankingRoundUsers,
+        guilds: {} as RankingRoundGuilds
     },
 ];
 

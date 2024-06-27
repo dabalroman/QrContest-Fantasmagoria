@@ -21,15 +21,19 @@ export type RankingRoundGuild = {
     updatedAt: Timestamp | FieldValue,
 }
 
+export type RankingRoundUsers = {
+    [uid: string]: RankingRoundUser
+}
+
+export type RankingRoundGuilds = {
+    [uid: string]: RankingRoundGuild
+}
+
 export type RankingRound = {
     uid: string,
     name: string;
     from: Timestamp | FieldValue | Date;
     to: Timestamp | FieldValue | Date;
-    users: {
-        [uid: string]: RankingRoundUser
-    },
-    guilds: {
-        [uid: string]: RankingRoundGuild
-    }
+    users: RankingRoundUsers
+    guilds: RankingRoundGuilds
 }

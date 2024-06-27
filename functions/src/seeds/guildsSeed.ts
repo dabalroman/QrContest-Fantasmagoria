@@ -1,6 +1,6 @@
 /* eslint-disable max-len */
 import { FieldValue } from 'firebase-admin/firestore';
-import { Guild } from '../types/guild';
+import {Guild, GuildMembers} from '../types/guild';
 
 const guildsSeed: Guild[] = [
     {
@@ -11,7 +11,7 @@ const guildsSeed: Guild[] = [
         amountOfMembers: 0,
         amountOfCollectedCards: 0,
         amountOfAnsweredQuestions: 0,
-        members: {},
+        members: {} as GuildMembers,
         updatedAt: FieldValue.serverTimestamp()
     },
     {
@@ -22,7 +22,7 @@ const guildsSeed: Guild[] = [
         amountOfMembers: 0,
         amountOfCollectedCards: 0,
         amountOfAnsweredQuestions: 0,
-        members: {},
+        members: {} as GuildMembers,
         updatedAt: FieldValue.serverTimestamp()
     },
     {
@@ -33,7 +33,7 @@ const guildsSeed: Guild[] = [
         amountOfMembers: 0,
         amountOfCollectedCards: 0,
         amountOfAnsweredQuestions: 0,
-        members: {},
+        members: {} as GuildMembers,
         updatedAt: FieldValue.serverTimestamp()
     },
     {
@@ -44,7 +44,7 @@ const guildsSeed: Guild[] = [
         amountOfMembers: 0,
         amountOfCollectedCards: 0,
         amountOfAnsweredQuestions: 0,
-        members: {},
+        members: {} as GuildMembers,
         updatedAt: FieldValue.serverTimestamp()
     },
 ];

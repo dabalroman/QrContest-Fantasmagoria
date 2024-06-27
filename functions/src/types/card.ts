@@ -21,16 +21,16 @@ export type CollectedBy = {
 }
 
 export type Card = {
+    uid: string;
     cardSet: string;
     code: string;
     collectedBy: CollectedBy;
     description: string;
-    comment: string;
     image: string;
     isActive: boolean;
+    comment: string;
     name: string;
     tier: CardTier;
-    uid: string;
     value: CardTierValue;
     withQuestion: boolean;
 }

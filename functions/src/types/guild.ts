@@ -12,6 +12,10 @@ export type GuildMember = {
     joinedAt: Timestamp | FieldValue | Date
 }
 
+export type GuildMembers = {
+    [uid: string]: GuildMember
+}
+
 export type Guild = {
     uid: GuildUid;
     name: string;
@@ -20,8 +24,6 @@ export type Guild = {
     amountOfMembers: number | FieldValue;
     amountOfCollectedCards: number | FieldValue;
     amountOfAnsweredQuestions: number | FieldValue;
-    members: {
-        [uid: string]: GuildMember
-    }
+    members: GuildMembers;
     updatedAt: Timestamp | FieldValue;
 }
