@@ -35,3 +35,9 @@ Remember to build functions before use in emulator.
 npm run build
 npm run build:watch
 ```
+
+# Deployment to Firebase
+## Functions
+```bash
+firebase deploy --only functions
+```

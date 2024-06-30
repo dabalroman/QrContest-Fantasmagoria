@@ -175,7 +175,7 @@ export default function DashboardPage () {
     });
 
     useEffect(() => {
-        if (user && user?.role !== UserRole.DASHBOARD) {
+        if (user && user.role === UserRole.USER) {
             router.push(Page.COLLECT)
                 .then();
         }
