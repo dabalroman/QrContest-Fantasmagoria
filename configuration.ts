@@ -12,6 +12,7 @@ const configuration = {
     emulatorAuthPort: process.env.NEXT_PUBLIC_FIREBASE_AUTH_EMULATOR_PORT,
     emulatorFirestorePort: process.env.NEXT_PUBLIC_FIREBASE_FIRESTORE_EMULATOR_PORT,
     emulatorFunctionsPort: process.env.NEXT_PUBLIC_FIREBASE_FUNCTIONS_EMULATOR_PORT,
+    emulatorStoragePort: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_EMULATOR_PORT,
     emulator: process.env.NEXT_PUBLIC_EMULATOR === 'true',
 };
 

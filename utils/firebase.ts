@@ -1,7 +1,7 @@
 import { FirebaseApp, getApp, initializeApp } from 'firebase/app';
 import { Auth, connectAuthEmulator, getAuth, GoogleAuthProvider } from '@firebase/auth';
 import { connectFirestoreEmulator, Firestore, getFirestore } from '@firebase/firestore';
-import { FirebaseStorage, getStorage } from '@firebase/storage';
+import { connectStorageEmulator, FirebaseStorage, getStorage } from '@firebase/storage';
 import { initializeAnalytics, isSupported } from '@firebase/analytics';
 import configuration from '@/configuration';
 import { connectFunctionsEmulator, getFunctions } from '@firebase/functions';
@@ -32,6 +32,11 @@ if (configuration.emulator) {
         functions,
         configuration.emulatorHost as string,
         parseInt(configuration.emulatorFunctionsPort as string, 10)
+    );
+    connectStorageEmulator(
+        storage,
+        configuration.emulatorHost as string,
+        parseInt(configuration.emulatorStoragePort as string, 10)
     );
 
     // @ts-ignore

@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "emulators": "firebase emulators:start --import .emulators --export-on-exit .emulators --only functions,firestore,auth"
+    "emulators": "firebase emulators:start --import .emulators --export-on-exit .emulators --only functions,firestore,auth,storage"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.5.2",
