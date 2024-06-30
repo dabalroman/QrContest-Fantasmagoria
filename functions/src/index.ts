@@ -5,6 +5,7 @@ import answerQuestionHandle from './answerQuestionHandle';
 import collectCardHandle from './collectCardHandle';
 import setupAccountHandle from './setupAccountHandle';
 import joinGuildHandle from './joinGuildHandle';
+import updateRoundsHandle from './updateRoundsHandle';
 
 const region = 'europe-west1';
 
@@ -34,3 +35,8 @@ exports.joinguild =
     functions.region(region)
         .https
         .onCall(joinGuildHandle);
+
+exports.updaterounds =
+    functions.region(region)
+        .https
+        .onCall(updateRoundsHandle);

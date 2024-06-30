@@ -9,6 +9,8 @@ export type RankingRoundUser = {
     amountOfCollectedCards: number,
     amountOfAnsweredQuestions: number,
     memberOf: GuildUid | null,
+    lastActiveInRound: string | null,
+    winnerInRound: string | null,
     updatedAt: Timestamp | FieldValue,
 }
 
@@ -31,9 +33,10 @@ export type RankingRoundGuilds = {
 
 export type RankingRound = {
     uid: string,
-    name: string;
-    from: Timestamp | FieldValue | Date;
-    to: Timestamp | FieldValue | Date;
-    users: RankingRoundUsers
+    name: string,
+    finished: boolean,
+    from: Timestamp | FieldValue | Date,
+    to: Timestamp | FieldValue | Date,
+    users: RankingRoundUsers,
     guilds: RankingRoundGuilds
 }
