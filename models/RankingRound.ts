@@ -10,6 +10,8 @@ export type UserRankingRecord = {
     amountOfCollectedCards: number,
     amountOfAnsweredQuestions: number,
     memberOf: GuildUid | null,
+    lastActiveInRound: string | null,
+    winnerInRound: string | null,
     updatedAt: Date,
 }
 
@@ -27,6 +29,7 @@ export type GuildRankingRecord = {
 export default class RankingRound extends FirebaseModel {
     uid: Uid;
     name: string;
+    finished: boolean;
     from: Date;
     to: Date;
     users: UserRankingRecord[];
@@ -35,6 +38,7 @@ export default class RankingRound extends FirebaseModel {
     constructor (
         uid: Uid,
         name: string,
+        finished: boolean,
         from: Date,
         to: Date,
         users: UserRankingRecord[],
@@ -44,6 +48,7 @@ export default class RankingRound extends FirebaseModel {
 
         this.uid = uid;
         this.name = name;
+        this.finished = finished;
         this.from = from;
         this.to = to;
         this.users = users;
@@ -73,6 +78,8 @@ export default class RankingRound extends FirebaseModel {
                     amountOfAnsweredQuestions: record.amountOfAnsweredQuestions,
                     memberOf: record.memberOf,
                     score: record.score,
+                    lastActiveInRound: record.lastActiveInRound,
+                    winnerInRound: record.winnerInRound,
                     updatedAt: record.updatedAt.toDate()
                 };
             })
@@ -132,6 +139,7 @@ export default class RankingRound extends FirebaseModel {
         return new RankingRound(
             data.uid,
             data.name,
+            data.finished,
             data.from.toDate(),
             data.to.toDate(),
             rankingEntries,

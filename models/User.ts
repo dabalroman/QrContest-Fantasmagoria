@@ -10,6 +10,8 @@ export default class User extends FirebaseModel {
     amountOfAnsweredQuestions: number;
     memberOf: string | null;
     role: UserRole;
+    lastActiveInRound: string | null;
+    winnerInRound: string | null;
     updatedAt: Date;
     lastGuildChangeAt: Date;
 
@@ -21,6 +23,8 @@ export default class User extends FirebaseModel {
         amountOfAnsweredQuestions: number = 0,
         memberOf: string | null = null,
         role: UserRole = UserRole.USER,
+        lastActiveInRound: string | null = null,
+        winnerInRound: string | null = null,
         updatedAt: Date = new Date(),
         lastGuildChangeAt: Date = new Date(),
     ) {
@@ -33,6 +37,8 @@ export default class User extends FirebaseModel {
         this.amountOfAnsweredQuestions = amountOfAnsweredQuestions;
         this.memberOf = memberOf;
         this.role = role;
+        this.lastActiveInRound = lastActiveInRound;
+        this.winnerInRound = winnerInRound;
         this.updatedAt = updatedAt;
         this.lastGuildChangeAt = lastGuildChangeAt;
     }
@@ -63,6 +69,8 @@ export default class User extends FirebaseModel {
             data.amountOfAnsweredQuestions,
             data.memberOf,
             data.role,
+            data.lastActiveInRound,
+            data.winnerInRound,
             data.updatedAt.toDate(),
             data.lastGuildChangeAt.toDate()
         );
