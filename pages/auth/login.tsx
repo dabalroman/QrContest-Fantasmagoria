@@ -60,8 +60,8 @@ export default function LoginPage () {
             <Metatags title="Logowanie"/>
             <ScreenTitle>{!(authUser && userReady) ? 'Zaloguj' : 'Wyloguj'}</ScreenTitle>
 
-            <Panel title="Zaloguj się" loading={loading}>
-                <p className="pb-2">Wybierz metodę logowania:</p>
+            <Panel loading={loading}>
+                <p className="pb-4">Wybierz metodę logowania:</p>
                 <Button onClick={signInWithGoogle} className="w-full mb-4">
                     <img src={'/google.png'} alt="Google logo" className="inline-block w-6 mr-2 relative bottom-0.5"/>
                     Konto Google

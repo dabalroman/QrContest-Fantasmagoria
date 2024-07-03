@@ -117,8 +117,7 @@ export default function FaqPage () {
                         &quot;QrContest - Zbierz je wszystkie!&quot;
                         W razie potrzeby możesz skontaktować się bezpośrednio z organizatorem konkursu przez
                         email <a href="mailto:dabalroman@gmail.com" className="underline">dabalroman@gmail.com</a> lub
-                        na Facebook przez <a href="https://m.me/roman.dabal" className="underline">messenger</a>.
-                        Możesz również zapytać w Punkcie Informacyjnym konwentu.
+                        przez <a href="https://m.me/roman.dabal" className="underline">messenger</a>.
                     </p>
                 </Panel>
                 {topics.map(({

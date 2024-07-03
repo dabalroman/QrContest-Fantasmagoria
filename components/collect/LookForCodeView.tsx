@@ -59,6 +59,7 @@ export default function LookForCodeView ({
         toast.error(code?.message ?? 'Błąd kodu.');
     };
 
+    // noinspection TypeScriptValidateTypes
     const currentInput = watch('code');
     const showScanner = currentInput.length === 0;
     useDynamicNavbar({
@@ -74,7 +75,7 @@ export default function LookForCodeView ({
         }
 
         if (typingAnimationText.length >= 10 && typingAnimationIntervalRef.current !== null) {
-            window.clearInterval(typingAnimationIntervalRef.current);
+            window.clearInterval(typingAnimationIntervalRef.current as number);
             return;
         }
 
@@ -103,11 +104,11 @@ export default function LookForCodeView ({
         <div>
             <Panel title="Zeskanuj kod karty">
                 <p>Kliknij w przycisk aparatu i zeskanuj kod!</p>
-                <p>Możesz również użyć innej aplikacji do skanowania.</p>
+                <p>Możesz też użyć innej aplikacji do skanowania.</p>
             </Panel>
 
             <Panel title="Wpisz kod karty" loading={loading}>
-                <p className="pb-2">Tutaj możesz wpisać znaleziony kod.</p>
+                <p className="pb-4">Tutaj możesz wpisać znaleziony kod.</p>
 
                 <form onSubmit={handleSubmit(collectCode)}>
                     <input type="text" placeholder="ABCDEFGHIJ" maxLength={10}
@@ -116,10 +117,10 @@ export default function LookForCodeView ({
                            {...register(
                                'code',
                                {
-                                   required: 'Wpisz kod karty',
+                                   required: 'Kod karty składa się z 10 znaków',
                                    pattern: {
                                        value: /^[A-z0-9]{10}$/,
-                                       message: 'Kod karty składa się z 10 znaków.'
+                                       message: 'Kod karty składa się z 10 znaków'
                                    }
                                }
                            )} />
