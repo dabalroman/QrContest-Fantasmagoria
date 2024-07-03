@@ -4,11 +4,11 @@ import LinkButton from '@/components/LinkButton';
 import React, { useContext, useEffect, useState } from 'react';
 import { UserContext, UserContextType } from '@/utils/context';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faDiceD6 } from '@fortawesome/free-solid-svg-icons';
+import { faDiceD6, faImagePortrait } from '@fortawesome/free-solid-svg-icons';
 import Metatags from '@/components/Metatags';
 import { UserRole } from '@/Enum/UserRole';
 import Button from '@/components/Button';
-import { seedDatabaseFunction } from '@/utils/functions';
+import { seedDatabaseFunction, updateRoundsFunction } from '@/utils/functions';
 import toast from 'react-hot-toast';
 import { Page } from '@/Enum/Page';
 import { auth, firestore } from '@/utils/firebase';
@@ -51,6 +51,13 @@ export default function AccountPage () {
             <LinkButton href={Page.ADMIN_CARDS} className={'mt-4'}>Lista kart</LinkButton>
             <LinkButton href={Page.ADMIN_USERS} className={'mt-4'}>Lista użytkowników</LinkButton>
 
+            <Button className="w-full mt-4" onClick={() => {
+                updateRoundsFunction()
+                    .then(() => toast.success('Rounds updated'))
+                    .catch((error) => toast.error('Update failed: ' + error.message));
+
+            }}>Update rounds</Button>
+
             <p className={'py-2 mt-20'}>Niebezpiecznie tutaj schodzić!</p>
             <Button className="w-full" style={{background: '#660000', borderColor: '#BB0000'}} onClick={() => {
                 const proceed = confirm('Are you sure?') ?? false;
@@ -79,18 +86,22 @@ export default function AccountPage () {
             <Metatags title="Profil"/>
             <div>
                 <Panel title={user.username ?? '...'} className="text-center">
-                    <p className="text-2xl">
-                        <FontAwesomeIcon className="px-1" icon={faDiceD6} size="sm"/>{user.score}
-                    </p>
+                    <div className="flex place-content-around text-2xl">
+                        <div>
+                            <FontAwesomeIcon className="px-1" icon={faImagePortrait} size="sm"/>
+                            {user?.amountOfCollectedCards}
+                        </div>
+                        <div><FontAwesomeIcon className="px-1" icon={faDiceD6} size="sm"/>{user?.score}</div>
+                    </div>
                 </Panel>
 
                 <Panel title="Nagrody i rundy">
-                    <p className='text-center text-lg'>
+                    <p className="text-center text-lg">
                         1. miejsce – 50 fantów <br/>
                         2. miejsce – 35 fantów <br/>
                         3. miejsce – 20 fantów <br/>
                     </p>
-                    <p className='mt-2 text-justify'>
+                    <p className="mt-2 text-justify">
                         Konkurs podzielony jest na dwie rundy. Daty rozpoczęcia i zakończenia każdej z nich znajdziesz
                         w zakładce &quot;Ranking&quot;. Punkty z rundy pierwszej przechodzą do rundy drugiej,
                         więc masz aż dwie szanse na wygraną! Każda runda to troje zwycięzców.

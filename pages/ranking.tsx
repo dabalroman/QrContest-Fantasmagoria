@@ -4,7 +4,7 @@ import Panel from '@/components/Panel';
 import React, { useContext, useEffect, useState } from 'react';
 import { UserContext, UserContextType } from '@/utils/context';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBolt, faDiceD6, faUser } from '@fortawesome/free-solid-svg-icons';
+import { faBolt, faDiceD6, faImagePortrait, faUser } from '@fortawesome/free-solid-svg-icons';
 import { collection, onSnapshot, orderBy, query } from '@firebase/firestore';
 import { firestore } from '@/utils/firebase';
 import { FireDoc } from '@/Enum/FireDoc';
@@ -42,8 +42,6 @@ export default function ScoreboardPage ({}) {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    const isCurrentRoundOver = currentRound && currentRound?.to.getTime() < (new Date()).getTime();
-
     const currentUserPlace: number = currentRound?.users
         .findIndex((record: UserRankingRecord) => record.uid === user?.uid) ?? -1;
     const currentGuildPlace: number = currentRound?.guilds
@@ -54,37 +52,44 @@ export default function ScoreboardPage ({}) {
             <Metatags title="Ranking"/>
             <ScreenTitle>Ranking</ScreenTitle>
             <div>
-                <Panel loading={loading} className="text-center">
-                    <p className="text-2xl font-fancy-capitals">
-                        {user?.username} <br/>
-                    </p>
-                    <p className="text-2xl">
-                        <FontAwesomeIcon className="px-1" icon={faDiceD6} size="sm"/>{user?.score}
-                    </p>
-                    <p className="mt-1">
-                        {currentUserPlace !== -1
-                            ? `Jesteś na ${currentUserPlace + 1}. miejscu w rankingu!`
-                            : `Nie brałeś/aś udziału w tej rundzie.`
-                        }
-                    </p>
-                    <p className="mt-1">
-                        {!user?.memberOf && (
-                            <>
-                                <span>Nie jesteś członkiem żadnej gildii.</span>
-                                <LinkButton className="mt-2" href={Page.GUILD}>Dołącz do gildii</LinkButton>
-                            </>
-                        )}
-                        {user?.memberOf && currentRound?.guilds[currentGuildPlace] && (
-                            <span>
-                                {currentRound?.guilds[currentGuildPlace].name}
-                                {currentGuildPlace !== -1
-                                    ? ` zajmuje ${currentGuildPlace + 1}. miejsce.`
-                                    : ' nie znajduje się w rankingu.'
-                                }
-                            </span>
-                        )}
-                    </p>
+                <Panel title={user?.username ?? '...'} loading={loading} className="text-center">
+                    <div className="flex place-content-around text-2xl">
+                        <div>
+                            <FontAwesomeIcon className="px-1" icon={faImagePortrait} size="sm"/>
+                            {user?.amountOfCollectedCards}
+                        </div>
+                        <div><FontAwesomeIcon className="px-1" icon={faDiceD6} size="sm"/>{user?.score}</div>
+                    </div>
+
+                    {!user?.winnerInRound && (
+                        currentUserPlace !== -1
+                            ? <p className="mt-1">Jesteś na {currentUserPlace + 1}. miejscu w rankingu!</p>
+                            : <p className="mt-1">Nie brałeś/aś udziału w tej rundzie.</p>
+                    )}
+
+                    {!user?.memberOf && (
+                        <p className="mt-1">
+                            <span>Nie jesteś członkiem żadnej gildii.</span>
+                            <LinkButton className="mt-2" href={Page.GUILD}>Dołącz do gildii</LinkButton>
+                        </p>
+                    )}
+
+                    {user?.memberOf && !user?.winnerInRound && currentRound?.guilds[currentGuildPlace] && (
+                        <p className="mt-1">
+                            {currentRound?.guilds[currentGuildPlace].name}
+                            {currentGuildPlace !== -1
+                                ? ` zajmuje ${currentGuildPlace + 1}. miejsce.`
+                                : ' nie znajduje się w rankingu.'
+                            }
+                        </p>
+                    )}
                 </Panel>
+
+                {user?.winnerInRound &&
+                    <Panel title={'Wygrana!'}>
+                        <p>Odwiedź punkt informacyjny konwentu aby odebrać Twoją nagrodę. </p>
+                    </Panel>
+                }
 
                 {currentRound &&
                     <CurrentRoundPanel currentRound={currentRound} loading={loading}/>
@@ -98,9 +103,9 @@ export default function ScoreboardPage ({}) {
                     )}
                 </div>
 
-                {currentRound && isCurrentRoundOver &&
+                {currentRound && currentRound.finished &&
                     <Panel title="Zwycięzcy rundy" loading={loading}>
-                        <RoundRankingTable user={user} currentRound={currentRound} top3={true}/>
+                        <RoundRankingTable user={user} currentRound={currentRound} winnersOnly={true}/>
                     </Panel>
                 }
 
@@ -151,6 +156,12 @@ export default function ScoreboardPage ({}) {
 
                 {currentRound &&
                     <Panel title="Ranking rundy" loading={loading}>
+                        {user?.winnerInRound && currentRound?.uid !== user?.winnerInRound &&
+                            <p className="text-center mb-4 text-text-dim">
+                                Wygrałeś/aś w poprzedniej rundzie, dlatego nie jesteś widoczny/a w tym rankingu!
+                            </p>
+                        }
+
                         <RoundRankingTable user={user} currentRound={currentRound}/>
                     </Panel>
                 }

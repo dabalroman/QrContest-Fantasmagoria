@@ -27,16 +27,16 @@ export default async function updateRoundsHandle (
     // Get rounds that have finished but are not marked as finished yet
     const rankingRoundSnapshots = roundsSnapshot.docs
         .filter((roundSnapshot) => {
-            const round = roundSnapshot.data();
-            const roundToTime: number = (round.to as Timestamp).toDate()
+            const rankingRound: RankingRound = roundSnapshot.data() as RankingRound;
+            const roundToTime: number = (rankingRound.to as Timestamp).toDate()
                 .getTime();
             const nowTime: number = (new Date()).getTime();
 
-            return !round.finished && roundToTime <= nowTime;
+            return !rankingRound.finished && roundToTime <= nowTime;
         });
 
     if (rankingRoundSnapshots.length === 0) {
-        logger.log('updateRoundsHandle', `no rounds to update`);
+        logger.log('updateRoundsHandle', `Nothing to do, no rounds to finish.`);
         return;
     }
 

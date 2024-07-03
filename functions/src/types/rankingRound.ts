@@ -9,7 +9,6 @@ export type RankingRoundUser = {
     amountOfCollectedCards: number,
     amountOfAnsweredQuestions: number,
     memberOf: GuildUid | null,
-    lastActiveInRound: string | null,
     winnerInRound: string | null,
     updatedAt: Timestamp | FieldValue,
 }

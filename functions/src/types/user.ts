@@ -17,7 +17,6 @@ export type User = {
     amountOfAnsweredQuestions: number,
     role: UserRole,
     memberOf: GuildUid | null,
-    lastActiveInRound: string | null,
     winnerInRound: string | null
     updatedAt: Timestamp | FieldValue,
     lastGuildChangeAt: Timestamp | FieldValue,

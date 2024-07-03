@@ -31,7 +31,6 @@ export default async function updateRanking (
             amountOfCollectedCards: user.amountOfCollectedCards,
             amountOfAnsweredQuestions: user.amountOfAnsweredQuestions,
             memberOf: user.memberOf,
-            lastActiveInRound: user.lastActiveInRound,
             winnerInRound: user.winnerInRound,
             updatedAt: FieldValue.serverTimestamp()
         };

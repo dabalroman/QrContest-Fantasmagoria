@@ -65,7 +65,6 @@ export default async function setupAccountHandle (
         amountOfAnsweredQuestions: 0,
         role: UserRole.USER,
         memberOf: null,
-        lastActiveInRound: null,
         winnerInRound: null,
         updatedAt: FieldValue.serverTimestamp(),
         lastGuildChangeAt: new Date('2020/01/01') as any

@@ -10,7 +10,6 @@ export type UserRankingRecord = {
     amountOfCollectedCards: number,
     amountOfAnsweredQuestions: number,
     memberOf: GuildUid | null,
-    lastActiveInRound: string | null,
     winnerInRound: string | null,
     updatedAt: Date,
 }
@@ -78,7 +77,6 @@ export default class RankingRound extends FirebaseModel {
                     amountOfAnsweredQuestions: record.amountOfAnsweredQuestions,
                     memberOf: record.memberOf,
                     score: record.score,
-                    lastActiveInRound: record.lastActiveInRound,
                     winnerInRound: record.winnerInRound,
                     updatedAt: record.updatedAt.toDate()
                 };

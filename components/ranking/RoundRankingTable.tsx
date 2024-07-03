@@ -9,8 +9,8 @@ import React from 'react';
 export default function RoundRankingTable ({
     user,
     currentRound,
-    top3 = false
-}: { user: User | null, currentRound: RankingRound, top3?: boolean }) {
+    winnersOnly = false
+}: { user: User | null, currentRound: RankingRound, winnersOnly?: boolean }) {
     return (
         <div>
             <table className="w-full text-left">
@@ -24,7 +24,12 @@ export default function RoundRankingTable ({
                 </thead>
                 <tbody>
                     {currentRound && currentRound.users
-                        .filter((record: UserRankingRecord, index: number) => !top3 || index < 3)
+                        .filter((record: UserRankingRecord) =>
+                            !winnersOnly || record.winnerInRound === currentRound.uid
+                        )
+                        .filter((record: UserRankingRecord) =>
+                            !record.winnerInRound || record.winnerInRound === currentRound.uid
+                        )
                         .map((
                             record: UserRankingRecord,
                             index: number
@@ -54,8 +59,10 @@ export default function RoundRankingTable ({
                                 </td>
                             </tr>
                         ))}
-                    {(!currentRound.users || currentRound.users.length === 0) &&
-                        <tr><td colSpan={4} className="text-center">Ranking jest pusty.</td></tr>
+                    {(!currentRound || !currentRound.users || currentRound.users.length === 0) &&
+                        <tr>
+                            <td colSpan={4} className="text-center">Ranking jest pusty.</td>
+                        </tr>
                     }
                 </tbody>
             </table>
