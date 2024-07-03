@@ -126,7 +126,7 @@ export default function FaqPage () {
                     answer
                 }) => (
                     <Panel key={question}>
-                        <p className={'text-xl'}>{question}</p>
+1                        <p className={'text-xl mb-3'}>{question}</p>
                         <p>{answer}</p>
                     </Panel>
                 ))}

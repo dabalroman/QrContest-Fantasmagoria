@@ -71,8 +71,8 @@ export default function LoginEmail () {
             <Metatags title="Rejestracja"/>
             <ScreenTitle>Rejestracja</ScreenTitle>
 
-            <Panel title="Rejestracja adresem email" loading={loading}>
-                <p className='mb-2'>Wpisz swój adres email i hasło. Potwierdzenie adresu email nie jest wymagane.</p>
+            <Panel loading={loading}>
+                <p className='mb-2'>Wpisz swój adres email i hasło.</p>
                 <form onSubmit={handleSubmit(registerUser)}>
                     <p>Adres email</p>
                     <input type="text"
@@ -109,10 +109,12 @@ export default function LoginEmail () {
 
                     {formState.errors.password?.message && (
                         <p className="text-danger mb-2">{formState.errors.password?.message as string}</p>)}
-
-                    <Button type="submit" className="w-full mt-4">
+                    
+                    <Button type="submit" className="w-full mt-6">
                         Zarejestruj
                     </Button>
+
+                    <p className='text-center mt-4'><small>Potwierdzenie adresu email nie jest wymagane.</small></p>
                 </form>
             </Panel>
         </main>

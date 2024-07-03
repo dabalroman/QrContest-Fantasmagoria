@@ -67,7 +67,7 @@ export default function LoginEmail () {
             <Metatags title="Logowanie"/>
             <ScreenTitle>Zaloguj</ScreenTitle>
 
-            <Panel title="Zaloguj adresem e-mail" loading={loading}>
+            <Panel loading={loading}>
                 <p className="mb-2">Wpisz dane, które zostały użyte do rejestracji.</p>
                 <form onSubmit={handleSubmit(loginUser)}>
                     <p>Adres email</p>
@@ -108,7 +108,7 @@ export default function LoginEmail () {
 
                     <Button
                         type="submit"
-                        className="w-full mt-4"
+                        className="w-full mt-6"
                         state={errors.email || errors.password ? ButtonState.DISABLED : ButtonState.ENABLED}
                     >
                         Zaloguj

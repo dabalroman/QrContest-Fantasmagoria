@@ -91,7 +91,7 @@ export default function Home () {
 
                 <Panel title="Karty">
                     <p className="mb-2">
-                        Każdy zebrany kod pozwoli Ci na okrycie karty kolekcjonerskiej.
+                        Każdy zebrany kod pozwoli Ci na odkrycie karty kolekcjonerskiej.
                         Karty te przedstawią Ci historię krainy Erindar. Czy uda Ci się zebrać je wszystkie?
                     </p>
 
