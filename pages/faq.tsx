@@ -22,27 +22,27 @@ export default function FaqPage () {
     const topics: { question: string, answer: string }[] = [
         {
             question: 'Jak mogę wziąć udział w konkursie?',
-            answer: 'Wystarczy zeskanować jeden kodów QR za pomocą swojego smartfona. Po zeskanowaniu pierwszego kodu, zostaniesz proszony o założenie konta w naszej aplikacji konkursowej.'
+            answer: 'Zeskanuj jeden z kodów QR za pomocą smartfona, a zostaniesz przeniesiony/a do formularza rejestracyjnego.'
         },
         {
-            question: 'Gdzie mogę znaleźć kody QR?',
+            question: 'Gdzie mogę znaleźć karty?',
             answer: 'Kody QR zostały ukryte na terenie konwentu - na zewnątrz, wewnątrz, w korytarzach, a nawet w miejscach, które mogą Cię zaskoczyć! Jednakże, aby nie zakłócać innych atrakcji konwentu, kody nie zostaną ukryte w salach prelekcyjnych.'
         },
         {
             question: 'Jak mogę zdobyć punkty?',
-            answer: 'Każde zebranie kodu QR dodaje punkty do Twojego konta. Pod niektórymi kodami kryją się również pytania, na które odpowiedź daje dodatkowe punkty.'
+            answer: 'Każde zebranie karty dodaje punkty do Twojego konta. Pod niektórymi kodami kryją się również pytania, na które odpowiedź daje dodatkowe punkty.'
         },
         {
-            question: 'Czy mogę zeskanować ten sam kod QR więcej niż raz?',
-            answer: 'Nie, każdy kod QR możesz zeskanować tylko raz.'
+            question: 'Czy mogę zeskanować ten sam kod QR wielokrotnie?',
+            answer: 'Możesz próbować, ale nie przyniesie to skutku.'
         },
         {
-            question: 'Czy mogę brać udział w drugiej turze, jeśli zdobyłem nagrodę w pierwszej?',
-            answer: 'Tak, ale nie będziesz mógł zdobyć nagrody. Możesz jednak dalej skanować kody, aby zdobyć wszystkie możliwe karty w kolekcji.'
+            question: 'Czy mogę brać udział w drugiej turze, jeśli zdobyłem/am nagrodę w pierwszej?',
+            answer: 'Tak, ale nie będziesz mógł/mogła zdobyć nagrody. Możesz dalej skanować kody, by zdobyć wszystkie możliwe karty w kolekcji.'
         },
         {
             question: 'Czy punkty z pierwszej tury przechodzą do drugiej tury?',
-            answer: 'Tak, jeżeli nie zdobyłeś/aś nagrody w pierwszej turze, Twoje punkty przechodzą do drugiej tury.'
+            answer: 'Tak, pod warunkiem, że nie zdobyłeś/aś nagrody w pierwszej turze.'
         },
         {
             question: 'Jakie są nagrody w konkursie?',
@@ -102,7 +102,11 @@ export default function FaqPage () {
         },
         {
             question: 'Jak jest wyliczany wynik gildii?',
-            answer: 'Wynik gildii (siła) jest obliczany jako średnia punktów wszystkich jej członków. To oznacza, że każdy uczestnik ma wkład w sukces swojej gildii, niezależnie od tego, ile punktów zdobył.'
+            answer: 'Siła gildii jest obliczana jako średnia punktów wszystkich jej członków. To oznacza, że każdy uczestnik ma wkład w sukces swojej gildii, niezależnie od tego, ile punktów zdobył.'
+        },
+        {
+            question: 'Czy mogę zbierać karty wspólnie z przyjacielem?',
+            answer: 'Tak, ale pamiętaj, że jedno konto to zawsze tylko jedna nagroda.'
         }
     ];
 
