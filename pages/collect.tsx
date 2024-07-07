@@ -22,7 +22,7 @@ enum CollectPageState {
 
 const collectErrorsDictionary: StringMap = {
     'card is already collected': 'Masz już tę kartę!',
-    'card code is invalid': 'Ten kod jest niepoprawny!'
+    'card code is invalid': 'Ten kod nie jest poprawny!'
 };
 
 export default function CollectPage () {

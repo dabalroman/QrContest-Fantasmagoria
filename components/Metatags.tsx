@@ -23,7 +23,15 @@ export default function Metatags({
 
             <meta name="viewport" content="width=device-width, initial-scale=1"/>
             <meta name="color-scheme" content="light only"/>
-            <link rel="icon" href="/favicon.ico"/>
+
+            <link rel="shortcut icon" type="image/svg+xml" href="/static/fantasmagoria_64px.svg"/>
+            <link rel="icon" type="image/png" sizes="48x48" href="/static/fantasmagoria_48px.png"/>
+            <link rel="icon" type="image/png" sizes="96x96" href="/static/fantasmagoria_96px.png"/>
+            <link rel="icon" type="image/png" sizes="32x32" href="/static/fantasmagoria_32px.png"/>
+            <link rel="icon" type="image/png" sizes="16x16" href="/static/fantasmagoria_16px.png"/>
+            <link rel="icon" type="image/png" sizes="64x64" href="/static/fantasmagoria_64px.png"/>
+            <link rel="icon" type="image/png" sizes="128x128" href="/static/fantasmagoria_128px.png"/>
+            <link rel="icon" type="image/png" sizes="256x256" href="/static/fantasmagoria_256px.png"/>
         </Head>
     );
 }
