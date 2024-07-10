@@ -1,12 +1,12 @@
 /* eslint-disable max-len */
 import { FieldValue } from 'firebase-admin/firestore';
-import {Guild, GuildMembers} from '../types/guild';
+import { Guild, GuildMembers } from '../types/guild';
 
 const guildsSeed: Guild[] = [
     {
         uid: 'guild-void',
         name: 'Gildia Mroku',
-        description: 'Mroczni magowie, wykorzystujący kosmiczną moc. Ich obecność to zimne ostrze, a ich Voidorb - narzędzie dominacji. Kontrola świata jest ich ostatecznym celem, a tajemnicza moc jest ich bronią.',
+        description: 'Tajemnicze zrzeszenie, którego pochodzenie owiane jest mrokiem i tajemnicą. Gildia Mroku operuje z ukrycia, a jej członkowie są otoczeni chłodem, które przenika wszystko wokół nich. Ich celem jest dominacja nad Erindar za pomocą wszelkich dostępnych środków. Od lat wydaje się tkwić w stagnacji, lecz jej wyznawcy wiedzą, że to zmieni się już niedługo - zbliża się dzień koniunkcji planet.',
         score: 0,
         amountOfMembers: 0,
         amountOfCollectedCards: 0,
@@ -17,7 +17,7 @@ const guildsSeed: Guild[] = [
     {
         uid: 'guild-water',
         name: 'Gildia Wody',
-        description: 'Morscy kupcy kontrolujący oceaniczne szlaki. Ich zasoby i bogactwa są legendą, a neutralność - ich tarczą. Handel to ich pasja i broń, której używają do utrzymania równowagi wobec innych gildii.',
+        description: 'Potężna koalicja kontrolująca oceaniczne szlaki handlowe Erindaru. Gildia jest znana z neutralności i dyplomatycznego podejścia, co pozwala jej utrzymać równowagę wobec innych gildii. Ich flota składa się z zaawansowanych technologicznie statków, a kontakty dyplomatyczne z morskimi istotami pozwalają im używać magii wody do kontrolowania mórz. Ta frakcja to federacja, co czasami doprowadza do konfliktów wewnętrznych.',
         score: 0,
         amountOfMembers: 0,
         amountOfCollectedCards: 0,
@@ -28,7 +28,7 @@ const guildsSeed: Guild[] = [
     {
         uid: 'guild-desert',
         name: 'Gildia Pustyni',
-        description: 'Bohaterowie pustyni, kultywujący moc wiatru i słońca. W pogoni za utrzymaniem swojego surowego, ale ukochanego domu, ich celem jest zniszczenie tamy Gildii Stali, która pochłania ich zasoby wodne.',
+        description: 'Potężna grupa wywodząca się z serca Pustyni Maraksha, gdzie walka o przetrwanie jest smutną codziennością. Członkowie gildii gardzą Gildią Stali od czasów konfliktu szesnastoletniego za ich ekspansję terytorialną i kradzież zasobów wodnych. Neutralność Gildi Wody w tym konflikcie tylko pogłębiła niechęć mieszkańców pustyni do przybyszów z zielonego świata. Ich celem jest zniszczenie tamy na rzece Nahr\'al, u której brzegów niegdyś tętniło życie.',
         score: 0,
         amountOfMembers: 0,
         amountOfCollectedCards: 0,
@@ -39,14 +39,14 @@ const guildsSeed: Guild[] = [
     {
         uid: 'guild-steel',
         name: 'Gildia Stali',
-        description: 'Architekci postępu, trzymający w rękach klucze do przemysłowego triumfu. Pragną zdominować Erindar i jego zasoby, aby rozpalić ogniska ich stalowych miast i maszyn. Nie cofną się przed niczym.',
+        description: 'Ambitna frakcja, która dąży do przemysłowej dominacji w Erindarze. Gildia Stali jest znana ze swoich nowatorskich wynalazków i potężnych maszyn, które napędzane są dzięki ogromnym ilościom pary. Po ich porażce w wojnie szesnastoletniej władze coraz mocniej naciskają na rozwój techniki wojskowej. Co prawda konflikt zakończył się rozejmem, ale dla Lorda Ferris był to dowód na przewagę magii na technologią. Gildia Stali nie cofnie się przed niczym, aby zdobyć zasoby i władzę.',
         score: 0,
         amountOfMembers: 0,
         amountOfCollectedCards: 0,
         amountOfAnsweredQuestions: 0,
         members: {} as GuildMembers,
         updatedAt: FieldValue.serverTimestamp()
-    },
+    }
 ];
 
 export default guildsSeed;
