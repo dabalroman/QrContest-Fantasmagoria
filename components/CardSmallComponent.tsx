@@ -13,7 +13,7 @@ export default function CardSmallComponent ({
                  + ' ' + className
              }
              style={{
-                 'backgroundImage': `url(/cards/${card.image}.webp)`,
+                 'backgroundImage': `url(/cards-thumbnails/${card.image}.webp)`,
                  'height': '8.25rem',
                  'width': '5.5rem'
              }}

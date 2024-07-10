@@ -128,7 +128,7 @@ export default function EditCardAdminPage () {
                                 + ` h-full border-card-border`
                             }
                             style={{
-                                'backgroundImage': `url(/cards/${card?.image}.webp)`
+                                'backgroundImage': `url(/cards-thumbnails/${card?.image}.webp)`
                             }}
                         >
                         </div>

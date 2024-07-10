@@ -34,7 +34,7 @@ export default function CurrentGuildPanel ({
                             + ` h-full border-${guild.uid}`
                         }
                         style={{
-                            'backgroundImage': `url(/guilds/${guild.uid}.webp)`
+                            'backgroundImage': `url(/guilds-thumbnails/${guild.uid}.webp)`
                         }}
                     >
                         <FontAwesomeIcon

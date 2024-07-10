@@ -71,7 +71,63 @@ export default function Home () {
                 style={{ gridTemplateRows: '1fr' }}
                 id="readme"
             >
-                <Panel title="Nagrody i rundy">
+                <Panel title="Czym jest QrContest?" className="text-justify">
+                    <p className="pt-1">QrContest to konkurs, który polega na odkrywaniu i skanowaniu kodów QR
+                        rozsianych po terenie konwentu. Za każdy zebrany kod otrzymasz punkty, a im więcej punktów
+                        zgromadzisz, tym wyżej znajdziesz się w rankingu. Miejsce na podium gwarantuje fantastyczną
+                        nagrodę!</p>
+                    <p className="pt-4">Udział w konkursie jest całkowicie darmowy. Wszystko, czego potrzebujesz, to
+                        smartfon z dostępem
+                        do internetu.</p>
+                    <p className="pt-4">Poniżej znajdziesz dodatkowe informacje o konkursie.</p>
+                    <LinkButton href={Page.FAQ} className="w-full mt-4">Pytania i odpowiedzi</LinkButton>
+                    <LinkButton href={Page.RULEBOOK} className="w-full mt-4">Regulamin konkursu</LinkButton>
+                </Panel>
+
+                <Panel title="Karty">
+                    <p className="mb-2">
+                        Każdy zebrany kod pozwoli Ci na odkrycie karty kolekcjonerskiej.
+                        Karty te przedstawią Ci historię krainy Erindar. Czy uda Ci się zebrać je wszystkie?
+                    </p>
+
+                    <div className="grid grid-cols-3 gap-4 justify-items-center">
+                        <div
+                            className={
+                                'border-4 border-card-border rounded-xl bg-background bg-center bg-cover shadow-card'
+                            }
+                            style={{
+                                'backgroundImage': `url(/cards-thumbnails/erindar.webp)`,
+                                'height': '8.25rem',
+                                'aspectRatio': '2/3'
+                            }}
+                        >
+                        </div>
+                        <div
+                            className={
+                                'border-4 border-card-border rounded-xl bg-background bg-center bg-cover shadow-card'
+                            }
+                            style={{
+                                'backgroundImage': `url(/cards-thumbnails/piaskowy-smok.webp)`,
+                                'height': '8.25rem',
+                                'aspectRatio': '2/3',
+                            }}
+                        >
+                        </div>
+                        <div
+                            className={
+                                'border-4 border-card-border rounded-xl bg-background bg-center bg-cover shadow-card'
+                            }
+                            style={{
+                                'backgroundImage': `url(/cards-thumbnails/wielki-zolw-pustynny.webp)`,
+                                'height': '8.25rem',
+                                'aspectRatio': '2/3',
+                            }}
+                        >
+                        </div>
+                    </div>
+                </Panel>
+
+                <Panel title="Nagrody i rundy" className='mb-12'>
                     <p className="text-center text-lg">
                         1. miejsce – 50 fantów <br/>
                         2. miejsce – 35 fantów <br/>
@@ -87,59 +143,6 @@ export default function Home () {
                         Zwycięzców zapraszamy po odbiór nagród w punkcie informacyjnym konwentu w momencie
                         zakończenia trwającej rundy.
                     </p>
-                </Panel>
-
-                <Panel title="Karty">
-                    <p className="mb-2">
-                        Każdy zebrany kod pozwoli Ci na odkrycie karty kolekcjonerskiej.
-                        Karty te przedstawią Ci historię krainy Erindar. Czy uda Ci się zebrać je wszystkie?
-                    </p>
-
-                    <div className="grid grid-cols-3 gap-4">
-                        <div
-                            className={
-                                'border-4 border-card-border rounded-xl bg-background bg-center bg-cover shadow-card'
-                            }
-                            style={{
-                                'backgroundImage': `url(/cards/erindar.webp)`,
-                                'height': '8.25rem'
-                            }}
-                        >
-                        </div>
-                        <div
-                            className={
-                                'border-4 border-card-border rounded-xl bg-background bg-center bg-cover shadow-card'
-                            }
-                            style={{
-                                'backgroundImage': `url(/cards/flordraak.webp)`,
-                                'height': '8.25rem'
-                            }}
-                        >
-                        </div>
-                        <div
-                            className={
-                                'border-4 border-card-border rounded-xl bg-background bg-center bg-cover shadow-card'
-                            }
-                            style={{
-                                'backgroundImage': `url(/cards/zorza.webp)`,
-                                'height': '8.25rem'
-                            }}
-                        >
-                        </div>
-                    </div>
-                </Panel>
-
-                <Panel title="Czym jest QrContest?" className="text-justify mb-12">
-                    <p className="pt-1">QrContest to konkurs, który polega na odkrywaniu i skanowaniu kodów QR
-                        rozsianych po terenie konwentu. Za każdy zebrany kod otrzymasz punkty, a im więcej punktów
-                        zgromadzisz, tym wyżej znajdziesz się w rankingu. Miejsce na podium gwarantuje fantastyczną
-                        nagrodę!</p>
-                    <p className="pt-4">Udział w konkursie jest całkowicie darmowy. Wszystko, czego potrzebujesz, to
-                        smartfon z dostępem
-                        do internetu.</p>
-                    <p className="pt-4">Poniżej znajdziesz dodatkowe informacje o konkursie.</p>
-                    <LinkButton href={Page.FAQ} className="w-full mt-4">Pytania i odpowiedzi</LinkButton>
-                    <LinkButton href={Page.RULEBOOK} className="w-full mt-4">Regulamin konkursu</LinkButton>
                 </Panel>
             </div>
         </main>

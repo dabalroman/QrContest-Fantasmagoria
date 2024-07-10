@@ -24,7 +24,7 @@ export default function CollectCardView ({
     return (
         <div className="relative h-full flex flex-col">
             <CardComponent card={card} className="z-50 relative top-3 grow w-full"/>
-            <Panel margin={false} className="text-center pt-10 relative bottom-3 z-0 rounded-b-2xl">
+            <Panel margin={false} className="text-center relative z-0 rounded-2xl">
                 <p>Karta została dodana do Twojej kolekcji.</p>
                 {question && <p>Zdobądź dodatkowe <FontAwesomeIcon icon={faDiceD6} size="xs"/> Rubiki w wyzwaniu!</p>}
             </Panel>
