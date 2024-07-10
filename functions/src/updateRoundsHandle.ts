@@ -2,6 +2,7 @@ import { https, logger } from 'firebase-functions';
 import { getFirestore } from 'firebase-admin/firestore';
 import { RankingRound, RankingRoundUser } from './types/rankingRound';
 import { firestore } from 'firebase-admin';
+import { User, UserRole } from './types/user';
 import Timestamp = firestore.Timestamp;
 
 type RankingRoundUserWithUid = RankingRoundUser & { uid: string };
@@ -15,7 +16,17 @@ export default async function updateRoundsHandle (
         throw new https.HttpsError('permission-denied', 'permission denied');
     }
 
+    const uid: string = context.auth.uid;
     const db = getFirestore();
+    const userRef = db.collection('users')
+        .doc(uid);
+    const userSnapshot = await userRef.get();
+
+    if (!userSnapshot.exists || (userSnapshot.data() as User).role !== UserRole.ADMIN) {
+        logger.error('seedDatabaseHandle', 'permission denied');
+        throw new https.HttpsError('permission-denied', 'permission denied');
+    }
+
     const roundsSnapshot = await db.collection('ranking')
         .orderBy('from', 'asc')
         .get();
