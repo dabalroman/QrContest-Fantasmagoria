@@ -103,13 +103,15 @@ export default function LookForCodeView ({
 
     return (
         <div>
-            <Panel title="Zeskanuj kod karty">
-                <p>Kliknij w przycisk aparatu i zeskanuj kod!</p>
-                <p>Możesz też użyć innej aplikacji do skanowania.</p>
+            <Panel title='Hej, to ważne!'>
+                <p className='mb-1'>
+                    Kodów nie ukryliśmy w salach prelekcyjnych i zajęciowych. Każdy z nich jest w Twoim zasięgu.
+                    Staraj się nie przeszkadzać innym konwentowiczom podczas swoich poszukiwań.
+                </p>
             </Panel>
 
             <Panel title="Wpisz kod karty" loading={loading}>
-                <p className="pb-4">Tutaj możesz wpisać znaleziony kod.</p>
+            <p className="pb-4">Tutaj możesz wpisać znaleziony kod.</p>
 
                 <form onSubmit={handleSubmit(collectCode)}>
                     <input type="text" placeholder="ABCDEFGHIJ" maxLength={10}
@@ -135,6 +137,11 @@ export default function LookForCodeView ({
                         }
                     </p>
                 </form>
+            </Panel>
+
+            <Panel title="Zeskanuj kod karty">
+                <p>Kliknij w przycisk aparatu i zeskanuj kod!</p>
+                <p>Możesz też użyć innej aplikacji do skanowania.</p>
             </Panel>
         </div>
     );
