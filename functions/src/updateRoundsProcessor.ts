@@ -1,57 +1,37 @@
-import { https, logger } from 'firebase-functions';
+import { logger } from 'firebase-functions';
 import { getFirestore } from 'firebase-admin/firestore';
 import { RankingRound, RankingRoundUser } from './types/rankingRound';
 import { firestore } from 'firebase-admin';
-import { User, UserRole } from './types/user';
 import Timestamp = firestore.Timestamp;
 
 type RankingRoundUserWithUid = RankingRoundUser & { uid: string };
 
-export default async function updateRoundsHandle (
-    data: any,
-    context: https.CallableContext
-): Promise<void> {
-    if (!context.auth || !context.auth.uid) {
-        logger.error('updateRoundsHandle', 'permission denied');
-        throw new https.HttpsError('permission-denied', 'permission denied');
-    }
-
-    const uid: string = context.auth.uid;
+export default async function updateRoundsProcessor(): Promise<string | void> {
     const db = getFirestore();
-    const userRef = db.collection('users')
-        .doc(uid);
-    const userSnapshot = await userRef.get();
-
-    if (!userSnapshot.exists || (userSnapshot.data() as User).role !== UserRole.ADMIN) {
-        logger.error('seedDatabaseHandle', 'permission denied');
-        throw new https.HttpsError('permission-denied', 'permission denied');
-    }
 
     const roundsSnapshot = await db.collection('ranking')
         .orderBy('from', 'asc')
         .get();
 
     if (roundsSnapshot.docs.length == 0) {
-        logger.error('updateRoundsHandle', 'No rounds found. Seed the database.');
+        logger.error('processUpdateRounds', 'No rounds found. Seed the database.');
+        return 'No rounds found. Seed the database.';
     }
 
-    // Get rounds that have finished but are not marked as finished yet
     const rankingRoundSnapshots = roundsSnapshot.docs
         .filter((roundSnapshot) => {
             const rankingRound: RankingRound = roundSnapshot.data() as RankingRound;
-            const roundToTime: number = (rankingRound.to as Timestamp).toDate()
-                .getTime();
+            const roundToTime: number = (rankingRound.to as Timestamp).toDate().getTime();
             const nowTime: number = (new Date()).getTime();
 
             return !rankingRound.finished && roundToTime <= nowTime;
         });
 
     if (rankingRoundSnapshots.length === 0) {
-        logger.log('updateRoundsHandle', `Nothing to do, no rounds to finish.`);
-        return;
+        logger.log('processUpdateRounds', 'Nothing to do, no rounds to finish.');
+        return 'Nothing to do, no rounds to finish.';
     }
 
-    // Finish round, mark winners and update their profiles
     await db.runTransaction(async (transaction) => {
         rankingRoundSnapshots.forEach((roundSnapshot) => {
             transaction.update(roundSnapshot.ref, { finished: true });
@@ -66,7 +46,7 @@ export default async function updateRoundsHandle (
                     winnerInRound: rankingRound.uid
                 }));
 
-            users.forEach(async (user) => {
+            users.forEach((user) => {
                 transaction.update(roundSnapshot.ref, {
                     [`users.${user.uid}`]: user
                 });
@@ -79,5 +59,6 @@ export default async function updateRoundsHandle (
         });
     });
 
-    logger.log('updateRoundsHandle', `done`);
-};
+    logger.log('processUpdateRounds', 'Rounds updated successfully.');
+    return 'Rounds updated successfully.';
+}

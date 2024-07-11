@@ -21,7 +21,7 @@ export default function CollectCardView ({
 
     return (
         <div className="relative h-full flex flex-col">
-            <CardComponent card={card} className="z-50 relative top-3 grow w-full"/>
+            <CardComponent card={card} className="z-20 relative top-3 grow w-full"/>
         </div>
     );
 }

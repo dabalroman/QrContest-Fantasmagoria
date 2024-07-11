@@ -62,7 +62,7 @@ export default function Home () {
                         Zbierz je wszystkie!
                     </h2>
                 </div>
-                <div className="absolute bottom-20 w-full p-4">
+                <div className="absolute bottom-32 w-full p-4">
                     {actionButton}
                 </div>
             </div>
@@ -72,10 +72,10 @@ export default function Home () {
                 id="readme"
             >
                 <Panel title="Czym jest QrContest?" className="text-justify">
-                    <p className="pt-1">QrContest to konkurs, który polega na odkrywaniu i skanowaniu kodów QR
-                        rozsianych po terenie konwentu. Za każdy zebrany kod otrzymasz punkty, a im więcej punktów
-                        zgromadzisz, tym wyżej znajdziesz się w rankingu. Miejsce na podium gwarantuje fantastyczną
-                        nagrodę!</p>
+                    <p className="pt-1">QrContest to konkurs, który polega na szukaniu i skanowaniu kodów QR
+                        ukrytych na terenie konwentu. Za każdą dodaną do kolekcji kartę otrzymasz punkty, a im więcej
+                        punktów zgromadzisz, tym wyżej znajdziesz się w rankingu. Miejsce na podium gwarantuje
+                        fantastyczną nagrodę!</p>
                     <p className="pt-4">Udział w konkursie jest całkowicie darmowy. Wszystko, czego potrzebujesz, to
                         smartfon z dostępem
                         do internetu.</p>
@@ -140,7 +140,7 @@ export default function Home () {
                         Każda runda to troje zwycięzców.
                     </p>
                     <p className="mt-2 text-justify">
-                        Zwycięzców zapraszamy po odbiór nagród w punkcie informacyjnym konwentu w momencie
+                        Zwycięzców zapraszamy po odbiór nagród do punktu informacyjnego konwentu w momencie
                         zakończenia trwającej rundy.
                     </p>
                 </Panel>

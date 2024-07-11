@@ -87,9 +87,9 @@ export default function ScannerPage () {
                         )}
                         {code && (
                             <>
-                                <p className="pt-3 text-xl">Wykryto kod!</p>
+                                <p className="pt-3 text-xl">Wykryto kod</p>
                                 <p className="pt-3 text-3xl">{code}</p>
-                                <p className="pt-3 text-2xl">Użyj przycisku poniżej by potwierdzić.</p>
+                                <p className="pt-3">Kliknij, by użyć kodu!</p>
                                 {user?.isAdmin() &&
                                     <LinkButton
                                         className="mt-2"

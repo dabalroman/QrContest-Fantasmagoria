@@ -107,6 +107,10 @@ export default function FaqPage () {
         {
             question: 'Czy mogę zbierać karty wspólnie z przyjacielem?',
             answer: 'Tak, ale pamiętaj, że jedno konto to zawsze tylko jedna nagroda.'
+        },
+        {
+            question: 'Na jakich urządzeniach mogę korzystać z aplikacji konkursowej?',
+            answer: 'Aplikacja przeszła testy na smartfonach z systemem Android oraz iOS, na przeglądarkach Chrome, Firefox i Safari. Może działać na innych urządzeniach, ale nie możemy zagwarantować pełnej kompatybilności.'
         }
     ];
 
@@ -129,7 +133,7 @@ export default function FaqPage () {
                     answer
                 }) => (
                     <Panel key={question}>
-1                        <p className={'text-xl mb-3'}>{question}</p>
+                        <p className={'text-xl mb-3'}>{question}</p>
                         <p>{answer}</p>
                     </Panel>
                 ))}

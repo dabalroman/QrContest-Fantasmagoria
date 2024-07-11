@@ -53,7 +53,7 @@ export default function AccountPage () {
 
             <Button className="w-full mt-4" onClick={() => {
                 updateRoundsFunction()
-                    .then(() => toast.success('Rounds updated'))
+                    .then((result) => toast.success(result.data.result))
                     .catch((error) => toast.error('Update failed: ' + error.message));
 
             }}>Wymuś aktualizację rund</Button>

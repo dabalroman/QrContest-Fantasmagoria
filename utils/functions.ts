@@ -24,7 +24,11 @@ export const joinGuildFunction: HttpsCallable<
 > = httpsCallable(functions, 'joinguild');
 
 export const seedDatabaseFunction: HttpsCallable<
-    { password: string }
+    { password: string },
+    {}
 > = httpsCallable(functions, 'seeddatabase');
 
-export const updateRoundsFunction: HttpsCallable = httpsCallable(functions, 'updaterounds');
+export const updateRoundsFunction: HttpsCallable<
+    {},
+    { result: string }
+> = httpsCallable(functions, 'updaterounds');

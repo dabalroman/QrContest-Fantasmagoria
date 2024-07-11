@@ -8,7 +8,7 @@ export default function CardSmallHiddenComponent ({
                 + ' ' + className
             }
             style={{
-                'backgroundImage': `url(/cards/hidden.webp)`,
+                'backgroundImage': `url(/cards-thumbnails/hidden.webp)`,
                 'height': '8.25rem',
                 'width': '5.5rem'
             }}

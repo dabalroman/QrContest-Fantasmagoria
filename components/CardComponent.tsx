@@ -60,7 +60,7 @@ export default function CardComponent ({
             style={{
                 'backgroundImage': `url(/cards/${card.image}.webp)`,
                 'minHeight': '200px',
-                'maxHeight': '80vh',
+                'maxHeight': '75vh',
                 'aspectRatio': '2/3',
                 'objectFit': 'contain',
                 'overflow': 'hidden',

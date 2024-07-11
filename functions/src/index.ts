@@ -5,7 +5,7 @@ import answerQuestionHandle from './answerQuestionHandle';
 import collectCardHandle from './collectCardHandle';
 import setupAccountHandle from './setupAccountHandle';
 import joinGuildHandle from './joinGuildHandle';
-import updateRoundsHandle from './updateRoundsHandle';
+import updateRoundsProcessor from './updateRoundsProcessor';
 
 const region = 'europe-west1';
 
@@ -39,4 +39,15 @@ exports.joinguild =
 exports.updaterounds =
     functions.region(region)
         .https
-        .onCall(updateRoundsHandle);
+        .onCall(async (data, context) => {
+            const result = await updateRoundsProcessor();
+            return { result };
+        });
+
+exports.autoUpdateRounds =
+    functions.region(region)
+        .pubsub
+        .schedule('0 * * * *')
+        .onRun(async (context) => {
+            await updateRoundsProcessor();
+        });
