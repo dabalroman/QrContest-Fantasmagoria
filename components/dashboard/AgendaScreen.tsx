@@ -56,15 +56,10 @@ export default function AgendaScreen ({ programEntries }: { programEntries: Fant
                         }}>{getTimeHourAndMinutes(entry.dateStart)}</p>
 
                         <div>
-                            <p style={{
-                                fontSize: '5em',
-                                filter: 'brightness(1.4)',
-                                position: 'relative',
-                                width: 'fit-content'
-                            }}>{entry.title}</p>
-                            <p style={{
-                                fontSize: '3em'
-                            }}>{entry.location}</p>
+                            <p style={{ fontSize: '5em' }}>{entry.title}</p>
+                            <p style={{ fontSize: '3em' }}>
+                                {entry.location} <span className='pl-10 text-text-dim'>{entry.name}</span>
+                            </p>
                         </div>
                     </div>
                 ))}

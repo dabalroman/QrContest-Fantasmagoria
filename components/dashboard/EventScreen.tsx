@@ -58,17 +58,18 @@ export default function EventScreen ({
                 marginBottom: '2rem'
             }}>{getHourMinutesAndWeekday(entryToDisplay.dateStart)}</p>
 
-            <p style={{
-                fontSize: '7em',
+            <div style={{
                 backgroundColor: colorTheme,
                 filter: 'brightness(1.4)',
                 position: 'relative',
                 padding: '1rem 5rem',
                 left: '-5rem',
                 marginBottom: '2rem',
-                fontWeight: '800',
                 width: 'fit-content'
-            }}>{entryToDisplay.title}</p>
+            }}>
+                <p style={{fontSize: '6em', fontWeight: '800',}}>{entryToDisplay.title}</p>
+                <p style={{fontSize: '3em'}} className='text-text-dim'>{entryToDisplay.name}</p>
+            </div>
 
             <p style={{
                 fontSize: '4.5em',

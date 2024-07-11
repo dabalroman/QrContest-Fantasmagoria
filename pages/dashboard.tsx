@@ -48,7 +48,7 @@ const getFantasmagoriaProgram = async (): Promise<FantasmagoriaProgramEntry[]> =
 
     const blacklist = [
         'QrContest',
-        'Przygotowanie Cosplay'
+        'Przygotowanie Cosplay',
     ];
 
     const now = new Date();
