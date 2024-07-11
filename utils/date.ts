@@ -44,3 +44,23 @@ export const formatTimeFromNow = (date: Date) => {
 
     return `${daysAgo} dni temu`;
 };
+
+export const getHourMinutesAndWeekday = (dateFrom: Date): string => {
+    let dateText = getTimeHourAndMinutes(dateFrom);
+
+    if (dateFrom.getDate() !== (new Date()).getDate()) {
+        dateText += ', ' + dateFrom.toLocaleDateString('pl-PL', { weekday: 'long' });
+    }
+
+    return dateText;
+};
+
+export const getTimeHourAndMinutes = (date: Date): string => {
+    return date.toLocaleString(
+        'pl-PL',
+        {
+            timeStyle: 'short',
+            hour12: false
+        }
+    );
+};
