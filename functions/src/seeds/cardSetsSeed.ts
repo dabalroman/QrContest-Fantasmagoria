@@ -29,19 +29,19 @@ const cardSetsSeed: CardSet[] = [
     {
         uid: 'fauna',
         amountOfCards: 13,
-        name: 'Fauna',
+        name: 'Przyroda Erindaru',
         description: '"Absolutnie fascynujące" - szepnęła Maren, zbliżając się do stołu badawczego. "Zastanawiam się, jak dokładnie działa ich bioluminescencja. Czy to kwestia symbiozy z bakteriami, czy może mają specjalne organelle odpowiedzialne za produkcję światła?"'
     },
     {
         uid: 'kraina-erindar',
         amountOfCards: 8,
-        name: 'Kraina Erindar',
+        name: 'Przewodnik Odkrywcy',
         description: 'Rozkaz był prosty - "Zebrać jak najwięcej". Gdy Thorin zaczął ostrożnie odłupywać kryształy usłyszeliśmy huk, a wejście do jaskini zasłoniła ogromna, lodowata sylwetka Szronokła. Potężny jaszczur syczał złowieszczo, blokując jedyną drogę ucieczki. Byliśmy uwięzieni.'
     },
     {
         uid: 'gildie',
-        amountOfCards: 4,
-        name: 'Gildie',
+        amountOfCards: 0,
+        name: 'Tajna kolekcja',
         description: '"Widziałem, jak z chaosu powstały cztery gildie, każda z potrzeby i ambicji, każda snująca inne sny o przyszłości. A my, mieszkańcy Erindaru, jesteśmy świadkami tej niekończącej się gry o władzę."'
     }
 ];

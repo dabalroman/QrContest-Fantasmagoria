@@ -52,6 +52,7 @@ export default function LookForCodeView ({
             .catch((error) => {
                 setLoading(false);
                 onCodeInvalid(error);
+                setValue('code', '');
             });
     };
 

@@ -39,11 +39,16 @@ export default function CollectPage () {
     }
 
     const onCodeValid = (card: Card, question: Question | null) => {
+        if(question) {
+            toast('Ta karta kryje wyzwanie!', {icon: '🎲'});
+        } else {
+            toast.success('Karta została dodana do Twojej kolekcji!');
+        }
+
         setState(question ? CollectPageState.CARD_FOUND_WITH_QUESTION : CollectPageState.CARD_FOUND);
         setCard(card);
         setQuestion(question);
         setCards(null);
-        toast.success('Karta została dodana do kolekcji!');
     };
 
     const onCodeInvalid = (error: Error) => {

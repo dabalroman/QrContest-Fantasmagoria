@@ -60,12 +60,10 @@ export default function CardComponent ({
             style={{
                 'backgroundImage': `url(/cards/${card.image}.webp)`,
                 'minHeight': '200px',
-                'maxHeight': '70vh',
+                'maxHeight': '80vh',
                 'aspectRatio': '2/3',
                 'objectFit': 'contain',
                 'overflow': 'hidden',
-                'transformStyle': 'preserve-3d',
-                'transform': 'scale(0.9)',
                 'filter': 'drop-shadow(8px 8px 10px rgba(0,0,0,0.5))',
                 // @ts-ignore
                 '--glare-left': '-50%'

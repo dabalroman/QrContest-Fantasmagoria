@@ -25,7 +25,6 @@ export default function ScannerPage () {
     });
 
     const handleCodeDetection = (code: string) => {
-
         const collectUrl: string = process.env.NEXT_PUBLIC_CODE_COLLECT_URL ?? 'env-not-found';
         const regex = /^[A-Za-z0-9]{8,10}$/;
 
@@ -80,10 +79,17 @@ export default function ScannerPage () {
                      className="relative flex flex-col-reverse pb-10"
                 >
                     <Panel margin={false} className="text-center relative bottom-4 z-0 rounded-b-2xl w-full">
-                        {!code && <p className="pt-3">Gdy kod zostanie wykryty, ramka karty zrobi się zielona.</p>}
+                        {!code && (
+                            <>
+                                <p className="pt-3 text-xl">Szukam kodu...</p>
+                                <p className="pt-3">Gdy kod zostanie wykryty, ramka karty zrobi się zielona.</p>
+                            </>
+                        )}
                         {code && (
                             <>
-                                <p className="pt-3">Wykryto kod!<br/><b>{code}</b></p>
+                                <p className="pt-3 text-xl">Wykryto kod!</p>
+                                <p className="pt-3 text-3xl">{code}</p>
+                                <p className="pt-3 text-2xl">Użyj przycisku poniżej by potwierdzić.</p>
                                 {user?.isAdmin() &&
                                     <LinkButton
                                         className="mt-2"

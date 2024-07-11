@@ -39,10 +39,21 @@ npm run build:watch
 # Deployment to Firebase
 ## App
 ```bash
-firebase deploy --only hosting,firestore,storage
+firebase deploy --only hosting,firestore
 ```
 
 ## Functions
 ```bash
 firebase deploy --only functions
+```
+
+# Debugging
+If deploy fails in weird ways (half-baked deploys, broken app, connection errors on prod), double check if the firebase-tools are up-to-date.
+```bash
+npm install -g firebase-tools
+```
+
+If deploy fails with `401` code, try to log in to firebase again.
+```bash
+firebase login --reauth
 ```

@@ -104,7 +104,7 @@ export default function ScoreboardPage ({}) {
                 </div>
 
                 {currentRound && currentRound.finished &&
-                    <Panel title="Zwycięzcy rundy" loading={loading}>
+                    <Panel title="Mistrzowie rundy" loading={loading}>
                         <RoundRankingTable user={user} currentRound={currentRound} winnersOnly={true}/>
                     </Panel>
                 }
@@ -156,7 +156,7 @@ export default function ScoreboardPage ({}) {
 
                 {currentRound &&
                     <Panel title="Ranking rundy" loading={loading}>
-                        {user?.winnerInRound && currentRound?.uid !== user?.winnerInRound &&
+                        {user?.winnerInRound && parseInt(user.winnerInRound) < parseInt(currentRound.uid) &&
                             <p className="text-center mb-4 text-text-dim">
                                 Wygrałeś/aś w poprzedniej rundzie, dlatego nie jesteś widoczny/a w tym rankingu!
                             </p>

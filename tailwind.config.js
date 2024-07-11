@@ -85,16 +85,16 @@ module.exports = {
                         filter: 'brightness(1)'
                     },
                     '5%': {
-                        filter: 'brightness(7)'
+                        filter: 'brightness(3)'
                     },
                     '100%': {
                         filter: 'brightness(1)'
                     }
-                }
+                },
             },
             animation: {
                 'pointsAdded': 'pointsAdded 4s ease-in-out 0s 1 normal forwards',
-                'flash': 'flash 0.8s ease-out 0s 1 normal forwards'
+                'flash': 'flash 0.4s ease-out 0s 1 normal forwards',
             }
         }
     },

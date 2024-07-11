@@ -85,7 +85,7 @@ export default function App ({
                                     className={
                                         `font-serif bg-image-default bg-center bg-cover bg-fixed min-h-screen`
                                     }/>
-                                <Toaster/>
+                                <Toaster toastOptions={{duration: 6000}}/>
                             </AuthCheck>
                         </div>
                     </>
