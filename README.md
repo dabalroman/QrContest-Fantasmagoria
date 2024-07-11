@@ -37,6 +37,11 @@ npm run build:watch
 ```
 
 # Deployment to Firebase
+## App
+```bash
+firebase deploy --only hosting,firestore,storage
+```
+
 ## Functions
 ```bash
 firebase deploy --only functions
