@@ -53,12 +53,12 @@ export default function ScoreboardPage ({}) {
             <ScreenTitle>Ranking</ScreenTitle>
             <div>
                 <Panel title={user?.username ?? '...'} loading={loading} className="text-center">
-                    <div className="flex place-content-around text-2xl">
+                    <div className="flex place-content-around text-4xl">
                         <div>
-                            <FontAwesomeIcon className="px-1" icon={faImagePortrait} size="sm"/>
+                            <FontAwesomeIcon className="px-1" icon={faImagePortrait} size="sm"/>&nbsp;
                             {user?.amountOfCollectedCards}
                         </div>
-                        <div><FontAwesomeIcon className="px-1" icon={faDiceD6} size="sm"/>{user?.score}</div>
+                        <div><FontAwesomeIcon className="px-1" icon={faDiceD6} size="sm"/>&nbsp;{user?.score}</div>
                     </div>
 
                     {!user?.winnerInRound && (

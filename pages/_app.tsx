@@ -5,7 +5,7 @@ import { Toaster } from 'react-hot-toast';
 import Navbar, { NavbarConfig } from '@/components/Navbar/Navbar';
 import { config } from '@fortawesome/fontawesome-svg-core';
 import '@fortawesome/fontawesome-svg-core/styles.css';
-import { IM_Fell_Double_Pica, IM_Fell_Double_Pica_SC, Spectral } from 'next/font/google';
+import { IM_Fell_Double_Pica, IM_Fell_Double_Pica_SC, Montserrat, Spectral } from 'next/font/google';
 import AuthCheck from '@/components/AuthCheck';
 import { useEffect, useState } from 'react';
 import CollectionCache from '@/models/CollectionCache';
@@ -33,6 +33,11 @@ const spectral = Spectral({
     weight: '400',
     subsets: ['latin'],
     variable: '--font-spectral'
+});
+const montserrat = Montserrat({
+    weight: ['400', '600', '800'],
+    subsets: ['latin'],
+    variable: '--font-montserrat'
 });
 
 export default function App ({
@@ -74,7 +79,7 @@ export default function App ({
                         <div
                             className={
                                 `${spectral.variable} ${imFellDoublePica.variable} ${imFellDoublePicaSC.variable} `
-                                + `text-text-base `
+                                + `${montserrat.variable} text-text-base `
                                 + `font-serif bg-image-default bg-fixed min-h-screen bg-image-mobile-position`
                             }
                         >

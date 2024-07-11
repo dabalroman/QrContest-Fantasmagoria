@@ -86,14 +86,16 @@ export default function AccountPage () {
             <Metatags title="Profil"/>
             <div>
                 <Panel title={user.username ?? '...'} className="text-center">
-                    <div className="flex place-content-around text-2xl">
+                    <div className="flex place-content-around text-4xl">
                         <div>
-                            <FontAwesomeIcon className="px-1" icon={faImagePortrait} size="sm"/>
+                            <FontAwesomeIcon className="px-1" icon={faImagePortrait} size="sm"/>&nbsp;
                             {user?.amountOfCollectedCards}
                         </div>
-                        <div><FontAwesomeIcon className="px-1" icon={faDiceD6} size="sm"/>{user?.score}</div>
+                        <div><FontAwesomeIcon className="px-1" icon={faDiceD6} size="sm"/>&nbsp;{user?.score}</div>
                     </div>
                 </Panel>
+
+                {user.memberOf === null && <JoinGuildPanel/>}
 
                 <Panel title="Nagrody i rundy">
                     <p className="text-center text-lg">
@@ -112,7 +114,6 @@ export default function AccountPage () {
                     </p>
                 </Panel>
 
-                {user.memberOf === null && <JoinGuildPanel/>}
                 {user.memberOf && guild && <CurrentGuildPanel guild={guild} loading={guildLoading}/>}
                 {user.memberOf && guild && <BetrayGuildPanel user={user} guild={guild}/>}
 

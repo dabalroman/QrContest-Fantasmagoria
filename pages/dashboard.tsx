@@ -22,16 +22,33 @@ const getFantasmagoriaProgram = async (): Promise<FantasmagoriaProgramEntry[]> =
             headers: { 'content-type': 'application/json-rpc' },
             body: JSON.stringify({
                 'id': null,
-                'method': 'GetKonwent2023Program'
+                'method': 'GetKonwent2024Program'
             })
         }
     )
         .then((response) => response.json());
 
+    const blacklist = [
+        'QrContest',
+        'Przygotowanie Cosplay'
+    ];
+
     const now = new Date();
     return data.result
         .map((raw: RawFantasmagoriaProgramEntry) => FantasmagoriaProgramEntry.fromRaw(raw))
         .filter((entry: FantasmagoriaProgramEntry) => entry.dateEnd >= now)
+        .filter((entry: FantasmagoriaProgramEntry) => blacklist.every((word: string) => !entry.title.includes(word)))
+        .map((entry: FantasmagoriaProgramEntry) => {
+            const description = entry.description;
+            const cutIndex = description.indexOf(' ', 400);
+
+            if (cutIndex !== -1) {
+                entry.description = description.slice(0, cutIndex) + '...';
+            }
+
+            return entry;
+        })
+        .filter((entry: FantasmagoriaProgramEntry) => entry.title.length <= 60)
         .sort((a: FantasmagoriaProgramEntry, b: FantasmagoriaProgramEntry) =>
             a.dateStart > b.dateStart ? 1 : (a.dateStart < b.dateStart ? -1 : 0)
         );
@@ -63,7 +80,7 @@ const getRandomNextHoursEntry = (
 };
 
 const getNextEntryToShow = (allEntries: FantasmagoriaProgramEntry[]): FantasmagoriaProgramEntry | null => {
-    const showRandom = Math.random() <= 0.2;
+    const showRandom = Math.random() <= 0.3;
 
     if (showRandom) {
         return getRandomNextEntry(allEntries);
@@ -78,50 +95,14 @@ const getNextEntryToShow = (allEntries: FantasmagoriaProgramEntry[]): Fantasmago
     return next;
 };
 
-const formatDateFromTo = (dateFrom: Date, dateTo: Date): string => {
-    let dateText = '';
+const formatDateFromTo = (dateFrom: Date): string => {
+    let dateText = formatTime(dateFrom);
 
     if (dateFrom.getDate() !== (new Date()).getDate()) {
-        dateText += formatDate(dateFrom) + ', ';
+        dateText += ', ' + dateFrom.toLocaleDateString('pl-PL', { weekday: 'long' });
     }
-
-    dateText += formatTime(dateFrom) + ' - ' + formatTime(dateTo);
-
-    // if (dateFrom.getDate() === dateTo.getDate()) {
-    //
-    // } else {
-    //     dateText += formatTime(dateFrom) + ' - ' + formatDate(dateTo) + ',  ' + formatTime(dateTo);
-    // }
 
     return dateText;
-};
-
-const formatDate = (date: Date): string => {
-    const amountOfDaysFromNow = date.getDate() - (new Date()).getDate();
-
-    if (amountOfDaysFromNow === 0) {
-        return '';
-    }
-
-    if (amountOfDaysFromNow === -1) {
-        return 'wczoraj';
-    }
-
-    if (amountOfDaysFromNow === -2) {
-        return 'przedwczoraj';
-    }
-
-    if (amountOfDaysFromNow === 1) {
-        return 'jutro';
-    }
-
-    if (amountOfDaysFromNow === 2) {
-        return 'pojutrze';
-    }
-
-    return '';
-
-    // return date.toLocaleDateString('pl-PL');
 };
 
 const formatTime = (date: Date): string => {
@@ -135,26 +116,25 @@ const formatTime = (date: Date): string => {
 };
 
 const colorThemes = [
-    '#091a49',
-    '#173893',
-    '#1d2a4d',
-    '#4d1d4c',
-    '#5f3a5e',
-    '#3f3a5f',
-    '#4d1d22',
-    '#1d4d39',
-    '#004528',
-    '#212121'
+    'rgba(16, 39, 104, 0.8)',
+    'rgba(2, 60, 73, 0.8)',
+    'rgba(20, 29, 54, 0.8)',
+    'rgba(54, 20, 53, 0.8)',
+    'rgba(44, 41, 67, 0.8)',
+    'rgba(54, 20, 24, 0.8)',
+    'rgba(20, 54, 40, 0.8)',
+    'rgba(0, 48, 28, 0.8)',
+    'rgba(23, 23, 23, 0.8)'
 ];
 
 const getRandomScreenId = () => {
     const rand = Math.random();
 
-    if (rand <= 0.1) {
+    if (rand <= 0.05) {
         return Screens.FantasmagoriaSplash;
     }
-
-    // if(rand <= 0.15) {
+    //
+    // if (rand <= 0.1) {
     //     return Screens.News;
     // }
 
@@ -164,7 +144,7 @@ const getRandomScreenId = () => {
 export default function DashboardPage () {
     const { user } = useUserData();
     const router = useRouter();
-    const [screenId, setScreenId] = useState<Screens>(Screens.FantasmagoriaSplash);
+    const [screenId, setScreenId] = useState<Screens>(Screens.News);
     const [programEntries, setProgramEntries] = useState<FantasmagoriaProgramEntry[]>([]);
     const [currentEntry, setCurrentEntry] = useState<FantasmagoriaProgramEntry | null>(null);
     const [currentSize, setCurrentSize] = useState<number>(0.8);
@@ -188,7 +168,7 @@ export default function DashboardPage () {
             setScreenId(getRandomScreenId());
             setCurrentEntry(getNextEntryToShow(programEntries));
             setCurrentTheme(getRandomArrayElement(colorThemes) as string);
-        }, 30000);
+        }, 60000);
 
         return () => clearInterval(timeout);
     }, [programEntries]);
@@ -211,49 +191,78 @@ export default function DashboardPage () {
 
     return (
         <div
-            className={'fixed top-0 left-0 w-screen h-screen z-50 text-white font-sans font-bold'
-                + ' transition-colors duration-1000'}
-            style={{
-                fontSize: `${currentSize}em`,
-                backgroundColor: currentTheme
-            }}
+            className="fixed top-0 left-0 w-screen h-screen z-50 bg-center bg-cover bg-fixed bg-no-repeat"
+            style={{ backgroundImage: `url(/backgrounds/bg.webp)` }}
         >
-            {screenId === Screens.FantasmagoriaSplash &&
-                <div
-                    className="w-full h-full fill bg-center bg-cover bg-red-800"
-                    style={{
-                        'backgroundImage': `url(/dashboard/splash.webp)`
-                    }}
-                ></div>
-            }
-            {/* {screenId === Screens.News && */}
-            {/*     <div className="w-full h-full flex justify-center items-center"> */}
-            {/*         <p style={{ fontSize: '150px' }}>Pij wodę!</p> */}
-            {/*     </div> */}
-            {/* } */}
-            {screenId === Screens.Program && currentEntry &&
-                <div className="w-full h-full flex flex-col justify-center p-20">
-                    <p style={{
-                        fontSize: '1.8em'
-                    }}>{currentEntry.name}</p>
-                    <p style={{
-                        padding: '0.3em 0',
-                        fontSize: '4.5em'
-                    }}>{currentEntry.title}</p>
-                    <p style={{
-                        paddingBottom: '0.5em',
-                        fontSize: '3em'
-                    }}>{formatDateFromTo(currentEntry.dateStart, currentEntry.dateEnd)}, {currentEntry.location}</p>
-                    <p style={{
-                        paddingBottom: '0',
-                        fontSize: '1.8em'
-                    }}>{currentEntry.description}</p>
-                </div>
-            }
-            <button
-                className="fixed bottom-0 right-0 h-32 w-32"
-                onClick={() => iterateFontSize()}
-            ></button>
+            <div
+                className={'h-full w-full z-50 text-white font-montserrat'
+                    + ' transition-colors duration-1000'}
+                style={{
+                    fontSize: `${currentSize}em`,
+                    backgroundColor: currentTheme
+                }}
+            >
+                {screenId === Screens.FantasmagoriaSplash &&
+                    <div
+                        className="w-full h-full fill bg-center bg-cover bg-red-800"
+                        style={{
+                            'backgroundImage': `url(/dashboard/splash.webp)`
+                        }}
+                    ></div>
+                }
+
+                {screenId === Screens.News &&
+                    <div className="w-full h-full flex flex-col justify-center p-20 font-semibold text-center">
+                        <p style={{
+                            padding: '0.3em 0',
+                            fontSize: '7em',
+                            filter: 'brightness(1.4)',
+                            position: 'relative',
+                            paddingLeft: '5rem',
+                            left: '-5rem',
+                            marginBottom: '2rem',
+                            fontWeight: '800'
+                        }}>Pij wodę!</p>
+                    </div>
+                }
+
+                {screenId === Screens.Program && currentEntry &&
+                    <div className="w-full h-full flex flex-col justify-center p-20 font-semibold">
+                        <p style={{
+                            fontSize: '6em',
+                            marginBottom: '2rem'
+                        }}>{formatDateFromTo(currentEntry.dateStart)}</p>
+
+                        <p style={{
+                            padding: '0.3em 0',
+                            fontSize: '7em',
+                            backgroundColor: currentTheme,
+                            filter: 'brightness(1.4)',
+                            position: 'relative',
+                            paddingLeft: '5rem',
+                            left: '-5rem',
+                            marginBottom: '2rem',
+                            fontWeight: '800'
+                        }}>{currentEntry.title}</p>
+
+                        <p style={{
+                            fontSize: '4.5em',
+                            marginBottom: '1rem'
+                        }}>{currentEntry.location}</p>
+
+                        <p style={{
+                            paddingBottom: '0',
+                            fontSize: '2.5em',
+                            marginBottom: '2rem'
+                        }}>{currentEntry.description}</p>
+                    </div>
+                }
+
+                <button
+                    className="fixed bottom-0 right-0 h-32 w-32"
+                    onClick={() => iterateFontSize()}
+                ></button>
+            </div>
         </div>
     );
 };
