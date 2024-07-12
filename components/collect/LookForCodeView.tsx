@@ -103,8 +103,8 @@ export default function LookForCodeView ({
 
     return (
         <div>
-            <Panel title='Hej, to ważne!'>
-                <p className='mb-1'>
+            <Panel title='Hej, zanim zaczniesz...'>
+                <p className='mb-1 text-justify'>
                     Kodów nie ukryliśmy w salach prelekcyjnych i zajęciowych. Każdy z nich jest w Twoim zasięgu.
                     Staraj się nie przeszkadzać innym konwentowiczom podczas swoich poszukiwań.
                 </p>
