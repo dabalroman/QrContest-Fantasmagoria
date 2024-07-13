@@ -73,10 +73,10 @@ export default function QuestionCardView ({
                 }
                 style={{
                     'minHeight': '200px',
-                    'maxHeight': '80vh',
-                    'aspectRatio': '2/3',
+                    // 'maxHeight': '80vh',
+                    // 'aspectRatio': '2/3',
                     'objectFit': 'contain',
-                    'overflow': 'hidden',
+                    'overflow': 'scroll',
                     'transformStyle': 'preserve-3d',
                     'transform': 'scale(0.9)',
                     'filter': 'drop-shadow(8px 8px 10px rgba(0,0,0,0.5))'

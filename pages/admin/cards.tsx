@@ -77,6 +77,7 @@ export default function CardsAdminPage () {
                             <tr key={card.uid} className={index % 2 ? 'bg-background' : ''}>
                                 <td className="p-2">{card.collectedBy.length}</td>
                                 <td className="p-2">{card.value}</td>
+                                <td className="p-2">{card.comment}</td>
                                 <td className="p-2">
                                     <a href={`${Page.ADMIN_EDIT_CARD}/${card.code}`}>{card.name}</a>
                                 </td>
@@ -84,7 +85,6 @@ export default function CardsAdminPage () {
                                 <td className="p-2">
                                     {(card.collectedBy[0] as any)?.collectedAt.toLocaleString('pl-PL')}
                                 </td>
-                                <td className="p-2">{card.comment}</td>
                                 <td className="p-2 font-mono">{card.code}</td>
                             </tr>
                         ))}

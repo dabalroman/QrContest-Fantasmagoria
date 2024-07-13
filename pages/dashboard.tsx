@@ -75,12 +75,10 @@ const getFantasmagoriaProgram = async (): Promise<FantasmagoriaProgramEntry[]> =
 };
 
 const getRandomScreenType = () => {
-    console.log('getRandomScreenType');
-
     const screenTypeWeights = {
         [ScreenType.FantasmagoriaSplash]: 0.05,
-        [ScreenType.QrContestSplash]: 0.05,
-        [ScreenType.News]: 0.05,
+        [ScreenType.QrContestSplash]: 0.07,
+        [ScreenType.News]: 0.03,
         [ScreenType.Event]: 0.40,
         [ScreenType.Agenda]: 0.45
     };
