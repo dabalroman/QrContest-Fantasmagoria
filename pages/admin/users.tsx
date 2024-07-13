@@ -47,7 +47,7 @@ export default function UsersAdminPage () {
                             <th className="p-2">Nick</th>
                             <th className="p-2">Wynik</th>
                             <th className="p-2"># kart</th>
-                            <th className="p-2"># pytań </th>
+                            <th className="p-2"># pytań</th>
                             <th className="p-2">Gildia</th>
                             <th className="p-2">Ostatnia akcja</th>
                         </tr>

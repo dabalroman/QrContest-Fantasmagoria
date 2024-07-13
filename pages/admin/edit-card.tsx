@@ -1,26 +1,26 @@
-import {useForm} from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import Card from '@/models/Card';
 import ScreenTitle from '@/components/ScreenTitle';
 import Panel from '@/components/Panel';
 import Button from '@/components/Button';
 import useCollectedCards from '@/hooks/useCollectedCards';
-import {useRouter} from 'next/router';
-import {useEffect, useState} from 'react';
-import {Page} from '@/Enum/Page';
-import {collection, DocumentReference, getDocs, limit, query, updateDoc, where} from '@firebase/firestore';
-import {firestore} from '@/utils/firebase';
-import {FireDoc} from '@/Enum/FireDoc';
-import {CardTier, getCardTierFriendlyName} from '@/Enum/CardTier';
+import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
+import { Page } from '@/Enum/Page';
+import { collection, DocumentReference, getDocs, limit, query, updateDoc, where } from '@firebase/firestore';
+import { firestore } from '@/utils/firebase';
+import { FireDoc } from '@/Enum/FireDoc';
+import { CardTier, getCardTierFriendlyName } from '@/Enum/CardTier';
 import useDynamicNavbar from '@/hooks/useDynamicNavbar';
-import {faCamera} from '@fortawesome/free-solid-svg-icons';
+import { faCamera } from '@fortawesome/free-solid-svg-icons';
 import useAdminOnly from '@/hooks/useAdminOnly';
 
-export default function EditCardAdminPage() {
+export default function EditCardAdminPage () {
     useAdminOnly();
 
     const router = useRouter();
-    const {cardSets} = useCollectedCards();
+    const { cardSets } = useCollectedCards();
     const [card, setCard] = useState<Card | null>(null);
 
     const [cardRef, setCardRef] = useState<DocumentReference | null>(null);
@@ -30,7 +30,7 @@ export default function EditCardAdminPage() {
         href: Page.SCANNER
     });
 
-    let {code} = router.query as { code: string | string[] | undefined | null };
+    let { code } = router.query as { code: string | string[] | undefined | null };
 
     useEffect(() => {
         if (!code || typeof code !== 'string') {

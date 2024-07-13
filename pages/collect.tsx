@@ -39,8 +39,8 @@ export default function CollectPage () {
     }
 
     const onCodeValid = (card: Card, question: Question | null) => {
-        if(question) {
-            toast('Ta karta kryje wyzwanie!', {icon: '🎲'});
+        if (question) {
+            toast('Ta karta kryje wyzwanie!', { icon: '🎲' });
         } else {
             toast.success('Karta została dodana do Twojej kolekcji!');
         }
