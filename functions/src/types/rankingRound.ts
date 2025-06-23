@@ -1,7 +1,5 @@
-import { firestore } from 'firebase-admin';
-import { FieldValue } from 'firebase-admin/firestore';
 import { GuildUid } from './guild';
-import Timestamp = firestore.Timestamp;
+import { FieldValue, Timestamp } from 'firebase-admin/firestore';
 
 export type RankingRoundUser = {
     username: string,
@@ -10,7 +8,7 @@ export type RankingRoundUser = {
     amountOfAnsweredQuestions: number,
     memberOf: GuildUid | null,
     winnerInRound: string | null,
-    updatedAt: Timestamp | FieldValue,
+    updatedAt: Timestamp | FieldValue | number,
 }
 
 export type RankingRoundGuild = {
@@ -19,7 +17,7 @@ export type RankingRoundGuild = {
     amountOfAnsweredQuestions: number,
     amountOfCollectedCards: number,
     amountOfMembers: number,
-    updatedAt: Timestamp | FieldValue,
+    updatedAt: Timestamp | FieldValue | number,
 }
 
 export type RankingRoundUsers = {

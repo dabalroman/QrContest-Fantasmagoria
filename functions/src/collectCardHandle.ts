@@ -1,28 +1,31 @@
-import { https, logger } from 'firebase-functions';
-
-import { FieldValue, getFirestore } from 'firebase-admin/firestore';
-import { Card, CollectedCard } from './types/card';
-import { CollectedQuestions, PublicQuestion, Question, QuestionsDoc } from './types/question';
+import {FieldValue, getFirestore, UpdateData} from 'firebase-admin/firestore';
+import {Card, CardCollectedBy, CollectedCard} from './types/card';
+import {CollectedCardQuestion, CollectedQuestions, PublicQuestion, Question, QuestionsDoc} from './types/question';
 import updateRanking from './actions/updateRanking';
 import getCurrentUser from './actions/getCurrentUser';
 import updateGuild from './actions/updateGuild';
+import {HttpsError, onCall} from 'firebase-functions/v2/https';
+import * as logger from 'firebase-functions/logger';
+import {User} from "./types/user";
 
-export default async function collectCardHandle (
-    data: any,
-    context: https.CallableContext
-): Promise<{ card: CollectedCard, question: PublicQuestion | null }> {
-    if (!context.auth || !context.auth.uid) {
+export const collectCardHandle = onCall(async (req): Promise<{
+    card: CollectedCard,
+    question: PublicQuestion | null
+}> => {
+    const data = req.data;
+    const auth = req.auth;
+    if (!auth || !auth.uid) {
         logger.error('collectCardHandle', 'permission denied');
-        throw new https.HttpsError('permission-denied', 'permission denied');
+        throw new HttpsError('permission-denied', 'permission denied');
     }
 
     // Does code looks right?
-    const uid: string = context.auth.uid;
+    const uid: string = auth.uid;
     let codeAttempt: string | null = data.code ?? null;
 
     if (typeof codeAttempt !== 'string' || codeAttempt.length !== 10) {
         logger.error('collectCardHandle', 'uid or code is null');
-        throw new https.HttpsError('invalid-argument', 'uid or code is null');
+        throw new HttpsError('invalid-argument', 'uid or code is null');
     }
 
     // Does user exist?
@@ -38,7 +41,7 @@ export default async function collectCardHandle (
 
     if (cardSnapshot.empty) {
         logger.error('collectCardHandle', 'card code is invalid', codeAttempt);
-        throw new https.HttpsError('not-found', 'card code is invalid');
+        throw new HttpsError('not-found', 'card code is invalid');
     }
 
     // Is card already collected?
@@ -51,12 +54,12 @@ export default async function collectCardHandle (
 
     if (isAlreadyCollected) {
         logger.error('collectCardHandle', 'card is already collected');
-        throw new https.HttpsError('already-exists', 'card is already collected');
+        throw new HttpsError('already-exists', 'card is already collected');
     }
 
     // Question
     let question: PublicQuestion | null = null;
-    const questionsRef: FirebaseFirestore.DocumentReference  = await db.collection('questions')
+    const questionsRef: FirebaseFirestore.DocumentReference = await db.collection('questions')
         .doc('questions');
 
     const collectedQuestionsRef: FirebaseFirestore.DocumentReference = db.collection('users')
@@ -77,7 +80,7 @@ export default async function collectCardHandle (
 
         const unansweredQuestions = questions.filter((question: Question) => !alreadyCollected.includes(question.uid));
 
-        if(unansweredQuestions.length > 0) {
+        if (unansweredQuestions.length > 0) {
             const randomQuestionIndex = Math.floor(Math.random() * unansweredQuestions.length);
             const questionData = unansweredQuestions[randomQuestionIndex];
 
@@ -112,33 +115,34 @@ export default async function collectCardHandle (
                 question: null,
                 withQuestion: card.withQuestion,
                 collectedAt: FieldValue.serverTimestamp()
-            } as CollectedCard);
+            });
 
             //Update user score and amount of collected cards
-            transaction.update(userRef, {
+            transaction.update<User, User>(userRef, ({
                 score: FieldValue.increment(card.value),
                 amountOfCollectedCards: FieldValue.increment(1),
                 updatedAt: FieldValue.serverTimestamp()
-            });
+            } as UpdateData<User>));
 
             //Update card collectedBy
-            transaction.update(cardRef, {
+            transaction.update<CardCollectedBy, CardCollectedBy>(cardRef, {
                 [`collectedBy.${uid}`]: {
                     username: user.username,
                     collectedAt: FieldValue.serverTimestamp()
                 }
-            });
+            } as UpdateData<CardCollectedBy>);
 
             //Questions
             if (question) {
                 //Save that user tried to answer this question
-                transaction.update(collectedQuestionsRef, {
+                transaction.update<CollectedQuestions, CollectedQuestions>(collectedQuestionsRef, ({
                     [question.uid]: {
                         answer: null,
                         correct: false,
-                        value: 0
-                    }
-                });
+                        value: 0,
+                        collectedAt: FieldValue.serverTimestamp()
+                    } as CollectedCardQuestion
+                }) as UpdateData<CollectedQuestions>);
             }
 
             await updateRanking(db, transaction, user);
@@ -152,6 +156,6 @@ export default async function collectCardHandle (
         };
     } catch (error) {
         logger.error('collectCardHandle', 'error while collecting card: ' + error);
-        throw new https.HttpsError('aborted', 'error while collecting card');
+        throw new HttpsError('aborted', 'error while collecting card');
     }
-};
+});

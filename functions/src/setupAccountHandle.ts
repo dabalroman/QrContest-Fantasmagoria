@@ -1,25 +1,26 @@
-import { https, logger } from 'firebase-functions';
-import { FieldValue, getFirestore } from 'firebase-admin/firestore';
-import { User, UserRole } from './types/user';
+import { onCall, HttpsError } from 'firebase-functions/v2/https';
+import * as logger from 'firebase-functions/logger';
+import {FieldValue, getFirestore, DocumentData, DocumentReference} from 'firebase-admin/firestore';
+import {User, UserRole, UserUsername} from './types/user';
 import updateRanking from './actions/updateRanking';
 import forbiddenPhrases from './data/forbiddenPhrases';
 
-function checkForForbiddenPhrases (username: string): boolean {
+function checkForForbiddenPhrases(username: string): boolean {
     const text = username.toLowerCase();
     return forbiddenPhrases.some((phrase) => text.includes(phrase));
 }
 
-export default async function setupAccountHandle (
-    data: any,
-    context: https.CallableContext
-): Promise<{ user: User }> {
-    if (!context.auth || !context.auth.uid) {
+export const setupAccountHandle = onCall(async (req): Promise<{ user: User }> => {
+    const data = req.data;
+    const auth = req.auth;
+
+    if (!auth || !auth.uid) {
         logger.error('setupAccountHandle', 'permission denied');
-        throw new https.HttpsError('permission-denied', 'permission denied');
+        throw new HttpsError('permission-denied', 'permission denied');
     }
 
     // Does username look right?
-    const uid: string = context.auth.uid;
+    const uid: string = auth.uid;
     let username: string | null = data.username.trim() ?? null;
 
     if (
@@ -28,33 +29,31 @@ export default async function setupAccountHandle (
         || username.match(/^[A-z0-9ąćęłóśźż\-\s&$#@.<>(){}:;+]+$/i) === null
     ) {
         logger.error('setupAccountHandle', 'username does not meet requirements');
-        throw new https.HttpsError('invalid-argument', 'username does not meet requirements');
+        throw new HttpsError('invalid-argument', 'username does not meet requirements');
     }
 
     if (checkForForbiddenPhrases(username)) {
         logger.error('setupAccountHandle', 'username does not meet requirements - bad words');
-        throw new https.HttpsError('invalid-argument', 'username does not meet requirements');
+        throw new HttpsError('invalid-argument', 'username does not meet requirements');
     }
 
     // Does user exist?
     const db = getFirestore();
-    const userRef = db.collection('users')
-        .doc(uid);
+    const userRef = db.collection('users').doc(uid);
     const userExist = (await userRef.get()).exists;
 
     if (userExist) {
         logger.error('setupAccountHandle', 'user uid exist already');
-        throw new https.HttpsError('invalid-argument', 'user uid exist already');
+        throw new HttpsError('invalid-argument', 'user uid exist already');
     }
 
     // Is username free to take?
-    const usernameRef = db.collection('users-usernames')
-        .doc(username);
+    const usernameRef = db.collection('users-usernames').doc(username) as DocumentReference<UserUsername, UserUsername>;
     const usernameTaken = (await usernameRef.get()).exists;
 
     if (usernameTaken) {
         logger.error('setupAccountHandle', 'nickname already taken');
-        throw new https.HttpsError('invalid-argument', 'nickname already taken');
+        throw new HttpsError('invalid-argument', 'nickname already taken');
     }
 
     const user: User = {
@@ -69,8 +68,13 @@ export default async function setupAccountHandle (
         updatedAt: FieldValue.serverTimestamp(),
         lastGuildChangeAt: new Date('2020/01/01') as any
     };
+    
+    const userUsername: UserUsername = {
+        uid: uid
+    };
 
-    let collectedQuestionsRef: FirebaseFirestore.DocumentReference = db.collection('users')
+    let collectedQuestionsRef = db
+        .collection('users')
         .doc(uid)
         .collection('collectedQuestions')
         .doc('collectedQuestions');
@@ -78,11 +82,8 @@ export default async function setupAccountHandle (
     try {
         await db.runTransaction(async (transaction) => {
             transaction.create(userRef, user);
-
-            transaction.create(usernameRef, { uid: uid });
-
+            transaction.create<UserUsername, DocumentData>(usernameRef, userUsername);
             transaction.create(collectedQuestionsRef, {});
-
             await updateRanking(db, transaction, user);
         });
 
@@ -90,6 +91,6 @@ export default async function setupAccountHandle (
         return { user };
     } catch (error) {
         logger.error('setupAccountHandle', 'error while registering the user: ' + error);
-        throw new https.HttpsError('aborted', 'error while registering the user');
+        throw new HttpsError('aborted', 'error while registering the user');
     }
-};
+});

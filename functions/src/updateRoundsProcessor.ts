@@ -1,8 +1,7 @@
-import { logger } from 'firebase-functions';
-import { getFirestore } from 'firebase-admin/firestore';
-import { RankingRound, RankingRoundUser } from './types/rankingRound';
-import { firestore } from 'firebase-admin';
-import Timestamp = firestore.Timestamp;
+import {logger} from 'firebase-functions';
+import {DocumentReference, getFirestore, Timestamp, UpdateData} from 'firebase-admin/firestore';
+import {RankingRound, RankingRoundUser, RankingRoundUsers} from './types/rankingRound';
+import {User} from "./types/user";
 
 type RankingRoundUserWithUid = RankingRoundUser & { uid: string };
 
@@ -34,11 +33,14 @@ export default async function updateRoundsProcessor(): Promise<string | void> {
 
     await db.runTransaction(async (transaction) => {
         rankingRoundSnapshots.forEach((roundSnapshot) => {
-            transaction.update(roundSnapshot.ref, { finished: true });
+            transaction.update<RankingRound, Partial<RankingRound>>(
+                roundSnapshot.ref as DocumentReference<RankingRound, RankingRound>,
+                {finished: true} as UpdateData<RankingRound>
+            );
 
             const rankingRound: RankingRound = roundSnapshot.data() as RankingRound;
             const users: RankingRoundUserWithUid[] = Object.entries(rankingRound.users)
-                .map(([uid, user]): RankingRoundUserWithUid => ({ uid, ...user }))
+                .map(([uid, user]): RankingRoundUserWithUid => ({uid, ...user}))
                 .sort((a, b) => b.score - a.score)
                 .slice(0, 3)
                 .map((user) => ({
@@ -47,14 +49,15 @@ export default async function updateRoundsProcessor(): Promise<string | void> {
                 }));
 
             users.forEach((user) => {
-                transaction.update(roundSnapshot.ref, {
-                    [`users.${user.uid}`]: user
-                });
+                transaction.update<RankingRoundUsers, Partial<RankingRoundUsers>>(roundSnapshot.ref, {
+                    [`users.${user.uid}`]: user as RankingRoundUser
+                } as UpdateData<RankingRoundUsers>);
 
-                const userRef = db.collection('users')
-                    .doc(user.uid);
+                const userRef = db.collection('users').doc(user.uid) as DocumentReference<User, User>;
 
-                transaction.update(userRef, { winnerInRound: user.winnerInRound });
+                transaction.update<User, Partial<User>>(userRef,
+                    {winnerInRound: user.winnerInRound} as UpdateData<User>
+                );
             });
         });
     });

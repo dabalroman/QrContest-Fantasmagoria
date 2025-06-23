@@ -1,14 +1,14 @@
-import { firestore } from 'firebase-admin';
-import { User } from '../types/user';
-import { FieldValue } from 'firebase-admin/firestore';
-import { https, logger } from 'firebase-functions';
-import { Guild, GuildMember } from '../types/guild';
-import { RankingRoundGuild } from '../types/rankingRound';
-import Timestamp = firestore.Timestamp;
+import {User} from '../types/user';
+import * as logger from 'firebase-functions/logger';
+import {Guild, GuildMember } from '../types/guild';
+import {RankingRoundGuild, RankingRoundGuilds} from '../types/rankingRound';
+import {DocumentReference, FieldValue, Firestore, Timestamp, Transaction, UpdateData} from 'firebase-admin/firestore';
+import {HttpsError} from "firebase-functions/v2/https";
 
-export default async function updateGuild (
-    db: firestore.Firestore,
-    transaction: firestore.Transaction,
+
+export default async function updateGuild(
+    db: Firestore,
+    transaction: Transaction,
     user: User
 ): Promise<void> {
     if (!user.memberOf) {
@@ -16,12 +16,12 @@ export default async function updateGuild (
     }
 
     const guildRef = db.collection('guilds')
-        .doc(user.memberOf);
+        .doc(user.memberOf) as DocumentReference<Guild>;
     const guildDoc = await guildRef.get();
 
     if (!guildDoc.exists) {
         logger.error('getGuildUpdate', 'guild does not exist');
-        throw new https.HttpsError('invalid-argument', 'guild does not exist');
+        throw new HttpsError('invalid-argument', 'guild does not exist');
     }
 
     const guild: Guild = guildDoc.data() as Guild;
@@ -55,7 +55,7 @@ export default async function updateGuild (
         }
     );
 
-    transaction.update(guildRef, {
+    transaction.update<Guild, UpdateData<Guild>>(guildRef, ({
         [`members.${user.uid}`]: {
             username: user.username,
             score: user.score,
@@ -68,7 +68,7 @@ export default async function updateGuild (
         amountOfCollectedCards: amountOfCollectedCards,
         amountOfMembers: amountOfMembers,
         updatedAt: FieldValue.serverTimestamp()
-    });
+    }) as UpdateData<Guild>);
 
     //
     // Update rankings for guilds
@@ -88,17 +88,15 @@ export default async function updateGuild (
     });
 
     roundsSnapshotsToUpdate.forEach((snapshot) => {
-        const record: RankingRoundGuild = {
-            name: guild.name,
-            score: score,
-            amountOfAnsweredQuestions: amountOfAnsweredQuestions,
-            amountOfCollectedCards: amountOfCollectedCards,
-            amountOfMembers: amountOfMembers,
-            updatedAt: FieldValue.serverTimestamp()
-        };
-
-        transaction.update(snapshot.ref, {
-            [`guilds.${guild.uid}`]: record
-        });
+        transaction.update<RankingRoundGuilds, UpdateData<RankingRoundGuilds>>(snapshot.ref, ({
+            [`guilds.${guild.uid}`]: {
+                name: guild.name,
+                score: score,
+                amountOfAnsweredQuestions: amountOfAnsweredQuestions,
+                amountOfCollectedCards: amountOfCollectedCards,
+                amountOfMembers: amountOfMembers,
+                updatedAt: FieldValue.serverTimestamp()
+            } as RankingRoundGuild
+        } as UpdateData<RankingRoundGuilds>));
     });
 }

@@ -6,29 +6,29 @@ import { QuestionAnswerValue } from '@/functions/src/types/question';
 export const collectCardFunction: HttpsCallable<
     { code: string },
     { card: RawCard, question: RawQuestion | null }
-> = httpsCallable(functions, 'collectcard');
+> = httpsCallable(functions, 'collectCardHandle');
 
 export const answerQuestionFunction: HttpsCallable<
     { uid: string, answer: string },
     { correct: boolean, correctAnswer: QuestionAnswerValue }
-> = httpsCallable(functions, 'answerquestion');
+> = httpsCallable(functions, 'answerQuestionHandle');
 
 export const setupAccountFunction: HttpsCallable<
     { username: string },
     {}
-> = httpsCallable(functions, 'setupaccount');
+> = httpsCallable(functions, 'setupAccountHandle');
 
 export const joinGuildFunction: HttpsCallable<
     { guild: string },
     {}
-> = httpsCallable(functions, 'joinguild');
+> = httpsCallable(functions, 'joinGuildHandle');
 
 export const seedDatabaseFunction: HttpsCallable<
     { password: string },
     {}
-> = httpsCallable(functions, 'seeddatabase');
+> = httpsCallable(functions, 'seedDatabaseHandle');
 
 export const updateRoundsFunction: HttpsCallable<
     {},
     { result: string }
-> = httpsCallable(functions, 'updaterounds');
+> = httpsCallable(functions, 'updateRoundsHandle');

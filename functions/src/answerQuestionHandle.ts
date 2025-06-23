@@ -1,22 +1,25 @@
-import { https, logger } from 'firebase-functions';
-import { HttpsError } from 'firebase-functions/v2/https';
-import { FieldValue, getFirestore } from 'firebase-admin/firestore';
-import { CollectedQuestions, Question, QuestionAnswerValue, QuestionsDoc } from './types/question';
+import * as logger from 'firebase-functions/logger';
+import {HttpsError} from 'firebase-functions/v2/https';
+import {DocumentReference, FieldValue, getFirestore, UpdateData} from 'firebase-admin/firestore';
+import {CollectedQuestions, Question, QuestionAnswerValue, QuestionsDoc} from './types/question';
 import updateRanking from './actions/updateRanking';
 import getCurrentUser from './actions/getCurrentUser';
 import updateGuild from './actions/updateGuild';
+import {onCall} from "firebase-functions/https";
 
-export default async function answerQuestionHandle (
-    data: any,
-    context: https.CallableContext
-): Promise<{ correct: boolean, correctAnswer: QuestionAnswerValue }> {
-    if (!context.auth || !context.auth.uid) {
+export const answerQuestionHandle = onCall(async (req): Promise<{
+    correct: boolean,
+    correctAnswer: QuestionAnswerValue
+}> => {
+    const data = req.data;
+    const auth = req.auth;
+
+    if (!auth || !auth.uid) {
         logger.error('collectCardHandle', 'permission denied');
         throw new HttpsError('permission-denied', 'permission denied');
     }
 
-    // Does request looks right?
-    const uid: string = context.auth.uid;
+    const uid: string = auth.uid;
     const questionUid: string | any = data.uid;
     const questionAnswer: string | any = data.answer;
 
@@ -32,7 +35,7 @@ export default async function answerQuestionHandle (
     const collectedQuestionsRef: FirebaseFirestore.DocumentReference = db.collection('users')
         .doc(uid)
         .collection('collectedQuestions')
-        .doc('collectedQuestions');
+        .doc('collectedQuestions') as DocumentReference<CollectedQuestions, CollectedQuestions>;
 
     try {
         const collectedQuestionsDoc = await collectedQuestionsRef.get();
@@ -46,7 +49,7 @@ export default async function answerQuestionHandle (
         throw new HttpsError('aborted', 'error while getting collected questions');
     }
 
-    const questionsRef: FirebaseFirestore.DocumentReference  = await db.collection('questions')
+    const questionsRef: FirebaseFirestore.DocumentReference = await db.collection('questions')
         .doc('questions');
     const questionsDoc = await questionsRef.get();
     const questionsData = questionsDoc.data() as QuestionsDoc;
@@ -75,14 +78,14 @@ export default async function answerQuestionHandle (
             });
 
             //Save user answered question
-            transaction.update(collectedQuestionsRef, {
+            transaction.update<CollectedQuestions, CollectedQuestions>(collectedQuestionsRef, {
                 [questionUid]: {
                     answer: questionAnswer,
                     correct: questionCorrect,
                     value: questionValue,
                     collectedAt: FieldValue.serverTimestamp()
                 }
-            });
+            } as UpdateData<CollectedQuestions>);
 
             await updateRanking(db, transaction, user);
             await updateGuild(db, transaction, user);
@@ -97,4 +100,4 @@ export default async function answerQuestionHandle (
         logger.error('answerQuestionHandle', 'error while answering the question: ' + error);
         throw new HttpsError('aborted', 'error while answering the question');
     }
-};
+});

@@ -36,6 +36,7 @@ functions/firebase-debug.log
 .emulators
 .firebase
 firebase-export-*
+.env
 
 # vercel
 .vercel

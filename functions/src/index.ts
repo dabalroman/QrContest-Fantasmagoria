@@ -1,53 +1,27 @@
-import * as functions from 'firebase-functions';
+import {setGlobalOptions} from "firebase-functions/v2";
 import * as admin from 'firebase-admin';
-import seedDatabaseHandle from './seedDatabaseHandle';
-import answerQuestionHandle from './answerQuestionHandle';
-import collectCardHandle from './collectCardHandle';
-import setupAccountHandle from './setupAccountHandle';
-import joinGuildHandle from './joinGuildHandle';
-import updateRoundsProcessor from './updateRoundsProcessor';
+import {setupAccountHandle} from './setupAccountHandle';
+import {seedDatabaseHandle} from './seedDatabaseHandle';
+import {collectCardHandle} from './collectCardHandle';
+import {answerQuestionHandle} from './answerQuestionHandle';
+import {joinGuildHandle} from './joinGuildHandle';
+import {onSchedule} from "firebase-functions/scheduler";
+import {logger} from "firebase-functions";
+import updateRoundsProcessor from "./updateRoundsProcessor";
+import {onCall} from "firebase-functions/https";
 
-const region = 'europe-west1';
+setGlobalOptions({region: 'europe-west1'});
 
 admin.initializeApp();
 
-exports.collectcard =
-    functions.region(region)
-        .https
-        .onCall(collectCardHandle);
+export {setupAccountHandle, seedDatabaseHandle, collectCardHandle, answerQuestionHandle, joinGuildHandle};
 
-exports.answerquestion =
-    functions.region(region)
-        .https
-        .onCall(answerQuestionHandle);
+export const updateRoundsHandle = onCall(async (): Promise<{}> => {
+    const result = await updateRoundsProcessor();
+    return { result };
+});
 
-exports.setupaccount =
-    functions.region(region)
-        .https
-        .onCall(setupAccountHandle);
-
-exports.seeddatabase =
-    functions.region(region)
-        .https
-        .onCall(seedDatabaseHandle);
-
-exports.joinguild =
-    functions.region(region)
-        .https
-        .onCall(joinGuildHandle);
-
-exports.updaterounds =
-    functions.region(region)
-        .https
-        .onCall(async (data, context) => {
-            const result = await updateRoundsProcessor();
-            return { result };
-        });
-
-exports.autoUpdateRounds =
-    functions.region(region)
-        .pubsub
-        .schedule('0 * * * *')
-        .onRun(async (context) => {
-            await updateRoundsProcessor();
-        });
+export const autoUpdateRounds = onSchedule("0 * * * *", async () => {
+    logger.info("Automatic update rounds");
+    await updateRoundsProcessor();
+});

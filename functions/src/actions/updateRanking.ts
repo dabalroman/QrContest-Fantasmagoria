@@ -1,13 +1,11 @@
-import { RankingRoundUser } from '../types/rankingRound';
-import { firestore } from 'firebase-admin';
-import { User } from '../types/user';
-import { FieldValue } from 'firebase-admin/firestore';
-import { logger } from 'firebase-functions';
-import Timestamp = firestore.Timestamp;
+import {RankingRoundUser, RankingRoundUsers} from '../types/rankingRound';
+import {User} from '../types/user';
+import {logger} from 'firebase-functions';
+import {FieldValue, Firestore, Timestamp, Transaction, UpdateData} from 'firebase-admin/firestore';
 
-export default async function updateRanking (
-    db: firestore.Firestore,
-    transaction: firestore.Transaction,
+export default async function updateRanking(
+    db: Firestore,
+    transaction: Transaction,
     user: User
 ): Promise<void> {
     const roundsSnapshot = await db.collection('ranking')
@@ -25,18 +23,16 @@ export default async function updateRanking (
     });
 
     roundsSnapshotsToUpdate.forEach((snapshot) => {
-        const record: RankingRoundUser = {
-            username: user.username,
-            score: user.score,
-            amountOfCollectedCards: user.amountOfCollectedCards,
-            amountOfAnsweredQuestions: user.amountOfAnsweredQuestions,
-            memberOf: user.memberOf,
-            winnerInRound: user.winnerInRound,
-            updatedAt: FieldValue.serverTimestamp()
-        };
-
-        transaction.update(snapshot.ref, {
-            [`users.${user.uid}`]: record
-        });
+        transaction.update<RankingRoundUsers, RankingRoundUsers>(snapshot.ref, ({
+            [`users.${user.uid}`]: {
+                username: user.username,
+                score: user.score,
+                amountOfCollectedCards: user.amountOfCollectedCards,
+                amountOfAnsweredQuestions: user.amountOfAnsweredQuestions,
+                memberOf: user.memberOf,
+                winnerInRound: user.winnerInRound,
+                updatedAt: FieldValue.serverTimestamp()
+            } as Partial<RankingRoundUser>
+        }) as UpdateData<RankingRoundUsers>);
     });
 }

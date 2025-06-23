@@ -1,13 +1,14 @@
-# QrContest23
-QrContest23 is an app made for 13'th edition of Fantasmagoria fantasy convention held in Gniezno, Poland (2023).
-It's fourth edition of QrContest, previous hence the name is combined with 2023 year.
+# QrContest
+QrContest is an app made for 15'th edition of Fantasmagoria fantasy convention held in Gniezno, Poland (2025).
+It's sixth edition of QrContest.
 
 Previous ones in short:
-1. QrContest 2017, ZSEO high school. PHP / MySql / Bootstrap.
-2. QrContest 2018, ZSEO high school. PHP / MySql / React / Bootstrap.
-3. QrContest 2022, 12'th Fantasmagoria fantasy convention. PHP / Laravel / MySql / React with TS / Mantine.
-4. QrContest 2023, 13'th Fantasmagoria fantasy convention. Next.js / React with TS / Firestore / Vercel / Tailwind.
-5. QrContest 2024, 14'th Fantasmagoria fantasy convention. Next.js / React with TS / Firestore / Vercel / Tailwind.
+1. QrContest 2025, 15'th Fantasmagoria fantasy convention. Next.js / React with TS / Firestore / Vercel / Tailwind.
+2. QrContest 2024, 14'th Fantasmagoria fantasy convention. Next.js / React with TS / Firestore / Vercel / Tailwind.
+3. QrContest 2023, 13'th Fantasmagoria fantasy convention. Next.js / React with TS / Firestore / Vercel / Tailwind.
+4. QrContest 2022, 12'th Fantasmagoria fantasy convention. PHP / Laravel / MySql / React with TS / Mantine.
+5. QrContest 2018, ZSEO high school. PHP / MySql / React / Bootstrap.
+6. QrContest 2017, ZSEO high school. PHP / MySql / Bootstrap.
 
 # Tech stack
 - React with TS
@@ -18,13 +19,16 @@ Previous ones in short:
 - Content generated using Stable Diffusion / BlueWillow / ChatGPT.
 
 # Run app
+First fill out the `.env.development` file from `.env.example`.
+
 ```bash
+npm install
 npm run dev
 ```
 
 ## Emulator
 ```bash
-npm install -g firebase-tools
+npm install --save-dev firebase-tools
 npm run emulators
 ```
 

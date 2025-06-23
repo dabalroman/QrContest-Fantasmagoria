@@ -1,6 +1,4 @@
-import { firestore } from 'firebase-admin';
-import { FieldValue } from 'firebase-admin/firestore';
-import Timestamp = firestore.Timestamp;
+import { FieldValue, Timestamp } from 'firebase-admin/firestore';
 
 export type GuildUid = 'guild-water' | 'guild-desert' | 'guild-steel' | 'guild-void';
 
@@ -25,5 +23,5 @@ export type Guild = {
     amountOfCollectedCards: number | FieldValue;
     amountOfAnsweredQuestions: number | FieldValue;
     members: GuildMembers;
-    updatedAt: Timestamp | FieldValue;
+    updatedAt: Timestamp | FieldValue | number;
 }

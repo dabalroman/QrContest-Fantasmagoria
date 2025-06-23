@@ -1,30 +1,28 @@
-import { https, logger } from 'firebase-functions';
-import { FieldValue, getFirestore } from 'firebase-admin/firestore';
-import { User } from './types/user';
+import * as logger from 'firebase-functions/logger';
+import {FieldValue, getFirestore, Timestamp, UpdateData} from 'firebase-admin/firestore';
+import {User} from './types/user';
 import getCurrentUser from './actions/getCurrentUser';
 import updateRanking from './actions/updateRanking';
-import { GuildUid } from './types/guild';
+import {GuildUid} from './types/guild';
 import updateGuild from './actions/updateGuild';
-import { firestore } from 'firebase-admin';
-import Timestamp = firestore.Timestamp;
+import {HttpsError, onCall} from "firebase-functions/https";
 
 const TIME_BETWEEN_GUILD_CHANGES_MS = 4 * 60 * 60 * 1000;
 
-export default async function joinGuildHandle (
-    data: any,
-    context: https.CallableContext
-): Promise<{ user: User }> {
-    if (!context.auth || !context.auth.uid) {
-        logger.error('joinGuildHandle', 'permission denied');
-        throw new https.HttpsError('permission-denied', 'permission denied');
-    }
+export const joinGuildHandle = onCall(async (req): Promise<{ user: User }> => {
+    const data = req.data;
+    const auth = req.auth;
 
-    const uid: string = context.auth.uid;
+    if (!auth || !auth.uid) {
+        logger.error('setupAccountHandle', 'permission denied');
+        throw new HttpsError('permission-denied', 'permission denied');
+    }
+    const uid: string = auth.uid;
     const guildToJoin: string | null = data.guild;
 
     if (typeof guildToJoin !== 'string' || guildToJoin.length < 3) {
         logger.error('setupAccountHandle', 'guildToJoin does not meet requirements');
-        throw new https.HttpsError('invalid-argument', 'guildToJoin does not meet requirements');
+        throw new HttpsError('invalid-argument', 'guildToJoin does not meet requirements');
     }
 
     // Does guild exist?
@@ -35,14 +33,14 @@ export default async function joinGuildHandle (
 
     if (!guildExist) {
         logger.error('joinGuildHandle', 'guild does not exist');
-        throw new https.HttpsError('invalid-argument', 'guild does not exist');
+        throw new HttpsError('invalid-argument', 'guild does not exist');
     }
 
     const [userRef, user] = await getCurrentUser(db, uid);
 
     if (user.memberOf === guildToJoin) {
         logger.error('joinGuildHandle', 'already member of this guild');
-        throw new https.HttpsError('invalid-argument', 'already member of this guild');
+        throw new HttpsError('invalid-argument', 'already member of this guild');
     }
 
     const timestampNow = (new Date()).getTime();
@@ -50,7 +48,7 @@ export default async function joinGuildHandle (
 
     if (timestampNow - timestampLastChange < TIME_BETWEEN_GUILD_CHANGES_MS) {
         logger.error('joinGuildHandle', 'cooldown');
-        throw new https.HttpsError('invalid-argument', 'cooldown');
+        throw new HttpsError('invalid-argument', 'cooldown');
     }
 
     // Previous guild
@@ -60,7 +58,7 @@ export default async function joinGuildHandle (
             .doc(user.memberOf);
         if (!(await previousGuildRef.get()).exists) {
             logger.error('joinGuildHandle', 'previous guild does not exist');
-            throw new https.HttpsError('invalid-argument', 'previous guild does not exist');
+            throw new HttpsError('invalid-argument', 'previous guild does not exist');
         }
     }
 
@@ -94,11 +92,11 @@ export default async function joinGuildHandle (
                 });
             }
 
-            transaction.update(userRef, {
+            transaction.update<User, User>(userRef, {
                 memberOf: guildToJoin,
                 lastGuildChangeAt: FieldValue.serverTimestamp(),
                 updatedAt: FieldValue.serverTimestamp()
-            } as User);
+            } as UpdateData<User>);
         });
 
         await db.runTransaction(async (transaction) => {
@@ -107,9 +105,9 @@ export default async function joinGuildHandle (
         });
 
         logger.log('joinGuildHandle', `User ${user.username} joined ${guildToJoin}.`);
-        return { user };
+        return {user};
     } catch (error) {
         logger.error('joinGuildHandle', 'error while joining the guild: ' + error);
-        throw new https.HttpsError('aborted', 'error while joining the guild');
+        throw new HttpsError('aborted', 'error while joining the guild');
     }
-};
+});

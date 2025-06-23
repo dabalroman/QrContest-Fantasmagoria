@@ -1,12 +1,11 @@
-import { firestore } from 'firebase-admin';
-import { FieldValue } from 'firebase-admin/firestore';
-import Timestamp = firestore.Timestamp;
+import { FieldValue, Timestamp } from 'firebase-admin/firestore';
 
-export type QuestionValue = 5 | 10 | 15;
+export type QuestionValue = 0 | 5 | 10 | 15;
 
-export type QuestionAnswerValue = 'a' | 'b' | 'c' | 'd';
+export type QuestionAnswerCorrectValue = 'a' | 'b' | 'c' | 'd';
+export type QuestionAnswerValue = QuestionAnswerCorrectValue | null;
 
-export type QuestionAnswers = { [index in QuestionAnswerValue]: string };
+export type QuestionAnswers = { [index in QuestionAnswerCorrectValue]: string };
 
 export type Question = {
     uid: string;
@@ -14,7 +13,7 @@ export type Question = {
     answers: QuestionAnswers,
     correct: QuestionAnswerValue,
     value: QuestionValue,
-    updatedAt: Timestamp | FieldValue;
+    updatedAt: Timestamp | FieldValue | number;
 }
 
 export type PublicQuestion = {
@@ -24,13 +23,15 @@ export type PublicQuestion = {
     value: QuestionValue
 }
 
+export type CollectedCardQuestion = {
+    answer: QuestionAnswerValue,
+    value: QuestionValue,
+    correct: boolean,
+    collectedAt: Timestamp | FieldValue
+}
+
 export type CollectedQuestions = {
-    [uid: string]: {
-        answer: QuestionAnswerValue,
-        value: QuestionValue,
-        isCorrect: boolean,
-        collectedAt: Timestamp | FieldValue
-    }
+    [uid: string]: CollectedCardQuestion
 }
 
 export type QuestionsDoc = {
