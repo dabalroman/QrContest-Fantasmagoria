@@ -31,12 +31,13 @@ ui-debug.log
 functions/firebase-debug.log
 
 # local env files
+.env
 .env.development
 .env.production
 .emulators
 .firebase
 firebase-export-*
-.env
+pubsub-debug.log
 
 # vercel
 .vercel
