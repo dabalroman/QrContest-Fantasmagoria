@@ -18,6 +18,14 @@ Previous ones in short:
 - Tailwind CSS
 - Content generated using Stable Diffusion / BlueWillow / ChatGPT.
 
+
+# Configuration
+## Local
+Copy `.env.dist` to `.env.development` and fill out the values using data from firebase console.
+
+## Production
+Copy `.env.dist` to `.env.production` and fill out the values using data from firebase console.
+
 # Run app
 First fill out the `.env.development` file from `.env.example`.
 
@@ -28,7 +36,7 @@ npm run dev
 
 ## Emulator
 ```bash
-npm install --save-dev firebase-tools
+npm install --g firebase-tools
 npm run emulators
 ```
 
@@ -41,6 +49,11 @@ npm run build:watch
 ```
 
 # Deployment to Firebase
+## Install firebase-tools
+```bash
+npm install -g firebase-tools
+```
+
 ## App
 ```bash
 firebase deploy --only hosting,firestore
