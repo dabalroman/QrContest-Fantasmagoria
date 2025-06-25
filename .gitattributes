@@ -1,0 +1,1 @@
+functions/src/seeds/**/*.ts    filter=git-crypt diff=git-crypt
