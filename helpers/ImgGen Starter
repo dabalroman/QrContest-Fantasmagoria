@@ -3,11 +3,16 @@ The goal of this conversation is creating the square images from quotes from pop
 We will go for pictures with full background. 
 The rarity pallete is clever idea, we will explore which colors to use as each rarity as background.
 I think watercolor will be fine, but we need to create some example images from prompts to grasp the final look. I think we should go for the middleground between realism and abstraction. We will use DALL-E, in chatgpt, so no need for precise settings for stable diffusion.
-
-Let's start with this quote:
-"Niebieski kwiat i kolce, niebieski kwiat i kolce... Było by prościej, gdybym nie był daltonistą!"
-I think the good object for that would be the blue flower, rose-like.
-
 Use DALLE to create the image for me, provide variations so we can establish the visual style.
 
-The style is very nice. The images should contain the object in the center, cause the image will be cropped into card format later. Create the image. If that's possible, we can use vertical, 3:4 ratio, so I don't need to crop that much. Only one object on whole image, centered, not as big.
+Template for the prompt:
+Portrait orientation, 4:3 ratio, watercolor painting of a single <OBJECT> centered in the frame at roughly 50% of the image height, rendered in a mid-realistic style with partly abstract brushstrokes. Background is full-coverage abstract color splashes with soft edges and visible watercolor paper texture. Soft lighting, gentle contrast, no extra elements or text.
+
+Each image have it's rarity value:
+- Common - Gray background
+- Rare - Blue background
+- Epic - Purple background
+- Legendary - Burst of colors including gold background
+- Mythical - Royal red background
+
+Create the image for this quote:

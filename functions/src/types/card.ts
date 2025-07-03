@@ -5,14 +5,16 @@ export enum CardTier {
     COMMON = 'common',
     RARE = 'rare',
     EPIC = 'epic',
-    LEGENDARY = 'legendary'
+    LEGENDARY = 'legendary',
+    MYTHICAL = 'mythical'
 }
 
 export enum CardTierValue {
     COMMON = 10,
     RARE = 15,
     EPIC = 20,
-    LEGENDARY = 30
+    LEGENDARY = 30,
+    MYTHICAL = 50
 }
 
 export type CardCollectedBy = {
