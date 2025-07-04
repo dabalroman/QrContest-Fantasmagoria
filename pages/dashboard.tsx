@@ -40,7 +40,7 @@ const getFantasmagoriaProgram = async (): Promise<FantasmagoriaProgramEntry[]> =
             headers: { 'content-type': 'application/json-rpc' },
             body: JSON.stringify({
                 'id': null,
-                'method': 'GetKonwent2024Program'
+                'method': 'GetKonwent2025Program'
             })
         }
     )
@@ -52,11 +52,13 @@ const getFantasmagoriaProgram = async (): Promise<FantasmagoriaProgramEntry[]> =
     ];
 
     const now = new Date();
+    
     return data.result
         .map((raw: RawFantasmagoriaProgramEntry) => FantasmagoriaProgramEntry.fromRaw(raw))
         .filter((entry: FantasmagoriaProgramEntry) => entry.dateEnd >= now)
-        .filter((entry: FantasmagoriaProgramEntry) => blacklist.every((word: string) => !entry.title.includes(word)))
+        .filter((entry: FantasmagoriaProgramEntry) => entry.title && blacklist.every((word: string) => !entry.title.includes(word)))
         .map((entry: FantasmagoriaProgramEntry) => {
+           
             const description = entry.description;
             const cutIndex = description.indexOf(' ', 400);
 
@@ -76,8 +78,8 @@ const getFantasmagoriaProgram = async (): Promise<FantasmagoriaProgramEntry[]> =
 
 const getRandomScreenType = () => {
     const screenTypeWeights = {
-        [ScreenType.FantasmagoriaSplash]: 0.05,
-        [ScreenType.QrContestSplash]: 0.07,
+        // [ScreenType.FantasmagoriaSplash]: 0.05,
+        // [ScreenType.QrContestSplash]: 0.07,
         [ScreenType.News]: 0.03,
         [ScreenType.Event]: 0.40,
         [ScreenType.Agenda]: 0.45
@@ -140,23 +142,23 @@ export default function DashboardPage () {
                     backgroundColor: currentTheme
                 }}
             >
-                {screenType === ScreenType.FantasmagoriaSplash &&
-                    <div
-                        className="w-full h-full fill bg-center bg-cover bg-red-800"
-                        style={{
-                            'backgroundImage': `url(/dashboard/splash.webp)`
-                        }}
-                    ></div>
-                }
-
-                {screenType === ScreenType.QrContestSplash &&
-                    <div
-                        className="w-full h-full fill bg-center bg-cover bg-red-800"
-                        style={{
-                            'backgroundImage': `url(/dashboard/guild-water-card.webp)`
-                        }}
-                    ></div>
-                }
+                {/*{screenType === ScreenType.FantasmagoriaSplash &&*/}
+                {/*    <div*/}
+                {/*        className="w-full h-full fill bg-center bg-cover bg-red-800"*/}
+                {/*        style={{*/}
+                {/*            'backgroundImage': `url(/dashboard/splash.webp)`*/}
+                {/*        }}*/}
+                {/*    ></div>*/}
+                {/*}*/}
+                
+                {/*{screenType === ScreenType.QrContestSplash &&*/}
+                {/*    <div*/}
+                {/*        className="w-full h-full fill bg-center bg-cover bg-red-800"*/}
+                {/*        style={{*/}
+                {/*            'backgroundImage': `url(/dashboard/guild-water-card.webp)`*/}
+                {/*        }}*/}
+                {/*    ></div>*/}
+                {/*}*/}
 
                 {screenType === ScreenType.News &&
                     <div className="w-full h-full flex flex-col justify-center p-20 font-semibold text-center">

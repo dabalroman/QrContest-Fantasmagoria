@@ -16,16 +16,16 @@ export default function AgendaScreen ({ programEntries }: { programEntries: Fant
             return null;
         }
 
-        return filteredEntries;
+        return filteredEntries.sort((a, b) => a.dateStart < b.dateStart ? -1 : 1);
     };
 
     let entriesToDisplay = getEntriesForNextHours(programEntries);
 
     if (entriesToDisplay === null) {
-        entriesToDisplay = getEntriesForNextHours(programEntries, 24);
+        entriesToDisplay = getEntriesForNextHours(programEntries, 256);
     }
 
-    entriesToDisplay = entriesToDisplay?.slice(0, 12) ?? null;
+    entriesToDisplay = entriesToDisplay?.slice(0, 15) ?? null;
 
     return (
         <div>

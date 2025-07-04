@@ -1,11 +1,12 @@
 export type RawFantasmagoriaProgramEntry = {
+    category: string,
+    date_end: string,
+    date_start: string,
+    description: string,
+    id: number,
+    location: string,
     name: string,
     title: string,
-    description: string,
-    category: string,
-    location: string,
-    date_start: string,
-    date_end: string,
 }
 
 export default class FantasmagoriaProgramEntry {
