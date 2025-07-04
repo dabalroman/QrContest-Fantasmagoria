@@ -21,7 +21,7 @@ const cardSetsSeed: CardSet[] = [
         description: '"Kolejny nieudany atak pustynnych barbarzyńców na tamę Nahr\'al" - przeczytał nagłówek z oburzeniem. Zacisnął szczęki, patrząc na towarzyszy przy stole. "Znowu próbowali. Myślą, że zdołają zniszczyć nasze dzieło, nasz cud inżynierii".'
     },
     {
-        uid: 'gildia-wody',
+        uid: 'gildia -wody',
         amountOfCards: 13,
         name: 'Gildia Wody',
         description: 'Woda dookoła Żarłacza wrzała od wybuchów, a ciemne niebo przeszywały błyskawice. Nikt nie spodziewał się, że morskie stworzenia przyjdą nam z pomocą - widziałem na własne oczy, jak Gryfony otaczały wrogie statki. Dzięki ich pomocy odnieśliśmy zwycięstwo, ale do portu wróciła tylko połowa naszej floty.'
