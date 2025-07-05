@@ -8,6 +8,7 @@ import FantasmagoriaProgramEntry, { RawFantasmagoriaProgramEntry } from '@/model
 import AgendaScreen from '@/components/dashboard/AgendaScreen';
 import EventScreen from '@/components/dashboard/EventScreen';
 import { getRandomArrayElement, getRandomArrayElementWithWeights } from '@/utils/randomArrayElement';
+import * as process from 'node:process';
 
 const cycleScreenEveryMs = 60 * 1000;
 const fetchNewDataEveryMs = 60 * 60 * 1000;
@@ -19,6 +20,14 @@ enum ScreenType {
     News,
     Agenda
 }
+
+const screenTypeWeights = {
+    // [ScreenType.FantasmagoriaSplash]: 0.05,
+    // [ScreenType.QrContestSplash]: 0.07,
+    [ScreenType.News]: 0.03,
+    [ScreenType.Event]: 0.40,
+    [ScreenType.Agenda]: 0.45
+};
 
 const colorThemes = [
     'rgba(44, 41, 67, 0.8)',
@@ -34,7 +43,7 @@ const colorThemes = [
 
 const getFantasmagoriaProgram = async (): Promise<FantasmagoriaProgramEntry[]> => {
     const data = await fetch(
-        'https://fantasmagoria.gniezno.pl/api/json-rpc/',
+        process.env.NEXT_PUBLIC_FANTASMAGORIA_API_URL ?? '',
         {
             method: 'POST',
             headers: { 'content-type': 'application/json-rpc' },
@@ -48,17 +57,18 @@ const getFantasmagoriaProgram = async (): Promise<FantasmagoriaProgramEntry[]> =
 
     const blacklist = [
         'QrContest',
-        'Przygotowanie Cosplay',
+        'Przygotowanie Cosplay'
     ];
 
     const now = new Date();
-    
+
     return data.result
         .map((raw: RawFantasmagoriaProgramEntry) => FantasmagoriaProgramEntry.fromRaw(raw))
         .filter((entry: FantasmagoriaProgramEntry) => entry.dateEnd >= now)
-        .filter((entry: FantasmagoriaProgramEntry) => entry.title && blacklist.every((word: string) => !entry.title.includes(word)))
+        .filter((entry: FantasmagoriaProgramEntry) => entry.title
+            && blacklist.every((word: string) => !entry.title.includes(word)))
         .map((entry: FantasmagoriaProgramEntry) => {
-           
+
             const description = entry.description;
             const cutIndex = description.indexOf(' ', 400);
 
@@ -77,17 +87,12 @@ const getFantasmagoriaProgram = async (): Promise<FantasmagoriaProgramEntry[]> =
 };
 
 const getRandomScreenType = () => {
-    const screenTypeWeights = {
-        // [ScreenType.FantasmagoriaSplash]: 0.05,
-        // [ScreenType.QrContestSplash]: 0.07,
-        [ScreenType.News]: 0.03,
-        [ScreenType.Event]: 0.40,
-        [ScreenType.Agenda]: 0.45
-    };
-
     return parseInt(
-        getRandomArrayElementWithWeights(Object.keys(screenTypeWeights) as string[], Object.values(screenTypeWeights)
-        ) as string ?? ScreenType.Event) as ScreenType;
+        getRandomArrayElementWithWeights(
+            Object.keys(screenTypeWeights) as string[],
+            Object.values(screenTypeWeights)
+        ) as string ?? ScreenType.Event
+    ) as ScreenType;
 };
 
 export default function DashboardPage () {
@@ -150,7 +155,7 @@ export default function DashboardPage () {
                 {/*        }}*/}
                 {/*    ></div>*/}
                 {/*}*/}
-                
+
                 {/*{screenType === ScreenType.QrContestSplash &&*/}
                 {/*    <div*/}
                 {/*        className="w-full h-full fill bg-center bg-cover bg-red-800"*/}
@@ -161,27 +166,27 @@ export default function DashboardPage () {
                 {/*}*/}
 
                 {screenType === ScreenType.News &&
-                    <div className="w-full h-full flex flex-col justify-center p-20 font-semibold text-center">
-                        <p style={{
-                            padding: '0.3em 0',
-                            fontSize: '7em',
-                            filter: 'brightness(1.4)',
-                            position: 'relative',
-                            paddingLeft: '5rem',
-                            left: '-5rem',
-                            marginBottom: '2rem',
-                            fontWeight: '800'
-                        }}>Pij wodę!</p>
-                    </div>
+                  <div className="w-full h-full flex flex-col justify-center p-20 font-semibold text-center">
+                    <p style={{
+                        padding: '0.3em 0',
+                        fontSize: '7em',
+                        filter: 'brightness(1.4)',
+                        position: 'relative',
+                        paddingLeft: '5rem',
+                        left: '-5rem',
+                        marginBottom: '2rem',
+                        fontWeight: '800'
+                    }}>Pij wodę!</p>
+                  </div>
                 }
 
                 {screenType === ScreenType.Event &&
-                    <EventScreen programEntries={programEntries} colorTheme={currentTheme}/>
+                  <EventScreen programEntries={programEntries} colorTheme={currentTheme}/>
                 }
 
 
                 {screenType === ScreenType.Agenda &&
-                    <AgendaScreen programEntries={programEntries}/>
+                  <AgendaScreen programEntries={programEntries}/>
                 }
             </div>
         </div>
