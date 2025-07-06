@@ -137,7 +137,7 @@ export default function DashboardPage () {
     return (
         <div
             className="fixed top-0 left-0 w-screen h-screen z-50 bg-center bg-cover bg-fixed bg-no-repeat"
-            style={{ backgroundImage: `url(/backgrounds/bg.webp)` }}
+            style={{ backgroundImage: `url(/backgrounds/bg-dashboard.webp)` }}
         >
             <div
                 className={'h-full w-full z-50 text-white font-montserrat'
