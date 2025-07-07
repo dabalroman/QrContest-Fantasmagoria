@@ -39,23 +39,30 @@ module.exports = {
                 'small-cards': 'repeat(auto-fit, minmax(88px, 1fr));'
             },
             colors: {
-                'panel-transparent': 'rgba(39,50,58,0.95)',
-                'panel-transparent-end': 'rgba(39,50,58,0.85)',
-                'panel-solid': 'rgba(39,50,58,1)',
+                'panel-transparent': 'rgba(217,217,217,0.3)',
+                'panel-transparent-end': 'rgba(217,217,217,0.3)',
+                'panel-solid': 'rgba(217,217,217,1)',
 
-                'text-base': '#eee',
-                'text-dim': '#bfbfbf',
-                'text-accent': '#eee',
+                'text-base': '#202020',
+                'text-dim': '#868686',
+                'text-accent': '#9D2F00',
 
-                'card-border': '#273F4F',
+                'card-border': '#868686',
 
-                'input-border': '#273F4F',
-                'input-background': '#4C6962',
+                'input-border': '#9D2F00',
+                'input-background': 'rgba(196,196,196,0.5)',
 
                 // Whole app and images
-                background: '#273F4F',
-                'navbar-background': 'rgba(26,40,51,0.95)',
-                'button-base': '#8da8b1',
+                background: '#E4D5C6',
+                'navbar-background': '#DEDEDE',
+                'button-base': 'rgba(196,196,196,0.5)',
+                'button-border': '#9D2F00',
+
+                'card-common': '#868686',
+                'card-rare': '#266592',
+                'card-epic': '#8D30C2',
+                'card-legendary': '#E9B119',
+                'card-mythical': '#A91103',
 
                 'guild-desert': '#be8d23',
                 'guild-void': '#7036b6',
@@ -111,7 +118,22 @@ module.exports = {
         'text-guild-desert',
         'text-guild-void',
         'text-guild-water',
-        'text-guild-steel'
+        'text-guild-steel',
+        'border-card-common',
+        'border-card-rare',
+        'border-card-epic',
+        'border-card-legendary',
+        'border-card-mythical',
+        'bg-card-common',
+        'bg-card-rare',
+        'bg-card-epic',
+        'bg-card-legendary',
+        'bg-card-mythical',
+        'text-card-common',
+        'text-card-rare',
+        'text-card-epic',
+        'text-card-legendary',
+        'text-card-mythical',
     ],
     plugins: []
 };

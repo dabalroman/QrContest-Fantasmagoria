@@ -43,12 +43,12 @@ export default function Home () {
         <main>
             <Metatags/>
             <div
-                className="min-h-screen relative grid items-center justify-center"
+                className="min-h-screen relative grid items-center justify-center text-text-accent"
                 style={{ gridTemplateRows: '100px 1fr 100px' }}
                 id="top"
             >
                 <div className="p-4 pt-16 max-w-xl">
-                    <img src="/fantasmagoria-logo.svg" className="text-text-base" alt="Fantasmagoria Logo"/>
+                    <img src="/fantasmagoria-logo.svg" alt="Fantasmagoria Logo"/>
                 </div>
                 <div className={
                     'text-center flex flex-col justify-center items-center h-64 p-4'

@@ -15,7 +15,7 @@ export default function EventScreen ({
 
     const getRandomEntryFromNextHours = (
         allEntries: FantasmagoriaProgramEntry[],
-        hoursToOffset = 2
+        hoursToOffset = 4
     ): FantasmagoriaProgramEntry | null => {
         const now = new Date();
         const nextHours = new Date((new Date()).getTime() + hoursToOffset * 60 * 60 * 1000);
