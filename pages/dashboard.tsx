@@ -8,7 +8,6 @@ import FantasmagoriaProgramEntry, { RawFantasmagoriaProgramEntry } from '@/model
 import AgendaScreen from '@/components/dashboard/AgendaScreen';
 import EventScreen from '@/components/dashboard/EventScreen';
 import { getRandomArrayElement, getRandomArrayElementWithWeights } from '@/utils/randomArrayElement';
-import * as process from 'node:process';
 
 const cycleScreenEveryMs = 60 * 1000;
 const fetchNewDataEveryMs = 60 * 60 * 1000;
@@ -43,7 +42,7 @@ const colorThemes = [
 
 const getFantasmagoriaProgram = async (): Promise<FantasmagoriaProgramEntry[]> => {
     const data = await fetch(
-        process.env.NEXT_PUBLIC_FANTASMAGORIA_API_URL ?? '',
+        process.env.NEXT_PUBLIC_DASHBOARD_API_URL ?? '',
         {
             method: 'POST',
             headers: { 'content-type': 'application/json-rpc' },
