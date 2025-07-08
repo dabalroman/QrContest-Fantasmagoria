@@ -19,18 +19,18 @@ export default function NavbarSuperButton ({
     onlyCenter?: boolean
 }) {
     const className =
-        'p-4 text-4xl text-center border-4 rounded-full shadow-panel bg-button-gradient bottom-2 h-24 w-24'
+        'p-4 text-4xl text-center rounded-full shadow-panel bg-text-accent bottom-2 h-24 w-24'
         + ' absolute flex justify-center content-center items-center'
         + (!disabled
-                ? ' cursor-auto text-button-base border-button-base'
-                : ' cursor-not-allowed text-gray-600 border-gray-600'
+                ? ' cursor-auto text-text-light'
+                : ' cursor-not-allowed text-gray-600'
         )
         + (animate ? ' animate-bounce' : '');
 
     const style = {
         background: (!disabled
-            ? 'bg-button-gradient'
-            : 'bg-button-gradient-disabled'),
+            ? 'bg-button-accent'
+            : 'bg-button-dim'),
         bottom: (onlyCenter ? '-3rem' : '0'),
     };
 

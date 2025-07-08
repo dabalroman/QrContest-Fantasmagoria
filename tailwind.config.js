@@ -39,23 +39,25 @@ module.exports = {
                 'small-cards': 'repeat(auto-fit, minmax(88px, 1fr));'
             },
             colors: {
-                'panel-transparent': 'rgba(217,217,217,0.3)',
-                'panel-transparent-end': 'rgba(217,217,217,0.3)',
-                'panel-solid': 'rgba(217,217,217,1)',
+                'panel-transparent': 'var(--color-panel-bg)',
+                'panel-transparent-end': 'var(--color-panel-bg)',
 
-                'text-base': '#202020',
-                'text-dim': '#5c5c5c',
+                'text-light': 'var(--color-text-light)',
+                'text-base': 'var(--color-text-dark)',
+                'text-dim': 'var(--color-dim)',
                 'text-accent': 'var(--color-primary)',
 
                 'card-border': '#868686',
 
                 'input-border': 'var(--color-primary)',
-                'input-background': 'rgba(196,196,196,0.5)',
+                'input-background': 'var(--color-button-bg)',
 
                 // Whole app and images
                 background: '#E4D5C6',
                 'navbar-background': '#DEDEDE',
-                'button-base': 'rgba(196,196,196,0.5)',
+                'button-base': 'var(--color-button-bg)',
+                'button-accent': 'var(--color-primary)',
+                'button-dim': 'var(--color-dim)',
                 'button-border': 'var(--color-primary)',
 
                 'card-common': 'var(--color-common)',

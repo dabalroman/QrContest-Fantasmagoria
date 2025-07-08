@@ -6,6 +6,13 @@
     color-scheme: light only;
     
     --color-primary: #9D2F00;
+    --color-dim: #5c5c5c;
+    --color-text-light: #ffffff;
+    --color-text-dark: #202020;
+    
+    --color-panel-bg: rgba(217,217,217,0.3);
+    --color-button-bg: rgba(196,196,196,0.5);
+    
     --color-common: #868686;
     --color-rare: #266592;
     --color-epic: #8D30C2;
