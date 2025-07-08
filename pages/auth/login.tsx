@@ -1,18 +1,18 @@
-import { signInWithPopup } from '@firebase/auth';
-import { useContext, useEffect, useState } from 'react';
+import {signInWithPopup} from '@firebase/auth';
+import {useContext, useEffect, useState} from 'react';
 import Metatags from '@/components/Metatags';
-import { UserContext, UserContextType } from '@/utils/context';
-import { auth, googleAuthProvider } from '@/utils/firebase';
+import {UserContext, UserContextType} from '@/utils/context';
+import {auth, googleAuthProvider} from '@/utils/firebase';
 import toast from 'react-hot-toast';
 import Panel from '@/components/Panel';
 import ScreenTitle from '@/components/ScreenTitle';
 import Button from '@/components/Button';
-import { Page } from '@/Enum/Page';
+import {Page} from '@/Enum/Page';
 import useDynamicNavbar from '@/hooks/useDynamicNavbar';
-import { faArrowLeft, faEnvelope } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {faArrowLeft, faEnvelope} from '@fortawesome/free-solid-svg-icons';
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import LinkButton from '@/components/LinkButton';
-import { useRouter } from 'next/router';
+import {useRouter} from 'next/router';
 
 export default function LoginPage () {
     const router = useRouter();
@@ -60,7 +60,7 @@ export default function LoginPage () {
             <Metatags title="Logowanie"/>
             <ScreenTitle>{!(authUser && userReady) ? 'Zaloguj' : 'Wyloguj'}</ScreenTitle>
 
-            <Panel loading={loading}>
+            <Panel loading={loading} title={'Logowanie'}>
                 <p className="pb-4">Wybierz metodę logowania:</p>
                 <Button onClick={signInWithGoogle} className="w-full mb-4">
                     <img src={'/google.png'} alt="Google logo" className="inline-block w-6 mr-2 relative bottom-0.5"/>

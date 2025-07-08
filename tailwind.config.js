@@ -44,25 +44,25 @@ module.exports = {
                 'panel-solid': 'rgba(217,217,217,1)',
 
                 'text-base': '#202020',
-                'text-dim': '#868686',
-                'text-accent': '#9D2F00',
+                'text-dim': '#5c5c5c',
+                'text-accent': 'var(--color-primary)',
 
                 'card-border': '#868686',
 
-                'input-border': '#9D2F00',
+                'input-border': 'var(--color-primary)',
                 'input-background': 'rgba(196,196,196,0.5)',
 
                 // Whole app and images
                 background: '#E4D5C6',
                 'navbar-background': '#DEDEDE',
                 'button-base': 'rgba(196,196,196,0.5)',
-                'button-border': '#9D2F00',
+                'button-border': 'var(--color-primary)',
 
-                'card-common': '#868686',
-                'card-rare': '#266592',
-                'card-epic': '#8D30C2',
-                'card-legendary': '#E9B119',
-                'card-mythical': '#A91103',
+                'card-common': 'var(--color-common)',
+                'card-rare': 'var(--color-rare)',
+                'card-epic': 'var(--color-epic)',
+                'card-legendary': 'var(--color-legendary)',
+                'card-mythical': 'var(--color-mythical)',
 
                 'guild-desert': '#be8d23',
                 'guild-void': '#7036b6',

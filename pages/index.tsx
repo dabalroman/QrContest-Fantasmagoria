@@ -15,8 +15,8 @@ export default function Home() {
         ? <LinkButton href={Page.COLLECT} className="w-full my-2">Przejdź do gry</LinkButton>
         : (
             <div>
-                <LinkButton href={Page.LOGIN} className="w-full my-2">Zaloguj</LinkButton>
-                <LinkButton href={Page.REGISTER} className="w-full my-2">Zarejestruj</LinkButton>
+                <LinkButton href={Page.LOGIN} className="w-full my-2">Zaloguj na konto</LinkButton>
+                <LinkButton href={Page.REGISTER} className="w-full my-2">Dołącz do konkursu</LinkButton>
             </div>
         );
 

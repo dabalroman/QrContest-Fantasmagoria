@@ -50,10 +50,10 @@ export default function RegisterPage () {
 
     return (
         <main className="grid grid-rows-layout items-center min-h-screen p-4">
-            <Metatags title="Rejestracja"/>
+            <Metatags title="Dołącz do konkursu"/>
             <ScreenTitle>Rejestracja</ScreenTitle>
 
-            <Panel title="Zarejestruj się" loading={loading}>
+            <Panel title="Dołącz do konkursu" loading={loading}>
                 <p className="pb-4">Wybierz metodę rejestracji:</p>
                 <Button onClick={signInWithGoogle} className="w-full mb-4">
                     <img src={'/google.png'} alt="Google logo" className="inline-block w-6 mr-2 relative bottom-0.5"/>
@@ -64,7 +64,7 @@ export default function RegisterPage () {
                     Adres Email
                 </LinkButton>
                 <p className='text-center mt-4'>Potwierdzenie adresu email nie jest wymagane.</p>
-                <p className="mt-2 text-center text-sm">Biorąc udział w konkursie akceptujesz warunki regulaminu
+                <p className="mt-2 text-center text-sm text-text-dim">Biorąc udział w konkursie akceptujesz warunki regulaminu
                     uczestnictwa.</p>
             </Panel>
         </main>

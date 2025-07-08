@@ -10,19 +10,19 @@ export enum ButtonState {
 
 const stateToLookMap = {
     [ButtonState.DISABLED]: {
-        class: 'border-gray-600 bg-button-gradient'
+        class: 'border-gray-600 text-text-dim'
     },
     [ButtonState.ENABLED]: {
-        class: 'border-button-base bg-button-gradient'
+        class: 'border-button-base'
     },
     [ButtonState.PENDING]: {
-        class: 'border-yellow-500 bg-button-gradient'
+        class: 'border-yellow-500 bg-yellow-100'
     },
     [ButtonState.CORRECT]: {
-        class: ' border-lime-400 bg-button-gradient'
+        class: ' border-lime-400 bg-lime-100'
     },
     [ButtonState.INCORRECT]: {
-        class: ' border-red-600 bg-button-gradient'
+        class: ' border-red-600 bg-red-100'
     }
 };
 
@@ -44,7 +44,8 @@ export default function Button ({
     return (
         <button
             className={
-                'p-2 block text-center text-text-base border-4 rounded-xl shadow-panel text-lg'
+                'p-2 block text-center text-text-accent border-2 rounded-full text-lg font-semibold'
+                + ' bg-input-background border-button-border backdrop-blur-sm'
                 + ' ' + stateToLookMap[state].class
                 + ' ' + className
             }
