@@ -9,6 +9,7 @@ export type NavbarConfig = {
     icon: IconProp,
     onClick: (() => void) | null,
     href: Page | string | null,
+    disabled: boolean,
     disabledCenter: boolean,
     disabledSides: boolean,
     animate: boolean,
@@ -17,6 +18,10 @@ export type NavbarConfig = {
 }
 
 export default function Navbar ({ navbarConfig }: { navbarConfig: NavbarConfig }) {
+    if (navbarConfig.disabled) {
+        return null;
+    }
+    
     if (navbarConfig.onlyCenter) {
         return (
             <div

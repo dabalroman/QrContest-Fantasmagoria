@@ -11,14 +11,14 @@ export default function Panel ({
     return (
         <div
             className={
-                'p-4 rounded-md shadow-panel'
-                + ' bg-gradient-to-b from-panel-transparent to-panel-transparent-end relative'
+                'p-4 rounded-md shadow-panel '
+                + 'bg-panel-transparent relative backdrop-blur-md '
                 + (margin ? ' my-4' : '')
                 + ' ' + className
             }
         >
             <div className={loading ? 'blur-sm pointer-events-none' : ''}>
-                {title && <h2 className="text-3xl font-fancy-capitals pb-2">{title}</h2>}
+                {title && <h2 className="text-3xl font-base tracking-wider font-semibold pb-2 text-left text-text-accent">{title}</h2>}
                 {children}
             </div>
             {loading && <Loader/>}

@@ -4,6 +4,8 @@
 
 :root {
     color-scheme: light only;
+    
+    --color-primary: #9D2F00;
 }
 
 * {

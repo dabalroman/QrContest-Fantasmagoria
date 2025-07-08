@@ -16,7 +16,7 @@ module.exports = {
                 serif: ['var(--font-spectral)'],
                 fancy: ['var(--font-imFellDoublePica)'],
                 'fancy-capitals': ['var(--font-imFellDoublePicaSC)'],
-                montserrat: ['var(--font-montserrat)']
+                base: ['var(--font-montserrat)']
             },
             backgroundImage: {
                 'image-default': 'url(\'/backgrounds/bg.webp\')',

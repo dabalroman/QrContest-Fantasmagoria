@@ -1,34 +1,15 @@
 import Metatags from '@/components/Metatags';
-import React, { useContext, useEffect, useState } from 'react';
+import React, {useContext} from 'react';
 import useDynamicNavbar from '@/hooks/useDynamicNavbar';
-import { faArrowDown, faArrowUp } from '@fortawesome/free-solid-svg-icons';
 import Panel from '@/components/Panel';
 import LinkButton from '@/components/LinkButton';
-import { Page } from '@/Enum/Page';
-import { UserContext, UserContextType } from '@/utils/context';
+import {Page} from '@/Enum/Page';
+import {UserContext, UserContextType} from '@/utils/context';
 
-export default function Home () {
-    const [isTopOfThePage, setIsTopOfThePage] = useState<boolean>(true);
+export default function Home() {
+    const {user} = useContext<UserContextType>(UserContext);
 
-    const { user } = useContext<UserContextType>(UserContext);
-
-    useEffect(() => {
-        const handleScroll = () => {
-            setIsTopOfThePage((document.body.scrollTop || document.documentElement.scrollTop) <= 100);
-        };
-
-        window.addEventListener('scroll', handleScroll, { passive: true });
-
-        return () => {
-            window.removeEventListener('scroll', handleScroll);
-        };
-    });
-
-    useDynamicNavbar({
-        onlyCenter: true,
-        icon: isTopOfThePage ? faArrowDown : faArrowUp,
-        href: isTopOfThePage ? '#readme' : '#top'
-    });
+    useDynamicNavbar({disabled: true});
 
     const actionButton = user
         ? <LinkButton href={Page.COLLECT} className="w-full my-2">Przejdź do gry</LinkButton>
@@ -40,38 +21,38 @@ export default function Home () {
         );
 
     return (
-        <main>
+        <main className='w-full'>
             <Metatags/>
             <div
-                className="min-h-screen relative grid items-center justify-center text-text-accent"
-                style={{ gridTemplateRows: '100px 1fr 100px' }}
+                className="grid items-center justify-center text-text-accent w-full"
+                style={{gridTemplateRows: '100px 1fr 200px', minHeight: '80vh'}}
                 id="top"
             >
-                <div className="p-4 pt-16 max-w-xl">
+                <div className="p-4 max-w-xl">
                     <img src="/fantasmagoria-logo.svg" alt="Fantasmagoria Logo"/>
                 </div>
                 <div className={
-                    'text-center flex flex-col justify-center items-center h-64 p-4'
+                    'text-center flex flex-col justify-center items-center p-4'
                 }>
-                    <h1 className="text-5xl font-fancy-capitals p-1"
-                        style={{ textShadow: '0 4px 4px rgba(0,0,0,0.25)' }}
+                    <h1 className="text-6xl font-fancy-capitals p-1"
+                        style={{textShadow: '0 4px 4px rgba(0,0,0,0.25)'}}
                     >
                         QrContest
                     </h1>
-                    <h2 className="text-2xl font-fancy pb-20" style={{ textShadow: '0 4px 4px rgba(0,0,0,0.25)' }}>
+                    <h2 className="text-3xl font-fancy" style={{textShadow: '0 4px 4px rgba(0,0,0,0.25)'}}>
                         Zbierz je wszystkie!
                     </h2>
                 </div>
-                <div className="absolute bottom-32 w-full p-4">
+                <div className="w-full p-4">
                     {actionButton}
                 </div>
             </div>
             <div
                 className="min-h-screen relative grid items-center justify-center p-4"
-                style={{ gridTemplateRows: '1fr' }}
+                style={{gridTemplateRows: '1fr'}}
                 id="readme"
             >
-                <Panel title="Czym jest QrContest?" className="text-justify">
+                <Panel title="Co to jest QrContest?" className="text-justify">
                     <p className="pt-1">QrContest to konkurs, który polega na szukaniu i skanowaniu kodów QR
                         ukrytych na terenie konwentu. Za każdą dodaną do kolekcji kartę otrzymasz punkty, a im więcej
                         punktów zgromadzisz, tym wyżej znajdziesz się w rankingu. Miejsce na podium gwarantuje
@@ -85,18 +66,20 @@ export default function Home () {
                 </Panel>
 
                 <Panel title="Karty">
-                    <p className="mb-2">
-                        Każdy zebrany kod pozwoli Ci na odkrycie karty kolekcjonerskiej.
-                        Karty te przedstawią Ci historię krainy Erindar. Czy uda Ci się zebrać je wszystkie?
+                    <p className="mb-4">
+                        W tym roku Twoim celem są znane cytaty! Każda karta to para unikalnej grafiki oraz genialnego
+                        tekstu, który odbił się szerokim echem w popkulturze. W Twojej kolekcji znajdziesz takie
+                        klasyki jak "Niebieski kwiat i kolce", "Jak to jest być skrybą?" czy "I'm groot". Do 
+                        znalezienia są aż 64 karty, więc pora ruszyć na łowy!
                     </p>
 
                     <div className="grid grid-cols-3 gap-4 justify-items-center">
                         <div
                             className={
-                                'border-4 border-card-border rounded-xl bg-background bg-center bg-cover shadow-card'
+                                'border-4 border-card-common rounded-xl bg-background bg-center bg-cover shadow-card'
                             }
                             style={{
-                                'backgroundImage': `url(/cards-thumbnails/erindar.webp)`,
+                                'backgroundImage': `url(/cards-thumbnails/luke-iam-your-thumbnail.webp)`,
                                 'height': '8.25rem',
                                 'aspectRatio': '2/3'
                             }}
@@ -104,10 +87,10 @@ export default function Home () {
                         </div>
                         <div
                             className={
-                                'border-4 border-card-border rounded-xl bg-background bg-center bg-cover shadow-card'
+                                'border-4 border-card-rare rounded-xl bg-background bg-center bg-cover shadow-card'
                             }
                             style={{
-                                'backgroundImage': `url(/cards-thumbnails/piaskowy-smok.webp)`,
+                                'backgroundImage': `url(/cards-thumbnails/the-one-piece-thumbnail.webp)`,
                                 'height': '8.25rem',
                                 'aspectRatio': '2/3',
                             }}
@@ -115,10 +98,10 @@ export default function Home () {
                         </div>
                         <div
                             className={
-                                'border-4 border-card-border rounded-xl bg-background bg-center bg-cover shadow-card'
+                                'border-4 border-card-epic rounded-xl bg-background bg-center bg-cover shadow-card'
                             }
                             style={{
-                                'backgroundImage': `url(/cards-thumbnails/wielki-zolw-pustynny.webp)`,
+                                'backgroundImage': `url(/cards-thumbnails/potezna-wichura-lamiac-thumbnail.webp)`,
                                 'height': '8.25rem',
                                 'aspectRatio': '2/3',
                             }}
@@ -128,20 +111,23 @@ export default function Home () {
                 </Panel>
 
                 <Panel title="Nagrody i rundy" className='mb-12'>
-                    <p className="text-center text-lg">
+                    <p className="text-justify">
+                        W każdym konkursie musi być nagroda - a w QrContest mamy ich aż sześć!
+                    </p>
+                    <p className="mt-4 text-center text-lg">
                         1. miejsce – 50 fantów <br/>
                         2. miejsce – 35 fantów <br/>
                         3. miejsce – 20 fantów <br/>
                     </p>
-                    <p className="mt-2 text-justify">
-                        Konkurs podzielony jest na dwie rundy. Daty rozpoczęcia i zakończenia każdej z nich znajdziesz
-                        w zakładce &quot;Ranking&quot;. Punkty z rundy pierwszej przechodzą do rundy drugiej,&nbsp;
-                        <span className={'underline'}>masz dwie szanse na wygraną!</span>&nbsp;
-                        Każda runda to troje zwycięzców.
+                    <p className="mt-4 text-justify">
+                        Konkurs podzielony jest na dwie rundy. Punkty z rundy pierwszej przechodzą do rundy
+                        drugiej,&nbsp;
+                        co oznacza, że <span className={'underline'}>masz dwie szanse na wygraną!</span>&nbsp;
+                        Każda z tur wyłoni troje zwycięzców.
                     </p>
-                    <p className="mt-2 text-justify">
+                    <p className="mt-4 text-justify">
                         Zwycięzców zapraszamy po odbiór nagród do punktu informacyjnego konwentu w momencie
-                        zakończenia trwającej rundy.
+                        zakończenia rundy.
                     </p>
                 </Panel>
             </div>

@@ -139,7 +139,7 @@ export default function DashboardPage () {
             style={{ backgroundImage: `url(/backgrounds/bg-dashboard.webp)` }}
         >
             <div
-                className={'h-full w-full z-50 text-white font-montserrat'
+                className={'h-full w-full z-50 text-white font-base'
                     + ' transition-colors duration-1000'}
                 style={{
                     fontSize: `0.8em`,

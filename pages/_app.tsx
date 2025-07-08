@@ -80,7 +80,7 @@ export default function App ({
                             className={
                                 `${spectral.variable} ${imFellDoublePica.variable} ${imFellDoublePicaSC.variable} `
                                 + `${montserrat.variable} text-text-base `
-                                + `font-serif bg-image-default bg-fixed min-h-screen bg-image-mobile-position`
+                                + `font-base bg-image-default bg-fixed min-h-screen bg-image-mobile-position`
                             }
                         >
                             <Navbar navbarConfig={navbarCenterAction}/>
