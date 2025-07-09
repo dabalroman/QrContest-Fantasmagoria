@@ -6,8 +6,6 @@ import CardSet from '@/models/CardSet';
 import CardSmallHiddenComponent from '@/components/CardSmallHiddenComponent';
 import { CardTier } from '@/Enum/CardTier';
 
-type CardCollectionDisplay = Array<Card | CardTier>;
-
 export default function CardsSetComponent ({
     cardSet,
     cards
@@ -16,20 +14,20 @@ export default function CardsSetComponent ({
 
     return (
         <Panel title={cardSet.name} className={'relative'}>
-            <div className='absolute -top-6 h-10' id={cardSet.uid}></div>
+            <div className="absolute -top-6 h-10" id={cardSet.uid}></div>
             <p className="text-justify">{cardSet.description}</p>
             <div className="grid grid-cols-small-cards gap-4 justify-items-center py-4">
                 {
                     Object.entries(cardSet.cardTiers)
                         .reverse()
-                        .map(([ tier, amount ]) => {
+                        .map(([tier, amount]) => {
                             const collectedCardsWithTier = cardsInSet.filter((card: Card) => card.tier === tier);
 
                             const collected = collectedCardsWithTier.map((card: Card) => (
                                 <Link href={`/collection/${card.uid}`} key={card.uid}>
                                     <CardSmallComponent card={card}/>
                                 </Link>
-                            ))
+                            ));
 
                             const notCollected = Array(amount - collectedCardsWithTier.length)
                                 .fill(0)

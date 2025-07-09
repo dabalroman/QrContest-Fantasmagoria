@@ -103,15 +103,15 @@ export default function LookForCodeView ({
 
     return (
         <div>
-            <Panel title='Hej, zanim zaczniesz...'>
-                <p className='mb-1 text-justify'>
+            <Panel title="Hej, zanim zaczniesz..." closeable={true} closeableUuid={'look-for-code-view-intro'}>
+                <p className="mb-1 text-justify">
                     Kodów nie ukryliśmy w salach prelekcyjnych i zajęciowych. Każdy z nich jest w Twoim zasięgu.
                     Staraj się nie przeszkadzać innym konwentowiczom podczas swoich poszukiwań.
                 </p>
             </Panel>
 
             <Panel title="Wpisz kod karty" loading={loading}>
-            <p className="pb-4">Tutaj możesz wpisać znaleziony kod.</p>
+                <p className="pb-4">Tutaj możesz wpisać znaleziony kod.</p>
 
                 <form onSubmit={handleSubmit(collectCode)}>
                     <input type="text" placeholder="ABCDEFGHIJ" maxLength={10}

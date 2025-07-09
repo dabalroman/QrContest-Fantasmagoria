@@ -21,7 +21,7 @@ export default function Navbar ({ navbarConfig }: { navbarConfig: NavbarConfig }
     if (navbarConfig.disabled) {
         return null;
     }
-    
+
     if (navbarConfig.onlyCenter) {
         return (
             <div
@@ -46,6 +46,10 @@ export default function Navbar ({ navbarConfig }: { navbarConfig: NavbarConfig }
                 + ' bg-navbar-background fixed bottom-0 w-screen z-50'}
             style={{ gridTemplateColumns: 'repeat(4, 1fr) 120px' }}
         >
+            <NavbarButton
+                href={Page.ACCOUNT} icon={faUser}
+                disabled={navbarConfig.disabledSides}
+            />
             <div className="relative">
                 <NavbarButton
                     href={Page.RANKING}
@@ -66,10 +70,6 @@ export default function Navbar ({ navbarConfig }: { navbarConfig: NavbarConfig }
                     </div>
                 }
             </div>
-            <NavbarButton
-                href={Page.ACCOUNT} icon={faUser}
-                disabled={navbarConfig.disabledSides}
-            />
             <NavbarButton
                 href={Page.COLLECTION} icon={faImages}
                 disabled={navbarConfig.disabledSides}
