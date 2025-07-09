@@ -115,9 +115,9 @@ export default function LookForCodeView ({
 
                 <form onSubmit={handleSubmit(collectCode)}>
                     <input type="text" placeholder="ABCDEFGHIJ" maxLength={10}
-                           className="rounded block w-full p-1 border-2 border-input-border text-center
+                           className="rounded-xl block w-full p-1 border-2 border-input-border text-center
                                bg-input-background text-text-accent uppercase text-2xl shadow-inner-input
-                               tracking-wider"
+                               tracking-wider font-semibold"
                            {...register(
                                'code',
                                {

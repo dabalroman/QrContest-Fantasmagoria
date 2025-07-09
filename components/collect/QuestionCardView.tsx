@@ -1,22 +1,22 @@
 import Card from '@/models/Card';
 import Question from '@/models/Question';
-import Button, { ButtonState } from '@/components/Button';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCheck, faDiceD6, faQuestion } from '@fortawesome/free-solid-svg-icons';
+import Button, {ButtonState} from '@/components/Button';
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
+import {faCheck, faDiceD6, faQuestion} from '@fortawesome/free-solid-svg-icons';
 import CardSmallComponent from '@/components/CardSmallComponent';
-import { useState } from 'react';
-import { answerQuestionFunction } from '@/utils/functions';
-import { QuestionAnswerValue } from '@/functions/src/types/question';
+import {useState} from 'react';
+import {answerQuestionFunction} from '@/utils/functions';
+import {QuestionAnswerValue} from '@/functions/src/types/question';
 import useDynamicNavbar from '@/hooks/useDynamicNavbar';
-import { Page } from '@/Enum/Page';
+import {Page} from '@/Enum/Page';
 import Loader from '@/components/Loader';
 
-export default function QuestionCardView ({
-    card,
-    question,
-    onAnswer,
-    onError
-}: {
+export default function QuestionCardView({
+                                             card,
+                                             question,
+                                             onAnswer,
+                                             onError
+                                         }: {
     card: Card,
     question: Question,
     onAnswer: (correct: boolean) => void,
@@ -50,7 +50,7 @@ export default function QuestionCardView ({
 
         answerQuestionFunction({
             uid: question.uid,
-            answer: userAnswer
+            answer: userAnswer as string
         })
             .then((result) => {
                 setLoading(false);
@@ -63,18 +63,20 @@ export default function QuestionCardView ({
             });
     };
 
+    const cardColorScheme = 'card-' + card.tier;
+
     return (
         <div className="relative h-full flex flex-col">
             <div
                 className={
-                    'border-8 border-card-border rounded-3xl shadow-panel top-3'
-                    + ' bg-gradient-to-b from-panel-transparent to-panel-transparent-end relative'
+                    'border-8 rounded-3xl shadow-panel top-3'
+                    + ' bg-panel-transparent relative'
+                    + ` border-${cardColorScheme}`
+                    + ` theme-${card.tier}`
                     + ' '
                 }
                 style={{
                     'minHeight': '200px',
-                    // 'maxHeight': '80vh',
-                    // 'aspectRatio': '2/3',
                     'objectFit': 'contain',
                     'overflow': 'scroll',
                     'transformStyle': 'preserve-3d',
@@ -86,15 +88,17 @@ export default function QuestionCardView ({
                     top: '-4px',
                     left: '-4px'
                 }}>
-                    <CardSmallComponent card={card} className="border-4 rounded-tl-3xl"/>
+                    <CardSmallComponent
+                        card={card}
+                        className="border-b-8 border-r-8 rounded-tl-3xl rounded-tr-none rounded-bl-none"
+                    />
                 </div>
                 <div
-                    className="bg-card-border text-text-accent text-3xl font-fancy-capitals p-4 pl-24
-                    flex justify-between"
+                    className={`bg-${cardColorScheme}` + " text-text-light text-3xl font-semibold p-4 pl-24 flex justify-between"}
                 >
                     <span>Wyzwanie</span>
                     <span>
-                     <FontAwesomeIcon icon={faDiceD6} size="xs" className="relative top-1"/> {question.value}
+                     <FontAwesomeIcon icon={faDiceD6} size="sm"/> {question.value}
                     </span>
                 </div>
                 <div className="p-4 mt-20">

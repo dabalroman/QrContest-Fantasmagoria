@@ -19,13 +19,13 @@ export default function NavbarSuperButton ({
     onlyCenter?: boolean
 }) {
     const className =
-        'p-4 text-4xl text-center rounded-full shadow-panel bg-text-accent bottom-2 h-24 w-24'
-        + ' absolute flex justify-center content-center items-center'
+        'p-4 text-4xl text-center rounded-full shadow-panel bg-text-accent h-24 w-24'
+        + ' absolute flex justify-center content-center items-center mb-3'
         + (!disabled
                 ? ' cursor-auto text-text-light'
                 : ' cursor-not-allowed text-gray-600'
         )
-        + (animate ? ' animate-bounce' : '');
+        + (animate ? ' animate-pulseSize' : '');
 
     const style = {
         background: (!disabled

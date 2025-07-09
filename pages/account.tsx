@@ -86,7 +86,7 @@ export default function AccountPage () {
             <Metatags title="Profil"/>
             <div>
                 <Panel title={user.username ?? '...'} className="text-center">
-                    <div className="flex place-content-around text-4xl">
+                    <div className="flex place-content-around text-4xl text-text-accent p-4">
                         <div>
                             <FontAwesomeIcon className="px-1" icon={faImagePortrait} size="sm"/>&nbsp;
                             {user?.amountOfCollectedCards}

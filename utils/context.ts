@@ -1,12 +1,13 @@
-import { Context, createContext } from 'react';
+import {Context, createContext, ReactNode, useState} from 'react';
 import User from '@/models/User';
-import { User as FirebaseUser } from '@firebase/auth';
+import {User as FirebaseUser} from '@firebase/auth';
 import CollectionCache from '@/models/CollectionCache';
 import Card from '@/models/Card';
 import CardSet from '@/models/CardSet';
-import { Page } from '@/Enum/Page';
-import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
-import { NavbarConfig } from '@/components/Navbar/Navbar';
+import {Page} from '@/Enum/Page';
+import {faMagnifyingGlass} from '@fortawesome/free-solid-svg-icons';
+import {NavbarConfig} from '@/components/Navbar/Navbar';
+import {AppTheme} from "@/Enum/AppTheme";
 
 export type AuthUser = FirebaseUser;
 
@@ -39,9 +40,11 @@ export interface CardsCacheContextType {
 // @ts-ignore
 export const CardsCacheContext: Context<CardsCacheContextType> = createContext({
     cards: null,
-    setCards: () => {},
+    setCards: () => {
+    },
     cardSets: null,
-    setCardSets: () => {}
+    setCardSets: () => {
+    }
 });
 
 // ---- NAVBAR ----
@@ -65,5 +68,20 @@ export interface NavbarConfigContextType {
 // @ts-ignore
 export const NavbarConfigContext: Context<NavbarConfigContextType> = createContext({
     navbarConfig: defaultNavbarConfig,
-    setNavbarCenterAction: () => {}
+    setNavbarCenterAction: () => {
+    }
+});
+
+// ---- THEME ----
+export type Theme = AppTheme | null;
+
+export interface ThemeContextType {
+    theme: Theme;
+    setTheme: (theme: Theme) => void;
+}
+
+export const ThemeContext: Context<ThemeContextType> = createContext<ThemeContextType>({
+    theme: null,
+    setTheme: () => {
+    }
 });

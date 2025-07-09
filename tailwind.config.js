@@ -40,7 +40,10 @@ module.exports = {
             },
             colors: {
                 'panel-transparent': 'var(--color-panel-bg)',
-                'panel-transparent-end': 'var(--color-panel-bg)',
+                
+                'overlay-start': 'rgba(217,217,217,1)',
+                'overlay-via': 'rgba(217,217,217,0.8)',
+                'overlay-end': 'rgba(217,217,217,0)',
 
                 'text-light': 'var(--color-text-light)',
                 'text-base': 'var(--color-text-dark)',
@@ -101,10 +104,22 @@ module.exports = {
                         filter: 'brightness(1)'
                     }
                 },
+                pulseSize: {
+                    '0%': {
+                        transform: 'scale(1)',
+                    },
+                    '50%': {
+                        transform: 'scale(1.05)',
+                    },
+                    '100%': {
+                        transform: 'scale(1.0)'
+                    }
+                }
             },
             animation: {
                 'pointsAdded': 'pointsAdded 4s ease-in-out 0s 1 normal forwards',
                 'flash': 'flash 0.4s ease-out 0s 1 normal forwards',
+                'pulseSize': 'pulseSize 1s ease-in-out 0s infinite normal forwards',
             }
         }
     },
@@ -131,6 +146,11 @@ module.exports = {
         'bg-card-epic',
         'bg-card-legendary',
         'bg-card-mythical',
+        'ring-card-common',
+        'ring-card-rare',
+        'ring-card-epic',
+        'ring-card-legendary',
+        'ring-card-mythical',
         'text-card-common',
         'text-card-rare',
         'text-card-epic',

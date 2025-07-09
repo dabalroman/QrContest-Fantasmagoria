@@ -53,7 +53,7 @@ export default function ScoreboardPage ({}) {
             <ScreenTitle>Ranking</ScreenTitle>
             <div>
                 <Panel title={user?.username ?? '...'} loading={loading} className="text-center">
-                    <div className="flex place-content-around text-4xl">
+                    <div className="flex place-content-around text-4xl text-text-accent p-4">
                         <div>
                             <FontAwesomeIcon className="px-1" icon={faImagePortrait} size="sm"/>&nbsp;
                             {user?.amountOfCollectedCards}
@@ -63,19 +63,18 @@ export default function ScoreboardPage ({}) {
 
                     {!user?.winnerInRound && (
                         currentUserPlace !== -1
-                            ? <p className="mt-1">Jesteś na {currentUserPlace + 1}. miejscu w rankingu!</p>
-                            : <p className="mt-1">Nie brałeś/aś udziału w tej rundzie.</p>
+                            ? <p className="mt-2">Jesteś na <b>{currentUserPlace + 1}.</b> miejscu w rankingu!</p>
+                            : <p className="mt-2">Nie brałeś/aś udziału w tej rundzie.</p>
                     )}
 
                     {!user?.memberOf && (
-                        <p className="mt-1">
+                        <p className="mt-4">
                             <span>Nie jesteś członkiem żadnej gildii.</span>
-                            <LinkButton className="mt-2" href={Page.GUILD}>Dołącz do gildii</LinkButton>
                         </p>
                     )}
 
                     {user?.memberOf && !user?.winnerInRound && currentRound?.guilds[currentGuildPlace] && (
-                        <p className="mt-1">
+                        <p className="mt-4">
                             {currentRound?.guilds[currentGuildPlace].name}
                             {currentGuildPlace !== -1
                                 ? ` zajmuje ${currentGuildPlace + 1}. miejsce.`

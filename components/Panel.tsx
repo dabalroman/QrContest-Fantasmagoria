@@ -11,7 +11,7 @@ export default function Panel ({
     return (
         <div
             className={
-                'p-4 rounded-md shadow-panel '
+                'p-4 rounded-xl shadow-panel '
                 + 'bg-panel-transparent relative backdrop-blur-md '
                 + (margin ? ' my-4' : '')
                 + ' ' + className

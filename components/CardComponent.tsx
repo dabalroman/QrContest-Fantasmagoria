@@ -1,10 +1,12 @@
 import Card from '@/models/Card';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faDiceD6 } from '@fortawesome/free-solid-svg-icons';
-import { getCardTierFriendlyName } from '@/Enum/CardTier';
-import { useEffect, useRef, useState } from 'react';
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
+import {faDiceD6} from '@fortawesome/free-solid-svg-icons';
+import {getCardTierFriendlyName} from '@/Enum/CardTier';
+import {useEffect, useRef, useState} from 'react';
+import useTheme from "@/hooks/useTheme";
+import {getThemeFromCardTier} from "@/Enum/AppTheme";
 
-export default function CardComponent ({
+export default function CardComponent({
     card,
     className = ''
 }: { card: Card, className?: string }) {
@@ -13,6 +15,8 @@ export default function CardComponent ({
         beta: 0,
         gamma: 0
     });
+
+    const {setTheme} = useTheme();
 
     useEffect(() => {
         const handleOrientation = (event: DeviceOrientationEvent) => {
@@ -49,12 +53,19 @@ export default function CardComponent ({
         };
     }, [initialOrientation, setInitialOrientation]);
 
+    const cardColorScheme = 'card-' + card.tier;
+
+    useEffect(() => {
+        setTheme(getThemeFromCardTier(card.tier));
+    }, []);
+
     return (
         <div
             ref={cardRef}
             className={
-                'rounded-3xl bg-background relative bg-center bg-cover '
-                + 'ring-8 ring-inset ring-card-border duration-150 ease-in-out'
+                'rounded-3xl relative bg-center bg-cover '
+                + 'ring-8 ring-inset duration-150 ease-in-out '
+                + `ring-${cardColorScheme} bg-${cardColorScheme}`
                 + ' ' + className
             }
             style={{
@@ -70,17 +81,16 @@ export default function CardComponent ({
             }}
         >
             <div
-                className="bg-card-border text-center text-text-accent absolute top-0 right-0 pb-4 pl-5 pt-2 pr-4
-                rounded-bl-3xl"
+                className={`bg-${cardColorScheme} text-center text-text-light absolute top-0 right-0 pb-4 pl-5 pt-2 pr-4 rounded-bl-3xl`}
             >
-                <span className="text-4xl font-fancy-capitals block">
-                    <FontAwesomeIcon icon={faDiceD6} size="xs" className="relative top-1"/> {card.value}
+                <span className="text-4xl block font-bold">
+                    <FontAwesomeIcon icon={faDiceD6} size="sm"/> {card.value}
                 </span>
-                <span className="mt-1 block text-xl">{getCardTierFriendlyName(card.tier)}</span>
+                <span className="mt-1 block text-xl font-semibold">{getCardTierFriendlyName(card.tier)}</span>
             </div>
             <div
-                className="bg-card-border text-text-accent absolute bottom-0 left-0 pb-4 pl-4 pt-3 pr-4 rounded-tr-3xl">
-                <span className="text-4xl font-fancy-capitals">{card.name}</span>
+                className={`bg-${cardColorScheme} text-text-light absolute bottom-0 left-0 pb-4 pl-4 pt-3 pr-4 w-full text-center`}>
+                <span className="text-4xl font-bold">{card.name}</span>
             </div>
             <div
                 className="glare"

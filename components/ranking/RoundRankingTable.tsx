@@ -17,7 +17,7 @@ export default function RoundRankingTable ({
                 <thead>
                     <tr className="text-text-dim">
                         <th>#</th>
-                        <th>Poszukiwacz</th>
+                        <th>Gracz</th>
                         <th>Karty</th>
                         <th className="text-right">Rubiki</th>
                     </tr>

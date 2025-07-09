@@ -16,7 +16,7 @@ export default function NavbarButton ({
 
     return (
         <Link href={href}>
-            <div className={'p-4 text-button-base' + className}><FontAwesomeIcon icon={icon}/></div>
+            <div className={'p-4 text-text-accent ' + className}><FontAwesomeIcon icon={icon}/></div>
         </Link>
     );
 }

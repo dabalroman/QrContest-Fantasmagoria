@@ -15,7 +15,7 @@ export default function CurrentGuildPanel ({
         <div
             className={
                 ' rounded-md shadow-panel rounded-tr-2xl'
-                + ' bg-gradient-to-b from-panel-transparent to-panel-transparent-end relative'
+                + ' bg-panel-transparent relative'
             }
         >
             <div className={loading ? 'blur-sm pointer-events-none' : ''}>

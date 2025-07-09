@@ -119,8 +119,8 @@ export default function AccountSetupPage () {
                     </p>
                     <form onSubmit={handleSubmit(onSubmit, onError)}>
                         <input
-                            placeholder="Morning-Angel"
-                            className={'rounded block w-full p-1 border-2 border-input-border text-center mt-4' +
+                            placeholder="Grzegżółka42"
+                            className={'rounded-xl block w-full p-1 border-2 border-input-border text-center mt-4' +
                                 ' bg-input-background text-text-accent text-xl shadow-inner-input'}
                             {...register(
                                 'username',

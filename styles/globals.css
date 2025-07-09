@@ -9,7 +9,7 @@
     --color-dim: #5c5c5c;
     --color-text-light: #ffffff;
     --color-text-dark: #202020;
-    
+
     --color-panel-bg: rgba(217,217,217,0.3);
     --color-button-bg: rgba(196,196,196,0.5);
     
@@ -18,6 +18,26 @@
     --color-epic: #8D30C2;
     --color-legendary: #E9B119;
     --color-mythical: #A91103;
+}
+
+.theme-common {
+    --color-primary: var(--color-common);
+}
+
+.theme-rare {
+    --color-primary: var(--color-rare);
+}
+
+.theme-epic {
+    --color-primary: var(--color-epic);
+}
+
+.theme-legendary {
+    --color-primary: var(--color-legendary);
+}
+
+.theme-mythical {
+    --color-primary: var(--color-mythical);
 }
 
 * {

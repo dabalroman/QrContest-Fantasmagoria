@@ -44,23 +44,8 @@ export default function Navbar ({ navbarConfig }: { navbarConfig: NavbarConfig }
         <div
             className={'grid align-center justify-items-center text-3xl'
                 + ' bg-navbar-background fixed bottom-0 w-screen z-50'}
-            style={{ gridTemplateColumns: 'repeat(2, 1fr) 100px repeat(2, 1fr)' }}
+            style={{ gridTemplateColumns: 'repeat(4, 1fr) 120px' }}
         >
-            <NavbarButton
-                href={Page.COLLECT} icon={faMagnifyingGlassLocation}
-                disabled={navbarConfig.disabledSides}
-            />
-            <NavbarButton
-                href={Page.COLLECTION} icon={faImages}
-                disabled={navbarConfig.disabledSides}
-            />
-            <NavbarSuperButton
-                href={navbarConfig.href}
-                icon={navbarConfig.icon}
-                onClick={navbarConfig.onClick}
-                disabled={navbarConfig.disabledCenter}
-                animate={navbarConfig.animate}
-            />
             <div className="relative">
                 <NavbarButton
                     href={Page.RANKING}
@@ -76,7 +61,7 @@ export default function Navbar ({ navbarConfig }: { navbarConfig: NavbarConfig }
                             left: '-0.4rem'
                         }}
                     >
-                        <p className="p-2 font-fancy-capitals text-xl">
+                        <p className="p-2 font-base text-xl">
                             + <FontAwesomeIcon icon={faDiceD6} size="xs"/> {navbarConfig.animatePointsAdded}</p>
                     </div>
                 }
@@ -84,6 +69,21 @@ export default function Navbar ({ navbarConfig }: { navbarConfig: NavbarConfig }
             <NavbarButton
                 href={Page.ACCOUNT} icon={faUser}
                 disabled={navbarConfig.disabledSides}
+            />
+            <NavbarButton
+                href={Page.COLLECTION} icon={faImages}
+                disabled={navbarConfig.disabledSides}
+            />
+            <NavbarButton
+                href={Page.COLLECT} icon={faMagnifyingGlassLocation}
+                disabled={navbarConfig.disabledSides}
+            />
+            <NavbarSuperButton
+                href={navbarConfig.href}
+                icon={navbarConfig.icon}
+                onClick={navbarConfig.onClick}
+                disabled={navbarConfig.disabledCenter}
+                animate={navbarConfig.animate}
             />
         </div>
     );
