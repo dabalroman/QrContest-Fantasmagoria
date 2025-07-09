@@ -8,9 +8,9 @@ export default function CollectedCardComponent ({ card }: { card: Card }) {
         <div className="relative h-full flex flex-col">
             <CardComponent card={card} className="z-50 relative top-3 grow w-full"/>
             <Panel margin={false} className="text-justify relative top-6 z-0 rounded-3xl">
-                <p>{card.description}</p>
+                <p className='whitespace-pre-line text-center'>{card.description}</p>
                 {card.collectedAt &&
-                    <p className="text-right mt-4">Karta zdobyta {formatTimeFromNow(card.collectedAt)}</p>
+                    <p className="text-right mt-4">Karta znaleziona {formatTimeFromNow(card.collectedAt)}</p>
                 }
             </Panel>
         </div>
