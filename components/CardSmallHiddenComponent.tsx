@@ -1,14 +1,20 @@
+import { CardTier } from '@/Enum/CardTier';
+
 export default function CardSmallHiddenComponent ({
-    className = ''
-}: { className?: string }) {
+    className = '',
+    cardTier = CardTier.COMMON,
+}: { className?: string, cardTier: CardTier }) {
+    const cardColorScheme = 'card-' + cardTier;
+
     return (
         <div
             className={
-                'border-4 border-gray-600 rounded-xl bg-background relative bg-center bg-cover shadow-card'
+                'border-4 rounded-xl bg-background relative bg-center bg-cover shadow-card opacity-70'
+                + ` border-${cardColorScheme} `
                 + ' ' + className
             }
             style={{
-                'backgroundImage': `url(/cards-thumbnails/hidden.webp)`,
+                'backgroundImage': `url(/cards-reverse/card-bg-${cardTier}-thumbnail.webp)`,
                 'height': '8.25rem',
                 'width': '5.5rem'
             }}

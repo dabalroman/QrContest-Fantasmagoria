@@ -1,22 +1,22 @@
 import Card from '@/models/Card';
 import Question from '@/models/Question';
-import Button, {ButtonState} from '@/components/Button';
-import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
-import {faCheck, faDiceD6, faQuestion} from '@fortawesome/free-solid-svg-icons';
+import Button, { ButtonState } from '@/components/Button';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCheck, faDiceD6, faQuestion } from '@fortawesome/free-solid-svg-icons';
 import CardSmallComponent from '@/components/CardSmallComponent';
-import {useState} from 'react';
-import {answerQuestionFunction} from '@/utils/functions';
-import {QuestionAnswerValue} from '@/functions/src/types/question';
+import { useState } from 'react';
+import { answerQuestionFunction } from '@/utils/functions';
+import { QuestionAnswerValue } from '@/functions/src/types/question';
 import useDynamicNavbar from '@/hooks/useDynamicNavbar';
-import {Page} from '@/Enum/Page';
+import { Page } from '@/Enum/Page';
 import Loader from '@/components/Loader';
 
-export default function QuestionCardView({
-                                             card,
-                                             question,
-                                             onAnswer,
-                                             onError
-                                         }: {
+export default function QuestionCardView ({
+    card,
+    question,
+    onAnswer,
+    onError
+}: {
     card: Card,
     question: Question,
     onAnswer: (correct: boolean) => void,
@@ -94,11 +94,11 @@ export default function QuestionCardView({
                     />
                 </div>
                 <div
-                    className={`bg-${cardColorScheme}` + " text-text-light text-3xl font-semibold p-4 pl-24 flex justify-between"}
+                    className={`bg-${cardColorScheme}`
+                        + ' text-text-light text-3xl font-semibold p-4 pl-24 flex justify-end'}
                 >
-                    <span>Wyzwanie</span>
                     <span>
-                     <FontAwesomeIcon icon={faDiceD6} size="sm"/> {question.value}
+                        <FontAwesomeIcon icon={faDiceD6} size="sm"/> {question.value}
                     </span>
                 </div>
                 <div className="p-4 mt-20">

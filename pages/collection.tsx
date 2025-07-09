@@ -55,21 +55,15 @@ export default function CollectionPage ({}) {
     let cardsToShow = null;
 
     if (cards && cardSets && cardSets?.get().length !== 0) {
-        const filteredCards = cardSets.get()
-            .filter((cardSet: CardSet) => {
-                const cardsInSet = cards.get()
-                    .filter((card: Card) => card.cardSet === cardSet.uid);
-                return cardsInSet.length !== 0;
-            });
-
-        cardsToShow = filteredCards.length !== 0
-            ? filteredCards.map((cardSet: CardSet) =>
+        cardsToShow = cardSets.get()
+            .sort((a, b) => a.order - b.order)
+            .map((cardSet: CardSet) =>
                 <CardsSetComponent
                     key={cardSet.uid}
                     cardSet={cardSet}
                     cards={cards.get()}
                 />
-            ) : empty;
+            );
     }
 
     return (

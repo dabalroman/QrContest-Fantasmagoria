@@ -58,6 +58,11 @@ npm run build
 npm run build:watch
 ```
 
+## Seed the db
+Create an account in the database.
+Go to the firestore's account record and set its role to `admin`.
+Use `seed db` option in the user profile tab in the app.
+
 ## Deployment to Firebase
 ### Install firebase-tools
 ```bash
@@ -78,20 +83,4 @@ npm install -g firebase-tools
 If deploy fails with `401` code, try to log in to firebase again.
 ```bash
 firebase login --reauth
-```
-
-# Git-crypt (Seed Files Encryption)
-The `functions/src/seeds/` folder is encrypted with **git-crypt**. On a new machine, perform these steps to decrypt and work with the seed files:
-
-## Install git-crypt and GPG**
-```bash
-sudo apt update
-sudo apt install git-crypt gnupg
-```
-
-## Import GPG key
-Obtain ASCII-armored key files (`mykey.pub.asc` and `mykey.sec.asc`) from the project maintainer, then run:
-```bash
-gpg --import mykey.pub.asc
-gpg --import mykey.sec.asc
 ```

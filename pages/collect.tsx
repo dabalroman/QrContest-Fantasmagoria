@@ -40,7 +40,7 @@ export default function CollectPage () {
 
     const onCodeValid = (card: Card, question: Question | null) => {
         if (question) {
-            toast('Ta karta kryje wyzwanie!', { icon: '🎲' });
+            toast('Ta karta kryje pytanie!', { icon: '🎲' });
         } else {
             toast.success('Karta została dodana do Twojej kolekcji!');
         }
