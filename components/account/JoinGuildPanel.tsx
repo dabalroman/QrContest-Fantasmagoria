@@ -5,11 +5,11 @@ import Panel from '@/components/Panel';
 
 export default function JoinGuildPanel () {
     return (
-        <Panel title="Gildia">
+        <Panel title="Klub">
             <p className="mb-3">
-                Nie jesteś członkiem żadnej gildii. Dołącz do towarzyszy i wspólnie wyruszcie w przygodę!
+                Nie jesteś jeszcze w Klubie. Dołącz do towarzyszy i wspólnie wyruszcie w przygodę!
             </p>
-            <LinkButton href={Page.GUILD}>Dołącz do gildii</LinkButton>
+            <LinkButton href={Page.GUILD}>Dołącz do klubu</LinkButton>
         </Panel>
     );
 }

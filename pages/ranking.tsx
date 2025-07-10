@@ -67,7 +67,7 @@ export default function ScoreboardPage({}) {
 
                     {!user?.memberOf && (
                         <p className="mt-4">
-                            <span>Nie jesteś członkiem żadnej gildii.</span>
+                            <span>Nie jesteś członkiem żadnego klubu.</span>
                         </p>
                     )}
 
@@ -106,7 +106,7 @@ export default function ScoreboardPage({}) {
                     </Panel>
                 }
 
-                <Panel title="Ranking Gildii">
+                <Panel title="Ranking klubów">
                     <div>
                         {currentRound?.guilds &&
                             currentRound.guilds.map((guild: GuildRankingRecord) => (
@@ -142,7 +142,7 @@ export default function ScoreboardPage({}) {
                         }
                     </div>
                     <div className="text-sm text-center mt-4">
-                        <span className="px-4"><FontAwesomeIcon icon={faBolt}/> Siła gildii</span>
+                        <span className="px-4"><FontAwesomeIcon icon={faBolt}/> Moc klubu</span>
                         <span className="px-4"><FontAwesomeIcon icon={faUser}/> Ilość członków</span>
                         <br/>
                         <span className="px-4">

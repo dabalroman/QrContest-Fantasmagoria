@@ -27,27 +27,27 @@ export default function GuildPage () {
 
     const joinGuild = (guildUid: string | null) => {
         if (typeof guildUid !== 'string') {
-            toast.error('Nie udało się dołączyć do gildii. Spróbuj ponownie.');
+            toast.error('Nie udało się dołączyć do klubu. Spróbuj ponownie.');
             return;
         }
 
         if (guildUid === user?.memberOf) {
-            toast.error('Jesteś już członkiem tej gildii.');
+            toast.error('Jesteś już członkiem tego klubu.');
         }
 
         setLoading(true);
         joinGuildFunction({ guild: guildUid })
             .then(() => {
-                    toast.success(`Dołączono do gildii.`);
+                    toast.success(`Dołączono do klubu!`);
                     setLoading(false);
                     router.push(Page.ACCOUNT);
                 }
             )
             .catch((error) => {
                     if (error.message === 'cooldown') {
-                        toast.error('Nie możesz jeszcze zmienić gildii. Spróbuj później.');
+                        toast.error('Nie możesz jeszcze zmienić klubu. Spróbuj później.');
                     } else {
-                        toast.error('Nie udało się dołączyć do gildii. Spróbuj ponownie.');
+                        toast.error('Nie udało się dołączyć do klubu. Spróbuj ponownie.');
                     }
                     setLoading(false);
                 }
@@ -81,20 +81,20 @@ export default function GuildPage () {
 
     return (
         <main className="grid grid-rows-layout items-center min-h-screen p-4">
-            <ScreenTitle>GILDIA</ScreenTitle>
-            <Metatags title="Gildia"/>
+            <ScreenTitle>Klub</ScreenTitle>
+            <Metatags title="Klub"/>
             <div>
                 {loading && <Loader/>}
 
-                <Panel title={selectedGuild?.name ?? 'Wybór Gildii'} className="text-center">
+                <Panel title={selectedGuild?.name ?? 'Wybór Klubu'} className="text-center">
                     {selectedGuild
                         ? (<p className='text-justify'>{selectedGuild.description}</p>)
                         : (
                             <>
-                                <p>Gildia to twoja rodzina, gildia to twój dom.
-                                    <br/> Wybierz tę, która bliska jest twemu sercu.</p>
+                                <p>W klubie znajdziesz ludzi, którzy kochają to, co Ty!</p>
                                 <p className="text-sm text-text-dim mt-2">
-                                    Wybór gildii nie wpływa na Twoje szanse na wygraną, ma charakter kosmetyczny.</p>
+                                    Wybór klubu nie wpływa na Twoje szanse na wygraną, ma charakter kosmetyczny.
+                                </p>
                             </>
                         )}
                 </Panel>

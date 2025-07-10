@@ -89,20 +89,20 @@ export default function FaqPage () {
             answer: 'Do odebrania nagrody potrzebujesz smartfona z zalogowaną aplikacją konkursową. Pokaż swoje konto przy odbiorze nagrody.'
         },
         {
-            question: 'Czym są gildie?',
-            answer: 'System gildii to społeczny element konkursu, który pozwala uczestnikom na dołączanie do jednej z czterech dostępnych gildii. Wybierzesz jedną z nich przy rejestracji swojego konta. Wybór gildii jest czysto kosmetyczny i nie wpływa na Twoje szanse na wygraną.'
+            question: 'Czym są kluby?',
+            answer: 'System klubów to społeczny element konkursu, który pozwala uczestnikom na dołączanie do jednego z czterech dostępnych klubów. Wybierzesz jedną z nich przy rejestracji swojego konta. Wybór klubu jest czysto kosmetyczny i nie wpływa na Twoje szanse na wygraną.'
         },
         {
             question: 'Czy w sekcji FAQ kryje się kod?',
             answer: 'Skoro pytasz, to proszę. Brzmi on "mampytanie". Możesz wpisać go na ekranie "Szukaj" w aplikacji.'
         },
         {
-            question: 'Czy mogę zmienić gildię?',
-            answer: 'Tak, możesz zmienić gildię raz na 4 godziny. Możesz skorzystać z tej opcji, jeśli zdecydujesz, że chciałbyś należeć do innej gildii.'
+            question: 'Czy mogę zmienić klub?',
+            answer: 'Tak, możesz zmienić klub raz na 4 godziny. Możesz skorzystać z tej opcji, jeśli zdecydujesz, że chciałbyś należeć do innego klubu.'
         },
         {
-            question: 'Jak jest wyliczany wynik gildii?',
-            answer: 'Siła gildii jest obliczana jako średnia punktów wszystkich jej członków. To oznacza, że każdy uczestnik ma wkład w sukces swojej gildii, niezależnie od tego, ile punktów zdobył.'
+            question: 'Jak jest wyliczany wynik klubu?',
+            answer: 'Moc klubu jest obliczana jako średnia punktów wszystkich jej członków. To oznacza, że każdy uczestnik ma wkład w sukces swojego klubu, niezależnie od tego, ile punktów zdobył.'
         },
         {
             question: 'Czy mogę zbierać karty wspólnie z przyjacielem?',

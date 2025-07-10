@@ -9,7 +9,7 @@ export default function CurrentGuildPanel ({
     guild,
     loading = false
 }: { guild: Guild, loading?: boolean, className?: string, title?: string }) {
-    const title = (loading) ? 'Gildia' : guild.name;
+    const title = (loading) ? 'Klub' : guild.name;
 
     return (
         <div

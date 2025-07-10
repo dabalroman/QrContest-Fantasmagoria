@@ -11,12 +11,12 @@ export default function BetrayGuildPanel ({
     guild
 }: { user: User, guild: Guild }) {
     return (
-        <Panel title="Zdrada Gildii">
-            <p className="mb-3">Możesz zdradzić swoich towarzyszy, by dołączyć do innej gildii.
+        <Panel title="Zdrada klubu">
+            <p className="mb-3">Możesz zdradzić swoich towarzyszy, by dołączyć do innego klubu.
                 Zmiany możesz dokonać tylko raz na 4 godziny.</p>
             {
                 guild?.canGuildBeChanged(user.lastGuildChangeAt)
-                    ? <LinkButton href={Page.GUILD}>Zdradź Gildię</LinkButton>
+                    ? <LinkButton href={Page.GUILD}>Zdradź klub</LinkButton>
                     : <Button state={ButtonState.DISABLED} className="w-full">
                         Zdrada nie jest jeszcze możliwa
                     </Button>

@@ -42,13 +42,6 @@ The QrContest is a contest where users can participate in and win prizes, and it
 Previous editions lore was about 4 guilds that were fighting against each other, and each guild had a leader. We can ignore that, cause we're going for pop culture this time.
 There was a guild of water, guild of desert, guild of steel and guild of void. We will steer the diffusion into realistic but fantasy style of images, so like AAA-games or wallpapers for games.
 
-# Additional info:
-Guilds from the past (from previous qrcontest):
-Gildia Mroku - Tajemnicze zrzeszenie, którego pochodzenie owiane jest mrokiem i tajemnicą. Gildia Mroku operuje z ukrycia, a jej członkowie są otoczeni chłodem, które przenika wszystko wokół nich. Ich celem jest dominacja nad Erindar za pomocą wszelkich dostępnych środków. Od lat wydaje się tkwić w stagnacji, lecz jej wyznawcy wiedzą, że to zmieni się już niedługo - zbliża się dzień koniunkcji planet.
-Gildia wody - Potężna koalicja kontrolująca oceaniczne szlaki handlowe Erindaru. Gildia jest znana z neutralności i dyplomatycznego podejścia, co pozwala jej utrzymać równowagę wobec innych gildii. Ich flota składa się z zaawansowanych technologicznie statków, a kontakty dyplomatyczne z morskimi istotami pozwalają im używać magii wody do kontrolowania mórz. Ta frakcja to federacja, co czasami doprowadza do konfliktów wewnętrznych.
-Gildia Pustyni - Potężna grupa wywodząca się z serca Pustyni Maraksha, gdzie walka o przetrwanie jest smutną codziennością. Członkowie gildii gardzą Gildią Stali od czasów konfliktu szesnastoletniego za ich ekspansję terytorialną i kradzież zasobów wodnych. Neutralność Gildi Wody w tym konflikcie tylko pogłębiła niechęć mieszkańców pustyni do przybyszów z zielonego świata. Ich celem jest zniszczenie tamy na rzece Nahr'al, u której brzegów niegdyś tętniło życie.
-Gildia Stali - Ambitna frakcja, która dąży do przemysłowej dominacji w Erindarze. Gildia Stali jest znana ze swoich nowatorskich wynalazków i potężnych maszyn, które napędzane są dzięki ogromnym ilościom pary. Po ich porażce w wojnie szesnastoletniej władze coraz mocniej naciskają na rozwój techniki wojskowej. Co prawda konflikt zakończył się rozejmem, ale dla Lorda Ferris był to dowód na przewagę magii na technologią. Gildia Stali nie cofnie się przed niczym, aby zdobyć zasoby i władzę.
-
 # Tech stack
 - React with TS
 - next.js 13
