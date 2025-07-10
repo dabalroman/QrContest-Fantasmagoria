@@ -47,7 +47,7 @@ export default function Button({
         <button
             className={
                 'p-2 block text-center text-text-accent border-2 rounded-full text-lg font-semibold'
-                + ' bg-input-background border-button-border backdrop-blur-sm'
+                + ' bg-input-background border-button-border'
                 + ' ' + stateToLookMap[state].class
                 + ' ' + className
             }

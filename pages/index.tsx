@@ -15,8 +15,8 @@ export default function Home() {
         ? <LinkButton href={Page.COLLECT} className="w-full my-2">Przejdź do gry</LinkButton>
         : (
             <div>
-                <LinkButton href={Page.LOGIN} className="w-full my-2">Zaloguj na konto</LinkButton>
-                <LinkButton href={Page.REGISTER} className="w-full my-2">Dołącz do konkursu</LinkButton>
+                <LinkButton href={Page.LOGIN} className="w-full my-2 backdrop-blur-sm">Zaloguj na konto</LinkButton>
+                <LinkButton href={Page.REGISTER} className="w-full my-2 backdrop-blur-sm">Dołącz do konkursu</LinkButton>
             </div>
         );
 
@@ -69,7 +69,7 @@ export default function Home() {
                     <p className="mb-4">
                         W tym roku Twoim celem są znane cytaty! Każda karta to para unikalnej grafiki oraz genialnego
                         tekstu, który odbił się szerokim echem w popkulturze. W Twojej kolekcji znajdziesz takie
-                        klasyki jak &quot;Niebieski kwiat i kolce&quot;, &quot;Jak to jest być skrybą?&quot; 
+                        klasyki jak &quot;Niebieski kwiat i kolce&quot;, &quot;Jak to jest być skrybą?&quot;
                         czy &quot;I&apos;m groot&quot;. Do znalezienia są aż 64 karty, więc pora ruszyć na łowy!
                     </p>
 

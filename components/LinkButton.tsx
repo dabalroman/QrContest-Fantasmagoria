@@ -10,7 +10,7 @@ export default function LinkButton ({
         <Link
             className={
                 'p-2 block text-center text-text-accent border-2 border-button-base rounded-full text-lg font-semibold'
-                + ' bg-input-background border-button-border backdrop-blur-sm'
+                + ' bg-input-background border-button-border'
                 + ' ' + className
             }
             href={href}
