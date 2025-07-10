@@ -19,7 +19,7 @@ export default function CardsSetComponent({
             <div className="grid grid-cols-small-cards gap-4 justify-items-center py-4">
                 {
                     Object.entries(cardSet.cardTiers)
-                        .sort(([tierA, amountA], [tierB, amountB]) => (
+                        .sort(([tierA, _], [tierB, __]) => (
                             cardSet.cardTiersOrder[tierA] - cardSet.cardTiersOrder[tierB]
                         ))
                         .map(([tier, amount]) => {
