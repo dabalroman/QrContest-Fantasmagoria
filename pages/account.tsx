@@ -4,7 +4,7 @@ import LinkButton from '@/components/LinkButton';
 import React, { useContext, useEffect, useState } from 'react';
 import { UserContext, UserContextType } from '@/utils/context';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faDiceD6, faImagePortrait } from '@fortawesome/free-solid-svg-icons';
+import { faStar, faImagePortrait } from '@fortawesome/free-solid-svg-icons';
 import Metatags from '@/components/Metatags';
 import { UserRole } from '@/Enum/UserRole';
 import Button from '@/components/Button';
@@ -91,7 +91,7 @@ export default function AccountPage () {
                             <FontAwesomeIcon className="px-1" icon={faImagePortrait} size="sm"/>&nbsp;
                             {user?.amountOfCollectedCards}
                         </div>
-                        <div><FontAwesomeIcon className="px-1" icon={faDiceD6} size="sm"/>&nbsp;{user?.score}</div>
+                        <div><FontAwesomeIcon className="px-1" icon={faStar} size="sm"/>&nbsp;{user?.score}</div>
                     </div>
                 </Panel>
 

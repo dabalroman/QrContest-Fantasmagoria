@@ -1,4 +1,4 @@
-import { faDiceD6, faImages, faMagnifyingGlassLocation, faTrophy, faUser } from '@fortawesome/free-solid-svg-icons';
+import { faStar, faImages, faMagnifyingGlassLocation, faTrophy, faUser } from '@fortawesome/free-solid-svg-icons';
 import NavbarButton from '@/components/Navbar/NavbarButton';
 import NavbarSuperButton from '@/components/Navbar/NavbarSuperButton';
 import { Page } from '@/Enum/Page';
@@ -66,7 +66,7 @@ export default function Navbar ({ navbarConfig }: { navbarConfig: NavbarConfig }
                         }}
                     >
                         <p className="p-2 font-base text-xl">
-                            + <FontAwesomeIcon icon={faDiceD6} size="xs"/> {navbarConfig.animatePointsAdded}</p>
+                            + <FontAwesomeIcon icon={faStar} size="xs"/> {navbarConfig.animatePointsAdded}</p>
                     </div>
                 }
             </div>

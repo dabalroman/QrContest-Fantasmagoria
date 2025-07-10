@@ -1,18 +1,18 @@
-import { GuildUid } from '@/models/Guild';
-import { faCircle, faDiamond, faDroplet, faFireFlameCurved, IconDefinition } from '@fortawesome/free-solid-svg-icons';
+import {GuildUid} from '@/models/Guild';
+import {faDiceD20, faFilm, faShrimp, faYinYang, IconDefinition} from '@fortawesome/free-solid-svg-icons';
 
-export default function getGuildIcon (guildUid: GuildUid): IconDefinition {
+export default function getGuildIcon(guildUid: GuildUid): IconDefinition {
     if (guildUid === GuildUid.desert) {
-        return faFireFlameCurved;
+        return faFilm;
     }
 
     if (guildUid === GuildUid.steel) {
-        return faDiamond;
+        return faDiceD20;
     }
 
     if (guildUid === GuildUid.water) {
-        return faDroplet;
+        return faShrimp;
     }
 
-    return faCircle;
+    return faYinYang;
 }

@@ -10,7 +10,7 @@ import ScreenTitle from '@/components/ScreenTitle';
 import Button from '@/components/Button';
 import { Page } from '@/Enum/Page';
 import useDynamicNavbar from '@/hooks/useDynamicNavbar';
-import { faArrowLeft, faCheck, faDiceD6, faX } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft, faCheck, faStar, faX } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useForm } from 'react-hook-form';
 import { setupAccountFunction } from '@/utils/functions';
@@ -172,7 +172,7 @@ function UsernameMessage ({
 }: { username: string, isValid: boolean, checking: boolean }) {
     if (checking) {
         return <>
-            <FontAwesomeIcon icon={faDiceD6} size="sm" spin className="mr-2"/>
+            <FontAwesomeIcon icon={faStar} size="sm" spin className="mr-2"/>
             Sprawdzanie...
         </>;
     } else if (isValid) {

@@ -1,6 +1,6 @@
 import RankingRound, { UserRankingRecord } from '@/models/RankingRound';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faDiceD6, faImagePortrait } from '@fortawesome/free-solid-svg-icons';
+import { faStar, faImagePortrait } from '@fortawesome/free-solid-svg-icons';
 import User from '@/models/User';
 import getGuildIcon from '@/utils/getGuildIcon';
 import { GuildUid } from '@/models/Guild';
@@ -19,7 +19,7 @@ export default function RoundRankingTable ({
                         <th>#</th>
                         <th>Gracz</th>
                         <th>Karty</th>
-                        <th className="text-right">Rubiki</th>
+                        <th className="text-right">Punkty</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -55,7 +55,7 @@ export default function RoundRankingTable ({
                                     {record.amountOfCollectedCards}
                                 </td>
                                 <td className="text-right">
-                                    <FontAwesomeIcon className="px-1" icon={faDiceD6} size="sm"/>{record.score}
+                                    <FontAwesomeIcon className="px-1" icon={faStar} size="sm"/>{record.score}
                                 </td>
                             </tr>
                         ))}
@@ -68,7 +68,7 @@ export default function RoundRankingTable ({
             </table>
             <div className="text-sm text-center mt-4">
                 <span className="px-4"><FontAwesomeIcon icon={faImagePortrait}/> Ilość kart</span>
-                <span className="px-4"><FontAwesomeIcon icon={faDiceD6}/> Ilość Rubików</span>
+                <span className="px-4"><FontAwesomeIcon icon={faStar}/> Ilość punktów</span>
             </div>
         </div>
     );

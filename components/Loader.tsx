@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faDiceD6 } from '@fortawesome/free-solid-svg-icons';
+import { faStar } from '@fortawesome/free-solid-svg-icons';
 
 export default function Loader () {
     return (
@@ -7,7 +7,7 @@ export default function Loader () {
             'flex flex-col justify-center items-center w-full h-full fixed top-0 left-0'
             + ' bg-gradient-radial from-overlay-start via-overlay-via to-overlay-end text-text-accent z-20'
         }>
-            <FontAwesomeIcon className="p-2" icon={faDiceD6} size="3x" spin/>
+            <FontAwesomeIcon className="p-2" icon={faStar} size="3x" spin/>
             <p className="p-2 font-base">Ładowanie...</p>
         </div>
     );

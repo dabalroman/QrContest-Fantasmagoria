@@ -4,7 +4,7 @@ import Panel from '@/components/Panel';
 import React, {useContext, useEffect, useState} from 'react';
 import {UserContext, UserContextType} from '@/utils/context';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
-import {faBolt, faDiceD6, faImagePortrait, faUser} from '@fortawesome/free-solid-svg-icons';
+import {faBolt, faStar, faImagePortrait, faUser} from '@fortawesome/free-solid-svg-icons';
 import {collection, onSnapshot, orderBy, query} from '@firebase/firestore';
 import {firestore} from '@/utils/firebase';
 import {FireDoc} from '@/Enum/FireDoc';
@@ -56,7 +56,7 @@ export default function ScoreboardPage({}) {
                             <FontAwesomeIcon className="px-1" icon={faImagePortrait} size="sm"/>&nbsp;
                             {user?.amountOfCollectedCards}
                         </div>
-                        <div><FontAwesomeIcon className="px-1" icon={faDiceD6} size="sm"/>&nbsp;{user?.score}</div>
+                        <div><FontAwesomeIcon className="px-1" icon={faStar} size="sm"/>&nbsp;{user?.score}</div>
                     </div>
 
                     {!user?.winnerInRound && (
@@ -132,7 +132,7 @@ export default function ScoreboardPage({}) {
                                         <div className="grid grid-cols-3 pt-0.5">
                                             <span><FontAwesomeIcon icon={faBolt}/> {guild.power}</span>
                                             <span><FontAwesomeIcon icon={faUser}/> {guild.amountOfMembers}</span>
-                                            <span><FontAwesomeIcon icon={faDiceD6}/> {guild.score}</span>
+                                            <span><FontAwesomeIcon icon={faStar}/> {guild.score}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -143,10 +143,10 @@ export default function ScoreboardPage({}) {
                     </div>
                     <div className="text-sm text-center mt-4">
                         <span className="px-4"><FontAwesomeIcon icon={faBolt}/> Moc klubu</span>
-                        <span className="px-4"><FontAwesomeIcon icon={faUser}/> Ilość członków</span>
+                        <span className="px-4"><FontAwesomeIcon icon={faUser}/> Ilość klubowiczów</span>
                         <br/>
                         <span className="px-4">
-                            <FontAwesomeIcon icon={faDiceD6}/> Suma Rubików wszystkich członków
+                            <FontAwesomeIcon icon={faStar}/> Suma punktów wszystkich klubowiczów
                         </span>
                     </div>
                 </Panel>

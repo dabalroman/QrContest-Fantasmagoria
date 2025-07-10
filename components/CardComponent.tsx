@@ -1,6 +1,6 @@
 import Card from '@/models/Card';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
-import {faDiceD6} from '@fortawesome/free-solid-svg-icons';
+import {faStar} from '@fortawesome/free-solid-svg-icons';
 import {getCardTierFriendlyName} from '@/Enum/CardTier';
 import {useEffect, useRef, useState} from 'react';
 import useTheme from "@/hooks/useTheme";
@@ -84,7 +84,7 @@ export default function CardComponent({
                 className={`bg-${cardColorScheme} text-center text-text-light absolute top-0 right-0 pb-4 pl-5 pt-2 pr-4 rounded-bl-3xl`}
             >
                 <span className="text-4xl block font-bold">
-                    <FontAwesomeIcon icon={faDiceD6} size="sm"/> {card.value}
+                    <FontAwesomeIcon icon={faStar} size="sm"/> {card.value}
                 </span>
                 <span className="mt-1 block text-xl font-semibold">{getCardTierFriendlyName(card.tier)}</span>
             </div>
