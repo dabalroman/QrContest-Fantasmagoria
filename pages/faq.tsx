@@ -2,15 +2,15 @@
 
 import ScreenTitle from '@/components/ScreenTitle';
 import Metatags from '@/components/Metatags';
-import React, { useContext } from 'react';
+import React, {useContext} from 'react';
 import Panel from '@/components/Panel';
 import useDynamicNavbar from '@/hooks/useDynamicNavbar';
-import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
-import { useRouter } from 'next/router';
-import { UserContext, UserContextType } from '@/utils/context';
+import {faArrowLeft} from '@fortawesome/free-solid-svg-icons';
+import {useRouter} from 'next/router';
+import {UserContext, UserContextType} from '@/utils/context';
 
-export default function FaqPage () {
-    const { user } = useContext<UserContextType>(UserContext);
+export default function FaqPage() {
+    const {user} = useContext<UserContextType>(UserContext);
     const router = useRouter();
 
     useDynamicNavbar({
@@ -94,7 +94,7 @@ export default function FaqPage () {
         },
         {
             question: 'Czy w sekcji FAQ kryje się kod?',
-            answer: 'Skoro pytasz, to proszę. Brzmi on "mampytanie". Możesz wpisać go na ekranie "Szukaj" w aplikacji.'
+            answer: 'Nie. Na pewno nie jest to "9DG76W9SGN". A już na pewno nie pisany od tyłu.'
         },
         {
             question: 'Czy mogę zmienić klub?',
