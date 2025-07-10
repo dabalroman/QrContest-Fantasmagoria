@@ -4,7 +4,7 @@ import LinkButton from '@/components/LinkButton';
 import React, { useContext, useEffect, useState } from 'react';
 import { UserContext, UserContextType } from '@/utils/context';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faStar, faImagePortrait } from '@fortawesome/free-solid-svg-icons';
+import { faImagePortrait, faStar } from '@fortawesome/free-solid-svg-icons';
 import Metatags from '@/components/Metatags';
 import { UserRole } from '@/Enum/UserRole';
 import Button from '@/components/Button';
@@ -59,7 +59,10 @@ export default function AccountPage () {
             }}>Wymuś aktualizację rund</Button>
 
             <p className={'py-2 mt-20'}>Niebezpiecznie tutaj schodzić!</p>
-            <Button className="w-full" style={{background: '#660000', borderColor: '#BB0000'}} onClick={() => {
+            <Button className="w-full" style={{
+                background: '#660000',
+                borderColor: '#BB0000'
+            }} onClick={() => {
                 const proceed = confirm('Are you sure?') ?? false;
 
                 if (!proceed) {
@@ -97,20 +100,29 @@ export default function AccountPage () {
 
                 {user.memberOf === null && <JoinGuildPanel/>}
 
-                <Panel title="Nagrody i rundy">
-                    <p className="text-center text-lg">
-                        <span className='text-xl font-semibold text-text-accent tracking-wider'>
-                            1. miejsce – 50 fantów
-                        </span><br/>
-                        <span className='text-xl'>2. miejsce – 35 fantów</span><br/>
-                        <span className='text-md'>3. miejsce – 20 fantów</span><br/>
+                <Panel title="Nagrody">
+                    <img src="/prize.webp" alt="prize" className="absolute right-0 bottom-0" style={{
+                        zIndex: -1,
+                        maxHeight: '80%'
+                    }}/>
+                    <p className="text-2xl">
+                        <span className="font-semibold text-text-accent">1. miejsce <br/></span><span>2x 50 fantów</span>
                     </p>
+                    <p className="text-xl pt-3">
+                        <span className="font-semibold text-text-accent">2. miejsce <br/> </span><span>2x 35 fantów</span>
+                    </p>
+                    <p className="text-lg pt-3">
+                        <span className="font-semibold text-text-accent">3. miejsce <br/> </span><span>2x 20 fantów</span>
+                    </p>
+                </Panel>
+
+                <Panel title="Rundy">
                     <p className="mt-2 text-justify">
                         Konkurs podzielony jest na dwie rundy. Daty rozpoczęcia i zakończenia każdej z nich znajdziesz
                         w zakładce &quot;Ranking&quot;. Punkty z rundy pierwszej przechodzą do rundy drugiej,
                         więc masz aż dwie szanse na wygraną! Każda runda to troje zwycięzców.
                     </p>
-                    <p className='mt-2 text-justify'>
+                    <p className="mt-2 text-justify">
                         Zwycięzców zapraszamy po odbiór nagród do punktu informacyjnego konwentu w momencie
                         zakończenia rundy.
                     </p>
