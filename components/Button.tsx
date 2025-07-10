@@ -41,7 +41,7 @@ export default function Button({
     style?: object,
     type?: React.ButtonHTMLAttributes<HTMLButtonElement>['type'],
     state?: ButtonState,
-    key?: string,
+    key?: string | null,
 }) {
     return (
         <button

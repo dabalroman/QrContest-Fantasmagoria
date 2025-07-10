@@ -54,10 +54,10 @@ export default function CardComponent({
     }, [initialOrientation, setInitialOrientation]);
 
     const cardColorScheme = 'card-' + card.tier;
-
+    
     useEffect(() => {
         setTheme(getThemeFromCardTier(card.tier));
-    }, []);
+    }, [setTheme, card.tier]);
 
     return (
         <div

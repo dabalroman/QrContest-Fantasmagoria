@@ -1,9 +1,9 @@
-import { ReactNode, useState } from 'react';
+import {ReactNode, useState} from 'react';
 import Loader from '@/components/Loader';
-import { faClose } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {faClose} from '@fortawesome/free-solid-svg-icons';
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 
-export default function Panel ({
+export default function Panel({
     title,
     children,
     closeable = false,
@@ -20,9 +20,11 @@ export default function Panel ({
     loading?: boolean,
     className?: string,
     title?: string,
-    key?: string
+    key?: string | null
 }) {
-    const [isClosed, setClosed] = useState<boolean>(closeable && localStorage.getItem('closeable-' + closeableUuid) === 'closed');
+    const [isClosed, setClosed] = useState<boolean>(
+        closeable && localStorage.getItem('closeable-' + closeableUuid) === 'closed'
+    );
 
     if (isClosed) {
         return null;
@@ -31,7 +33,7 @@ export default function Panel ({
     const close = () => {
         localStorage.setItem('closeable-' + closeableUuid, 'closed');
         setClosed(true);
-    }
+    };
 
     return (
         <div
@@ -46,9 +48,16 @@ export default function Panel ({
             <div className={loading ? 'blur-sm pointer-events-none' : ''}>
                 <div className="flex justify-between items-start">
                     {title && <h2
-                      className="text-3xl font-base tracking-wider font-semibold pb-2 text-left text-text-accent">{title}</h2>}
-                    {closeable && <FontAwesomeIcon className="text-text-accent opacity-60" icon={faClose} size="2x" onClick={close}/>
-                    }
+                        className="text-3xl font-base tracking-wider font-semibold pb-2 text-left text-text-accent"
+                    >
+                        {title}
+                    </h2>}
+                    {closeable && <FontAwesomeIcon
+                        className="text-text-accent opacity-60"
+                        icon={faClose}
+                        size="2x"
+                        onClick={close}
+                    />}
                 </div>
                 {children}
             </div>

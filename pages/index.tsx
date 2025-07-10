@@ -69,8 +69,8 @@ export default function Home() {
                     <p className="mb-4">
                         W tym roku Twoim celem są znane cytaty! Każda karta to para unikalnej grafiki oraz genialnego
                         tekstu, który odbił się szerokim echem w popkulturze. W Twojej kolekcji znajdziesz takie
-                        klasyki jak "Niebieski kwiat i kolce", "Jak to jest być skrybą?" czy "I'm groot". Do 
-                        znalezienia są aż 64 karty, więc pora ruszyć na łowy!
+                        klasyki jak &quot;Niebieski kwiat i kolce&quot;, &quot;Jak to jest być skrybą?&quot; 
+                        czy &quot;I&apos;m groot&quot;. Do znalezienia są aż 64 karty, więc pora ruszyć na łowy!
                     </p>
 
                     <div className="grid grid-cols-3 gap-4 justify-items-center">

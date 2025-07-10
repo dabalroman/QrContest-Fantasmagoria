@@ -18,13 +18,13 @@ Previous ones in short:
 - Tailwind CSS
 
 ## 2025 Edition TODO:
-- [ ] Create new lore - story and cards
-- [ ] Create images for new lore
-- [ ] Create 80 QR codes
-- [ ] New UI skin
+- [x] Create new lore - story and cards
+- [x] Create images for new lore
+- [x] Create 64 QR codes
+- [x] New UI skin
 - [ ] Update questions list
-- [ ] Seed the hidden category of cards
-- [ ] Update the dashboard to use new api
+- [x] Seed the hidden category of cards
+- [x] Update the dashboard to use new api
 - [ ] Prepare posters
 - [ ] Prepare splash screen for dashboard
 - [ ] Fix ranking bug for second round

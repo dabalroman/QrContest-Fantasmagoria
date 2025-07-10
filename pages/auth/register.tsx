@@ -1,20 +1,20 @@
-import { signInWithPopup } from '@firebase/auth';
-import React, { useContext, useEffect, useState } from 'react';
+import {signInWithPopup} from '@firebase/auth';
+import React, {useContext, useEffect, useState} from 'react';
 import Metatags from '@/components/Metatags';
-import { UserContext, UserContextType } from '@/utils/context';
-import { auth, googleAuthProvider } from '@/utils/firebase';
+import {UserContext, UserContextType} from '@/utils/context';
+import {auth, googleAuthProvider} from '@/utils/firebase';
 import toast from 'react-hot-toast';
 import Panel from '@/components/Panel';
 import ScreenTitle from '@/components/ScreenTitle';
 import Button from '@/components/Button';
-import { Page } from '@/Enum/Page';
+import {Page} from '@/Enum/Page';
 import useDynamicNavbar from '@/hooks/useDynamicNavbar';
-import { faArrowLeft, faEnvelope } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {faArrowLeft, faEnvelope} from '@fortawesome/free-solid-svg-icons';
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import LinkButton from '@/components/LinkButton';
-import { useRouter } from 'next/router';
+import {useRouter} from 'next/router';
 
-export default function RegisterPage () {
+export default function RegisterPage() {
     const router = useRouter();
     const [loading, setLoading] = useState<boolean>(false);
 
@@ -64,8 +64,9 @@ export default function RegisterPage () {
                     Adres Email
                 </LinkButton>
                 <p className='text-center mt-4'>Potwierdzenie adresu email nie jest wymagane.</p>
-                <p className="mt-2 text-center text-sm text-text-dim">Biorąc udział w konkursie akceptujesz warunki regulaminu
-                    uczestnictwa.</p>
+                <p className="mt-2 text-center text-sm text-text-dim">
+                    Biorąc udział w konkursie akceptujesz warunki regulaminu uczestnictwa.
+                </p>
             </Panel>
         </main>
     );

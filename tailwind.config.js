@@ -13,7 +13,6 @@ module.exports = {
     theme: {
         extend: {
             fontFamily: {
-                serif: ['var(--font-spectral)'],
                 fancy: ['var(--font-imFellDoublePica)'],
                 'fancy-capitals': ['var(--font-imFellDoublePicaSC)'],
                 base: ['var(--font-montserrat)']
