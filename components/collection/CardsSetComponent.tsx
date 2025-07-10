@@ -20,7 +20,7 @@ export default function CardsSetComponent({
                 {
                     Object.entries(cardSet.cardTiers)
                         .sort(([tierA, _], [tierB, __]) => (
-                            cardSet.cardTiersOrder[tierA] - cardSet.cardTiersOrder[tierB]
+                            (cardSet as any).cardTiersOrder[tierA] - (cardSet as any).cardTiersOrder[tierB]
                         ))
                         .map(([tier, amount]) => {
                             const collectedCardsWithTier = cardsInSet.filter((card: Card) => card.tier === tier);

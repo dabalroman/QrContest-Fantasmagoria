@@ -58,7 +58,7 @@ export default function AgendaScreen ({ programEntries }: { programEntries: Fant
                         <div>
                             <p style={{ fontSize: '5em' }}>{entry.title}</p>
                             <p style={{ fontSize: '3em' }}>
-                                {entry.location} <span className='pl-10 text-text-dim'>{entry.name}</span>
+                                {entry.location} <span className='pl-10 opacity-50'>{entry.name}</span>
                             </p>
                         </div>
                     </div>

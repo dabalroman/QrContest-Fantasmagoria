@@ -4,7 +4,7 @@ export default function CardSmallHiddenComponent ({
     className = '',
     cardTier = CardTier.COMMON,
     key = null
-}: { className?: string, cardTier: CardTier, key?: string | null }) {
+}: { className?: string, cardTier: CardTier, key?: string | number | null }) {
     const cardColorScheme = 'card-' + cardTier;
 
     return (
