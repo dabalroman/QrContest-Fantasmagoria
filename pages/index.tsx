@@ -115,9 +115,11 @@ export default function Home() {
                         W każdym konkursie musi być nagroda - a w QrContest mamy ich aż sześć!
                     </p>
                     <p className="mt-4 text-center text-lg">
-                        1. miejsce – 50 fantów <br/>
-                        2. miejsce – 35 fantów <br/>
-                        3. miejsce – 20 fantów <br/>
+                        <span className='text-xl font-semibold text-text-accent tracking-wider'>
+                            1. miejsce – 50 fantów
+                        </span><br/>
+                        <span className='text-xl'>2. miejsce – 35 fantów</span><br/>
+                        <span className='text-md'>3. miejsce – 20 fantów</span><br/>
                     </p>
                     <p className="mt-4 text-justify">
                         Konkurs podzielony jest na dwie rundy. Punkty z rundy pierwszej przechodzą do rundy

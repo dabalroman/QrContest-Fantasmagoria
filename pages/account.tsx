@@ -99,9 +99,11 @@ export default function AccountPage () {
 
                 <Panel title="Nagrody i rundy">
                     <p className="text-center text-lg">
-                        1. miejsce – 50 fantów <br/>
-                        2. miejsce – 35 fantów <br/>
-                        3. miejsce – 20 fantów <br/>
+                        <span className='text-xl font-semibold text-text-accent tracking-wider'>
+                            1. miejsce – 50 fantów
+                        </span><br/>
+                        <span className='text-xl'>2. miejsce – 35 fantów</span><br/>
+                        <span className='text-md'>3. miejsce – 20 fantów</span><br/>
                     </p>
                     <p className="mt-2 text-justify">
                         Konkurs podzielony jest na dwie rundy. Daty rozpoczęcia i zakończenia każdej z nich znajdziesz
@@ -127,7 +129,7 @@ export default function AccountPage () {
 
                 <Panel title={'Kontakt'}>
                     <p className="text-justify">
-                        Coś nie działa? Masz więcej pytań? <br/>
+                        Coś nie działa? Masz jakieś pytania? <br/>
                         W razie potrzeby możesz skontaktować się bezpośrednio z organizatorem konkursu przez
                         email <a href="mailto:dabalroman@gmail.com" className="underline">dabalroman@gmail.com</a> lub
                         przez <a href="https://m.me/roman.dabal" className="underline">messenger</a>.

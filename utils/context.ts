@@ -1,4 +1,4 @@
-import {Context, createContext, ReactNode, useState} from 'react';
+import {Context, createContext} from 'react';
 import User from '@/models/User';
 import {User as FirebaseUser} from '@firebase/auth';
 import CollectionCache from '@/models/CollectionCache';

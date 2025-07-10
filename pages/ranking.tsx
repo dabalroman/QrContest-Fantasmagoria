@@ -1,23 +1,21 @@
 import ScreenTitle from '@/components/ScreenTitle';
 import Metatags from '@/components/Metatags';
 import Panel from '@/components/Panel';
-import React, { useContext, useEffect, useState } from 'react';
-import { UserContext, UserContextType } from '@/utils/context';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBolt, faDiceD6, faImagePortrait, faUser } from '@fortawesome/free-solid-svg-icons';
-import { collection, onSnapshot, orderBy, query } from '@firebase/firestore';
-import { firestore } from '@/utils/firebase';
-import { FireDoc } from '@/Enum/FireDoc';
-import RankingRound, { GuildRankingRecord, UserRankingRecord } from '@/models/RankingRound';
+import React, {useContext, useEffect, useState} from 'react';
+import {UserContext, UserContextType} from '@/utils/context';
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
+import {faBolt, faDiceD6, faImagePortrait, faUser} from '@fortawesome/free-solid-svg-icons';
+import {collection, onSnapshot, orderBy, query} from '@firebase/firestore';
+import {firestore} from '@/utils/firebase';
+import {FireDoc} from '@/Enum/FireDoc';
+import RankingRound, {GuildRankingRecord, UserRankingRecord} from '@/models/RankingRound';
 import CurrentRoundPanel from '@/components/ranking/CurrentRoundPanel';
 import Button from '@/components/Button';
 import RoundRankingTable from '@/components/ranking/RoundRankingTable';
 import getGuildIcon from '@/utils/getGuildIcon';
-import LinkButton from '@/components/LinkButton';
-import { Page } from '@/Enum/Page';
 
-export default function ScoreboardPage ({}) {
-    const { user } = useContext<UserContextType>(UserContext);
+export default function ScoreboardPage({}) {
+    const {user} = useContext<UserContextType>(UserContext);
     const [loading, setLoading] = useState(true);
     const [rankingRounds, setRankingRounds] = useState<RankingRound[]>([]);
     const [currentRound, setCurrentRound] = useState<RankingRound | null>(null);
