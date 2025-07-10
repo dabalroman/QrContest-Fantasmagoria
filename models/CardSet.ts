@@ -18,6 +18,13 @@ export default class CardSet extends FirebaseModel {
     description: string;
     amountOfCards: number;
     cardTiers: CardSetTiersRecord;
+    cardTiersOrder: CardSetTiersRecord = {
+        [CardTier.COMMON]: 4,
+        [CardTier.RARE]: 3,
+        [CardTier.EPIC]: 2,
+        [CardTier.LEGENDARY]: 1,
+        [CardTier.MYTHICAL]: 0,
+    };
 
     constructor (
         uid: Uid = '',
@@ -31,7 +38,7 @@ export default class CardSet extends FirebaseModel {
             [CardTier.EPIC]: 0,
             [CardTier.LEGENDARY]: 0,
             [CardTier.MYTHICAL]: 0,
-        }
+        },
     ) {
         super();
 
