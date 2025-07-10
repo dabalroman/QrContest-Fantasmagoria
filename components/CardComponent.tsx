@@ -81,7 +81,10 @@ export default function CardComponent({
             }}
         >
             <div
-                className={`bg-${cardColorScheme} text-center text-text-light absolute top-0 right-0 pb-4 pl-5 pt-2 pr-4 rounded-bl-3xl`}
+                className={
+                    `bg-${cardColorScheme} `
+                    + "text-center text-text-light absolute top-0 right-0 pb-4 pl-5 pt-2 pr-4 rounded-bl-3xl"
+                }
             >
                 <span className="text-4xl block font-bold">
                     <FontAwesomeIcon icon={faStar} size="sm"/> {card.value}
@@ -89,7 +92,10 @@ export default function CardComponent({
                 <span className="mt-1 block text-xl font-semibold">{getCardTierFriendlyName(card.tier)}</span>
             </div>
             <div
-                className={`bg-${cardColorScheme} text-text-light absolute bottom-0 left-0 pb-4 pl-4 pt-3 pr-4 w-full text-center`}>
+                className={
+                    `bg-${cardColorScheme} `
+                    + "text-text-light absolute bottom-0 left-0 pb-4 pl-4 pt-3 pr-4 w-full text-center"
+                }>
                 <span className="text-4xl font-bold">{card.name}</span>
             </div>
             <div

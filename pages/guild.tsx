@@ -7,7 +7,7 @@ import { firestore } from '@/utils/firebase';
 import { useRouter } from 'next/router';
 import { collection, onSnapshot, orderBy, query } from '@firebase/firestore';
 import { FireDoc } from '@/Enum/FireDoc';
-import Guild from '@/models/Guild';
+import Guild, {GuildUid} from '@/models/Guild';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faCheck, faUser } from '@fortawesome/free-solid-svg-icons';
 import useDynamicNavbar from '@/hooks/useDynamicNavbar';
@@ -23,9 +23,9 @@ export default function GuildPage () {
 
     const [loading, setLoading] = useState<boolean>(true);
     const [guilds, setGuilds] = useState<Guild[] | null>(null);
-    const [selectedGuildUid, setSelectedGuildUid] = useState<string | null>(user?.memberOf ?? null);
+    const [selectedGuildUid, setSelectedGuildUid] = useState<GuildUid | null>((user?.memberOf as GuildUid) ?? null);
 
-    const joinGuild = (guildUid: string | null) => {
+    const joinGuild = (guildUid: GuildUid | null) => {
         if (typeof guildUid !== 'string') {
             toast.error('Nie udało się dołączyć do klubu. Spróbuj ponownie.');
             return;

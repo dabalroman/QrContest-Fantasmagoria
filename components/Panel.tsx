@@ -10,7 +10,8 @@ export default function Panel ({
     closeableUuid = '0000',
     margin = true,
     loading = false,
-    className = ''
+    className = '',
+    key = null
 }: {
     children: ReactNode,
     closeable?: boolean,
@@ -18,7 +19,8 @@ export default function Panel ({
     margin?: boolean,
     loading?: boolean,
     className?: string,
-    title?: string
+    title?: string,
+    key?: string
 }) {
     const [isClosed, setClosed] = useState<boolean>(closeable && localStorage.getItem('closeable-' + closeableUuid) === 'closed');
 
@@ -33,6 +35,7 @@ export default function Panel ({
 
     return (
         <div
+            key={key}
             className={
                 'p-4 rounded-xl shadow-panel '
                 + 'bg-panel-transparent relative backdrop-blur-md '

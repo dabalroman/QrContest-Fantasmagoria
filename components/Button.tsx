@@ -1,4 +1,4 @@
-import React, { MouseEventHandler, ReactNode } from 'react';
+import React, {MouseEventHandler, ReactNode} from 'react';
 
 export enum ButtonState {
     DISABLED,
@@ -26,13 +26,14 @@ const stateToLookMap = {
     }
 };
 
-export default function Button ({
+export default function Button({
     children,
     onClick,
     className,
     style,
     type = 'button',
-    state = ButtonState.ENABLED
+    state = ButtonState.ENABLED,
+    key = null,
 }: {
     children: ReactNode,
     onClick?: MouseEventHandler<HTMLButtonElement>,
@@ -40,6 +41,7 @@ export default function Button ({
     style?: object,
     type?: React.ButtonHTMLAttributes<HTMLButtonElement>['type'],
     state?: ButtonState,
+    key?: string,
 }) {
     return (
         <button
@@ -49,10 +51,11 @@ export default function Button ({
                 + ' ' + stateToLookMap[state].class
                 + ' ' + className
             }
-            style={{ ...style}}
+            style={{...style}}
             type={type}
             onClick={onClick}
             disabled={state === ButtonState.DISABLED}
+            key={key}
         >
             {children}
         </button>
