@@ -4,7 +4,7 @@
 
 :root {
     color-scheme: light only;
-    
+
     --color-primary: #9D2F00;
     --color-dim: #5c5c5c;
     --color-text-light: #ffffff;
@@ -12,33 +12,40 @@
 
     --color-panel-bg: rgba(217,217,217,0.3);
     --color-button-bg: rgba(196,196,196,0.5);
-    
+
     --color-common: #868686;
     --color-rare: #266592;
     --color-epic: #8D30C2;
     --color-legendary: #E9B119;
     --color-mythical: #A91103;
+
+    --color-guild-steel: #1e5533;
+    --color-guild-water: #1d597e;
+    --color-guild-void: #7d1b81;
+    --color-guild-desert: #3f268f;
 }
 
-.theme-common {
-    --color-primary: var(--color-common);
+/* Liga graczy */
+.theme-steel {
+    --color-primary: var(--color-guild-steel);
 }
 
-.theme-rare {
-    --color-primary: var(--color-rare);
+/* Zakon memów */
+.theme-water {
+    --color-primary: var(--color-guild-water);
 }
 
-.theme-epic {
-    --color-primary: var(--color-epic);
+/* Klub Otaku */
+.theme-void {
+    --color-primary: var(--color-guild-void);
 }
 
-.theme-legendary {
-    --color-primary: var(--color-legendary);
+/* Bractwo kinomaniaków */
+.theme-desert {
+    --color-primary: var(--color-guild-desert);
 }
 
-.theme-mythical {
-    --color-primary: var(--color-mythical);
-}
+.theme-default {}
 
 * {
     box-sizing: border-box;

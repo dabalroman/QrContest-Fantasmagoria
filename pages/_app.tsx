@@ -23,6 +23,8 @@ import useUserData from '@/hooks/useUserData';
 import {UserRole} from '@/Enum/UserRole';
 import {useRouter} from 'next/router';
 import {Page} from '@/Enum/Page';
+import useTheme from '@/hooks/useTheme';
+import { getThemeFromGuildUuid } from '@/Enum/AppTheme';
 
 config.autoAddCss = false;
 
@@ -64,6 +66,10 @@ export default function App({
             router.push(Page.DASHBOARD).then();
         }
     }, [router, userData.user]);
+
+    useEffect(() => {
+        setTheme(getThemeFromGuildUuid(userData.user?.memberOf ?? null)  );
+    }, [userData.authUser, userData.user]);
 
     return (
         <UserContext.Provider value={userData}>

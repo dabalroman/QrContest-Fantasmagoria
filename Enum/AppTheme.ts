@@ -1,26 +1,24 @@
-import {CardTier} from "@/Enum/CardTier";
+import { GuildUid } from '@/models/Guild';
 
 export enum AppTheme {
-    COMMON = 'theme-common',
-    RARE = 'theme-rare',
-    EPIC = 'theme-epic',
-    LEGENDARY = 'theme-legendary',
-    MYTHICAL = 'theme-mythical'
+    DESERT = 'theme-desert',
+    STEEL = 'theme-steel',
+    VOID = 'theme-void',
+    WATER = 'theme-water',
+    DEFAULT = 'theme-default'
 }
 
-export const getThemeFromCardTier = (tier: CardTier): AppTheme | null => {
-    switch (tier) {
+export const getThemeFromGuildUuid = (guildUuid: GuildUid | null): AppTheme | null => {
+    switch (guildUuid) {
         default:
-            return null;
-        case CardTier.COMMON:
-            return AppTheme.COMMON;
-        case CardTier.RARE:
-            return AppTheme.RARE;
-        case CardTier.EPIC:
-            return AppTheme.EPIC;
-        case CardTier.LEGENDARY:
-            return AppTheme.LEGENDARY;
-        case CardTier.MYTHICAL:
-            return AppTheme.MYTHICAL;
+            return AppTheme.DEFAULT;
+        case GuildUid.desert:
+            return AppTheme.DESERT;
+        case GuildUid.steel:
+            return AppTheme.STEEL;
+        case GuildUid.void:
+            return AppTheme.VOID;
+        case GuildUid.water:
+            return AppTheme.WATER;
     }
-}
+};

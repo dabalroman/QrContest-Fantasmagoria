@@ -1,6 +1,7 @@
 import FirebaseModel from '@/models/FirebaseModel';
 import { DocumentSnapshot, SnapshotOptions } from '@firebase/firestore';
 import { isUserRole, UserRole } from '@/Enum/UserRole';
+import { GuildUid } from '@/models/Guild';
 
 export default class User extends FirebaseModel {
     uid: string;
@@ -8,7 +9,7 @@ export default class User extends FirebaseModel {
     score: number;
     amountOfCollectedCards: number;
     amountOfAnsweredQuestions: number;
-    memberOf: string | null;
+    memberOf: GuildUid | null;
     role: UserRole;
     winnerInRound: string | null;
     updatedAt: Date;
@@ -20,7 +21,7 @@ export default class User extends FirebaseModel {
         score: number = 0,
         amountOfCollectedCards: number = 0,
         amountOfAnsweredQuestions: number = 0,
-        memberOf: string | null = null,
+        memberOf: GuildUid | null = null,
         role: UserRole = UserRole.USER,
         winnerInRound: string | null = null,
         updatedAt: Date = new Date(),

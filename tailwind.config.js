@@ -39,7 +39,7 @@ module.exports = {
             },
             colors: {
                 'panel-transparent': 'var(--color-panel-bg)',
-                
+
                 'overlay-start': 'rgba(217,217,217,1)',
                 'overlay-via': 'rgba(217,217,217,0.8)',
                 'overlay-end': 'rgba(217,217,217,0)',
@@ -68,10 +68,10 @@ module.exports = {
                 'card-legendary': 'var(--color-legendary)',
                 'card-mythical': 'var(--color-mythical)',
 
-                'guild-desert': '#be8d23',
-                'guild-void': '#7036b6',
-                'guild-water': '#3e75be',
-                'guild-steel': '#4B4B4B'
+                'guild-desert': 'var(--color-guild-desert)',
+                'guild-void': 'var(--color-guild-void)',
+                'guild-water': 'var(--color-guild-water)',
+                'guild-steel': 'var(--color-guild-steel)'
             },
             keyframes: {
                 pointsAdded: {

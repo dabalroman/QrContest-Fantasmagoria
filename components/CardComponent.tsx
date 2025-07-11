@@ -3,8 +3,6 @@ import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faStar} from '@fortawesome/free-solid-svg-icons';
 import {getCardTierFriendlyName} from '@/Enum/CardTier';
 import {useEffect, useRef, useState} from 'react';
-import useTheme from "@/hooks/useTheme";
-import {getThemeFromCardTier} from "@/Enum/AppTheme";
 
 export default function CardComponent({
     card,
@@ -15,8 +13,6 @@ export default function CardComponent({
         beta: 0,
         gamma: 0
     });
-
-    const {setTheme} = useTheme();
 
     useEffect(() => {
         const handleOrientation = (event: DeviceOrientationEvent) => {
@@ -54,10 +50,6 @@ export default function CardComponent({
     }, [initialOrientation, setInitialOrientation]);
 
     const cardColorScheme = 'card-' + card.tier;
-    
-    useEffect(() => {
-        setTheme(getThemeFromCardTier(card.tier));
-    }, [setTheme, card.tier]);
 
     return (
         <div
