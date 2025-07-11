@@ -113,12 +113,21 @@ module.exports = {
                     '100%': {
                         transform: 'scale(1.0)'
                     }
+                },
+                cardReveal: {
+                    '80%': {
+                        transform: 'translateY(0%)',
+                    },
+                    '100%': {
+                        transform: 'translateY(100%)',
+                    }
                 }
             },
             animation: {
                 'pointsAdded': 'pointsAdded 4s ease-in-out 0s 1 normal forwards',
                 'flash': 'flash 0.4s ease-out 0s 1 normal forwards',
                 'pulseSize': 'pulseSize 1s ease-in-out 0s infinite normal forwards',
+                'cardReveal': 'cardReveal 4s ease-in-out 0s 1 normal forwards',
             }
         }
     },

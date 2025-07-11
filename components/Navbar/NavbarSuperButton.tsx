@@ -28,14 +28,13 @@ export default function NavbarSuperButton ({
         + (animate ? ' animate-pulseSize' : '');
 
     const style = {
-        background: (!disabled
-            ? 'bg-button-accent'
-            : 'bg-button-dim'),
+        background: (!disabled ? 'bg-button-primary' : 'bg-button-dim'),
         bottom: (onlyCenter ? '-3rem' : '0'),
+        zIndex: 9999
     };
 
     const iconElement = onlyCenter
-        ? <FontAwesomeIcon className='relative bottom-5' icon={icon} size={'sm'}/>
+        ? <FontAwesomeIcon className="relative bottom-5" icon={icon} size={'sm'}/>
         : <FontAwesomeIcon icon={icon}/>;
 
     return (

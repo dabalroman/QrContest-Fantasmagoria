@@ -28,7 +28,7 @@ export default function QuestionCardView ({
 
     useDynamicNavbar({
         icon: correctAnswer ? faCheck : faQuestion,
-        href: Page.COLLECTION + `/${card?.uid}`,
+        href: Page.COLLECTION,
         disabledCenter: !correctAnswer,
         disabledSides: !correctAnswer,
         animate: correctAnswer !== null,
