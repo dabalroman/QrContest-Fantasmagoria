@@ -28,8 +28,8 @@ Previous ones in short:
 - [ ] Prepare posters
 - [ ] Prepare splash screen for dashboard
 - [ ] Fix ranking bug for second round
-- [ ] Cleanup production database
-- [ ] Production release
+- [x] Cleanup production database
+- [x] Production release
 - [ ] Create nice readme
 
 # Configuration
@@ -70,6 +70,7 @@ npm install -g firebase-tools
 ```
 
 ```bash
+firebase deploy --only hosting,firestore,functions
 firebase deploy --only hosting,firestore
 firebase deploy --only functions
 ```

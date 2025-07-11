@@ -80,8 +80,9 @@ export default function CardComponent ({
                 className={`bg-${cardColorScheme} flex items-center h-full w-full absolute z-20 `
                     + 'text-text-light animate-cardReveal'}
                 style={{ pointerEvents: 'none' }}>
-                <span
-                    className="w-full whitespace-pre-line text-2xl font-semibold text-center p-6">{trimmedDescription}</span>
+                <span className="w-full whitespace-pre-line text-2xl font-semibold text-center p-6">
+                    {trimmedDescription}
+                </span>
             </div>
             <div className="flex h-full w-full flex-col absolute z-0">
                 <div className="bg-center bg-cover grow w-full" style={{

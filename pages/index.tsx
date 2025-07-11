@@ -15,8 +15,12 @@ export default function Home() {
         ? <LinkButton href={Page.COLLECT} className="w-full my-2">Przejdź do gry</LinkButton>
         : (
             <div>
-                <LinkButton href={Page.LOGIN} className="w-full my-2 backdrop-blur-sm">Zaloguj na konto</LinkButton>
-                <LinkButton href={Page.REGISTER} className="w-full my-2 backdrop-blur-sm">Dołącz do konkursu</LinkButton>
+                <LinkButton href={Page.LOGIN} className="w-full my-2 backdrop-blur-sm">
+                    Zaloguj na konto
+                </LinkButton>
+                <LinkButton href={Page.REGISTER} className="w-full my-2 backdrop-blur-sm">
+                    Dołącz do konkursu
+                </LinkButton>
             </div>
         );
 
@@ -58,13 +62,16 @@ export default function Home() {
                         maxHeight: '80%'
                     }}/>
                     <p className="text-2xl">
-                        <span className="font-semibold text-text-accent">1. miejsce <br/></span><span>2x 50 fantów</span>
+                        <span className="font-semibold text-text-accent">1. miejsce <br/></span>
+                        <span>2x 50 fantów</span>
                     </p>
                     <p className="text-xl pt-3">
-                        <span className="font-semibold text-text-accent">2. miejsce <br/> </span><span>2x 35 fantów</span>
+                        <span className="font-semibold text-text-accent">2. miejsce <br/> </span>
+                        <span>2x 35 fantów</span>
                     </p>
                     <p className="text-lg pt-3">
-                        <span className="font-semibold text-text-accent">3. miejsce <br/> </span><span>2x 20 fantów</span>
+                        <span className="font-semibold text-text-accent">3. miejsce <br/> </span>
+                        <span>2x 20 fantów</span>
                     </p>
                 </Panel>
 
@@ -77,7 +84,7 @@ export default function Home() {
                         smartfon z dostępem
                         do internetu.</p>
                     <p className="pt-4">Dołącz już teraz używając przycisków powyżej,
-                        lub przejdź do "Pytania i odpowiedzi" jeśli chcesz wiedzieć więcej.</p>
+                        lub przejdź do &quot;Pytania i odpowiedzi&quot; jeśli chcesz wiedzieć więcej.</p>
                     <LinkButton href={Page.FAQ} className="w-full mt-4">Pytania i odpowiedzi</LinkButton>
                     <LinkButton href={Page.RULEBOOK} className="w-full mt-4">Regulamin konkursu</LinkButton>
                 </Panel>
@@ -144,7 +151,7 @@ export default function Home() {
 
                 <Panel title="Organizatorzy">
                     <p className="text-justify">
-                        Organizatorem konkursu "QrContest" na 15. Konwencie Fantastyki Fantasmagoria jest
+                        Organizatorem konkursu &quot;QrContest&quot; na 15. Konwencie Fantastyki Fantasmagoria jest
                         <b> Roman Dąbal.</b>
                     </p>
                     <p className="mt-4 text-justify">
@@ -159,7 +166,10 @@ export default function Home() {
                     </ul>
                 </Panel>
             </div>
-            <p className="text-center p-2 w-full text-sm">QrContest 2025 - Roman Dąbal dla 15. Konwent Fantastyki Fantasmagoria w Gnieźnie.<br/>Wszelkie prawa zastrzeżone.</p>
+            <p className="text-center p-2 w-full text-sm">
+                QrContest 2025 - Roman Dąbal dla 15. Konwent Fantastyki Fantasmagoria w Gnieźnie.<br/>
+                Wszelkie prawa zastrzeżone.
+            </p>
         </main>
     );
 }
