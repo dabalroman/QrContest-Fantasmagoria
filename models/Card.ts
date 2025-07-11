@@ -34,7 +34,7 @@ export default class Card extends FirebaseModel {
         withQuestion: boolean = false,
         isActive: boolean = false,
         collectedBy: string[] = [],
-        collectedAt: Date | null = null
+        collectedAt: Date | null = null,
     ) {
         super();
 

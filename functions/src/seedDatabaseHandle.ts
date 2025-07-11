@@ -11,6 +11,8 @@ import questionsSeed from './seeds/questionsSeed';
 import cardsSeed from './seeds/cardsSeed';
 import guildsSeed from './seeds/guildsSeed';
 import { Guild } from './types/guild';
+import cluesSeed from './seeds/cluesSeed';
+import { CardClue } from './types/cardClue';
 
 export const seedDatabaseHandle = onCall(async (req): Promise<{}> => {
     const data = req.data;
@@ -41,6 +43,7 @@ export const seedDatabaseHandle = onCall(async (req): Promise<{}> => {
     await seedCardSets(db);
     await seedRounds(db);
     await seedGuilds(db);
+    await seedClues(db);
 
     return { status: 'ok' };
 });
@@ -81,4 +84,12 @@ async function seedGuilds(db: FirebaseFirestore.Firestore) {
         db.collection('guilds').doc(guild.uid).set(guild, { merge: true });
     });
     logger.log('seedDatabaseHandle', 'seeding guilds done');
+}
+
+async function seedClues(db: FirebaseFirestore.Firestore) {
+    logger.log('seedDatabaseHandle', 'seeding clues');
+    cluesSeed.forEach((clue: CardClue) => {
+        db.collection('clues').doc(clue.uid).set(clue, { merge: true });
+    });
+    logger.log('seedDatabaseHandle', 'seeding clues done');
 }

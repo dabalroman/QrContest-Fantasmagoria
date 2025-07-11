@@ -6,6 +6,7 @@ import { FireDoc } from '@/Enum/FireDoc';
 import Card from '@/models/Card';
 import CollectionCache from '@/models/CollectionCache';
 import CardSet from '@/models/CardSet';
+import CardClue from '@/models/CardClue';
 
 export default function useCollectedCards() {
     const { user } = useContext<UserContextType>(UserContext);
@@ -13,7 +14,9 @@ export default function useCollectedCards() {
         cards,
         setCards,
         cardSets,
-        setCardSets
+        setCardSets,
+        clues,
+        setClues
     } = useContext<CardsCacheContextType>(CardsCacheContext);
 
     useEffect(() => {
@@ -43,7 +46,17 @@ export default function useCollectedCards() {
                 setCardSets(new CollectionCache<CardSet>(cardSetsDocs));
             });
         }
-    }, [cards, setCards, cardSets, setCardSets, user?.uid]);
 
-    return { cards, setCards, cardSets, setCardSets };
+        if (!clues) {
+            const cluesQuery = query(collection(firestore, FireDoc.CLUES))
+                .withConverter(CardClue.getConverter());
+
+            getDocs(cluesQuery).then((querySnapshot: QuerySnapshot) => {
+                const cluesDocs = querySnapshot.docs.map((doc: any) => doc.data()) as CardClue[];
+                setClues(new CollectionCache<CardClue>(cluesDocs));
+            })
+        }
+    }, [cards, setCards, cardSets, setCardSets, clues, setClues, user?.uid]);
+
+    return { cards, setCards, cardSets, setCardSets, clues, setClues };
 }

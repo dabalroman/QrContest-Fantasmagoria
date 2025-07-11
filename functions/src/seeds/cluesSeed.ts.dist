@@ -1,0 +1,39 @@
+import { CardClue } from '../types/cardClue';
+import { CardTier } from '../types/card';
+
+const cluesSeed: CardClue[] = [
+    {
+        uid: 'zaraz-bedzie-ciemno',
+        order: 1,
+        image: 'zaraz-bedzie-ciemno',
+        title: 'W dobrym miejscu, w dobrym czasie.',
+        description: 'Znajdź kuca. Applejack po ciężkim dniu pracy lubi relaksować się oglądając ulubiony serial. Pooglądaj razem z nią!',
+        tier: CardTier.MYTHICAL,
+    },
+    {
+        uid: 'disco-disco',
+        order: 2,
+        image: 'disco-disco',
+        title: 'Łowca głów',
+        description: 'Znajdź wolontariusza, który nosi ten wisiorek. A gdy już go znajdziesz, wystarczy udzielić poprawnej odpowiedzi w zagadce.',
+        tier: CardTier.LEGENDARY
+    },
+    {
+        uid: 'kinda-sus',
+        order: 3,
+        image: null,
+        title: 'A po co?',
+        description: 'Ten kod jest ukryty gdzieś w aplikacji!',
+        tier: CardTier.LEGENDARY
+    },
+    {
+        uid: 'houston-mamy-problem',
+        order: 4,
+        image: null,
+        title: 'Prawnik',
+        description: 'Ten kod jest ukryty gdzieś w aplikacji!',
+        tier: CardTier.EPIC,
+    }
+];
+
+export default cluesSeed;

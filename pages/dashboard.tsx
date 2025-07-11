@@ -21,11 +21,11 @@ enum ScreenType {
 }
 
 const screenTypeWeights = {
-    // [ScreenType.FantasmagoriaSplash]: 0.05,
-    // [ScreenType.QrContestSplash]: 0.07,
+    [ScreenType.FantasmagoriaSplash]: 0.05,
+    [ScreenType.QrContestSplash]: 0.1,
     [ScreenType.News]: 0.03,
     [ScreenType.Event]: 0.40,
-    [ScreenType.Agenda]: 0.45
+    [ScreenType.Agenda]: 0.42
 };
 
 const colorThemes = [
@@ -133,6 +133,9 @@ export default function DashboardPage () {
         return () => clearInterval(fetchTimeout);
     }, []);
 
+    const currentHour = new Date().getHours();
+    const isDarkAlready = currentHour >= 21 || currentHour < 6;
+
     return (
         <div
             className="fixed top-0 left-0 w-screen h-screen z-50 bg-center bg-cover bg-fixed bg-no-repeat"
@@ -146,23 +149,33 @@ export default function DashboardPage () {
                     backgroundColor: currentTheme
                 }}
             >
-                {/*{screenType === ScreenType.FantasmagoriaSplash &&*/}
-                {/*    <div*/}
-                {/*        className="w-full h-full fill bg-center bg-cover bg-red-800"*/}
-                {/*        style={{*/}
-                {/*            'backgroundImage': `url(/dashboard/splash.webp)`*/}
-                {/*        }}*/}
-                {/*    ></div>*/}
-                {/*}*/}
+                {screenType === ScreenType.FantasmagoriaSplash &&
+                   <div
+                       className="w-full h-full fill bg-center bg-contain bg-no-repeat"
+                       style={{
+                           'backgroundImage': `url(/dashboard/splash.webp)`
+                       }}
+                   ></div>
+                }
 
-                {/*{screenType === ScreenType.QrContestSplash &&*/}
-                {/*    <div*/}
-                {/*        className="w-full h-full fill bg-center bg-cover bg-red-800"*/}
-                {/*        style={{*/}
-                {/*            'backgroundImage': `url(/dashboard/guild-water-card.webp)`*/}
-                {/*        }}*/}
-                {/*    ></div>*/}
-                {/*}*/}
+                {screenType === ScreenType.QrContestSplash && (
+                    isDarkAlready ? (
+                        <div
+                            className="w-full h-full fill bg-center bg-contain bg-no-repeat"
+                            style={{
+                                'backgroundImage': `url(/dashboard/zaraz-bedzie-ciemno.webp)`
+                            }}
+                        ></div>
+                    ) : (
+                        <div
+                            className="w-full h-full fill bg-center bg-contain bg-no-repeat"
+                            style={{
+                                'backgroundImage': `url(/dashboard/qrContest.webp)`
+                            }}
+                        ></div>
+                    )
+                )
+                }
 
                 {screenType === ScreenType.News &&
                   <div className="w-full h-full flex flex-col justify-center p-20 font-semibold text-center">

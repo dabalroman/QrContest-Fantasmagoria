@@ -4,13 +4,16 @@ import Panel from '@/components/Panel';
 import Link from 'next/link';
 import CardSet from '@/models/CardSet';
 import CardSmallHiddenComponent from '@/components/CardSmallHiddenComponent';
-import {CardTier} from '@/Enum/CardTier';
+import { CardTier } from '@/Enum/CardTier';
+import CardClue from '@/models/CardClue';
 
-export default function CardsSetComponent({
+export default function CardsSetComponent ({
     cardSet,
-    cards
-}: { cardSet: CardSet, cards: Card[] }) {
+    cards,
+    clues
+}: { cardSet: CardSet, cards: Card[], clues: CardClue[] }) {
     const cardsInSet = cards.filter((card: Card) => card.cardSet === cardSet.uid);
+    const isSecretSet = cardSet.uid === 'secret';
 
     return (
         <Panel title={cardSet.name} className={'relative'}>
@@ -31,11 +34,29 @@ export default function CardsSetComponent({
                                 </Link>
                             ));
 
-                            const notCollected = Array(amount - collectedCardsWithTier.length)
-                                .fill(0)
-                                .map((_, i) => (
-                                    <CardSmallHiddenComponent key={i} cardTier={tier as CardTier}/>
-                                ));
+                            let notCollected = Array();
+
+                            if (isSecretSet) {
+                                notCollected = clues
+                                    .filter((clue: CardClue) => clue.tier === tier)
+                                    .filter((clue: CardClue) => !cards.some((card: Card) => card.uid === clue.uid))
+                                    .map((clue: CardClue) => (
+                                        <Link href={`/clue/${clue.uid}`} key={clue.uid}>
+                                            <CardSmallHiddenComponent
+                                                cardTier={tier as CardTier}
+                                                withClue={true}
+                                                key={clue.uid}
+                                            />
+                                        </Link>
+                                    ));
+
+                            } else {
+                                notCollected = Array(amount - collectedCardsWithTier.length)
+                                    .fill(0)
+                                    .map((_, i) => (
+                                        <CardSmallHiddenComponent key={i} cardTier={tier as CardTier}/>
+                                    ));
+                            }
 
                             return collected.concat(notCollected);
                         })

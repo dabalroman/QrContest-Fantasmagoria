@@ -3,8 +3,9 @@ import { CardTier } from '@/Enum/CardTier';
 export default function CardSmallHiddenComponent ({
     className = '',
     cardTier = CardTier.COMMON,
+    withClue = false,
     key = null
-}: { className?: string, cardTier: CardTier, key?: string | number | null }) {
+}: { className?: string, cardTier: CardTier, withClue?: boolean, key?: string | number | null }) {
     const cardColorScheme = 'card-' + cardTier;
 
     return (
@@ -21,6 +22,12 @@ export default function CardSmallHiddenComponent ({
                 'width': '5.5rem'
             }}
         >
+            {withClue &&
+              <div className="flex flex-col justify-between h-full">
+                <span className={`text-text-light font-bold text-3xl rounded-full pl-1`}>?</span>
+                <span className={`text-text-light font-bold text-3xl rounded-full pr-1 text-right`}>?</span>
+              </div>
+            }
         </div>
     );
 }

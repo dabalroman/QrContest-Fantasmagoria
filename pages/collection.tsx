@@ -17,7 +17,8 @@ import { Page } from '@/Enum/Page';
 export default function CollectionPage ({}) {
     const {
         cards,
-        cardSets
+        cardSets,
+        clues
     } = useCollectedCards();
     const [loading, setLoading] = useState<boolean>(!cards);
 
@@ -54,7 +55,7 @@ export default function CollectionPage ({}) {
 
     let cardsToShow = null;
 
-    if (cards && cardSets && cardSets?.get().length !== 0) {
+    if (cards && cardSets && clues && cardSets?.get().length !== 0) {
         cardsToShow = cardSets.get()
             .sort((a, b) => a.order - b.order)
             .map((cardSet: CardSet) =>
@@ -62,6 +63,7 @@ export default function CollectionPage ({}) {
                     key={cardSet.uid}
                     cardSet={cardSet}
                     cards={cards.get()}
+                    clues={clues.get()}
                 />
             );
     }

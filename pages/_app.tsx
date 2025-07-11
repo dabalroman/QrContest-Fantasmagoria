@@ -1,5 +1,5 @@
 import '@/styles/globals.css';
-import type {AppProps} from 'next/app';
+import type { AppProps } from 'next/app';
 import {
     CardsCacheContext,
     defaultNavbarConfig,
@@ -8,22 +8,22 @@ import {
     ThemeContext,
     UserContext
 } from '@/utils/context';
-import {Toaster} from 'react-hot-toast';
-import Navbar, {NavbarConfig} from '@/components/Navbar/Navbar';
-import {config} from '@fortawesome/fontawesome-svg-core';
+import { Toaster } from 'react-hot-toast';
+import Navbar, { NavbarConfig } from '@/components/Navbar/Navbar';
+import { config } from '@fortawesome/fontawesome-svg-core';
 import '@fortawesome/fontawesome-svg-core/styles.css';
-import {IM_Fell_Double_Pica, IM_Fell_Double_Pica_SC, Montserrat} from 'next/font/google';
+import { IM_Fell_Double_Pica, IM_Fell_Double_Pica_SC, Montserrat } from 'next/font/google';
 import AuthCheck from '@/components/AuthCheck';
-import {useEffect, useState} from 'react';
+import { useEffect, useState } from 'react';
 import CollectionCache from '@/models/CollectionCache';
 import Card from '@/models/Card';
 import CardSet from '@/models/CardSet';
+import CardClue from '@/models/CardClue';
 import Metatags from '@/components/Metatags';
 import useUserData from '@/hooks/useUserData';
-import {UserRole} from '@/Enum/UserRole';
-import {useRouter} from 'next/router';
-import {Page} from '@/Enum/Page';
-import useTheme from '@/hooks/useTheme';
+import { UserRole } from '@/Enum/UserRole';
+import { useRouter } from 'next/router';
+import { Page } from '@/Enum/Page';
 import { getThemeFromGuildUuid } from '@/Enum/AppTheme';
 
 config.autoAddCss = false;
@@ -44,7 +44,7 @@ const montserrat = Montserrat({
     variable: '--font-montserrat'
 });
 
-export default function App({
+export default function App ({
     Component,
     pageProps
 }: AppProps) {
@@ -53,6 +53,7 @@ export default function App({
     const [theme, setTheme] = useState<Theme>(null);
     const [cards, setCards] = useState<CollectionCache<Card> | null>(null);
     const [cardSets, setCardSets] = useState<CollectionCache<CardSet> | null>(null);
+    const [clues, setClues] = useState<CollectionCache<CardClue> | null>(null);
     const [navbarCenterAction, setNavbarCenterAction] = useState<NavbarConfig>(defaultNavbarConfig);
 
     useEffect(() => {
@@ -63,17 +64,21 @@ export default function App({
 
     useEffect(() => {
         if (userData.user?.role === UserRole.DASHBOARD && router.pathname !== Page.DASHBOARD) {
-            router.push(Page.DASHBOARD).then();
+            router.push(Page.DASHBOARD)
+                .then();
         }
     }, [router, userData.user]);
 
     useEffect(() => {
-        setTheme(getThemeFromGuildUuid(userData.user?.memberOf ?? null)  );
+        setTheme(getThemeFromGuildUuid(userData.user?.memberOf ?? null));
     }, [userData.authUser, userData.user]);
 
     return (
         <UserContext.Provider value={userData}>
-            <ThemeContext.Provider value={{theme, setTheme}}>
+            <ThemeContext.Provider value={{
+                theme,
+                setTheme
+            }}>
                 <NavbarConfigContext.Provider value={{
                     navbarConfig: navbarCenterAction,
                     setNavbarCenterAction
@@ -82,7 +87,9 @@ export default function App({
                         cards,
                         setCards,
                         cardSets,
-                        setCardSets
+                        setCardSets,
+                        clues,
+                        setClues
                     }}>
                         <>
                             <Metatags title="QrContest"/>
@@ -101,7 +108,7 @@ export default function App({
                                         className={
                                             `font-base bg-image-default bg-center bg-cover bg-fixed min-h-screen`
                                         }/>
-                                    <Toaster toastOptions={{duration: 6000}}/>
+                                    <Toaster toastOptions={{ duration: 6000 }}/>
                                 </AuthCheck>
                             </div>
                         </>

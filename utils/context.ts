@@ -4,6 +4,7 @@ import {User as FirebaseUser} from '@firebase/auth';
 import CollectionCache from '@/models/CollectionCache';
 import Card from '@/models/Card';
 import CardSet from '@/models/CardSet';
+import CardClue from '@/models/CardClue';
 import {Page} from '@/Enum/Page';
 import {faMagnifyingGlass} from '@fortawesome/free-solid-svg-icons';
 import {NavbarConfig} from '@/components/Navbar/Navbar';
@@ -34,7 +35,9 @@ export interface CardsCacheContextType {
     cards: CollectionCache<Card> | null,
     setCards: (cardsCache: CollectionCache<Card> | null) => void,
     cardSets: CollectionCache<CardSet> | null,
-    setCardSets: (cardSetsCache: CollectionCache<CardSet> | null) => void
+    setCardSets: (cardSetsCache: CollectionCache<CardSet> | null) => void,
+    clues: CollectionCache<CardClue> | null,
+    setClues: (cluesCache: CollectionCache<CardClue> | null) => void,
 }
 
 // @ts-ignore
@@ -44,6 +47,9 @@ export const CardsCacheContext: Context<CardsCacheContextType> = createContext({
     },
     cardSets: null,
     setCardSets: () => {
+    },
+    clues: null,
+    setClues: () => {
     }
 });
 
