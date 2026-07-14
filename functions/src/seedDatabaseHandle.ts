@@ -56,40 +56,40 @@ async function seedQuestions(db: FirebaseFirestore.Firestore) {
 
 async function seedCards(db: FirebaseFirestore.Firestore) {
     logger.log('seedDatabaseHandle', 'seeding cards');
-    cardsSeed.forEach((card: Card) => {
-        db.collection('cards').doc(card.uid).set(card);
-    });
+    await Promise.all(cardsSeed.map((card: Card) =>
+        db.collection('cards').doc(card.uid).set(card)
+    ));
     logger.log('seedDatabaseHandle', 'seeding cards done');
 }
 
 async function seedCardSets(db: FirebaseFirestore.Firestore) {
     logger.log('seedDatabaseHandle', 'seeding card sets');
-    cardSetsSeed.forEach((cardSet: CardSet) => {
-        db.collection('cardSets').doc(cardSet.uid).set(cardSet);
-    });
+    await Promise.all(cardSetsSeed.map((cardSet: CardSet) =>
+        db.collection('cardSets').doc(cardSet.uid).set(cardSet)
+    ));
     logger.log('seedDatabaseHandle', 'seeding card sets done');
 }
 
 async function seedRounds(db: FirebaseFirestore.Firestore) {
     logger.log('seedDatabaseHandle', 'seeding rounds');
-    rankingRoundsSeed.forEach((round: RankingRound) => {
-        db.collection('ranking').doc(round.uid).set(round, { merge: true });
-    });
+    await Promise.all(rankingRoundsSeed.map((round: RankingRound) =>
+        db.collection('ranking').doc(round.uid).set(round, { merge: true })
+    ));
     logger.log('seedDatabaseHandle', 'seeding rounds done');
 }
 
 async function seedGuilds(db: FirebaseFirestore.Firestore) {
     logger.log('seedDatabaseHandle', 'seeding guilds');
-    guildsSeed.forEach((guild: Guild) => {
-        db.collection('guilds').doc(guild.uid).set(guild, { merge: true });
-    });
+    await Promise.all(guildsSeed.map((guild: Guild) =>
+        db.collection('guilds').doc(guild.uid).set(guild, { merge: true })
+    ));
     logger.log('seedDatabaseHandle', 'seeding guilds done');
 }
 
 async function seedClues(db: FirebaseFirestore.Firestore) {
     logger.log('seedDatabaseHandle', 'seeding clues');
-    cluesSeed.forEach((clue: CardClue) => {
-        db.collection('clues').doc(clue.uid).set(clue, { merge: true });
-    });
+    await Promise.all(cluesSeed.map((clue: CardClue) =>
+        db.collection('clues').doc(clue.uid).set(clue, { merge: true })
+    ));
     logger.log('seedDatabaseHandle', 'seeding clues done');
 }
