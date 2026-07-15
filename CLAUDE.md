@@ -435,11 +435,15 @@ up is Firebase **Storage**, for photo uploads — see 12.4 — and only under ti
 
 - **Completing a quest grants points.** That is the load-bearing sentence.
 - ⚠️ Points fan out to **four** places (user doc, every open ranking round, the guild's member entry, the guild
-  aggregate). Today `collectCardHandle` and `answerQuestionHandle` each hand-roll that fan-out by calling
-  `updateRanking()` **and** `updateGuild()` inside their transaction. Skipping either silently desyncs the
-  leaderboard, with no error anywhere.
-  → **This is being extracted into one shared transactional `awardPoints` action first. Route quests through
-  that, do not hand-roll a third copy.**
+  aggregate). This is now owned by **`functions/src/actions/awardPoints.ts`** —
+  `awardPoints(db, tx, userRef, user, points, counters?)` does the user-doc `score`/counter increment, mutates
+  the in-memory `user` in place, and fans out to `updateRanking` + `updateGuild` (reading the `ranking`
+  collection once and passing the snapshot to both). `collectCardHandle` and `answerQuestionHandle` both go
+  through it; they keep only their domain writes. `counters` is a generic `Partial<Record<UserCounterKey, number>>`
+  delta map — quests pass `{ amountOfCompletedQuests: 1 }` once that field is added to `User` (see #4).
+  `updateRanking(rounds, tx, user)` / `updateGuild(db, rounds, tx, user)` take the pre-fetched rounds snapshot;
+  the two non-award callers (`setupAccountHandle`, `joinGuildHandle`) fetch it inline and pass it.
+  → **Route quests through `awardPoints`, do not hand-roll a third copy of the fan-out.**
 - Points are never awarded client-side. New callable → `functions/src/completeQuestHandle.ts` (or similar),
   registered in `functions/src/index.ts`, exported through `utils/functions.ts`.
 
