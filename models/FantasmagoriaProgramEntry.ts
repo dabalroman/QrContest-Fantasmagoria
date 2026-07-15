@@ -36,6 +36,10 @@ export default class FantasmagoriaProgramEntry {
         this.dateEnd = dateEnd;
     }
 
+    public get durationHours(): number {
+        return (this.dateEnd.getTime() - this.dateStart.getTime()) / (60 * 60 * 1000);
+    }
+
     public static fromRaw(raw: RawFantasmagoriaProgramEntry) {
         return new FantasmagoriaProgramEntry(
             raw.name,

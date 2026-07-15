@@ -48,7 +48,7 @@ const getFantasmagoriaProgram = async (): Promise<FantasmagoriaProgramEntry[]> =
             headers: { 'content-type': 'application/json-rpc' },
             body: JSON.stringify({
                 'id': null,
-                'method': 'GetKonwent2025Program'
+                'method': 'GetKonwent2026Program'
             })
         }
     )

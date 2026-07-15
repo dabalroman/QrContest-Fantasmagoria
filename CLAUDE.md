@@ -36,6 +36,9 @@ Root `package.json` is at version `6.0.0` (the 2025 / 15th-edition release).
 - `setGlobalOptions({region: 'europe-west1'})` is set in `functions/src/index.ts` — every function inherits it.
 - The client resolves the callable region from `NEXT_PUBLIC_FIREBASE_REGION`. If those two disagree,
   every callable fails with a CORS/404 — check both when callables mysteriously break.
+- Off-season the project runs on the **Spark plan**; Gen-2 callables then return **503**, surfacing in the browser
+  as *"CORS header … missing"*. Real cause shows in `npx firebase functions:log` ("billing is disabled"). Fix =
+  re-enable **Blaze** (no redeploy). **Check billing before debugging CORS.**
 
 ---
 
@@ -373,8 +376,11 @@ will need an index added here.
 `pages/dashboard.tsx` is a full-screen kiosk view for a projector/TV, gated to `UserRole.DASHBOARD`.
 It cycles randomly (weighted) between screen types every 60s — Agenda, Event, splash screens, and a
 "Pij wodę!" (drink water) reminder — and re-fetches the convention program hourly from Fantasmagoria's
-JSON-RPC API (`NEXT_PUBLIC_DASHBOARD_API_URL`, method `GetKonwent2025Program`). Note the method name is
-**year-stamped** and will need bumping each edition.
+JSON-RPC API (`NEXT_PUBLIC_DASHBOARD_API_URL`, method `GetKonwent2026Program`). The method is a **hardcoded
+literal in `pages/dashboard.tsx`** and **year-stamped** — bump each edition. The URL var must be set in
+`.env.production` at build time (`NEXT_PUBLIC_`, inlined) or the fetch silently resolves to `''`.
+`AgendaScreen` drops entries longer than 6h (`MAX_AGENDA_ENTRY_DURATION_HOURS`) — permanent all-day booths
+that would otherwise flood the scroll list.
 
 ---
 
