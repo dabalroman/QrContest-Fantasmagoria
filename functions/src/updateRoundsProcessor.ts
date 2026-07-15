@@ -31,6 +31,15 @@ export default async function updateRoundsProcessor(): Promise<string | void> {
         return 'Nothing to do, no rounds to finish.';
     }
 
+    const closingRoundUids = new Set(rankingRoundSnapshots.map((roundSnapshot) => roundSnapshot.id));
+
+    const openRoundSnapshots = roundsSnapshot.docs
+        .filter((roundSnapshot) => {
+            const rankingRound: RankingRound = roundSnapshot.data() as RankingRound;
+
+            return !closingRoundUids.has(roundSnapshot.id) && !rankingRound.finished;
+        });
+
     await db.runTransaction(async (transaction) => {
         rankingRoundSnapshots.forEach((roundSnapshot) => {
             transaction.update<RankingRound, Partial<RankingRound>>(
@@ -58,6 +67,18 @@ export default async function updateRoundsProcessor(): Promise<string | void> {
                 transaction.update<User, Partial<User>>(userRef,
                     {winnerInRound: user.winnerInRound} as UpdateData<User>
                 );
+
+                openRoundSnapshots.forEach((openRoundSnapshot) => {
+                    const openRankingRound: RankingRound = openRoundSnapshot.data() as RankingRound;
+
+                    if (!openRankingRound.users[user.uid]) {
+                        return;
+                    }
+
+                    transaction.update<RankingRoundUsers, Partial<RankingRoundUsers>>(openRoundSnapshot.ref, {
+                        [`users.${user.uid}.winnerInRound`]: user.winnerInRound
+                    } as unknown as UpdateData<RankingRoundUsers>);
+                });
             });
         });
     });

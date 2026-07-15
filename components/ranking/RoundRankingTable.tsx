@@ -28,7 +28,7 @@ export default function RoundRankingTable ({
                             !winnersOnly || record.winnerInRound === currentRound.uid
                         )
                         .filter((record: UserRankingRecord) =>
-                            !record.winnerInRound || record.winnerInRound === currentRound.uid
+                            RankingRound.isVisibleInRound(record, currentRound.uid)
                         )
                         .map((
                             record: UserRankingRecord,

@@ -41,6 +41,7 @@ export default function ScoreboardPage({}) {
     }, []);
 
     const currentUserPlace: number = currentRound?.users
+        .filter((record: UserRankingRecord) => RankingRound.isVisibleInRound(record, currentRound.uid))
         .findIndex((record: UserRankingRecord) => record.uid === user?.uid) ?? -1;
     const currentGuildPlace: number = currentRound?.guilds
         .findIndex((guild: GuildRankingRecord) => guild.uid === user?.memberOf) ?? -1;

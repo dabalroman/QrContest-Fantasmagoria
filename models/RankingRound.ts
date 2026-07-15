@@ -58,6 +58,10 @@ export default class RankingRound extends FirebaseModel {
         throw new Error('Ranking is immutable.');
     }
 
+    static isVisibleInRound (record: UserRankingRecord, roundUid: Uid): boolean {
+        return !record.winnerInRound || record.winnerInRound === roundUid;
+    }
+
     protected static fromFirestore (
         snapshot: DocumentSnapshot,
         options: SnapshotOptions
