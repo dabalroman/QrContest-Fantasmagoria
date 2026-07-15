@@ -1,22 +1,13 @@
 import {RankingRoundUser, RankingRoundUsers} from '../types/rankingRound';
 import {User} from '../types/user';
-import {logger} from 'firebase-functions';
-import {FieldValue, Firestore, Timestamp, Transaction, UpdateData} from 'firebase-admin/firestore';
+import {FieldValue, QuerySnapshot, Timestamp, Transaction, UpdateData} from 'firebase-admin/firestore';
 
-export default async function updateRanking(
-    db: Firestore,
+export default function updateRanking(
+    rounds: QuerySnapshot,
     transaction: Transaction,
     user: User
-): Promise<void> {
-    const roundsSnapshot = await db.collection('ranking')
-        .orderBy('from', 'asc')
-        .get();
-
-    if (roundsSnapshot.docs.length == 0) {
-        logger.error('No rounds found. Seed the database.');
-    }
-
-    const roundsSnapshotsToUpdate = roundsSnapshot.docs.filter((roundSnapshot) => {
+): void {
+    const roundsSnapshotsToUpdate = rounds.docs.filter((roundSnapshot) => {
         const round = roundSnapshot.data();
         return (round.to as Timestamp).toDate()
             .getTime() >= (new Date()).getTime();

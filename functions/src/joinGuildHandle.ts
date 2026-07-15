@@ -99,9 +99,13 @@ export const joinGuildHandle = onCall(async (req): Promise<{ user: User }> => {
             } as UpdateData<User>);
         });
 
+        const rounds = await db.collection('ranking')
+            .orderBy('from', 'asc')
+            .get();
+
         await db.runTransaction(async (transaction) => {
-            await updateRanking(db, transaction, user);
-            await updateGuild(db, transaction, user);
+            updateRanking(rounds, transaction, user);
+            await updateGuild(db, rounds, transaction, user);
         });
 
         logger.log('joinGuildHandle', `User ${user.username} joined ${guildToJoin}.`);

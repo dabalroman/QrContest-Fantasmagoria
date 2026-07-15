@@ -79,12 +79,16 @@ export const setupAccountHandle = onCall(async (req): Promise<{ user: User }> =>
         .collection('collectedQuestions')
         .doc('collectedQuestions');
 
+    const rounds = await db.collection('ranking')
+        .orderBy('from', 'asc')
+        .get();
+
     try {
         await db.runTransaction(async (transaction) => {
             transaction.create(userRef, user);
             transaction.create<UserUsername, DocumentData>(usernameRef, userUsername);
             transaction.create(collectedQuestionsRef, {});
-            await updateRanking(db, transaction, user);
+            updateRanking(rounds, transaction, user);
         });
 
         logger.log('setupAccountHandle', `User ${user.username} registered.`);

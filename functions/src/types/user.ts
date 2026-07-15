@@ -23,3 +23,5 @@ export type User = {
 export type UserUsername = {
     uid: string,
 }
+
+export type UserCounterKey = 'amountOfCollectedCards' | 'amountOfAnsweredQuestions';

@@ -2,9 +2,8 @@ import * as logger from 'firebase-functions/logger';
 import {HttpsError} from 'firebase-functions/v2/https';
 import {DocumentReference, FieldValue, getFirestore, UpdateData} from 'firebase-admin/firestore';
 import {CollectedQuestions, Question, QuestionAnswerValue, QuestionsDoc} from './types/question';
-import updateRanking from './actions/updateRanking';
 import getCurrentUser from './actions/getCurrentUser';
-import updateGuild from './actions/updateGuild';
+import awardPoints from './actions/awardPoints';
 import {onCall} from "firebase-functions/https";
 
 export const answerQuestionHandle = onCall(async (req): Promise<{
@@ -65,18 +64,8 @@ export const answerQuestionHandle = onCall(async (req): Promise<{
     const questionCorrect = questionCorrectAnswer === questionAnswer;
     const questionValue = questionCorrect ? question.value : 0;
 
-    user.score += questionValue;
-    user.amountOfAnsweredQuestions += 1;
-
     try {
         await db.runTransaction(async (transaction) => {
-            //Update user score and amount of collected cards
-            transaction.update(userRef, {
-                score: FieldValue.increment(questionValue),
-                amountOfAnsweredQuestions: FieldValue.increment(1),
-                updatedAt: FieldValue.serverTimestamp()
-            });
-
             //Save user answered question
             transaction.update<CollectedQuestions, CollectedQuestions>(collectedQuestionsRef, {
                 [questionUid]: {
@@ -87,8 +76,7 @@ export const answerQuestionHandle = onCall(async (req): Promise<{
                 }
             } as UpdateData<CollectedQuestions>);
 
-            await updateRanking(db, transaction, user);
-            await updateGuild(db, transaction, user);
+            await awardPoints(db, transaction, userRef, user, questionValue, {amountOfAnsweredQuestions: 1});
         });
 
         logger.log('answerQuestionHandle', user.username, `question answer ${questionUid} registered`);

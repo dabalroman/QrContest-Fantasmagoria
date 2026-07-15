@@ -1,12 +1,10 @@
 import {FieldValue, getFirestore, UpdateData} from 'firebase-admin/firestore';
 import {Card, CardCollectedBy, CollectedCard} from './types/card';
 import {CollectedCardQuestion, CollectedQuestions, PublicQuestion, Question, QuestionsDoc} from './types/question';
-import updateRanking from './actions/updateRanking';
 import getCurrentUser from './actions/getCurrentUser';
-import updateGuild from './actions/updateGuild';
+import awardPoints from './actions/awardPoints';
 import {HttpsError, onCall} from 'firebase-functions/v2/https';
 import * as logger from 'firebase-functions/logger';
-import {User} from "./types/user";
 
 export const collectCardHandle = onCall(async (req): Promise<{
     card: CollectedCard,
@@ -97,9 +95,6 @@ export const collectCardHandle = onCall(async (req): Promise<{
     const collectedCardRef = userRef.collection('collectedCards')
         .doc(card.uid);
 
-    user.score += card.value;
-    user.amountOfCollectedCards += 1;
-
     try {
         await db.runTransaction(async (transaction) => {
             //Collect card
@@ -116,13 +111,6 @@ export const collectCardHandle = onCall(async (req): Promise<{
                 withQuestion: card.withQuestion,
                 collectedAt: FieldValue.serverTimestamp()
             });
-
-            //Update user score and amount of collected cards
-            transaction.update<User, User>(userRef, ({
-                score: FieldValue.increment(card.value),
-                amountOfCollectedCards: FieldValue.increment(1),
-                updatedAt: FieldValue.serverTimestamp()
-            } as UpdateData<User>));
 
             //Update card collectedBy
             transaction.update<CardCollectedBy, CardCollectedBy>(cardRef, {
@@ -145,8 +133,7 @@ export const collectCardHandle = onCall(async (req): Promise<{
                 }) as UpdateData<CollectedQuestions>);
             }
 
-            await updateRanking(db, transaction, user);
-            await updateGuild(db, transaction, user);
+            await awardPoints(db, transaction, userRef, user, card.value, {amountOfCollectedCards: 1});
         });
 
         logger.log('collectCardHandle', user.username, `card code ${codeAttempt} is valid`);

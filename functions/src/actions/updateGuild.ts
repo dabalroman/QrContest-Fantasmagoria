@@ -2,12 +2,15 @@ import {User} from '../types/user';
 import * as logger from 'firebase-functions/logger';
 import {Guild, GuildMember } from '../types/guild';
 import {RankingRoundGuild, RankingRoundGuilds} from '../types/rankingRound';
-import {DocumentReference, FieldValue, Firestore, Timestamp, Transaction, UpdateData} from 'firebase-admin/firestore';
+import {
+    DocumentReference, FieldValue, Firestore, QuerySnapshot, Timestamp, Transaction, UpdateData
+} from 'firebase-admin/firestore';
 import {HttpsError} from "firebase-functions/v2/https";
 
 
 export default async function updateGuild(
     db: Firestore,
+    rounds: QuerySnapshot,
     transaction: Transaction,
     user: User
 ): Promise<void> {
@@ -73,15 +76,7 @@ export default async function updateGuild(
     //
     // Update rankings for guilds
     //
-    const roundsSnapshot = await db.collection('ranking')
-        .orderBy('from', 'asc')
-        .get();
-
-    if (roundsSnapshot.docs.length == 0) {
-        logger.error('No rounds found. Seed the database.');
-    }
-
-    const roundsSnapshotsToUpdate = roundsSnapshot.docs.filter((roundSnapshot) => {
+    const roundsSnapshotsToUpdate = rounds.docs.filter((roundSnapshot) => {
         const round = roundSnapshot.data();
         return (round.to as Timestamp).toDate()
             .getTime() >= (new Date()).getTime();
