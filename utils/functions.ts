@@ -1,12 +1,17 @@
 import { HttpsCallable, httpsCallable } from '@firebase/functions';
 import { functions } from '@/utils/firebase';
-import { RawCard, RawQuestion } from '@/models/Raw';
+import { RawCard, RawCompletedPin, RawQuestion } from '@/models/Raw';
 import { QuestionAnswerValue } from '@/functions/src/types/question';
 
 export const collectCardFunction: HttpsCallable<
     { code: string },
     { card: RawCard, question: RawQuestion | null }
 > = httpsCallable(functions, 'collectCardHandle');
+
+export const completePinFunction: HttpsCallable<
+    { code?: string, pinUid?: string, answer?: string },
+    { pin: RawCompletedPin, question: RawQuestion | null }
+> = httpsCallable(functions, 'completePinHandle');
 
 export const answerQuestionFunction: HttpsCallable<
     { uid: string, answer: string },

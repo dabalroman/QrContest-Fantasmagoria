@@ -44,3 +44,12 @@ export interface RawPin {
     availableFrom: RawFirestoreTimestamp | undefined,
     availableTo: RawFirestoreTimestamp | undefined
 }
+
+export interface RawCompletedPin {
+    uid: Uid,
+    type: PinType,
+    completedAt: RawFirestoreTimestamp,
+    awardedPoints: number,
+    talkName: string | undefined,
+    rating: number | undefined
+}

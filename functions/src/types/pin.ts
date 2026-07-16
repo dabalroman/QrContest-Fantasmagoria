@@ -13,6 +13,13 @@ export type PinCoords = {
     y: number;
 }
 
+export type PinCompletedBy = {
+    [uid: string]: {
+        username: string;
+        completedAt: FieldValue;
+    }
+}
+
 export type Pin = {
     uid: string;
     name: string;
@@ -28,6 +35,7 @@ export type Pin = {
     availableTo: Timestamp | FieldValue | null;
     isActive: boolean;
     code: string | null;
+    completedBy: PinCompletedBy;
 }
 
 export type CompletedPin = {

@@ -37,7 +37,7 @@ export default async function awardPoints(
     // Mutate the in-memory user so the fan-out helpers read post-award values off it
     user.score += points;
     counterKeys.forEach((key) => {
-        user[key] += counters[key] as number;
+        user[key] = (user[key] ?? 0) + (counters[key] as number);
     });
 
     // Fan out — read the ranking collection once and hand it to both helpers

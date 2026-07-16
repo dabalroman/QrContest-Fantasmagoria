@@ -1,6 +1,7 @@
 import FirebaseModel from '@/models/FirebaseModel';
-import { DocumentSnapshot, SnapshotOptions } from '@firebase/firestore';
+import { DocumentSnapshot, SnapshotOptions, Timestamp } from '@firebase/firestore';
 import { isPinType, PinType } from '@/Enum/PinType';
+import { RawCompletedPin } from '@/models/Raw';
 import { Uid } from '@/types/global';
 
 export default class CompletedPin extends FirebaseModel {
@@ -31,6 +32,17 @@ export default class CompletedPin extends FirebaseModel {
         this.awardedPoints = awardedPoints;
         this.talkName = talkName;
         this.rating = rating;
+    }
+
+    public static fromRaw (rawCompletedPin: RawCompletedPin): CompletedPin {
+        return new CompletedPin(
+            rawCompletedPin.uid,
+            rawCompletedPin.type,
+            Timestamp.fromMillis(rawCompletedPin.completedAt._seconds * 1000).toDate(),
+            rawCompletedPin.awardedPoints,
+            rawCompletedPin.talkName ?? null,
+            rawCompletedPin.rating ?? null
+        );
     }
 
     protected static toFirestore (data: CompletedPin): object {

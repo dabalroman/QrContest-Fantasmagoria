@@ -9,6 +9,7 @@ export default class User extends FirebaseModel {
     score: number;
     amountOfCollectedCards: number;
     amountOfAnsweredQuestions: number;
+    amountOfCompletedPins: number;
     memberOf: GuildUid | null;
     role: UserRole;
     winnerInRound: string | null;
@@ -21,6 +22,7 @@ export default class User extends FirebaseModel {
         score: number = 0,
         amountOfCollectedCards: number = 0,
         amountOfAnsweredQuestions: number = 0,
+        amountOfCompletedPins: number = 0,
         memberOf: GuildUid | null = null,
         role: UserRole = UserRole.USER,
         winnerInRound: string | null = null,
@@ -34,6 +36,7 @@ export default class User extends FirebaseModel {
         this.score = score;
         this.amountOfCollectedCards = amountOfCollectedCards;
         this.amountOfAnsweredQuestions = amountOfAnsweredQuestions;
+        this.amountOfCompletedPins = amountOfCompletedPins;
         this.memberOf = memberOf;
         this.role = role;
         this.winnerInRound = winnerInRound;
@@ -65,6 +68,7 @@ export default class User extends FirebaseModel {
             data.score,
             data.amountOfCollectedCards,
             data.amountOfAnsweredQuestions,
+            data.amountOfCompletedPins,
             data.memberOf,
             data.role,
             data.winnerInRound,

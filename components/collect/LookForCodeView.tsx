@@ -119,6 +119,7 @@ export default function LookForCodeView ({
                            {...register(
                                'code',
                                {
+                                   setValueAs: (value: string) => value.trim(),
                                    required: 'Kod karty składa się z 10 znaków',
                                    pattern: {
                                        value: /^[A-z0-9]{10}$/,

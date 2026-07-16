@@ -13,6 +13,7 @@ export type User = {
     score: number,
     amountOfCollectedCards: number,
     amountOfAnsweredQuestions: number,
+    amountOfCompletedPins: number,
     role: UserRole,
     memberOf: GuildUid | null,
     winnerInRound: string | null
@@ -24,4 +25,4 @@ export type UserUsername = {
     uid: string,
 }
 
-export type UserCounterKey = 'amountOfCollectedCards' | 'amountOfAnsweredQuestions';
+export type UserCounterKey = 'amountOfCollectedCards' | 'amountOfAnsweredQuestions' | 'amountOfCompletedPins';

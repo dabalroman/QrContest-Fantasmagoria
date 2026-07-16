@@ -48,7 +48,7 @@ export const answerQuestionHandle = onCall(async (req): Promise<{
         throw new HttpsError('aborted', 'error while getting collected questions');
     }
 
-    const questionsRef: FirebaseFirestore.DocumentReference = await db.collection('questions')
+    const questionsRef: FirebaseFirestore.DocumentReference = db.collection('questions')
         .doc('questions');
     const questionsDoc = await questionsRef.get();
     const questionsData = questionsDoc.data() as QuestionsDoc;

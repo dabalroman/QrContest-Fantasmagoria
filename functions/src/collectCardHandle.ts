@@ -57,7 +57,7 @@ export const collectCardHandle = onCall(async (req): Promise<{
 
     // Question
     let question: PublicQuestion | null = null;
-    const questionsRef: FirebaseFirestore.DocumentReference = await db.collection('questions')
+    const questionsRef: FirebaseFirestore.DocumentReference = db.collection('questions')
         .doc('questions');
 
     const collectedQuestionsRef: FirebaseFirestore.DocumentReference = db.collection('users')

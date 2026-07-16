@@ -18,6 +18,24 @@ export const QUESTION_CORRECT = 'a';
 /** Total score a user should have after collect (+10) then a correct answer (+15). */
 export const EXPECTED_TOTAL = CARD_VALUE + QUESTION_VALUE;
 
+// --- Pins ---
+export const PIN_CODE_UID = 'test-pin-code';
+export const PIN_CODE_VALUE = 20;
+export const PIN_CODE_CODE = 'PINCODE001';     // 10 chars, [A-Z0-9]
+
+export const PIN_RIDDLE_UID = 'test-pin-riddle';
+export const PIN_RIDDLE_VALUE = 15;
+export const PIN_RIDDLE_ANSWER = 'smok';       // free-text, matched case/whitespace-insensitively
+
+export const PIN_VISIT_UID = 'test-pin-visit';
+export const PIN_VISIT_VALUE = 5;
+
+export const PIN_FEEDBACK_UID = 'test-pin-feedback';
+export const PIN_PHOTO_UID = 'test-pin-photo';
+
+export const PIN_UNAVAILABLE_UID = 'test-pin-unavailable';
+export const PIN_UNAVAILABLE_VALUE = 5;
+
 export async function seedFixture () {
     const now = Date.now();
 
@@ -68,5 +86,114 @@ export async function seedFixture () {
             value: QUESTION_VALUE,
             updatedAt: FieldValue.serverTimestamp()
         }
+    });
+
+    await db.collection('pins').doc(PIN_CODE_UID).set({
+        uid: PIN_CODE_UID,
+        name: 'Test pin (code)',
+        description: 'test pin',
+        clue: '',
+        type: 'code',
+        groups: ['test'],
+        mapId: 'test-map',
+        coords: { x: 0, y: 0 },
+        value: PIN_CODE_VALUE,
+        withQuestion: true,
+        availableFrom: null,
+        availableTo: null,
+        isActive: true,
+        code: PIN_CODE_CODE,
+        completedBy: {}
+    });
+
+    await db.collection('pins').doc(PIN_RIDDLE_UID).set({
+        uid: PIN_RIDDLE_UID,
+        name: 'Test pin (riddle)',
+        description: 'test pin',
+        clue: 'What breathes fire?',
+        type: 'riddle',
+        groups: ['test'],
+        mapId: 'test-map',
+        coords: { x: 10, y: 10 },
+        value: PIN_RIDDLE_VALUE,
+        withQuestion: false,
+        availableFrom: null,
+        availableTo: null,
+        isActive: true,
+        code: PIN_RIDDLE_ANSWER,
+        completedBy: {}
+    });
+
+    await db.collection('pins').doc(PIN_VISIT_UID).set({
+        uid: PIN_VISIT_UID,
+        name: 'Test pin (visit)',
+        description: 'test pin',
+        clue: '',
+        type: 'visit',
+        groups: ['test'],
+        mapId: 'test-map',
+        coords: { x: 20, y: 20 },
+        value: PIN_VISIT_VALUE,
+        withQuestion: false,
+        availableFrom: null,
+        availableTo: null,
+        isActive: true,
+        code: null,
+        completedBy: {}
+    });
+
+    await db.collection('pins').doc(PIN_FEEDBACK_UID).set({
+        uid: PIN_FEEDBACK_UID,
+        name: 'Test pin (feedback)',
+        description: 'test pin',
+        clue: '',
+        type: 'feedback',
+        groups: ['test'],
+        mapId: 'test-map',
+        coords: { x: 30, y: 30 },
+        value: 5,
+        withQuestion: false,
+        availableFrom: null,
+        availableTo: null,
+        isActive: true,
+        code: null,
+        completedBy: {}
+    });
+
+    await db.collection('pins').doc(PIN_PHOTO_UID).set({
+        uid: PIN_PHOTO_UID,
+        name: 'Test pin (photo)',
+        description: 'test pin',
+        clue: '',
+        type: 'photo',
+        groups: ['test'],
+        mapId: 'test-map',
+        coords: { x: 40, y: 40 },
+        value: 5,
+        withQuestion: false,
+        availableFrom: null,
+        availableTo: null,
+        isActive: true,
+        code: null,
+        completedBy: {}
+    });
+
+    // Outside its availability window: closed an hour ago.
+    await db.collection('pins').doc(PIN_UNAVAILABLE_UID).set({
+        uid: PIN_UNAVAILABLE_UID,
+        name: 'Test pin (unavailable)',
+        description: 'test pin',
+        clue: '',
+        type: 'visit',
+        groups: ['test'],
+        mapId: 'test-map',
+        coords: { x: 50, y: 50 },
+        value: PIN_UNAVAILABLE_VALUE,
+        withQuestion: false,
+        availableFrom: Timestamp.fromMillis(now - 2 * 60 * 60 * 1000),
+        availableTo: Timestamp.fromMillis(now - 60 * 60 * 1000),
+        isActive: true,
+        code: null,
+        completedBy: {}
     });
 }
