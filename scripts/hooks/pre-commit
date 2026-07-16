@@ -1,0 +1,91 @@
+#!/usr/bin/env bash
+#
+# pre-commit — full frontend + backend gate.
+#
+# Runs the complete verification pipeline on every commit and aborts the commit
+# if any leg fails. Roughly ~50s. Deliberately unconditional: it does NOT try to
+# guess from the staged paths which half of the app is affected.
+#
+# WHY unconditional: the client and Cloud Functions type worlds are not isolated
+# (CLAUDE.md §4) — client files import admin types directly, e.g.
+# `models/CardClue.ts` imports from `@/functions/src/types/card`. So a backend
+# type edit breaks the frontend typecheck, and path-matching that "only functions/
+# changed, skip the frontend" would sail straight past it. 50s is cheap next to
+# shipping a broken build during a 3-day event with no redeploy window.
+#
+# WHAT is checked, in fail-fast order (cheapest first):
+#   1. frontend lint       npm run lint
+#   2. frontend typecheck  npx tsc --noEmit
+#   3. frontend build      npm run build            (next build)
+#   4. backend lint        npm --prefix functions run lint
+#   5. backend build       npm --prefix functions run build   (tsc -> functions/lib)
+#   6. backend e2e         scripts/emu-test.sh      (real callables vs. emulators)
+#
+# Step 6 reuses step 5's compiled output via EMU_NO_BUILD=1 — the emulator loads
+# functions/lib, never the .ts source, and step 5 just produced it. Building twice
+# would only burn ~5s.
+#
+# SCOPE: this verifies the WORKING TREE as it sits on disk, not the staged
+# snapshot. It never stashes, so it can never eat your uncommitted work. The
+# tradeoff: with a partially-staged commit the hook can pass while the committed
+# snapshot is broken. Commit whole files and this never bites.
+#
+# BYPASS:  git commit --no-verify
+#
+# INSTALL: npm run hooks:install     (sets core.hooksPath — needed once per clone,
+#                                     git config is local and is never committed)
+set -euo pipefail
+
+# Hooks run from the repo root already, but be explicit — emu-test.sh and the npm
+# scripts all assume it, and a hook invoked by a GUI client may differ.
+cd "$(git rev-parse --show-toplevel)"
+
+RED=''; GREEN=''; DIM=''; RESET=''
+if [ -t 1 ]; then
+    RED=$'\033[31m'; GREEN=$'\033[32m'; DIM=$'\033[2m'; RESET=$'\033[0m'
+fi
+
+STARTED=$SECONDS
+
+# run_step <label> <cmd...>
+# Keeps output quiet on success and dumps the full log on failure — a green run
+# should be six lines, not six screens of next/tsc/emulator chatter.
+run_step() {
+    local label="$1"; shift
+    local log start code
+    log="$(mktemp)"
+    start=$SECONDS
+
+    printf '[pre-commit] %-22s' "$label"
+
+    set +e
+    "$@" >"$log" 2>&1
+    code=$?
+    set -e
+
+    if [ "$code" -eq 0 ]; then
+        printf '%sok%s %s(%ds)%s\n' "$GREEN" "$RESET" "$DIM" "$((SECONDS - start))" "$RESET"
+        rm -f "$log"
+        return 0
+    fi
+
+    printf '%sFAIL%s %s(%ds)%s\n\n' "$RED" "$RESET" "$DIM" "$((SECONDS - start))" "$RESET"
+    printf '%s----- output of: %s -----%s\n' "$DIM" "$*" "$RESET"
+    cat "$log"
+    rm -f "$log"
+    printf '\n%s[pre-commit] %s failed - commit aborted.%s\n' "$RED" "$label" "$RESET"
+    printf '[pre-commit] Fix it, or bypass with: git commit --no-verify\n'
+    exit "$code"
+}
+
+printf '[pre-commit] verifying frontend + backend (~50s, --no-verify to skip)\n'
+
+run_step 'frontend lint'      npm run lint
+run_step 'frontend typecheck' npx tsc --noEmit
+run_step 'frontend build'     npm run build
+
+run_step 'backend lint'       npm --prefix functions run lint
+run_step 'backend build'      npm --prefix functions run build
+run_step 'backend e2e'        env EMU_NO_BUILD=1 ./scripts/emu-test.sh
+
+printf '%s[pre-commit] all checks passed (%ds)%s\n' "$GREEN" "$((SECONDS - STARTED))" "$RESET"

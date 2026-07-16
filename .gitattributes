@@ -1,0 +1,5 @@
+# Shell scripts and git hooks must always be LF — core.autocrlf would otherwise
+# check them out as CRLF, making the shebang `#!/usr/bin/env bash\r` and breaking
+# them with "bad interpreter". Hook files have no extension, hence the second rule.
+*.sh            text eol=lf
+scripts/hooks/* text eol=lf

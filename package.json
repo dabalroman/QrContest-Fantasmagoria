@@ -8,7 +8,9 @@
     "start": "next start",
     "lint": "next lint",
     "emulators": "firebase emulators:start --import .emulators --export-on-exit .emulators --only functions,firestore,auth,storage,pubsub",
-    "emulators:test": "firebase emulators:start --project demo-qrcontest --only functions,firestore,auth,storage,pubsub"
+    "emulators:test": "firebase emulators:start --project demo-qrcontest --only functions,firestore,auth,storage,pubsub",
+    "hooks:install": "git config core.hooksPath scripts/hooks",
+    "verify": "scripts/hooks/pre-commit"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.7.2",
