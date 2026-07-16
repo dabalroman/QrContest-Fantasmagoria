@@ -51,6 +51,7 @@ npm run dev
 # Lint / build
 npm run lint
 npm run build
+npx tsc --noEmit                       # fast client-tree typecheck (skips the full Next build)
 
 # Emulators (functions, firestore, auth, storage, pubsub) — imports/exports ./.emulators
 npm run emulators
@@ -139,7 +140,9 @@ This is the single most important architectural quirk. **Every domain concept is
 The client uses `withConverter(Model.getConverter())` on every query so Firestore snapshots come back as
 real class instances. `FirebaseModel.toFirestore` throws by default; several models deliberately keep it
 throwing (`User`, `Guild`, `Question`, `RankingRound`, `CardClue` all throw *"X is immutable"*), because
-**the client is never allowed to write them.**
+**the client is never allowed to write them.** (The editor flags the unused `data` param on these
+`toFirestore(data: X)` throwers as TS `[6133]` — spurious; the real `tsc`/build doesn't enforce
+`noUnusedParameters`, so match the existing signature, don't "fix" it.)
 
 The two worlds are **not** generated from each other and there is no compile-time link. Some client files
 even reach across the boundary and import the admin types directly:
@@ -280,6 +283,9 @@ so the UI can render grey "not yet found" placeholders. The set with `uid === 's
 - **4-space indent, single quotes, semicolons required, `max-len: 120`** (`.eslintrc.json`). Same in `functions/`.
 - Long copy blocks (faq, rulebook) opt out with `/* eslint-disable max-len */` at the top of the file.
 - **Uids are kebab-case**, generated with `lodash.kebabcase` from the name (see `models/Card.ts` constructor).
+- **Reuse-first — don't reinvent.** Fork the nearest existing handler/model and match its idioms rather than
+  inventing new patterns; never hand-roll what a shared action already does (route every point award through
+  `functions/src/actions/awardPoints.ts`). Keeps the two type worlds + fan-out consistent.
 
 ### Routing & rewrites
 
@@ -360,6 +366,9 @@ Firestore transactions and the score fan-out — nothing is mocked.
   for manual app testing, since it imports/exports `.emulators` and must match the app config.)
 - Then `cd functions && npm test`. The harness resets Firestore+Auth and re-seeds a minimal fixture before each
   test; it does **not** use the real 64-card seed.
+- **One-shot alternative:** `scripts/emu-test.sh [cmd...]` wraps `firebase emulators:exec` (demo project, builds
+  functions first, waits for ready + tears down, propagates the exit code) — no two-terminal dance. Default cmd =
+  the functions suite; pass any command (e.g. `node verify.mjs`). Env: `EMU_ONLY`, `EMU_NO_BUILD`, `EMU_PROJECT`.
 - The canonical test asserts the score is identical in all four denormalized places after a collect + answer.
   **Every new point-granting feature must extend this suite** (see the fan-out warning in §12.2).
 
@@ -382,6 +391,10 @@ literal in `pages/dashboard.tsx`** and **year-stamped** — bump each edition. T
 `AgendaScreen` drops entries longer than 6h (`MAX_AGENDA_ENTRY_DURATION_HOURS`) — permanent all-day booths
 that would otherwise flood the scroll list.
 
+Fetch the live program yourself (no app needed):
+`curl -s -X POST "$NEXT_PUBLIC_DASHBOARD_API_URL" -H 'content-type: application/json-rpc' -d '{"id":null,"method":"GetKonwent2026Program"}'`
+→ `result[]` of `{id, name, title, description, category, location, date_start, date_end}` (UTC dates).
+
 ---
 
 ## 11. Known cruft / staleness
@@ -400,7 +413,7 @@ Things that are wrong-but-harmless today; fix opportunistically, don't be surpri
 
 ---
 
-## 12. Planned expansion (2026 edition)
+## 12. Planned expansion (2026 / 16th edition)
 
 Hosting stays on **Firebase**, same as last year. Read this section before planning any of it.
 
