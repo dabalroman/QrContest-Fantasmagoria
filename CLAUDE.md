@@ -457,6 +457,14 @@ up is Firebase **Storage**, for photo uploads — see 12.4 — and only under ti
   `updateRanking(rounds, tx, user)` / `updateGuild(db, rounds, tx, user)` take the pre-fetched rounds snapshot;
   the two non-award callers (`setupAccountHandle`, `joinGuildHandle`) fetch it inline and pass it.
   → **Route quests through `awardPoints`, do not hand-roll a third copy of the fan-out.**
+- **User counters are normalized on hydration, not per-award.** A user doc written before a counter existed
+  lacks that field, and `getCurrentUser` casts `doc.data() as User` — so the type would otherwise lie.
+  `getCurrentUser` spreads `USER_COUNTER_DEFAULTS` (`functions/src/types/user.ts`, next to the `UserCounterKey`
+  union) over the doc, which is why `awardPoints` can use a plain `user[key] += …` with no `?? 0` guard.
+  Without it, `updateRanking` copies `undefined` into the round and the admin SDK **throws mid-transaction**,
+  aborting the whole award. `USER_COUNTER_DEFAULTS` is typed `Record<UserCounterKey, number>`, so a new
+  counter without a default is a compile error — add every new counter to the union, `User`, *and* the
+  defaults. Regression net: `functions/test/counters.test.mjs` (+ `seedLegacyUser` in `fixtures.mjs`).
 - Points are never awarded client-side. New callable → `functions/src/completeQuestHandle.ts` (or similar),
   registered in `functions/src/index.ts`, exported through `utils/functions.ts`.
 
@@ -508,8 +516,8 @@ update `Enum/Page.ts` and, for new dynamic routes, the rewrites in `next.config.
 7. `components/Navbar/Navbar.tsx` — if it gets a tab (mind the hard-coded 4-column grid).
 8. `tailwind.config.js` `safelist` — if it introduces dynamically-built class names.
 9. `firestore.indexes.json` — if it needs a composite query.
-10. Update `User` in **both** type worlds if it adds a counter, and `RankingRoundUser` / `GuildMember`
-    if that counter should show up on a leaderboard.
+10. Update `User` in **both** type worlds if it adds a counter, plus `USER_COUNTER_DEFAULTS` (compile-enforced),
+    and `RankingRoundUser` / `GuildMember` if that counter should show up on a leaderboard.
 11. **Route every point award through the shared transactional `awardPoints` action.** Never hand-roll the fan-out.
 
 ### Checklist for adding *any* new entity (map marker, quest, achievement)
@@ -525,5 +533,5 @@ update `Enum/Page.ts` and, for new dynamic routes, the rewrites in `next.config.
 7. `components/Navbar/Navbar.tsx` — if it gets a tab (mind the hard-coded 4-column grid).
 8. `tailwind.config.js` `safelist` — if it introduces dynamically-built class names.
 9. `firestore.indexes.json` — if it needs a composite query.
-10. Update `User` in **both** type worlds if it adds a counter, and `RankingRoundUser` / `GuildMember`
-    if that counter should show up on a leaderboard.
+10. Update `User` in **both** type worlds if it adds a counter, plus `USER_COUNTER_DEFAULTS` (compile-enforced),
+    and `RankingRoundUser` / `GuildMember` if that counter should show up on a leaderboard.
