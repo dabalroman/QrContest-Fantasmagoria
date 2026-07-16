@@ -13,6 +13,8 @@ import guildsSeed from './seeds/guildsSeed';
 import { Guild } from './types/guild';
 import cluesSeed from './seeds/cluesSeed';
 import { CardClue } from './types/cardClue';
+import pinsSeed from './seeds/pinsSeed';
+import { Pin } from './types/pin';
 
 export const seedDatabaseHandle = onCall(async (req): Promise<{}> => {
     const data = req.data;
@@ -40,6 +42,7 @@ export const seedDatabaseHandle = onCall(async (req): Promise<{}> => {
 
     await seedQuestions(db);
     await seedCards(db);
+    await seedPins(db);
     await seedCardSets(db);
     await seedRounds(db);
     await seedGuilds(db);
@@ -60,6 +63,14 @@ async function seedCards(db: FirebaseFirestore.Firestore) {
         db.collection('cards').doc(card.uid).set(card)
     ));
     logger.log('seedDatabaseHandle', 'seeding cards done');
+}
+
+async function seedPins(db: FirebaseFirestore.Firestore) {
+    logger.log('seedDatabaseHandle', 'seeding pins');
+    await Promise.all(pinsSeed.map((pin: Pin) =>
+        db.collection('pins').doc(pin.uid).set(pin)
+    ));
+    logger.log('seedDatabaseHandle', 'seeding pins done');
 }
 
 async function seedCardSets(db: FirebaseFirestore.Firestore) {

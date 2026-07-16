@@ -1,0 +1,118 @@
+import FirebaseModel from '@/models/FirebaseModel';
+import { DocumentSnapshot, SnapshotOptions, Timestamp } from '@firebase/firestore';
+import { isPinType, PinType } from '@/Enum/PinType';
+import kebabCase from 'lodash.kebabcase';
+import { RawPin } from '@/models/Raw';
+import { Uid } from '@/types/global';
+
+export type PinCoords = { x: number, y: number };
+
+export default class Pin extends FirebaseModel {
+    uid: Uid;
+    name: string;
+    code: string | null;
+    type: PinType;
+    groups: string[];
+    mapId: string;
+    coords: PinCoords;
+    value: number;
+    description: string;
+    clue: string;
+    withQuestion: boolean;
+    isActive: boolean;
+    availableFrom: Date | null;
+    availableTo: Date | null;
+
+    constructor (
+        uid: Uid | null = null,
+        name: string = '',
+        code: string | null = null,
+        type: PinType = PinType.CODE,
+        groups: string[] = [],
+        mapId: string = '',
+        coords: PinCoords = { x: 0, y: 0 },
+        value: number = 0,
+        description: string = '',
+        clue: string = '',
+        withQuestion: boolean = false,
+        isActive: boolean = false,
+        availableFrom: Date | null = null,
+        availableTo: Date | null = null,
+    ) {
+        super();
+
+        if (!isPinType(type)) {
+            throw new Error(`Invalid value '${type}' for pin.type`);
+        }
+
+        this.uid = uid ?? kebabCase(name);
+        this.name = name;
+        this.code = code;
+        this.type = type;
+        this.groups = groups;
+        this.mapId = mapId;
+        this.coords = coords;
+        this.value = value;
+        this.description = description;
+        this.clue = clue;
+        this.withQuestion = withQuestion;
+        this.isActive = isActive;
+        this.availableFrom = availableFrom;
+        this.availableTo = availableTo;
+    }
+
+    public static fromRaw (rawPin: RawPin): Pin {
+        return new Pin(
+            rawPin.uid,
+            rawPin.name,
+            rawPin.code ?? null,
+            rawPin.type,
+            rawPin.groups,
+            rawPin.mapId,
+            rawPin.coords,
+            rawPin.value,
+            rawPin.description,
+            rawPin.clue ?? '',
+            rawPin.withQuestion,
+            rawPin.isActive,
+            rawPin.availableFrom
+                ? Timestamp.fromMillis(rawPin.availableFrom._seconds * 1000).toDate()
+                : null,
+            rawPin.availableTo
+                ? Timestamp.fromMillis(rawPin.availableTo._seconds * 1000).toDate()
+                : null
+        );
+    }
+
+    protected static toFirestore (data: Pin): object {
+        throw new Error('Pin is immutable.');
+    }
+
+    protected static fromFirestore (
+        snapshot: DocumentSnapshot,
+        options: SnapshotOptions
+    ): Pin {
+        const data = snapshot.data(options);
+
+        if (data === undefined) {
+            throw new Error('Data undefined');
+        }
+
+        return new Pin(
+            data.uid,
+            data.name,
+            data.code ?? null,
+            data.type,
+            data.groups,
+            data.mapId,
+            data.coords,
+            data.value,
+            data.description,
+            data.clue,
+            data.withQuestion,
+            data.isActive,
+            data.availableFrom?.toDate() ?? null,
+            data.availableTo?.toDate() ?? null
+        );
+    }
+}

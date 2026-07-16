@@ -17,6 +17,13 @@ service cloud.firestore {
 
                 allow write: if false;
             }
+
+            match /completedPins/{pinId} {
+                allow read: if request.auth != null
+                    && request.auth.uid == userId;
+
+                allow write: if false;
+            }
         }
 
         match /users-usernames/{username} {
@@ -27,6 +34,13 @@ service cloud.firestore {
 
         match /cards/{cardId} {
             allow read, update: if request.auth != null
+                && isUserAdmin();
+
+            allow write: if false;
+        }
+
+        match /pins/{pinId} {
+            allow read: if request.auth != null
                 && isUserAdmin();
 
             allow write: if false;

@@ -1,4 +1,5 @@
 import { CardTier } from '@/Enum/CardTier';
+import { PinType } from '@/Enum/PinType';
 import { StringMap, Uid } from '@/types/global';
 
 export type RawFirestoreTimestamp = { _seconds: number, _nanoseconds: number };
@@ -25,4 +26,21 @@ export interface RawQuestion {
     question: string,
     answers: StringMap,
     value: number
+}
+
+export interface RawPin {
+    uid: Uid,
+    name: string,
+    code: string | undefined,
+    type: PinType,
+    groups: string[],
+    mapId: string,
+    coords: { x: number, y: number },
+    value: number,
+    description: string,
+    clue: string | undefined,
+    withQuestion: boolean,
+    isActive: boolean,
+    availableFrom: RawFirestoreTimestamp | undefined,
+    availableTo: RawFirestoreTimestamp | undefined
 }

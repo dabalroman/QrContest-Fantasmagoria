@@ -1,0 +1,71 @@
+/* eslint-disable max-len */
+import { Pin, PinType } from '../types/pin';
+
+const pinsSeed: Pin[] = [
+    {
+        uid: 'lorem-ipsum-code',
+        name: 'Lorem ipsum',
+        description: 'Lorem ipsum dolor sit amet.',
+        clue: '',
+        type: PinType.CODE,
+        groups: ['building-a', 'building-a-floor-0'],
+        mapId: 'building-a-floor-0',
+        coords: { x: 100, y: 200 },
+        value: 20,
+        withQuestion: true,
+        availableFrom: null,
+        availableTo: null,
+        isActive: true,
+        code: '0000000000'
+    },
+    {
+        uid: 'lorem-ipsum-riddle',
+        name: 'Lorem ipsum riddle',
+        description: 'Lorem ipsum dolor sit amet.',
+        clue: 'Lorem ipsum clue pointing at the answer.',
+        type: PinType.RIDDLE,
+        groups: ['building-a', 'building-a-floor-1'],
+        mapId: 'building-a-floor-1',
+        coords: { x: 300, y: 150 },
+        value: 15,
+        withQuestion: false,
+        availableFrom: null,
+        availableTo: null,
+        isActive: true,
+        code: 'lorem'
+    },
+    {
+        uid: 'lorem-ipsum-visit',
+        name: 'Lorem ipsum visit',
+        description: 'Lorem ipsum dolor sit amet.',
+        clue: '',
+        type: PinType.VISIT,
+        groups: ['outdoor'],
+        mapId: 'outdoor',
+        coords: { x: 500, y: 400 },
+        value: 5,
+        withQuestion: false,
+        availableFrom: null,
+        availableTo: null,
+        isActive: true,
+        code: null
+    },
+    {
+        uid: 'lorem-ipsum-feedback',
+        name: 'Lorem ipsum feedback',
+        description: 'Lorem ipsum dolor sit amet.',
+        clue: '',
+        type: PinType.FEEDBACK,
+        groups: ['building-b', 'building-b-floor-0'],
+        mapId: 'building-b-floor-0',
+        coords: { x: 250, y: 250 },
+        value: 5,
+        withQuestion: false,
+        availableFrom: null,
+        availableTo: null,
+        isActive: true,
+        code: null
+    }
+];
+
+export default pinsSeed;
