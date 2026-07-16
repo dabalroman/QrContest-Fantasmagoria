@@ -36,6 +36,34 @@ export const PIN_PHOTO_UID = 'test-pin-photo';
 export const PIN_UNAVAILABLE_UID = 'test-pin-unavailable';
 export const PIN_UNAVAILABLE_VALUE = 5;
 
+/**
+ * A user doc as it looked before `amountOfCompletedPins` existed — written straight through the
+ * admin SDK so it bypasses setupAccountHandle, which would initialize every counter. Mirrors what
+ * an account created mid-development actually holds, and re-arms for every counter added later.
+ */
+export async function seedLegacyUser (uid, username) {
+    await db.collection('users').doc(uid).set({
+        uid,
+        username,
+        score: 0,
+        amountOfCollectedCards: 0,
+        amountOfAnsweredQuestions: 0,
+        // amountOfCompletedPins deliberately absent — that is the whole point of this fixture.
+        role: 'user',
+        memberOf: null,
+        winnerInRound: null,
+        updatedAt: FieldValue.serverTimestamp(),
+        lastGuildChangeAt: Timestamp.fromDate(new Date('2020/01/01'))
+    });
+
+    await db.collection('users-usernames').doc(username).set({ uid });
+
+    // collectCardHandle / completePinHandle transaction.update this doc — it must exist.
+    await db.collection('users').doc(uid)
+        .collection('collectedQuestions').doc('collectedQuestions')
+        .set({});
+}
+
 export async function seedFixture () {
     const now = Date.now();
 

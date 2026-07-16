@@ -1,4 +1,4 @@
-import {User} from '../types/user';
+import {User, USER_COUNTER_DEFAULTS} from '../types/user';
 import {logger} from 'firebase-functions';
 import {HttpsError} from 'firebase-functions/v2/https';
 import {DocumentReference} from "firebase-admin/firestore";
@@ -16,5 +16,8 @@ export default async function getCurrentUser(
         throw new HttpsError('not-found', 'user uid does not exist');
     }
 
-    return [userRef as DocumentReference<User, User>, userSnapshot.data() as User];
+    return [
+        userRef as DocumentReference<User, User>,
+        {...USER_COUNTER_DEFAULTS, ...userSnapshot.data()} as User
+    ];
 }

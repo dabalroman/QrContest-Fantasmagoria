@@ -26,3 +26,12 @@ export type UserUsername = {
 }
 
 export type UserCounterKey = 'amountOfCollectedCards' | 'amountOfAnsweredQuestions' | 'amountOfCompletedPins';
+
+// User docs written before a counter existed simply lack that field, so `User` only holds true once
+// these are applied — see getCurrentUser. Typed as a total Record: a new UserCounterKey without a
+// default here is a compile error.
+export const USER_COUNTER_DEFAULTS: Record<UserCounterKey, number> = {
+    amountOfCollectedCards: 0,
+    amountOfAnsweredQuestions: 0,
+    amountOfCompletedPins: 0
+};
