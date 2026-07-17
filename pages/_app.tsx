@@ -74,6 +74,13 @@ export default function App ({
     }, [router, userData.user]);
 
     useEffect(() => {
+        if (userData.userReady && userData.user?.role !== UserRole.DASHBOARD && router.pathname === Page.MAIN) {
+            router.push(Page.MAP)
+                .then();
+        }
+    }, [router, userData.userReady, userData.user]);
+
+    useEffect(() => {
         setTheme(getThemeFromGuildUuid(userData.user?.memberOf ?? null));
     }, [userData.authUser, userData.user]);
 

@@ -1,6 +1,6 @@
 import { useContext, useEffect } from 'react';
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
-import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
+import { faMapLocationDot } from '@fortawesome/free-solid-svg-icons';
 import { Page } from '@/Enum/Page';
 import { defaultNavbarConfig, NavbarConfigContext, NavbarConfigContextType } from '@/utils/context';
 
@@ -29,8 +29,8 @@ export default function useDynamicNavbar ({
 
     useEffect(() => {
         setNavbarCenterAction({
-            href: href ?? Page.COLLECT,
-            icon: icon ?? faMagnifyingGlass,
+            href: href ?? Page.MAP,
+            icon: icon ?? faMapLocationDot,
             onClick: onClick ?? null,
             disabled: disabled ?? false,
             disabledCenter: disabledCenter ?? false,

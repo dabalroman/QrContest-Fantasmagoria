@@ -32,7 +32,7 @@ export default function AccountSetupPage () {
 
     useEffect(() => {
         if (userReady) {
-            router.push(Page.COLLECT)
+            router.push(Page.MAP)
                 .then();
         }
     }, [userReady, router]);
@@ -88,7 +88,7 @@ export default function AccountSetupPage () {
         try {
             await setupAccountFunction({ username: data.username });
             toast.success('Rejestracja przebiegła pomyślnie!');
-            await router.push(Page.COLLECT);
+            await router.push(Page.MAP);
             setLoading(false);
             reset();
         } catch (error) {

@@ -8,7 +8,7 @@ import CardClue from '@/models/CardClue';
 import Pin from '@/models/Pin';
 import CollectedPin from '@/models/CollectedPin';
 import {Page} from '@/Enum/Page';
-import {faMagnifyingGlass} from '@fortawesome/free-solid-svg-icons';
+import {faMapLocationDot} from '@fortawesome/free-solid-svg-icons';
 import {NavbarConfig} from '@/components/Navbar/Navbar';
 import {AppTheme} from "@/Enum/AppTheme";
 
@@ -79,9 +79,9 @@ export const PinsCacheContext: Context<PinsCacheContextType> = createContext({
 
 // ---- NAVBAR ----
 export const defaultNavbarConfig: NavbarConfig = {
-    icon: faMagnifyingGlass,
+    icon: faMapLocationDot,
     onClick: null,
-    href: Page.COLLECT,
+    href: Page.MAP,
     disabled: false,
     disabledCenter: false,
     disabledSides: false,

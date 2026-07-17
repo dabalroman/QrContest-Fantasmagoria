@@ -12,7 +12,7 @@ export default function Home() {
     useDynamicNavbar({disabled: true});
 
     const actionButton = user
-        ? <LinkButton href={Page.COLLECT} className="w-full my-2">Przejdź do gry</LinkButton>
+        ? <LinkButton href={Page.MAP} className="w-full my-2">Przejdź do gry</LinkButton>
         : (
             <div>
                 <LinkButton href={Page.LOGIN} className="w-full my-2 backdrop-blur-sm">

@@ -1,4 +1,4 @@
-import { faStar, faImages, faMagnifyingGlassLocation, faTrophy, faUser } from '@fortawesome/free-solid-svg-icons';
+import { faStar, faMedal, faMagnifyingGlassLocation, faTrophy, faUser } from '@fortawesome/free-solid-svg-icons';
 import NavbarButton from '@/components/Navbar/NavbarButton';
 import NavbarSuperButton from '@/components/Navbar/NavbarSuperButton';
 import { Page } from '@/Enum/Page';
@@ -44,11 +44,22 @@ export default function Navbar ({ navbarConfig }: { navbarConfig: NavbarConfig }
         <div
             className={'grid align-center justify-items-center text-3xl'
                 + ' bg-navbar-background fixed bottom-0 w-screen z-50'}
-            style={{ gridTemplateColumns: 'repeat(4, 1fr) 120px' }}
+            style={{ gridTemplateColumns: 'repeat(2, 1fr) 120px repeat(2, 1fr)' }}
         >
             <NavbarButton
-                href={Page.ACCOUNT} icon={faUser}
+                href={Page.COLLECT} icon={faMagnifyingGlassLocation}
                 disabled={navbarConfig.disabledSides}
+            />
+            <NavbarButton
+                href={Page.ACHIEVEMENTS} icon={faMedal}
+                disabled={navbarConfig.disabledSides}
+            />
+            <NavbarSuperButton
+                href={navbarConfig.href}
+                icon={navbarConfig.icon}
+                onClick={navbarConfig.onClick}
+                disabled={navbarConfig.disabledCenter}
+                animate={navbarConfig.animate}
             />
             <div className="relative">
                 <NavbarButton
@@ -71,19 +82,8 @@ export default function Navbar ({ navbarConfig }: { navbarConfig: NavbarConfig }
                 }
             </div>
             <NavbarButton
-                href={Page.COLLECTION} icon={faImages}
+                href={Page.ACCOUNT} icon={faUser}
                 disabled={navbarConfig.disabledSides}
-            />
-            <NavbarButton
-                href={Page.COLLECT} icon={faMagnifyingGlassLocation}
-                disabled={navbarConfig.disabledSides}
-            />
-            <NavbarSuperButton
-                href={navbarConfig.href}
-                icon={navbarConfig.icon}
-                onClick={navbarConfig.onClick}
-                disabled={navbarConfig.disabledCenter}
-                animate={navbarConfig.animate}
             />
         </div>
     );

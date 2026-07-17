@@ -6,7 +6,10 @@ import CollectedPin from '@/models/CollectedPin';
 import Question from '@/models/Question';
 import useDynamicNavbar from '@/hooks/useDynamicNavbar';
 import { faCamera, faCheck } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Page } from '@/Enum/Page';
+import Button, { ButtonState } from '@/components/Button';
+import LinkButton from '@/components/LinkButton';
 import toast from 'react-hot-toast';
 
 export default function LookForCodeView ({
@@ -62,13 +65,10 @@ export default function LookForCodeView ({
 
     // noinspection TypeScriptValidateTypes
     const currentInput = watch('code');
-    const showScanner = currentInput.length === 0;
-    useDynamicNavbar({
-        icon: showScanner ? faCamera : faCheck,
-        animate: showScanner || formState.isValid || currentInput === code,
-        href: showScanner ? Page.SCANNER : undefined,
-        onClick: !showScanner ? handleSubmit(collectCode, onInvalidInput) : undefined
-    });
+
+    // Scan is demoted to an in-page action; the navbar centre stays Map (default) so the map is always
+    // one tap away from the collect screen.
+    useDynamicNavbar({});
 
     useEffect(() => {
         if (code === null || code.length !== 10) {
@@ -111,7 +111,7 @@ export default function LookForCodeView ({
             </Panel>
 
             <Panel title="Wpisz kod miejsca" loading={loading}>
-                <form onSubmit={handleSubmit(collectCode)}>
+                <form onSubmit={handleSubmit(collectCode, onInvalidInput)}>
                     <input type="text" placeholder="ABCDEFGHIJ" maxLength={10}
                            className="rounded-xl block w-full p-1 border-2 border-input-border text-center
                                bg-input-background text-text-accent uppercase text-2xl shadow-inner-input
@@ -132,14 +132,26 @@ export default function LookForCodeView ({
                         {
                             formState.errors.code?.message || currentInput.length === 0
                                 ? formState.errors.code?.message
-                                : 'Kliknij, by potwierdzić kod!'
+                                : 'Kod gotowy — potwierdź poniżej!'
                         }
                     </p>
+
+                    <Button
+                        type="submit"
+                        state={formState.isValid ? ButtonState.ENABLED : ButtonState.DISABLED}
+                        className="w-full mt-2"
+                    >
+                        <FontAwesomeIcon icon={faCheck}/> Potwierdź kod
+                    </Button>
                 </form>
             </Panel>
 
             <Panel title="Zeskanuj kod miejsca">
-                <p>Dotknij przycisku aparatu i zeskanuj kod! Możesz też użyć dowolnej innej aplikacji do skanowania.</p>
+                <p>Nie chcesz wpisywać kodu ręcznie? Zeskanuj go aparatem. Możesz też użyć dowolnej innej
+                    aplikacji do skanowania.</p>
+                <LinkButton href={Page.SCANNER} className="w-full mt-4">
+                    <FontAwesomeIcon icon={faCamera}/> Skanuj aparatem
+                </LinkButton>
             </Panel>
         </div>
     );

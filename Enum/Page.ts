@@ -9,6 +9,7 @@ export enum Page {
     RULEBOOK = '/rulebook',
     GUILD = '/guild',
     MAP = '/map',
+    ACHIEVEMENTS = '/achievements',
     MAIN = '/',
     LOGIN = '/auth/login',
     LOGIN_EMAIL = '/auth/login-email',
