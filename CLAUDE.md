@@ -58,6 +58,7 @@ npm run emulators
 
 # Cloud Functions MUST be compiled before the emulator picks them up
 cd functions && npm run build          # or: npm run build:watch
+cd functions && rm -rf lib && npm run build   # REQUIRED after renaming/deleting a source file
 
 # Deploy
 firebase deploy --only hosting,firestore,functions
@@ -71,6 +72,14 @@ cd functions && npm test    # node:test suite hitting the real callables
 Gotchas (from `Setup.md`, all real):
 - **Functions must be built (`tsc` → `functions/lib/`) before running the emulator.** The emulator loads
   `functions/lib/index.js` (`"main"` in `functions/package.json`), never the TypeScript source.
+- **`tsc` never deletes outputs for renamed/removed sources.** Rename `fooHandle.ts` → `barHandle.ts` and
+  `lib/fooHandle.js` survives; a running emulator also keeps the dead route registered (it answers `500`)
+  until restarted. After any rename: `rm -rf lib && npm run build`, then restart the emulator.
+- **`npm run lint` is `next lint` — it does NOT cover `functions/`, and it never linted `.tsx`.** Components
+  and the whole backend are effectively checked only by `tsc` and the pre-commit hook.
+- **A pre-commit hook runs the full pipeline** (FE typecheck + build, BE lint + build + e2e, ~50s) — see
+  `scripts/hooks/pre-commit`. It **fails while a manual emulator is running**, because the e2e leg needs the
+  same ports (see §9a).
 - Half-baked or weird deploy failures are almost always a stale `firebase-tools` — `npm i -g firebase-tools`.
 - Deploy failing with `401` → `firebase login --reauth`.
 - **The emulator won't boot until you run `npx firebase experiments:enable webframeworks`** (per-machine, one-time).
@@ -109,12 +118,13 @@ reads `process.env`; everything else imports `configuration`. Notable vars:
 ```
 pages/            Next.js pages router. Top-level = player screens; auth/ and admin/ are sub-routes.
 components/       Shared UI (Panel, Button, LinkButton, Loader, ScreenTitle, Metatags, AuthCheck, Navbar/)
-                  plus per-feature folders: collect/, collection/, account/, ranking/, dashboard/
+                  plus per-feature folders: collect/, collection/, account/, ranking/, dashboard/, pin/
 models/           CLIENT-side domain classes. Extend FirebaseModel, carry Firestore converters.
 Enum/             CardTier, UserRole, FireDoc (collection names), Page (routes), AppTheme
 hooks/            useUserData, useCollectedCards, useDynamicNavbar, useTheme, useAdminOnly
 utils/            firebase.ts (SDK init), functions.ts (typed callables), context.ts (React contexts),
-                  date.ts (Polish pluralization + formatting), getGuildIcon.ts, randomArrayElement.ts
+                  date.ts (Polish pluralization + formatting), getGuildIcon.ts, getPinIcon.ts,
+                  randomArrayElement.ts
 types/            global.ts — Uid, StringMap
 functions/src/    Cloud Functions. Handlers at the root, actions/ for shared transaction helpers,
                   types/ for the ADMIN-side types, seeds/ for the seed data, data/forbiddenPhrases.ts
@@ -166,9 +176,11 @@ Collection names live in `Enum/FireDoc.ts` — **but that enum is incomplete.** 
 |---|---|---|---|
 | `users/{uid}` | ✅ `USERS` | functions only | owner + admins |
 | `users/{uid}/collectedCards/{cardUid}` | ✅ `USERS__COLLECTED_CARDS` | functions only | owner |
+| `users/{uid}/collectedPins/{pinUid}` | ✅ `USERS__COLLECTED_PINS` | functions only | owner |
 | `users/{uid}/collectedQuestions/collectedQuestions` | ❌ | functions only | **nobody** (no rule → denied) |
 | `users-usernames/{username}` | ✅ `USERS_USERNAMES` | functions only | any authed user (uniqueness check) |
 | `cards/{cardUid}` | ✅ `CARDS` | functions + **admin `update`** | admins only |
+| `pins/{pinUid}` | ✅ `PINS` | functions + seed | **admins only** — the `code` is inline |
 | `cardSets/{setUid}` | ✅ `CARD_SET` | seed only | any authed user |
 | `clues/{clueUid}` | ✅ `CLUES` | seed only | any authed user |
 | `ranking/{roundUid}` | ✅ `RANKING` | functions only | any authed user |
@@ -183,6 +195,10 @@ Two things worth internalising:
    absent from `firestore.rules`, and Firestore denies anything not explicitly allowed.
 2. **`collectedCards` is a per-user snapshot copy of the card**, not a reference. It duplicates
    `name`/`image`/`description`/`tier`/`value`. That is what the collection screen renders.
+   **`collectedPins` does the same for pins** (`name`/`description`/`value`) — and there it is not an
+   optimisation but a hard requirement: `pins` is admin-only read, so a snapshot is the *only* way the
+   player's client can ever learn what it just found. The snapshot deliberately omits `code` and
+   `collectedBy`; `functions/test/pins.test.mjs` asserts it.
 
 ### Denormalization / fan-out
 
@@ -212,10 +228,11 @@ Every other mutation goes through an authenticated **callable Cloud Function**. 
 | Callable | File | What it does |
 |---|---|---|
 | `setupAccountHandle` | `setupAccountHandle.ts` | Creates the user doc + username reservation + empty `collectedQuestions`. Validates username (3–20 chars, a regex allowlist, and a `forbiddenPhrases` blocklist). |
-| `collectCardHandle` | `collectCardHandle.ts` | Validates a 10-char code against `cards` (`isActive == true`), rejects already-collected, optionally draws a random **unanswered** question, writes `collectedCards`, increments score, fans out to ranking + guild. |
-| `answerQuestionHandle` | `answerQuestionHandle.ts` | Grades an answer server-side, awards `value` or `0`, fans out. Rejects re-answering. |
+| `collectCardHandle` | `collectCardHandle.ts` | Validates a 10-char code against `cards` (`isActive == true`), rejects already-collected, optionally draws a random **unanswered** question, writes `collectedCards`, increments score, fans out to ranking + guild. **Cards are retired for 2026** — still deployed, but nothing in the UI calls it (see §12). |
+| `collectPinHandle` | `collectPinHandle.ts` | The 2026 replacement for `collectCardHandle` — **fork THIS for any new pin flow.** Two entry paths: `{code}` (global scanner/manual entry, cross-pin lookup filtered to `type == 'code'`) and `{pinUid, answer}` (the map's pin UI, validated against that one pin). Writes `collectedPins` + the pin's `collectedBy`, draws a question, awards via `awardPoints`. Rejects `feedback`/`photo` types. |
+| `answerQuestionHandle` | `answerQuestionHandle.ts` | Grades an answer server-side, awards `value` or `0`, fans out. Rejects re-answering. **Shared by cards and pins, unchanged.** |
 | `joinGuildHandle` | `joinGuildHandle.ts` | Moves the user between guilds, enforces the **4-hour cooldown**, moves the score contribution from the old guild to the new one. |
-| `seedDatabaseHandle` | `seedDatabaseHandle.ts` | Admin-only + **hardcoded password `'4064'`**. Seeds questions, cards, cardSets, ranking rounds, guilds, clues. |
+| `seedDatabaseHandle` | `seedDatabaseHandle.ts` | Admin-only + **hardcoded password `'4064'`**. Seeds questions, cards, cardSets, ranking rounds, guilds, clues, **pins**. |
 | `updateRoundsHandle` | `index.ts` → `updateRoundsProcessor.ts` | Manual "force round update" from the admin panel. |
 | `autoUpdateRounds` | `index.ts` | **Scheduled**, cron `0 * * * *` (hourly). Marks finished rounds, stamps the top 3 users with `winnerInRound`. |
 
@@ -334,10 +351,15 @@ are all defined **in terms of those CSS variables**, so the whole app recolors t
 
 ### ⚠️ Tailwind safelist
 
-Class names are built dynamically in several places (`` `border-${guild.uid}` ``, `` `bg-card-${tier}` ``).
-Tailwind cannot see those, so `tailwind.config.js` carries an explicit **`safelist`** with every
-`{border,bg,text,ring}-guild-*` and `{border,bg,text,ring}-card-*` combination.
+Class names are built dynamically in several places (`` `border-${guild.uid}` ``, `` `bg-card-${tier}` ``,
+`` `bg-pin-${pin.type}` ``). Tailwind cannot see those, so `tailwind.config.js` carries an explicit
+**`safelist`** — plain string literals, no patterns — with every `{border,bg,text,ring}-guild-*`,
+`-card-*` and `-pin-*` combination.
 **Any new dynamically-composed class must be added to that safelist or it will silently not exist in prod.**
+Dev looks fine either way — the only honest check is to grep the built CSS:
+`npm run build && grep -o '\.bg-pin-code' .next/static/css/*.css`.
+Note the prefix asymmetry: `GuildUid` values already embed their prefix (`'guild-desert'`), while `CardTier`
+and `PinType` values are bare (`'common'`, `'code'`) — hence `'card-' + tier` / `'pin-' + pin.type`.
 Also note `content` only scans `./pages`, `./components`, `./layouts` — classes written in `utils/` or
 `models/` are invisible to Tailwind.
 
@@ -369,8 +391,16 @@ Firestore transactions and the score fan-out — nothing is mocked.
 - **One-shot alternative:** `scripts/emu-test.sh [cmd...]` wraps `firebase emulators:exec` (demo project, builds
   functions first, waits for ready + tears down, propagates the exit code) — no two-terminal dance. Default cmd =
   the functions suite; pass any command (e.g. `node verify.mjs`). Env: `EMU_ONLY`, `EMU_NO_BUILD`, `EMU_PROJECT`.
+- ⚠️ **The suite cannot share ports with a manual `npm run emulators`, and it cannot run against it either** —
+  the tests REQUIRE the `demo-` project id (under the real id the in-function admin SDK hangs ~60s then 500s).
+  So stop the manual emulator before running the suite **or committing** (the pre-commit hook runs it).
+  Stop it with **SIGINT to the `firebase` node process** (the one carrying `--export-on-exit`) and wait for
+  `✔ Export complete` — never `pkill` the java children, that loses the `.emulators` dump.
 - The canonical test asserts the score is identical in all four denormalized places after a collect + answer.
   **Every new point-granting feature must extend this suite** (see the fan-out warning in §12.2).
+- Current suite (**18 tests**): `scoring` (card fan-out), `rounds` (`winnerInRound` propagation), `pins`
+  (both entry paths, anti-bruteforce, dup guard, availability window, normalization, snapshot/secret-stripping)
+  and `counters` (legacy docs missing a counter — the §12.2 hydration rule).
 
 ## 10a. Firestore indexes
 
@@ -421,8 +451,16 @@ Hosting stays on **Firebase**, same as last year. Read this section before plann
 > The app only runs for ~3 days and does 100k+ ops in that window; there is no calm redeploy window
 > mid-event. Scope accordingly: fewer features, tested, beats more features, untested.
 >
-> **Not everything below will ship.** The details of quests and achievements are still subject to a
-> brainstorming session. The map, the IA rework, and the photo-proof flow are decided.
+> **Status as of 2026-07-17 — this section is now part plan, part history:**
+> - ✅ **12.2 shipped as pins** — the pin model, `collectPinHandle`, the pin visual system and the rewired
+>   collect screen are done and manually verified. Cards are retired (handler still deployed, UI orphaned).
+> - ⏳ **12.1 (map), 12.3 (achievements), 12.5 (navbar/IA)** — still to build. The map is next.
+> - ❌ **12.4 (photo proof) deferred out of v1.** `photo` exists in `PinType` but `collectPinHandle` rejects it.
+> - ❌ **Clubs/guilds are likely to be DROPPED for 2026.** The fan-out still writes them; do not invest new
+>   work in guild surfaces without checking first.
+>
+> ⚠️ **The task manager is the live source of truth, not this file.** Task **#9** is the epic/status board
+> for the 2026 edition — read it first for current status and the full list of locked decisions.
 
 ### 12.0 Non-negotiable design requirement
 
@@ -441,22 +479,40 @@ up is Firebase **Storage**, for photo uploads — see 12.4 — and only under ti
 - Markers are **RPG-game style** points of interest, not real-world pins.
 - Images are static assets → they live in `public/` and are served off Firebase Hosting's CDN, the same way
   the 64 card images already are. Bulk static image serving is a proven path in this repo.
-- Pan/zoom/marker hit-testing is custom work. Decide early whether to hand-roll it (CSS transforms) or take
-  a dependency — Leaflet with `CRS.Simple` is designed for exactly this (tiled non-geographic image + markers).
+- Pan/zoom/marker hit-testing is custom work. **Decided: Leaflet + `CRS.Simple`** (non-geographic image + markers).
+- **The data layer already exists — do not rebuild it.** The `pins` model, its `mapId` + `coords {x,y}` fields
+  and `collectPinHandle`'s `{pinUid, answer}` entry path were built for this screen. What the map still owes:
+  - a **`getPins` callable** — `pins` is admin-only read, so the client cannot query it. It **must strip both
+    `code` (the secret) and `collectedBy` (a uid→username map of every finder: privacy leak + unbounded payload)**.
+  - **reuse `components/pin/PinCardComponent.tsx`** for the pin-click sheet — it is the same card the collect
+    screen shows after a scan, deliberately. Reuse `utils/getPinIcon.ts` and the `--color-pin-*` palette too;
+    do not invent a second pin colour scheme for markers.
+  - a pin cache. `useCollectedCards` / `CardsCacheContext` is **card-only** — there is no pin equivalent yet.
+- Only `code` pins are reachable from `/collect/:code`. **`riddle` / `visit` / `feedback` pins have no other
+  entry point than this screen**, so they are untestable until it exists.
 
-### 12.2 Quests / tasks
+### 12.2 Quests / tasks → **SHIPPED as pins**
 
-- **Completing a quest grants points.** That is the load-bearing sentence.
+> ✅ **This section is now history, not a plan.** "Quests" never shipped as a separate entity — they became
+> **pins** (`pins/{pinUid}`, `collectPinHandle`, `users/{uid}/collectedPins`). There is no `questHandle`, no
+> `amountOfCompletedQuests`. The counter that shipped is **`amountOfCollectedPins`**.
+> **Naming rule: pins say `collect`, never `complete`** — pins mirror cards 1:1, and cards are `collected`
+> throughout. No `complete*` **identifier** exists anywhere in the source, rules, tests or seeds; the word
+> survives only as ordinary English prose in comments and docs. Do not reintroduce one.
+> The paragraphs below are kept because the `awardPoints` contract and the counter-hydration rule they
+> describe are still exactly right — and they bind every future point-granting feature (achievements, #23).
+
+- **Collecting a pin grants points.** That is the load-bearing sentence.
 - ⚠️ Points fan out to **four** places (user doc, every open ranking round, the guild's member entry, the guild
   aggregate). This is now owned by **`functions/src/actions/awardPoints.ts`** —
   `awardPoints(db, tx, userRef, user, points, counters?)` does the user-doc `score`/counter increment, mutates
   the in-memory `user` in place, and fans out to `updateRanking` + `updateGuild` (reading the `ranking`
-  collection once and passing the snapshot to both). `collectCardHandle` and `answerQuestionHandle` both go
-  through it; they keep only their domain writes. `counters` is a generic `Partial<Record<UserCounterKey, number>>`
-  delta map — quests pass `{ amountOfCompletedQuests: 1 }` once that field is added to `User` (see #4).
+  collection once and passing the snapshot to both). `collectCardHandle`, `collectPinHandle` and
+  `answerQuestionHandle` all go through it; they keep only their domain writes. `counters` is a generic
+  `Partial<Record<UserCounterKey, number>>` delta map — `collectPinHandle` passes `{ amountOfCollectedPins: 1 }`.
   `updateRanking(rounds, tx, user)` / `updateGuild(db, rounds, tx, user)` take the pre-fetched rounds snapshot;
   the two non-award callers (`setupAccountHandle`, `joinGuildHandle`) fetch it inline and pass it.
-  → **Route quests through `awardPoints`, do not hand-roll a third copy of the fan-out.**
+  → **Route every point award through `awardPoints`, do not hand-roll another copy of the fan-out.**
 - **User counters are normalized on hydration, not per-award.** A user doc written before a counter existed
   lacks that field, and `getCurrentUser` casts `doc.data() as User` — so the type would otherwise lie.
   `getCurrentUser` spreads `USER_COUNTER_DEFAULTS` (`functions/src/types/user.ts`, next to the `UserCounterKey`
@@ -465,8 +521,9 @@ up is Firebase **Storage**, for photo uploads — see 12.4 — and only under ti
   aborting the whole award. `USER_COUNTER_DEFAULTS` is typed `Record<UserCounterKey, number>`, so a new
   counter without a default is a compile error — add every new counter to the union, `User`, *and* the
   defaults. Regression net: `functions/test/counters.test.mjs` (+ `seedLegacyUser` in `fixtures.mjs`).
-- Points are never awarded client-side. New callable → `functions/src/completeQuestHandle.ts` (or similar),
-  registered in `functions/src/index.ts`, exported through `utils/functions.ts`.
+- Points are never awarded client-side. The callable that shipped is `functions/src/collectPinHandle.ts`,
+  registered in `functions/src/index.ts`, exported through `utils/functions.ts` as `collectPinFunction`.
+  Any further pin flow (talk feedback, #12) forks **it**, not `collectCardHandle`.
 
 ### 12.3 Achievements — replace the card gallery
 
@@ -479,7 +536,7 @@ up is Firebase **Storage**, for photo uploads — see 12.4 — and only under ti
 
 ### 12.4 User photo uploads — private quest proof, manually reviewed
 
-- Photos are **proof that a quest was completed.** They are **not** a social feature.
+- Photos are **proof that a pin was collected.** They are **not** a social feature.
 - **Users cannot see other users' uploads.** No public gallery.
 - **Review is manual. Explicitly no AI moderation** — the cost would escalate quickly and it is not wanted.
   This implies an **admin review queue** and an approval state on the quest submission.
@@ -519,19 +576,10 @@ update `Enum/Page.ts` and, for new dynamic routes, the rewrites in `next.config.
 10. Update `User` in **both** type worlds if it adds a counter, plus `USER_COUNTER_DEFAULTS` (compile-enforced),
     and `RankingRoundUser` / `GuildMember` if that counter should show up on a leaderboard.
 11. **Route every point award through the shared transactional `awardPoints` action.** Never hand-roll the fan-out.
+12. Extend `functions/test/` — the e2e suite is the only safety net (§9a).
 
-### Checklist for adding *any* new entity (map marker, quest, achievement)
-
-1. `Enum/FireDoc.ts` — add the collection name.
-2. `firestore.rules` — add a `match` block. **Default to `allow read: if request.auth != null; allow write: if false;`**
-   and put the mutation behind a callable. If the client must never see part of the doc (e.g. a quest's answer,
-   a marker's solution), keep it in a server-only collection with *no* rule at all, the way `questions` does.
-3. `models/<Entity>.ts` — client class + converter (throw in `toFirestore` if immutable).
-4. `functions/src/types/<entity>.ts` — admin-side type.
-5. `functions/src/seeds/<entity>Seed.ts.dist` + wire it into `seedDatabaseHandle.ts`.
-6. `Enum/Page.ts` + `next.config.js` rewrites — if it gets a route.
-7. `components/Navbar/Navbar.tsx` — if it gets a tab (mind the hard-coded 4-column grid).
-8. `tailwind.config.js` `safelist` — if it introduces dynamically-built class names.
-9. `firestore.indexes.json` — if it needs a composite query.
-10. Update `User` in **both** type worlds if it adds a counter, plus `USER_COUNTER_DEFAULTS` (compile-enforced),
-    and `RankingRoundUser` / `GuildMember` if that counter should show up on a leaderboard.
+**Worked example:** pins did every step of this. `Enum/FireDoc.ts` (`PINS`, `USERS__COLLECTED_PINS`),
+`firestore.rules` (admin-only read, because the `code` is inline), `models/Pin.ts` + `models/CollectedPin.ts`,
+`functions/src/types/pin.ts`, `pinsSeed.ts.dist` → `seedDatabaseHandle`, the safelist, the `User` counter +
+`USER_COUNTER_DEFAULTS` + `RankingRoundUser`, `awardPoints`, and `functions/test/pins.test.mjs`.
+Copy that shape for achievements (#23).
