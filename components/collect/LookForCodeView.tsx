@@ -1,8 +1,8 @@
 import Panel from '../Panel';
 import { SubmitErrorHandler, useForm } from 'react-hook-form';
 import { useEffect, useRef, useState } from 'react';
-import { collectCardFunction } from '@/utils/functions';
-import Card from '@/models/Card';
+import { completePinFunction } from '@/utils/functions';
+import CompletedPin from '@/models/CompletedPin';
 import Question from '@/models/Question';
 import useDynamicNavbar from '@/hooks/useDynamicNavbar';
 import { faCamera, faCheck } from '@fortawesome/free-solid-svg-icons';
@@ -15,7 +15,7 @@ export default function LookForCodeView ({
     onCodeInvalid
 }: {
     code?: string | null,
-    onCodeValid: (card: Card, question: Question | null) => void,
+    onCodeValid: (pin: CompletedPin, question: Question | null) => void,
     onCodeInvalid: (error: Error) => void
 }) {
     const [loading, setLoading] = useState<boolean>(false);
@@ -39,13 +39,13 @@ export default function LookForCodeView ({
     const collectCode = (data: any) => {
         setLoading(true);
 
-        collectCardFunction({ code: data.code })
+        completePinFunction({ code: data.code })
             .then((result) => {
                 setLoading(false);
                 reset();
 
                 onCodeValid(
-                    Card.fromRaw(result.data.card),
+                    CompletedPin.fromRaw(result.data.pin),
                     result.data.question ? Question.fromRaw(result.data.question) : null
                 );
             })
@@ -110,7 +110,7 @@ export default function LookForCodeView ({
                 </p>
             </Panel>
 
-            <Panel title="Wpisz kod karty" loading={loading}>
+            <Panel title="Wpisz kod miejsca" loading={loading}>
                 <form onSubmit={handleSubmit(collectCode)}>
                     <input type="text" placeholder="ABCDEFGHIJ" maxLength={10}
                            className="rounded-xl block w-full p-1 border-2 border-input-border text-center
@@ -120,10 +120,10 @@ export default function LookForCodeView ({
                                'code',
                                {
                                    setValueAs: (value: string) => value.trim(),
-                                   required: 'Kod karty składa się z 10 znaków',
+                                   required: 'Kod miejsca składa się z 10 znaków',
                                    pattern: {
                                        value: /^[A-z0-9]{10}$/,
-                                       message: 'Kod karty składa się z 10 znaków'
+                                       message: 'Kod miejsca składa się z 10 znaków'
                                    }
                                }
                            )} />
@@ -138,7 +138,7 @@ export default function LookForCodeView ({
                 </form>
             </Panel>
 
-            <Panel title="Zeskanuj kod karty">
+            <Panel title="Zeskanuj kod miejsca">
                 <p>Dotknij przycisku aparatu i zeskanuj kod! Możesz też użyć dowolnej innej aplikacji do skanowania.</p>
             </Panel>
         </div>

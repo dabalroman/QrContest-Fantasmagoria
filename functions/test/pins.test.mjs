@@ -11,7 +11,7 @@ import {
 } from './emulator.mjs';
 import {
     seedFixture, ROUND_UID,
-    PIN_CODE_UID, PIN_CODE_VALUE, PIN_CODE_CODE,
+    PIN_CODE_UID, PIN_CODE_VALUE, PIN_CODE_CODE, PIN_CODE_NAME, PIN_CODE_DESCRIPTION,
     PIN_RIDDLE_UID, PIN_RIDDLE_VALUE, PIN_RIDDLE_ANSWER,
     PIN_VISIT_UID, PIN_VISIT_VALUE,
     PIN_FEEDBACK_UID, PIN_PHOTO_UID,
@@ -49,6 +49,32 @@ test('code pin via global scanner path awards and fans out', async () => {
     assert.equal(user.amountOfCompletedPins, 1, 'user.amountOfCompletedPins');
     assert.equal(round.users[uid].score, PIN_CODE_VALUE, 'ranking round copy score');
     assert.equal(round.users[uid].amountOfCompletedPins, 1, 'ranking round copy counter');
+});
+
+test('completedPins snapshots name/description/value but never the secret', async () => {
+    const uid = 'pin-player-snapshot';
+    const token = await registerPlayer(uid, 'PinPlayerSnap');
+
+    const result = await callCallable('completePinHandle', { code: PIN_CODE_CODE }, token);
+
+    // The client renders straight off this payload — `pins` is admin-only read, so anything
+    // missing here is unrenderable. Mirrors how collectedCards snapshots the card.
+    assert.equal(result.pin.name, PIN_CODE_NAME, 'callable payload name');
+    assert.equal(result.pin.description, PIN_CODE_DESCRIPTION, 'callable payload description');
+    assert.equal(result.pin.value, PIN_CODE_VALUE, 'callable payload value');
+
+    const completedPin = (await db.collection('users').doc(uid)
+        .collection('completedPins').doc(PIN_CODE_UID).get()).data();
+
+    assert.equal(completedPin.name, PIN_CODE_NAME, 'stored name');
+    assert.equal(completedPin.description, PIN_CODE_DESCRIPTION, 'stored description');
+    assert.equal(completedPin.value, PIN_CODE_VALUE, 'stored value');
+
+    // The snapshot must never carry the pin's secret or the uid->username map of every finder.
+    assert.equal(completedPin.code, undefined, 'completedPins must not carry the code');
+    assert.equal(completedPin.completedBy, undefined, 'completedPins must not carry completedBy');
+    assert.equal(result.pin.code, undefined, 'callable payload must not carry the code');
+    assert.equal(result.pin.completedBy, undefined, 'callable payload must not carry completedBy');
 });
 
 test('code pin via pin-UI path ({pinUid, answer}) awards', async () => {

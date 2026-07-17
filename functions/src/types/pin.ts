@@ -38,8 +38,13 @@ export type Pin = {
     completedBy: PinCompletedBy;
 }
 
+// Snapshot copy of the pin, the way collectedCards snapshots the card: name/description/value are
+// duplicated here because `pins` is admin-only read, so the client can never resolve pins/{uid} itself.
 export type CompletedPin = {
     uid: string;
+    name: string;
+    description: string;
+    value: number;
     type: PinType;
     completedAt: Timestamp | FieldValue;
     awardedPoints: number;

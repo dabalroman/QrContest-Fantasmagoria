@@ -71,7 +71,13 @@ module.exports = {
                 'guild-desert': 'var(--color-guild-desert)',
                 'guild-void': 'var(--color-guild-void)',
                 'guild-water': 'var(--color-guild-water)',
-                'guild-steel': 'var(--color-guild-steel)'
+                'guild-steel': 'var(--color-guild-steel)',
+
+                'pin-code': 'var(--color-pin-code)',
+                'pin-riddle': 'var(--color-pin-riddle)',
+                'pin-visit': 'var(--color-pin-visit)',
+                'pin-feedback': 'var(--color-pin-feedback)',
+                'pin-photo': 'var(--color-pin-photo)'
             },
             keyframes: {
                 pointsAdded: {
@@ -164,6 +170,26 @@ module.exports = {
         'text-card-epic',
         'text-card-legendary',
         'text-card-mythical',
+        'border-pin-code',
+        'border-pin-riddle',
+        'border-pin-visit',
+        'border-pin-feedback',
+        'border-pin-photo',
+        'bg-pin-code',
+        'bg-pin-riddle',
+        'bg-pin-visit',
+        'bg-pin-feedback',
+        'bg-pin-photo',
+        'ring-pin-code',
+        'ring-pin-riddle',
+        'ring-pin-visit',
+        'ring-pin-feedback',
+        'ring-pin-photo',
+        'text-pin-code',
+        'text-pin-riddle',
+        'text-pin-visit',
+        'text-pin-feedback',
+        'text-pin-photo',
     ],
     plugins: []
 };

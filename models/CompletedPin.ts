@@ -6,6 +6,9 @@ import { Uid } from '@/types/global';
 
 export default class CompletedPin extends FirebaseModel {
     uid: Uid;
+    name: string;
+    description: string;
+    value: number;
     type: PinType;
     completedAt: Date | null;
     awardedPoints: number;
@@ -14,6 +17,9 @@ export default class CompletedPin extends FirebaseModel {
 
     constructor (
         uid: Uid = '',
+        name: string = '',
+        description: string = '',
+        value: number = 0,
         type: PinType = PinType.CODE,
         completedAt: Date | null = null,
         awardedPoints: number = 0,
@@ -27,6 +33,9 @@ export default class CompletedPin extends FirebaseModel {
         }
 
         this.uid = uid;
+        this.name = name;
+        this.description = description;
+        this.value = value;
         this.type = type;
         this.completedAt = completedAt;
         this.awardedPoints = awardedPoints;
@@ -37,6 +46,9 @@ export default class CompletedPin extends FirebaseModel {
     public static fromRaw (rawCompletedPin: RawCompletedPin): CompletedPin {
         return new CompletedPin(
             rawCompletedPin.uid,
+            rawCompletedPin.name,
+            rawCompletedPin.description,
+            rawCompletedPin.value,
             rawCompletedPin.type,
             Timestamp.fromMillis(rawCompletedPin.completedAt._seconds * 1000).toDate(),
             rawCompletedPin.awardedPoints,
@@ -61,6 +73,9 @@ export default class CompletedPin extends FirebaseModel {
 
         return new CompletedPin(
             data.uid,
+            data.name,
+            data.description,
+            data.value,
             data.type,
             data.completedAt?.toDate() ?? null,
             data.awardedPoints,

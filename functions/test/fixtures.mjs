@@ -22,6 +22,8 @@ export const EXPECTED_TOTAL = CARD_VALUE + QUESTION_VALUE;
 export const PIN_CODE_UID = 'test-pin-code';
 export const PIN_CODE_VALUE = 20;
 export const PIN_CODE_CODE = 'PINCODE001';     // 10 chars, [A-Z0-9]
+export const PIN_CODE_NAME = 'Test pin (code)';
+export const PIN_CODE_DESCRIPTION = 'test pin';
 
 export const PIN_RIDDLE_UID = 'test-pin-riddle';
 export const PIN_RIDDLE_VALUE = 15;
@@ -118,8 +120,8 @@ export async function seedFixture () {
 
     await db.collection('pins').doc(PIN_CODE_UID).set({
         uid: PIN_CODE_UID,
-        name: 'Test pin (code)',
-        description: 'test pin',
+        name: PIN_CODE_NAME,
+        description: PIN_CODE_DESCRIPTION,
         clue: '',
         type: 'code',
         groups: ['test'],

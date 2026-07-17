@@ -7,6 +7,15 @@ import { Uid } from '@/types/global';
 
 export type PinCoords = { x: number, y: number };
 
+// The subset PinCardComponent renders. Both Pin and CompletedPin satisfy it structurally, which is what
+// lets the map and the collect screen share one card component without an adapter. The description is
+// rendered by the caller in a Panel below the card, the way CollectCardView does it.
+export interface PinCardData {
+    type: PinType;
+    name: string;
+    value: number;
+}
+
 export default class Pin extends FirebaseModel {
     uid: Uid;
     name: string;

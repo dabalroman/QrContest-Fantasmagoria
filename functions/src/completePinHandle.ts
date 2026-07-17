@@ -139,6 +139,9 @@ export const completePinHandle = onCall(async (req): Promise<{
             // Complete pin
             transaction.create(completedPinRef, {
                 uid: pin.uid,
+                name: pin.name,
+                description: pin.description,
+                value: pin.value,
                 type: pin.type,
                 completedAt: FieldValue.serverTimestamp(),
                 awardedPoints: pin.value,

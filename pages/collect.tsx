@@ -1,34 +1,39 @@
 import Metatags from '@/components/Metatags';
-import Card from '@/models/Card';
+import CompletedPin from '@/models/CompletedPin';
 import ScreenTitle from '@/components/ScreenTitle';
 import toast from 'react-hot-toast';
 import { useState } from 'react';
-import useCollectedCards from '@/hooks/useCollectedCards';
 import { useRouter } from 'next/router';
 import Question from '@/models/Question';
 import { StringMap } from '@/types/global';
-import QuestionCardView from '@/components/collect/QuestionCardView';
-import CollectCardView from '@/components/collect/CollectCardView';
+import QuestionPinView from '@/components/collect/QuestionPinView';
+import CompletePinView from '@/components/collect/CompletePinView';
 import LookForCodeView from '@/components/collect/LookForCodeView';
 
 enum CollectPageState {
     LOOK_FOR_CODE,
-    CARD_FOUND,
-    CARD_FOUND_WITH_QUESTION,
+    PIN_FOUND,
+    PIN_FOUND_WITH_QUESTION,
     QUESTION,
     QUESTION_ANSWERED_OK,
     QUESTION_ANSWERED_MISTAKE
 }
 
+// Keys are the HttpsError messages completePinHandle throws.
 const collectErrorsDictionary: StringMap = {
-    'card is already collected': 'Masz już tę kartę!',
-    'card code is invalid': 'Ten kod nie jest poprawny!'
+    'pin is already completed': 'To miejsce masz już odwiedzone!',
+    'pin code is invalid': 'Ten kod nie jest poprawny!',
+    'code is invalid': 'Ten kod nie jest poprawny!',
+    'pin uid is invalid': 'Nie znaleziono takiego miejsca.',
+    'pin is not active': 'To miejsce jest nieaktywne.',
+    'pin is not available yet': 'To miejsce nie jest jeszcze dostępne.',
+    'pin is no longer available': 'To miejsce nie jest już dostępne.',
+    'wrong answer': 'Błędna odpowiedź!'
 };
 
 export default function CollectPage () {
-    const { setCards } = useCollectedCards();
     const [state, setState] = useState<CollectPageState>(CollectPageState.LOOK_FOR_CODE);
-    const [card, setCard] = useState<Card | null>(null);
+    const [pin, setPin] = useState<CompletedPin | null>(null);
     const [question, setQuestion] = useState<Question | null>(null);
 
     const router = useRouter();
@@ -38,17 +43,16 @@ export default function CollectPage () {
         code = null;
     }
 
-    const onCodeValid = (card: Card, question: Question | null) => {
+    const onCodeValid = (pin: CompletedPin, question: Question | null) => {
         if (question) {
-            toast('Ta karta kryje pytanie!', { icon: '🎲' });
+            toast('To miejsce kryje pytanie!', { icon: '🎲' });
         } else {
-            toast.success('Karta została dodana do Twojej kolekcji!');
+            toast.success('Miejsce zaliczone!');
         }
 
-        setState(question ? CollectPageState.CARD_FOUND_WITH_QUESTION : CollectPageState.CARD_FOUND);
-        setCard(card);
+        setState(question ? CollectPageState.PIN_FOUND_WITH_QUESTION : CollectPageState.PIN_FOUND);
+        setPin(pin);
         setQuestion(question);
-        setCards(null);
     };
 
     const onCodeInvalid = (error: Error) => {
@@ -85,10 +89,10 @@ export default function CollectPage () {
                     onCodeInvalid={onCodeInvalid}
                 />
             }
-            {(state === CollectPageState.CARD_FOUND || state === CollectPageState.CARD_FOUND_WITH_QUESTION)
-                && card &&
-                <CollectCardView
-                    card={card}
+            {(state === CollectPageState.PIN_FOUND || state === CollectPageState.PIN_FOUND_WITH_QUESTION)
+                && pin &&
+                <CompletePinView
+                    pin={pin}
                     question={question}
                     goToQuestion={() => setState(CollectPageState.QUESTION)}
                 />
@@ -98,9 +102,9 @@ export default function CollectPage () {
                     || state === CollectPageState.QUESTION_ANSWERED_OK
                     || state === CollectPageState.QUESTION_ANSWERED_MISTAKE
                 )
-                && card && question &&
-                <QuestionCardView
-                    card={card}
+                && pin && question &&
+                <QuestionPinView
+                    pin={pin}
                     question={question}
                     onAnswer={onQuestionAnswer}
                     onError={onQuestionError}

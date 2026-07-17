@@ -47,6 +47,9 @@ export interface RawPin {
 
 export interface RawCompletedPin {
     uid: Uid,
+    name: string,
+    description: string,
+    value: number,
     type: PinType,
     completedAt: RawFirestoreTimestamp,
     awardedPoints: number,
