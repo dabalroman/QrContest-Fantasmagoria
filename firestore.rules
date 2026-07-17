@@ -18,7 +18,7 @@ service cloud.firestore {
                 allow write: if false;
             }
 
-            match /completedPins/{pinId} {
+            match /collectedPins/{pinId} {
                 allow read: if request.auth != null
                     && request.auth.uid == userId;
 

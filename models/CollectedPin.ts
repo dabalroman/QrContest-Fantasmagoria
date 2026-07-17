@@ -1,16 +1,16 @@
 import FirebaseModel from '@/models/FirebaseModel';
 import { DocumentSnapshot, SnapshotOptions, Timestamp } from '@firebase/firestore';
 import { isPinType, PinType } from '@/Enum/PinType';
-import { RawCompletedPin } from '@/models/Raw';
+import { RawCollectedPin } from '@/models/Raw';
 import { Uid } from '@/types/global';
 
-export default class CompletedPin extends FirebaseModel {
+export default class CollectedPin extends FirebaseModel {
     uid: Uid;
     name: string;
     description: string;
     value: number;
     type: PinType;
-    completedAt: Date | null;
+    collectedAt: Date | null;
     awardedPoints: number;
     talkName: string | null;
     rating: number | null;
@@ -21,7 +21,7 @@ export default class CompletedPin extends FirebaseModel {
         description: string = '',
         value: number = 0,
         type: PinType = PinType.CODE,
-        completedAt: Date | null = null,
+        collectedAt: Date | null = null,
         awardedPoints: number = 0,
         talkName: string | null = null,
         rating: number | null = null,
@@ -29,7 +29,7 @@ export default class CompletedPin extends FirebaseModel {
         super();
 
         if (!isPinType(type)) {
-            throw new Error(`Invalid value '${type}' for completedPin.type`);
+            throw new Error(`Invalid value '${type}' for collectedPin.type`);
         }
 
         this.uid = uid;
@@ -37,47 +37,47 @@ export default class CompletedPin extends FirebaseModel {
         this.description = description;
         this.value = value;
         this.type = type;
-        this.completedAt = completedAt;
+        this.collectedAt = collectedAt;
         this.awardedPoints = awardedPoints;
         this.talkName = talkName;
         this.rating = rating;
     }
 
-    public static fromRaw (rawCompletedPin: RawCompletedPin): CompletedPin {
-        return new CompletedPin(
-            rawCompletedPin.uid,
-            rawCompletedPin.name,
-            rawCompletedPin.description,
-            rawCompletedPin.value,
-            rawCompletedPin.type,
-            Timestamp.fromMillis(rawCompletedPin.completedAt._seconds * 1000).toDate(),
-            rawCompletedPin.awardedPoints,
-            rawCompletedPin.talkName ?? null,
-            rawCompletedPin.rating ?? null
+    public static fromRaw (rawCollectedPin: RawCollectedPin): CollectedPin {
+        return new CollectedPin(
+            rawCollectedPin.uid,
+            rawCollectedPin.name,
+            rawCollectedPin.description,
+            rawCollectedPin.value,
+            rawCollectedPin.type,
+            Timestamp.fromMillis(rawCollectedPin.collectedAt._seconds * 1000).toDate(),
+            rawCollectedPin.awardedPoints,
+            rawCollectedPin.talkName ?? null,
+            rawCollectedPin.rating ?? null
         );
     }
 
-    protected static toFirestore (data: CompletedPin): object {
-        throw new Error('CompletedPin is immutable.');
+    protected static toFirestore (data: CollectedPin): object {
+        throw new Error('CollectedPin is immutable.');
     }
 
     protected static fromFirestore (
         snapshot: DocumentSnapshot,
         options: SnapshotOptions
-    ): CompletedPin {
+    ): CollectedPin {
         const data = snapshot.data(options);
 
         if (data === undefined) {
             throw new Error('Data undefined');
         }
 
-        return new CompletedPin(
+        return new CollectedPin(
             data.uid,
             data.name,
             data.description,
             data.value,
             data.type,
-            data.completedAt?.toDate() ?? null,
+            data.collectedAt?.toDate() ?? null,
             data.awardedPoints,
             data.talkName ?? null,
             data.rating ?? null

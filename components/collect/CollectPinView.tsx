@@ -1,16 +1,16 @@
 import PinCardComponent from '@/components/pin/PinCardComponent';
-import CompletedPin from '@/models/CompletedPin';
+import CollectedPin from '@/models/CollectedPin';
 import Question from '@/models/Question';
 import { faCheck, faQuestion } from '@fortawesome/free-solid-svg-icons';
 import useDynamicNavbar from '@/hooks/useDynamicNavbar';
 import { Page } from '@/Enum/Page';
 import Panel from '@/components/Panel';
 
-export default function CompletePinView ({
+export default function CollectPinView ({
     pin,
     question,
     goToQuestion
-}: { pin: CompletedPin, question?: Question | null, goToQuestion: () => void }) {
+}: { pin: CollectedPin, question?: Question | null, goToQuestion: () => void }) {
     useDynamicNavbar({
         icon: question ? faQuestion : faCheck,
         href: !question ? Page.MAIN : undefined,

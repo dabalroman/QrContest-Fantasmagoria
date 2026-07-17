@@ -1,5 +1,5 @@
 import {FieldValue, getFirestore, Timestamp, UpdateData} from 'firebase-admin/firestore';
-import {CompletedPin, Pin, PinCompletedBy, PinType} from './types/pin';
+import {CollectedPin, Pin, PinCollectedBy, PinType} from './types/pin';
 import {CollectedCardQuestion, CollectedQuestions, PublicQuestion, Question, QuestionsDoc} from './types/question';
 import getCurrentUser from './actions/getCurrentUser';
 import awardPoints from './actions/awardPoints';
@@ -8,14 +8,14 @@ import * as logger from 'firebase-functions/logger';
 
 const normalize = (s: string): string => s.trim().toUpperCase();
 
-export const completePinHandle = onCall(async (req): Promise<{
-    pin: CompletedPin,
+export const collectPinHandle = onCall(async (req): Promise<{
+    pin: CollectedPin,
     question: PublicQuestion | null
 }> => {
     const data = req.data;
     const auth = req.auth;
     if (!auth || !auth.uid) {
-        logger.error('completePinHandle', 'permission denied');
+        logger.error('collectPinHandle', 'permission denied');
         throw new HttpsError('permission-denied', 'permission denied');
     }
 
@@ -36,28 +36,28 @@ export const completePinHandle = onCall(async (req): Promise<{
         const pinDoc = await pinRef.get();
 
         if (!pinDoc.exists) {
-            logger.error('completePinHandle', 'pin uid is invalid', pinUid);
+            logger.error('collectPinHandle', 'pin uid is invalid', pinUid);
             throw new HttpsError('not-found', 'pin uid is invalid');
         }
 
         pin = pinDoc.data() as Pin;
 
         if (pin.type === PinType.FEEDBACK || pin.type === PinType.PHOTO) {
-            logger.error('completePinHandle', 'pin type is not supported yet', pin.type);
+            logger.error('collectPinHandle', 'pin type is not supported yet', pin.type);
             throw new HttpsError('invalid-argument', 'pin type is not supported yet');
         }
 
         if (!pin.isActive) {
-            logger.error('completePinHandle', 'pin is not active');
+            logger.error('collectPinHandle', 'pin is not active');
             throw new HttpsError('not-found', 'pin is not active');
         }
 
         assertPinIsAvailable(pin);
-        assertPinIsNotAlreadyCompleted(pin, uid);
+        assertPinIsNotAlreadyCollected(pin, uid);
 
         if (pin.type !== PinType.VISIT) {
             if (answerAttempt === null || pin.code === null || normalize(answerAttempt) !== normalize(pin.code)) {
-                logger.warn('completePinHandle', 'wrong answer', {pinUid: pin.uid, uid});
+                logger.warn('collectPinHandle', 'wrong answer', {pinUid: pin.uid, uid});
                 throw new HttpsError('invalid-argument', 'wrong answer');
             }
         }
@@ -66,7 +66,7 @@ export const completePinHandle = onCall(async (req): Promise<{
         const normalizedCode = normalize(codeAttempt);
 
         if (normalizedCode.length !== 10) {
-            logger.error('completePinHandle', 'code is invalid');
+            logger.error('collectPinHandle', 'code is invalid');
             throw new HttpsError('invalid-argument', 'code is invalid');
         }
 
@@ -79,7 +79,7 @@ export const completePinHandle = onCall(async (req): Promise<{
             .get();
 
         if (pinSnapshot.empty) {
-            logger.error('completePinHandle', 'pin code is invalid', codeAttempt);
+            logger.error('collectPinHandle', 'pin code is invalid', codeAttempt);
             throw new HttpsError('not-found', 'pin code is invalid');
         }
 
@@ -88,9 +88,9 @@ export const completePinHandle = onCall(async (req): Promise<{
         pin = pinDoc.data() as Pin;
 
         assertPinIsAvailable(pin);
-        assertPinIsNotAlreadyCompleted(pin, uid);
+        assertPinIsNotAlreadyCollected(pin, uid);
     } else {
-        logger.error('completePinHandle', 'pinUid or code is null');
+        logger.error('collectPinHandle', 'pinUid or code is null');
         throw new HttpsError('invalid-argument', 'pinUid or code is null');
     }
 
@@ -130,32 +130,32 @@ export const completePinHandle = onCall(async (req): Promise<{
         }
     }
 
-    // Complete the pin
-    const completedPinRef = userRef.collection('completedPins')
+    // Collect the pin
+    const collectedPinRef = userRef.collection('collectedPins')
         .doc(pin.uid);
 
     try {
         await db.runTransaction(async (transaction) => {
-            // Complete pin
-            transaction.create(completedPinRef, {
+            // Collect pin
+            transaction.create(collectedPinRef, {
                 uid: pin.uid,
                 name: pin.name,
                 description: pin.description,
                 value: pin.value,
                 type: pin.type,
-                completedAt: FieldValue.serverTimestamp(),
+                collectedAt: FieldValue.serverTimestamp(),
                 awardedPoints: pin.value,
                 talkName: null,
                 rating: null
             });
 
-            // Update pin completedBy
-            transaction.update<PinCompletedBy, PinCompletedBy>(pinRef, {
-                [`completedBy.${uid}`]: {
+            // Update pin collectedBy
+            transaction.update<PinCollectedBy, PinCollectedBy>(pinRef, {
+                [`collectedBy.${uid}`]: {
                     username: user.username,
-                    completedAt: FieldValue.serverTimestamp()
+                    collectedAt: FieldValue.serverTimestamp()
                 }
-            } as UpdateData<PinCompletedBy>);
+            } as UpdateData<PinCollectedBy>);
 
             // Questions
             if (question) {
@@ -170,17 +170,17 @@ export const completePinHandle = onCall(async (req): Promise<{
                 }) as UpdateData<CollectedQuestions>);
             }
 
-            await awardPoints(db, transaction, userRef, user, pin.value, {amountOfCompletedPins: 1});
+            await awardPoints(db, transaction, userRef, user, pin.value, {amountOfCollectedPins: 1});
         });
 
-        logger.log('completePinHandle', user.username, `pin ${pin.uid} completed`);
+        logger.log('collectPinHandle', user.username, `pin ${pin.uid} collected`);
         return {
-            pin: (await completedPinRef.get()).data() as CompletedPin,
+            pin: (await collectedPinRef.get()).data() as CollectedPin,
             question: question as PublicQuestion
         };
     } catch (error) {
-        logger.error('completePinHandle', 'error while completing pin: ' + error);
-        throw new HttpsError('aborted', 'error while completing pin');
+        logger.error('collectPinHandle', 'error while collecting pin: ' + error);
+        throw new HttpsError('aborted', 'error while collecting pin');
     }
 });
 
@@ -188,21 +188,21 @@ function assertPinIsAvailable(pin: Pin): void {
     const now = Date.now();
 
     if (pin.availableFrom && (pin.availableFrom as Timestamp).toDate().getTime() > now) {
-        logger.error('completePinHandle', 'pin is not available yet', pin.uid);
+        logger.error('collectPinHandle', 'pin is not available yet', pin.uid);
         throw new HttpsError('failed-precondition', 'pin is not available yet');
     }
 
     if (pin.availableTo && (pin.availableTo as Timestamp).toDate().getTime() < now) {
-        logger.error('completePinHandle', 'pin is no longer available', pin.uid);
+        logger.error('collectPinHandle', 'pin is no longer available', pin.uid);
         throw new HttpsError('failed-precondition', 'pin is no longer available');
     }
 }
 
-function assertPinIsNotAlreadyCompleted(pin: Pin, uid: string): void {
-    const isAlreadyCompleted = pin.completedBy && uid in pin.completedBy;
+function assertPinIsNotAlreadyCollected(pin: Pin, uid: string): void {
+    const isAlreadyCollected = pin.collectedBy && uid in pin.collectedBy;
 
-    if (isAlreadyCompleted) {
-        logger.error('completePinHandle', 'pin is already completed');
-        throw new HttpsError('already-exists', 'pin is already completed');
+    if (isAlreadyCollected) {
+        logger.error('collectPinHandle', 'pin is already collected');
+        throw new HttpsError('already-exists', 'pin is already collected');
     }
 }

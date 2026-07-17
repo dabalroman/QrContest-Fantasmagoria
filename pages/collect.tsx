@@ -1,5 +1,5 @@
 import Metatags from '@/components/Metatags';
-import CompletedPin from '@/models/CompletedPin';
+import CollectedPin from '@/models/CollectedPin';
 import ScreenTitle from '@/components/ScreenTitle';
 import toast from 'react-hot-toast';
 import { useState } from 'react';
@@ -7,7 +7,7 @@ import { useRouter } from 'next/router';
 import Question from '@/models/Question';
 import { StringMap } from '@/types/global';
 import QuestionPinView from '@/components/collect/QuestionPinView';
-import CompletePinView from '@/components/collect/CompletePinView';
+import CollectPinView from '@/components/collect/CollectPinView';
 import LookForCodeView from '@/components/collect/LookForCodeView';
 
 enum CollectPageState {
@@ -19,9 +19,9 @@ enum CollectPageState {
     QUESTION_ANSWERED_MISTAKE
 }
 
-// Keys are the HttpsError messages completePinHandle throws.
+// Keys are the HttpsError messages collectPinHandle throws.
 const collectErrorsDictionary: StringMap = {
-    'pin is already completed': 'To miejsce masz już odwiedzone!',
+    'pin is already collected': 'To miejsce masz już odwiedzone!',
     'pin code is invalid': 'Ten kod nie jest poprawny!',
     'code is invalid': 'Ten kod nie jest poprawny!',
     'pin uid is invalid': 'Nie znaleziono takiego miejsca.',
@@ -33,7 +33,7 @@ const collectErrorsDictionary: StringMap = {
 
 export default function CollectPage () {
     const [state, setState] = useState<CollectPageState>(CollectPageState.LOOK_FOR_CODE);
-    const [pin, setPin] = useState<CompletedPin | null>(null);
+    const [pin, setPin] = useState<CollectedPin | null>(null);
     const [question, setQuestion] = useState<Question | null>(null);
 
     const router = useRouter();
@@ -43,7 +43,7 @@ export default function CollectPage () {
         code = null;
     }
 
-    const onCodeValid = (pin: CompletedPin, question: Question | null) => {
+    const onCodeValid = (pin: CollectedPin, question: Question | null) => {
         if (question) {
             toast('To miejsce kryje pytanie!', { icon: '🎲' });
         } else {
@@ -91,7 +91,7 @@ export default function CollectPage () {
             }
             {(state === CollectPageState.PIN_FOUND || state === CollectPageState.PIN_FOUND_WITH_QUESTION)
                 && pin &&
-                <CompletePinView
+                <CollectPinView
                     pin={pin}
                     question={question}
                     goToQuestion={() => setState(CollectPageState.QUESTION)}

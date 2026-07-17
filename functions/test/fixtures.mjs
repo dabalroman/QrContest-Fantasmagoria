@@ -39,7 +39,7 @@ export const PIN_UNAVAILABLE_UID = 'test-pin-unavailable';
 export const PIN_UNAVAILABLE_VALUE = 5;
 
 /**
- * A user doc as it looked before `amountOfCompletedPins` existed — written straight through the
+ * A user doc as it looked before `amountOfCollectedPins` existed — written straight through the
  * admin SDK so it bypasses setupAccountHandle, which would initialize every counter. Mirrors what
  * an account created mid-development actually holds, and re-arms for every counter added later.
  */
@@ -50,7 +50,7 @@ export async function seedLegacyUser (uid, username) {
         score: 0,
         amountOfCollectedCards: 0,
         amountOfAnsweredQuestions: 0,
-        // amountOfCompletedPins deliberately absent — that is the whole point of this fixture.
+        // amountOfCollectedPins deliberately absent — that is the whole point of this fixture.
         role: 'user',
         memberOf: null,
         winnerInRound: null,
@@ -60,7 +60,7 @@ export async function seedLegacyUser (uid, username) {
 
     await db.collection('users-usernames').doc(username).set({ uid });
 
-    // collectCardHandle / completePinHandle transaction.update this doc — it must exist.
+    // collectCardHandle / collectPinHandle transaction.update this doc — it must exist.
     await db.collection('users').doc(uid)
         .collection('collectedQuestions').doc('collectedQuestions')
         .set({});
@@ -133,7 +133,7 @@ export async function seedFixture () {
         availableTo: null,
         isActive: true,
         code: PIN_CODE_CODE,
-        completedBy: {}
+        collectedBy: {}
     });
 
     await db.collection('pins').doc(PIN_RIDDLE_UID).set({
@@ -151,7 +151,7 @@ export async function seedFixture () {
         availableTo: null,
         isActive: true,
         code: PIN_RIDDLE_ANSWER,
-        completedBy: {}
+        collectedBy: {}
     });
 
     await db.collection('pins').doc(PIN_VISIT_UID).set({
@@ -169,7 +169,7 @@ export async function seedFixture () {
         availableTo: null,
         isActive: true,
         code: null,
-        completedBy: {}
+        collectedBy: {}
     });
 
     await db.collection('pins').doc(PIN_FEEDBACK_UID).set({
@@ -187,7 +187,7 @@ export async function seedFixture () {
         availableTo: null,
         isActive: true,
         code: null,
-        completedBy: {}
+        collectedBy: {}
     });
 
     await db.collection('pins').doc(PIN_PHOTO_UID).set({
@@ -205,7 +205,7 @@ export async function seedFixture () {
         availableTo: null,
         isActive: true,
         code: null,
-        completedBy: {}
+        collectedBy: {}
     });
 
     // Outside its availability window: closed an hour ago.
@@ -224,6 +224,6 @@ export async function seedFixture () {
         availableTo: Timestamp.fromMillis(now - 60 * 60 * 1000),
         isActive: true,
         code: null,
-        completedBy: {}
+        collectedBy: {}
     });
 }

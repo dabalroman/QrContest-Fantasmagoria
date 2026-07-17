@@ -13,10 +13,10 @@ export type PinCoords = {
     y: number;
 }
 
-export type PinCompletedBy = {
+export type PinCollectedBy = {
     [uid: string]: {
         username: string;
-        completedAt: FieldValue;
+        collectedAt: FieldValue;
     }
 }
 
@@ -35,18 +35,18 @@ export type Pin = {
     availableTo: Timestamp | FieldValue | null;
     isActive: boolean;
     code: string | null;
-    completedBy: PinCompletedBy;
+    collectedBy: PinCollectedBy;
 }
 
 // Snapshot copy of the pin, the way collectedCards snapshots the card: name/description/value are
 // duplicated here because `pins` is admin-only read, so the client can never resolve pins/{uid} itself.
-export type CompletedPin = {
+export type CollectedPin = {
     uid: string;
     name: string;
     description: string;
     value: number;
     type: PinType;
-    completedAt: Timestamp | FieldValue;
+    collectedAt: Timestamp | FieldValue;
     awardedPoints: number;
     talkName: string | null;
     rating: number | null;

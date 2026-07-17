@@ -1,8 +1,8 @@
 import Panel from '../Panel';
 import { SubmitErrorHandler, useForm } from 'react-hook-form';
 import { useEffect, useRef, useState } from 'react';
-import { completePinFunction } from '@/utils/functions';
-import CompletedPin from '@/models/CompletedPin';
+import { collectPinFunction } from '@/utils/functions';
+import CollectedPin from '@/models/CollectedPin';
 import Question from '@/models/Question';
 import useDynamicNavbar from '@/hooks/useDynamicNavbar';
 import { faCamera, faCheck } from '@fortawesome/free-solid-svg-icons';
@@ -15,7 +15,7 @@ export default function LookForCodeView ({
     onCodeInvalid
 }: {
     code?: string | null,
-    onCodeValid: (pin: CompletedPin, question: Question | null) => void,
+    onCodeValid: (pin: CollectedPin, question: Question | null) => void,
     onCodeInvalid: (error: Error) => void
 }) {
     const [loading, setLoading] = useState<boolean>(false);
@@ -39,13 +39,13 @@ export default function LookForCodeView ({
     const collectCode = (data: any) => {
         setLoading(true);
 
-        completePinFunction({ code: data.code })
+        collectPinFunction({ code: data.code })
             .then((result) => {
                 setLoading(false);
                 reset();
 
                 onCodeValid(
-                    CompletedPin.fromRaw(result.data.pin),
+                    CollectedPin.fromRaw(result.data.pin),
                     result.data.question ? Question.fromRaw(result.data.question) : null
                 );
             })

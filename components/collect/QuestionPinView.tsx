@@ -1,4 +1,4 @@
-import CompletedPin from '@/models/CompletedPin';
+import CollectedPin from '@/models/CollectedPin';
 import Question from '@/models/Question';
 import Button, { ButtonState } from '@/components/Button';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -17,7 +17,7 @@ export default function QuestionPinView ({
     onAnswer,
     onError
 }: {
-    pin: CompletedPin,
+    pin: CollectedPin,
     question: Question,
     onAnswer: (correct: boolean) => void,
     onError: (error: Error) => void
