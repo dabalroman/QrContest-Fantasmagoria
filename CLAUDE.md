@@ -320,17 +320,25 @@ constant added to `Enum/Page.ts`.
 
 ### Navbar
 
-`components/Navbar/Navbar.tsx` is a fixed bottom bar with **4 side buttons** (account / ranking / collection /
-collect) plus a large circular **"super button"** in the middle whose icon + action are *per-page*. Pages
-configure it declaratively:
+`components/Navbar/Navbar.tsx` is a fixed bottom bar with **4 side buttons** (Skanuj=`/collect` /
+Osiągnięcia=`/achievements` / Ranking / Konto=`/account`) around a large circular **"super button"** in the
+**middle** whose icon + action are *per-page*. The super-button's default is **Map** (`Page.MAP` /
+`faMapLocationDot`, in `defaultNavbarConfig` + `useDynamicNavbar`'s fallbacks) — so with no override the
+centre is the home/map button; pages override it declaratively for contextual actions:
 
 ```ts
 useDynamicNavbar({ icon: faArrowLeft, onClick: () => router.back() });
 ```
 
-The config lives in `NavbarConfigContext` and is reset on unmount. Flags: `disabled`, `disabledCenter`,
-`disabledSides`, `onlyCenter` (used by public/full-screen pages), `animate`, `animatePointsAdded`.
-The grid is hard-coded `gridTemplateColumns: 'repeat(4, 1fr) 120px'` — **adding a 5th tab means changing that.**
+The config lives in `NavbarConfigContext` and is reset to the Map default on unmount. Flags: `disabled`,
+`disabledCenter`, `disabledSides`, `onlyCenter` (used by public/full-screen pages), `animate`,
+`animatePointsAdded`. **Only the centre is dynamic — the 4 side tabs are hardcoded with fixed hrefs.** The
+grid is `gridTemplateColumns: 'repeat(2, 1fr) 120px repeat(2, 1fr)'` (centre in the middle) — **adding a 5th
+tab or making a side tab swappable means changing that + `NavbarConfig`.** The `+points` animation
+(`animatePointsAdded`) renders next to the Ranking button. The old Collection/gallery tab was **retired** from
+the nav (route + `collectCardHandle` kept, just no tab). Scanning is demoted to the Skanuj tab; the collect
+code-entry screen (`LookForCodeView`) keeps the centre on Map and offers scan/confirm as **in-page buttons**,
+so the map is always one tap away.
 
 ### Caching
 
@@ -465,9 +473,12 @@ Hosting stays on **Firebase**, same as last year. Read this section before plann
 >   collect screen are done and manually verified. Cards are retired (handler still deployed, UI orphaned).
 > - ✅ **12.1 shipped as the `/map` screen (#13)** — Leaflet `CRS.Simple` over 9 maps, the `getPins`
 >   read callable (strips `code` + `collectedBy`), the `hintRadius` field, `usePinsData` (getPins poll +
->   live `collectedPins`), and the per-type pin sheet. `/` stays the public landing; `#25` still owns the
->   navbar rework that makes `/map` the center tab.
-> - ⏳ **12.3 (achievements), 12.5 (navbar/IA)** — still to build.
+>   live `collectedPins`), and the per-type pin sheet. `/` stays the public landing.
+> - ✅ **12.5 shipped as the navbar/IA rework (#25)** — centre super-button defaults to **Map** (still
+>   per-page overridable), side tabs are Skanuj/Osiągnięcia/Ranking/Konto, the Collection tab is retired,
+>   signed-in users hitting `/` redirect to `/map`, and the collect screen moves scan/confirm in-page so the
+>   centre stays Map. A stub `/achievements` route ships with it; **#24 now depends on that route.**
+> - ⏳ **12.3 / #24 (achievements screen)** — still to build (fills the `/achievements` stub).
 > - ❌ **12.4 (photo proof) deferred out of v1.** `photo` exists in `PinType` but `collectPinHandle` rejects it.
 > - ❌ **Clubs/guilds are likely to be DROPPED for 2026.** The fan-out still writes them; do not invest new
 >   work in guild surfaces without checking first.
@@ -580,7 +591,12 @@ up is Firebase **Storage**, for photo uploads — see 12.4 — and only under ti
 
 ### 12.5 Navigation / IA rework
 
-The bottom navbar is **full**: 4 side tabs (account / ranking / collection / collect) plus the center
+> **✅ SHIPPED (#25).** The navbar/IA rework is done and committed — see the **§8 Navbar** section for the
+> shipped behaviour (Map-default centre, Skanuj/Osiągnięcia/Ranking/Konto side tabs, retired gallery,
+> `repeat(2, 1fr) 120px repeat(2, 1fr)` grid, signed-in `/`→`/map` redirect, in-page collect scan/confirm).
+> The prose below is the original design record.
+
+The bottom navbar was **full**: 4 side tabs (account / ranking / collection / collect) plus the center
 "super button", on a hard-coded `gridTemplateColumns: 'repeat(4, 1fr) 120px'`. The 2026 layout changes:
 
 - **Map becomes the main screen.**
@@ -601,7 +617,7 @@ update `Enum/Page.ts` and, for new dynamic routes, the rewrites in `next.config.
 4. `functions/src/types/<entity>.ts` — admin-side type.
 5. `functions/src/seeds/<entity>Seed.ts.dist` + wire it into `seedDatabaseHandle.ts`.
 6. `Enum/Page.ts` + `next.config.js` rewrites — if it gets a route.
-7. `components/Navbar/Navbar.tsx` — if it gets a tab (mind the hard-coded 4-column grid).
+7. `components/Navbar/Navbar.tsx` — if it gets a tab (mind the hard-coded `repeat(2, 1fr) 120px repeat(2, 1fr)` grid + hardcoded side hrefs).
 8. `tailwind.config.js` `safelist` — if it introduces dynamically-built class names.
 9. `firestore.indexes.json` — if it needs a composite query.
 10. Update `User` in **both** type worlds if it adds a counter, plus `USER_COUNTER_DEFAULTS` (compile-enforced),
