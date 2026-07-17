@@ -471,11 +471,19 @@ up is Firebase **Storage**, for photo uploads — see 12.4 — and only under ti
 
 ### 12.1 Map — becomes the app's main screen
 
-- **Plain `.webp` images. No GPS, no geolocation, no map SDK in `package.json` today.**
+> **#13 was refined on 2026-07-17 and is `todo`.** Decisions 24–31 in task #9 are locked and bind this
+> section — read the task before the prose below.
+
+- **Plain `.webp` images. No GPS, no geolocation, no map SDK in `package.json` today.** GPS was proposed
+  again during refinement and **rejected**: it cannot distinguish MOK's floors indoors, and a misfiring
+  geofence is unfixable mid-event.
 - Shows the area **outside** the convention *and* the buildings.
-- Needs: **scroll, zoom, waypoints/markers, and a floor toggle — each building has 3 floors.**
-  The floor toggle means the map is not one image but a set, switched between; plan the marker model
-  around a `(building, floor)` or layer coordinate, not just an `(x, y)`.
+- ⚠️ **The map set is NINE images, not six — and it is NOT "each building has 3 floors"** (that earlier claim
+  was wrong). **Dwór** is a standalone *city* map belonging to no building; **MOK** has 5 levels (Piwnica,
+  Parter, Piętro 1, **Piętro 1.5**, Piętro 2); **2LO** has 3 (Parter, Piętro 1, Piętro 2). The registry
+  (`mapId` → area, floor label, file, dimensions) lives in `utils/maps.ts`, and the toggle is **peer areas
+  + a per-building floor strip** (Dwór shows no strip). Markers are modelled `(mapId, coords{x,y})` — already
+  on `Pin` — plus **`hintRadius`**, a new field making a QR marker an *area* hint rather than a precise dot.
 - Markers are **RPG-game style** points of interest, not real-world pins.
 - Images are static assets → they live in `public/` and are served off Firebase Hosting's CDN, the same way
   the 64 card images already are. Bulk static image serving is a proven path in this repo.
@@ -483,11 +491,19 @@ up is Firebase **Storage**, for photo uploads — see 12.4 — and only under ti
 - **The data layer already exists — do not rebuild it.** The `pins` model, its `mapId` + `coords {x,y}` fields
   and `collectPinHandle`'s `{pinUid, answer}` entry path were built for this screen. What the map still owes:
   - a **`getPins` callable** — `pins` is admin-only read, so the client cannot query it. It **must strip both
-    `code` (the secret) and `collectedBy` (a uid→username map of every finder: privacy leak + unbounded payload)**.
+    `code` (the secret) and `collectedBy` (a uid→username map of every finder: privacy leak + unbounded payload)**
+    via an **explicit field whitelist — never `...pinDoc.data()`**. Filters `isActive` **and** the
+    `availableFrom/To` window server-side.
   - **reuse `components/pin/PinCardComponent.tsx`** for the pin-click sheet — it is the same card the collect
     screen shows after a scan, deliberately. Reuse `utils/getPinIcon.ts` and the `--color-pin-*` palette too;
     do not invent a second pin colour scheme for markers.
   - a pin cache. `useCollectedCards` / `CardsCacheContext` is **card-only** — there is no pin equivalent yet.
+    ⚠️ **Mirror `useUserData` (live), NOT `useCollectedCards` (one-shot):** `collectedPins` gets a live
+    `onSnapshot`; only `getPins` is one-shot. The card cache can be one-shot because you collect on `/collect`
+    and view on `/collection` — two screens. The map is **both at once**, so scanner→map→scanner has no
+    natural invalidation point. A listener is also cheaper than refetching the subcollection per collect.
+  - the route: **`/map`** (`Page.MAP`, static — no rewrite). `/` stays the **public landing**; the pin sheet is
+    in-map with **no route of its own**.
 - Only `code` pins are reachable from `/collect/:code`. **`riddle` / `visit` / `feedback` pins have no other
   entry point than this screen**, so they are untestable until it exists.
 
