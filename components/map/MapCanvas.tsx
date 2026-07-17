@@ -1,8 +1,10 @@
 import L from 'leaflet';
-import { useEffect, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
+import debounce from 'lodash.debounce';
 import Pin from '@/models/Pin';
 import { getMap, imageBounds, toLatLng } from '@/utils/maps';
+import { getStoredView, saveView } from '@/utils/mapView';
 import PinMarkerIcon from '@/components/map/PinMarkerIcon';
 
 // The ONLY file that value-imports leaflet (it touches `window` at module scope), so pages/map.tsx
@@ -27,6 +29,19 @@ export default function MapCanvas ({
     const onPinClickRef = useRef(onPinClick);
     onPinClickRef.current = onPinClick;
 
+    // Latest floor, read by ref so the once-bound moveend/zoomend listener persists to the right map.
+    const activeMapIdRef = useRef(activeMapId);
+    activeMapIdRef.current = activeMapId;
+
+    // Coalesce a rapid pan→zoom→pan flurry into one localStorage write. moveend/zoomend are already
+    // terminal (one per settled gesture), so this only merges back-to-back gestures.
+    const persistView = useMemo(
+        () => debounce((mapId: string, view: { center: [number, number], zoom: number }) => {
+            saveView(mapId, view);
+        }, 250),
+        []
+    );
+
     // Init + teardown, once. preferCanvas stays false: hintRadius circles are styled by CSS class,
     // which only exists on SVG paths.
     useEffect(() => {
@@ -44,15 +59,28 @@ export default function MapCanvas ({
         mapRef.current = map;
         layerGroupRef.current = L.layerGroup().addTo(map);
 
+        // Persist the settled view for the current floor. Programmatic setView/fitBounds (floor swap,
+        // first fit) also fire these — that just re-persists the same view, which is harmless.
+        map.on('moveend zoomend', () => {
+            const m = mapRef.current;
+            if (!m) {
+                return;
+            }
+            const center = m.getCenter();
+            persistView(activeMapIdRef.current, { center: [center.lat, center.lng], zoom: m.getZoom() });
+        });
+
         return () => {
+            persistView.flush();  // don't lose a pan made right before navigating away
             map.remove();
             mapRef.current = null;
             overlayRef.current = null;
             layerGroupRef.current = null;
         };
-    }, []);
+    }, [persistView]);
 
-    // Swap the floor image without recreating the map, so pan/zoom survives a floor change.
+    // Swap the floor image without recreating the map, and restore that floor's own saved view (or the
+    // whole-image overview if it has none). Per-floor, so switching floors shows each one where it was left.
     useEffect(() => {
         const map = mapRef.current;
         const mapDef = getMap(activeMapId);
@@ -64,15 +92,24 @@ export default function MapCanvas ({
 
         if (!overlayRef.current) {
             overlayRef.current = L.imageOverlay(mapDef.image, bounds).addTo(map);
-            // Fit only on first mount: "zoomed out" = whole image visible regardless of art size/device.
-            map.fitBounds(bounds);
-            map.setMinZoom(map.getZoom());
         } else {
             overlayRef.current.setUrl(mapDef.image);
             overlayRef.current.setBounds(bounds);
         }
 
         map.setMaxBounds(bounds.pad(0.05));
+        // minZoom = the overview (whole image visible), recomputed per floor and set BEFORE any restore so
+        // a stored zoom can never sit below the overview. A stored center/zoom outside the current art is
+        // clamped by minZoom + maxBounds.
+        const fitZoom = map.getBoundsZoom(bounds);
+        map.setMinZoom(fitZoom);
+
+        const stored = getStoredView(activeMapId);
+        if (stored) {
+            map.setView(stored.center, stored.zoom, { animate: false });
+        } else {
+            map.fitBounds(bounds);
+        }
     }, [activeMapId]);
 
     // Rebuild markers + hint circles for the active floor.

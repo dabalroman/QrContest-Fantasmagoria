@@ -1,4 +1,4 @@
-import { useContext, useMemo, useState } from 'react';
+import { useContext, useEffect, useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
 import toast from 'react-hot-toast';
 import Metatags from '@/components/Metatags';
@@ -12,7 +12,8 @@ import Pin from '@/models/Pin';
 import CollectedPin from '@/models/CollectedPin';
 import Question from '@/models/Question';
 import { PinsCacheContext, PinsCacheContextType } from '@/utils/context';
-import { defaultMapId } from '@/utils/maps';
+import { defaultMapId, getMap } from '@/utils/maps';
+import { getStoredLastMapId, saveLastMapId } from '@/utils/mapView';
 import { getCollectErrorMessage } from '@/utils/collectErrors';
 
 // Leaflet touches window at module scope and /map prerenders at build → client-only.
@@ -48,6 +49,8 @@ export default function MapPage () {
     const { pins, collectedPins } = useContext<PinsCacheContextType>(PinsCacheContext);
 
     const [activeMapId, setActiveMapId] = useState<string>(defaultMapId);
+    // Gate the canvas until we've read the stored floor, so it never mounts on Dwór and swaps a frame later.
+    const [restored, setRestored] = useState<boolean>(false);
     const [selectedPin, setSelectedPin] = useState<Pin | null>(null);
     const [overlayState, setOverlayState] = useState<MapOverlayState>(MapOverlayState.NONE);
     const [collectedPin, setCollectedPin] = useState<CollectedPin | null>(null);
@@ -61,6 +64,21 @@ export default function MapPage () {
         () => new Set((collectedPins?.get() ?? []).map((pin) => pin.uid)),
         [collectedPins]
     );
+
+    // Restore the last floor once, after mount — not in the useState initializer, which would run during
+    // SSR and cause a hydration mismatch. An unknown/renamed mapId is ignored (falls back to defaultMapId).
+    useEffect(() => {
+        const last = getStoredLastMapId();
+        if (last && getMap(last)) {
+            setActiveMapId(last);
+        }
+        setRestored(true);
+    }, []);
+
+    const onSelectFloor = (mapId: string) => {
+        setActiveMapId(mapId);
+        saveLastMapId(mapId);
+    };
 
     const onPinCollected = (collected: CollectedPin, drawnQuestion: Question | null) => {
         setSelectedPin(null);
@@ -107,16 +125,19 @@ export default function MapPage () {
         <main className="grid grid-rows-layout h-dvh overflow-hidden">
             <Metatags title="Mapa"/>
 
-            <MapAreaToggle activeMapId={activeMapId} onSelect={setActiveMapId}/>
+            <MapAreaToggle activeMapId={activeMapId} onSelect={onSelectFloor}/>
 
             {/* z-0 makes a stacking context so Leaflet's internal z-indices never paint over the navbar. */}
             <div className="relative overflow-hidden z-0">
-                <MapCanvas
-                    pins={visiblePins}
-                    activeMapId={activeMapId}
-                    collectedUids={collectedUids}
-                    onPinClick={setSelectedPin}
-                />
+                {restored
+                    ? <MapCanvas
+                        pins={visiblePins}
+                        activeMapId={activeMapId}
+                        collectedUids={collectedUids}
+                        onPinClick={setSelectedPin}
+                    />
+                    : <Loader/>
+                }
             </div>
 
             {selectedPin && overlayState === MapOverlayState.NONE &&
