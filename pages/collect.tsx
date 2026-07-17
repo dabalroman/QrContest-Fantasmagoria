@@ -5,10 +5,10 @@ import toast from 'react-hot-toast';
 import { useState } from 'react';
 import { useRouter } from 'next/router';
 import Question from '@/models/Question';
-import { StringMap } from '@/types/global';
 import QuestionPinView from '@/components/collect/QuestionPinView';
 import CollectPinView from '@/components/collect/CollectPinView';
 import LookForCodeView from '@/components/collect/LookForCodeView';
+import { getCollectErrorMessage } from '@/utils/collectErrors';
 
 enum CollectPageState {
     LOOK_FOR_CODE,
@@ -18,18 +18,6 @@ enum CollectPageState {
     QUESTION_ANSWERED_OK,
     QUESTION_ANSWERED_MISTAKE
 }
-
-// Keys are the HttpsError messages collectPinHandle throws.
-const collectErrorsDictionary: StringMap = {
-    'pin is already collected': 'To miejsce masz już odwiedzone!',
-    'pin code is invalid': 'Ten kod nie jest poprawny!',
-    'code is invalid': 'Ten kod nie jest poprawny!',
-    'pin uid is invalid': 'Nie znaleziono takiego miejsca.',
-    'pin is not active': 'To miejsce jest nieaktywne.',
-    'pin is not available yet': 'To miejsce nie jest jeszcze dostępne.',
-    'pin is no longer available': 'To miejsce nie jest już dostępne.',
-    'wrong answer': 'Błędna odpowiedź!'
-};
 
 export default function CollectPage () {
     const [state, setState] = useState<CollectPageState>(CollectPageState.LOOK_FOR_CODE);
@@ -57,7 +45,7 @@ export default function CollectPage () {
 
     const onCodeInvalid = (error: Error) => {
         setState(CollectPageState.LOOK_FOR_CODE);
-        toast.error(collectErrorsDictionary[error.message] ?? 'Błąd aplikacji, spróbuj ponownie.');
+        toast.error(getCollectErrorMessage(error));
         console.error(error.message);
     };
 
@@ -73,7 +61,7 @@ export default function CollectPage () {
 
     const onQuestionError = (error: Error) => {
         setState(CollectPageState.LOOK_FOR_CODE);
-        toast.error(collectErrorsDictionary[error.message] ?? 'Błąd aplikacji, spróbuj ponownie.');
+        toast.error(getCollectErrorMessage(error));
         console.error(error.message);
     };
 

@@ -5,6 +5,8 @@ import CollectionCache from '@/models/CollectionCache';
 import Card from '@/models/Card';
 import CardSet from '@/models/CardSet';
 import CardClue from '@/models/CardClue';
+import Pin from '@/models/Pin';
+import CollectedPin from '@/models/CollectedPin';
 import {Page} from '@/Enum/Page';
 import {faMagnifyingGlass} from '@fortawesome/free-solid-svg-icons';
 import {NavbarConfig} from '@/components/Navbar/Navbar';
@@ -50,6 +52,28 @@ export const CardsCacheContext: Context<CardsCacheContextType> = createContext({
     },
     clues: null,
     setClues: () => {
+    }
+});
+
+// ---- PINS ----
+// Unlike the one-shot card cache, this is live-ish: `pins` comes from the getPins callable (polled +
+// refetched on tab-focus, since `pins` is admin-only read and can't be a client listener without
+// leaking the code), while `collectedPins` is a true live onSnapshot. See hooks/usePinsData.
+export interface PinsCacheContextType {
+    pins: CollectionCache<Pin> | null,
+    collectedPins: CollectionCache<CollectedPin> | null,
+    pinsLoading: boolean,
+    pinsError: boolean,
+    reloadPins: () => void,
+}
+
+// @ts-ignore
+export const PinsCacheContext: Context<PinsCacheContextType> = createContext({
+    pins: null,
+    collectedPins: null,
+    pinsLoading: false,
+    pinsError: false,
+    reloadPins: () => {
     }
 });
 

@@ -15,20 +15,25 @@ export default function QuestionPinView ({
     pin,
     question,
     onAnswer,
-    onError
+    onError,
+    onDone
 }: {
     pin: CollectedPin,
     question: Question,
     onAnswer: (correct: boolean) => void,
-    onError: (error: Error) => void
+    onError: (error: Error) => void,
+    onDone?: () => void
 }) {
     const [loading, setLoading] = useState<boolean>(false);
     const [selectedAnswer, setSelectedAnswer] = useState<QuestionAnswerValue | null>(null);
     const [correctAnswer, setCorrectAnswer] = useState<QuestionAnswerValue | null>(null);
 
+    // href for /collect; onDone (preferred) closes the map overlay in place. Center stays disabled
+    // until answered, so onDone only ever fires post-answer.
     useDynamicNavbar({
         icon: correctAnswer ? faCheck : faQuestion,
-        href: Page.MAIN,
+        href: Page.MAP,
+        onClick: onDone,
         disabledCenter: !correctAnswer,
         disabledSides: !correctAnswer,
         animate: correctAnswer !== null,

@@ -8,6 +8,7 @@ export enum Page {
     FAQ = '/faq',
     RULEBOOK = '/rulebook',
     GUILD = '/guild',
+    MAP = '/map',
     MAIN = '/',
     LOGIN = '/auth/login',
     LOGIN_EMAIL = '/auth/login-email',

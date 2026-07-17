@@ -11,11 +11,13 @@ import {
 } from './emulator.mjs';
 import {
     seedFixture, ROUND_UID,
-    PIN_CODE_UID, PIN_CODE_VALUE, PIN_CODE_CODE, PIN_CODE_NAME, PIN_CODE_DESCRIPTION,
+    PIN_CODE_UID, PIN_CODE_VALUE, PIN_CODE_CODE, PIN_CODE_NAME, PIN_CODE_DESCRIPTION, PIN_CODE_HINT_RADIUS,
     PIN_RIDDLE_UID, PIN_RIDDLE_VALUE, PIN_RIDDLE_ANSWER,
     PIN_VISIT_UID, PIN_VISIT_VALUE,
     PIN_FEEDBACK_UID, PIN_PHOTO_UID,
-    PIN_UNAVAILABLE_UID
+    PIN_UNAVAILABLE_UID,
+    PIN_INACTIVE_UID, PIN_INACTIVE_CODE,
+    PIN_FUTURE_UID, PIN_WINDOWED_UID
 } from './fixtures.mjs';
 
 before(async () => {
@@ -204,4 +206,99 @@ test('scanner path trims before the 10-char length check', async () => {
         token
     );
     assert.equal(result.pin.uid, PIN_CODE_UID);
+});
+
+// --- getPinsHandle: the map's read path ---
+
+test('getPins returns active pins and drops inactive ones', async () => {
+    const uid = 'pin-getpins-1';
+    const token = await registerPlayer(uid, 'PinGetPins1');
+
+    const { pins } = await callCallable('getPinsHandle', {}, token);
+    const uids = pins.map((pin) => pin.uid);
+
+    assert.ok(uids.includes(PIN_CODE_UID), 'code pin present');
+    // Null-window pins are the whole game; this is the regression net against the Firestore
+    // null-ordering trap (a `where('availableTo', ...)` query would silently drop them).
+    assert.ok(uids.includes(PIN_VISIT_UID), 'null-window pin present');
+    assert.ok(uids.includes(PIN_FEEDBACK_UID), 'feedback pin still renders (collect owned by #12)');
+    assert.ok(uids.includes(PIN_PHOTO_UID), 'photo pin still renders');
+    assert.ok(!uids.includes(PIN_INACTIVE_UID), 'inactive pin dropped server-side');
+});
+
+test('getPins strips code and collectedBy from every returned pin', async () => {
+    const uid = 'pin-getpins-2';
+    const token = await registerPlayer(uid, 'PinGetPins2');
+
+    // Collect first so at least one pin has a populated collectedBy map to try to leak.
+    await callCallable('collectPinHandle', { code: PIN_CODE_CODE }, token);
+
+    const { pins } = await callCallable('getPinsHandle', {}, token);
+
+    assert.ok(pins.length > 0, 'expected getPins to return pins (loop must not vacuously pass)');
+    for (const pin of pins) {
+        assert.equal(pin.code, undefined, `pin ${pin.uid} must not carry the code`);
+        assert.equal(pin.collectedBy, undefined, `pin ${pin.uid} must not carry collectedBy`);
+    }
+});
+
+test('getPins carries the render payload', async () => {
+    const uid = 'pin-getpins-3';
+    const token = await registerPlayer(uid, 'PinGetPins3');
+
+    const { pins } = await callCallable('getPinsHandle', {}, token);
+    const byUid = Object.fromEntries(pins.map((pin) => [pin.uid, pin]));
+
+    const codePin = byUid[PIN_CODE_UID];
+    assert.equal(codePin.name, PIN_CODE_NAME);
+    assert.equal(codePin.description, PIN_CODE_DESCRIPTION);
+    assert.equal(codePin.value, PIN_CODE_VALUE);
+    assert.equal(codePin.type, 'code');
+    assert.equal(codePin.mapId, 'test-map');
+    assert.deepEqual(codePin.coords, { x: 0, y: 0 });
+    assert.equal(codePin.hintRadius, PIN_CODE_HINT_RADIUS);
+    assert.equal(codePin.withQuestion, true);
+
+    const riddlePin = byUid[PIN_RIDDLE_UID];
+    assert.equal(riddlePin.clue, 'What breathes fire?', 'riddle clue present');
+    assert.equal(riddlePin.hintRadius, null, 'non-code pin has no hint radius');
+});
+
+test('getPins timestamps carry _seconds (Pin.fromRaw); null windows stay null', async () => {
+    const uid = 'pin-getpins-4';
+    const token = await registerPlayer(uid, 'PinGetPins4');
+
+    const { pins } = await callCallable('getPinsHandle', {}, token);
+    const byUid = Object.fromEntries(pins.map((pin) => [pin.uid, pin]));
+
+    const windowed = byUid[PIN_WINDOWED_UID];
+    assert.equal(typeof windowed.availableFrom._seconds, 'number', 'availableFrom serialized for fromRaw');
+    assert.equal(typeof windowed.availableTo._seconds, 'number', 'availableTo serialized for fromRaw');
+
+    const nullWindow = byUid[PIN_VISIT_UID];
+    assert.equal(nullWindow.availableFrom, null, 'null window stays null');
+    assert.equal(nullWindow.availableTo, null, 'null window stays null');
+
+    assert.ok(byUid[PIN_FUTURE_UID], 'future-windowed pin still returned (client hides it by clock)');
+});
+
+test('getPins requires auth', async () => {
+    await assert.rejects(
+        () => callCallable('getPinsHandle', {}, null),
+        /permission/i
+    );
+});
+
+test('both collect paths report an inactive pin identically (decision 28)', async () => {
+    const uid = 'pin-getpins-6';
+    const token = await registerPlayer(uid, 'PinGetPins6');
+
+    await assert.rejects(
+        () => callCallable('collectPinHandle', { pinUid: PIN_INACTIVE_UID }, token),
+        /not active/i
+    );
+    await assert.rejects(
+        () => callCallable('collectPinHandle', { code: PIN_INACTIVE_CODE }, token),
+        /not active/i
+    );
 });

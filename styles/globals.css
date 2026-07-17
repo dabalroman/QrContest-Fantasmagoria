@@ -53,6 +53,24 @@
 
 .theme-default {}
 
+/* Map markers + hint circles (components/map). Plain CSS, not @apply — no purge, no safelist entry. */
+.pin-marker {
+    background: transparent;
+    border: none;
+}
+
+.pin-hint-circle {
+    fill-opacity: 0.15;
+    stroke-opacity: 0.6;
+    stroke-width: 2;
+}
+
+.pin-hint-circle--code { fill: var(--color-pin-code); stroke: var(--color-pin-code); }
+.pin-hint-circle--riddle { fill: var(--color-pin-riddle); stroke: var(--color-pin-riddle); }
+.pin-hint-circle--visit { fill: var(--color-pin-visit); stroke: var(--color-pin-visit); }
+.pin-hint-circle--feedback { fill: var(--color-pin-feedback); stroke: var(--color-pin-feedback); }
+.pin-hint-circle--photo { fill: var(--color-pin-photo); stroke: var(--color-pin-photo); }
+
 * {
     box-sizing: border-box;
     padding: 0;

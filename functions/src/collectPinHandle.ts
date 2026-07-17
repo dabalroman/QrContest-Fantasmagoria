@@ -47,11 +47,7 @@ export const collectPinHandle = onCall(async (req): Promise<{
             throw new HttpsError('invalid-argument', 'pin type is not supported yet');
         }
 
-        if (!pin.isActive) {
-            logger.error('collectPinHandle', 'pin is not active');
-            throw new HttpsError('not-found', 'pin is not active');
-        }
-
+        assertPinIsActive(pin);
         assertPinIsAvailable(pin);
         assertPinIsNotAlreadyCollected(pin, uid);
 
@@ -72,10 +68,11 @@ export const collectPinHandle = onCall(async (req): Promise<{
 
         // type == 'code' is the anti-bruteforce rule: a riddle's `code` holds a guessable
         // free-text answer, so a cross-pin lookup would let players solve riddles they never found.
+        // isActive is NOT queried here (decision 28): an inactive pin must report 'pin is not active',
+        // the same as the pin-UI path, rather than the misleading 'pin code is invalid'.
         const pinSnapshot = await db.collection('pins')
             .where('code', '==', normalizedCode)
             .where('type', '==', PinType.CODE)
-            .where('isActive', '==', true)
             .get();
 
         if (pinSnapshot.empty) {
@@ -87,6 +84,7 @@ export const collectPinHandle = onCall(async (req): Promise<{
         pinRef = pinDoc.ref;
         pin = pinDoc.data() as Pin;
 
+        assertPinIsActive(pin);
         assertPinIsAvailable(pin);
         assertPinIsNotAlreadyCollected(pin, uid);
     } else {
@@ -183,6 +181,13 @@ export const collectPinHandle = onCall(async (req): Promise<{
         throw new HttpsError('aborted', 'error while collecting pin');
     }
 });
+
+function assertPinIsActive(pin: Pin): void {
+    if (!pin.isActive) {
+        logger.error('collectPinHandle', 'pin is not active', pin.uid);
+        throw new HttpsError('not-found', 'pin is not active');
+    }
+}
 
 function assertPinIsAvailable(pin: Pin): void {
     const now = Date.now();

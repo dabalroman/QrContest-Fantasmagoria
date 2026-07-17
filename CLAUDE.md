@@ -342,6 +342,15 @@ exactly that after a successful scan so the collection screen refetches.
 By contrast, `ranking`, `guilds`, the user doc, and the admin lists all use **live `onSnapshot`**
 subscriptions — that's what makes the leaderboard feel instant.
 
+The **pins cache (`usePinsData` → `PinsCacheContext`) is a hybrid**, because the map both collects and
+views at once (scanner↔map has no natural invalidation point): `pins` comes from the **`getPins`
+callable** (`pins` is admin-only read, so it can't be a client listener without leaking the inline
+`code`) with a **15-min poll + tab-focus refetch**, while `collectedPins` is a **live `onSnapshot`** so a
+player's own collect greys its marker instantly. There is deliberately **no `setCollectedPins(null)`** —
+refetch is freshness/retry only, never coupled to a collect. Mirror `useUserData`, not `useCollectedCards`.
+The map registry (`mapId` → area/floor/image/dims) and the coordinate convention (`coords{x,y}` = pixels
+from the image top-left, y down; the sole `[-y, x]` swap into Leaflet space) live in `utils/maps.ts`.
+
 ### Theming
 
 `Enum/AppTheme.ts` maps a `GuildUid` → a theme class (`theme-desert`, `theme-steel`, `theme-void`,
@@ -454,7 +463,11 @@ Hosting stays on **Firebase**, same as last year. Read this section before plann
 > **Status as of 2026-07-17 — this section is now part plan, part history:**
 > - ✅ **12.2 shipped as pins** — the pin model, `collectPinHandle`, the pin visual system and the rewired
 >   collect screen are done and manually verified. Cards are retired (handler still deployed, UI orphaned).
-> - ⏳ **12.1 (map), 12.3 (achievements), 12.5 (navbar/IA)** — still to build. The map is next.
+> - ✅ **12.1 shipped as the `/map` screen (#13)** — Leaflet `CRS.Simple` over 9 maps, the `getPins`
+>   read callable (strips `code` + `collectedBy`), the `hintRadius` field, `usePinsData` (getPins poll +
+>   live `collectedPins`), and the per-type pin sheet. `/` stays the public landing; `#25` still owns the
+>   navbar rework that makes `/map` the center tab.
+> - ⏳ **12.3 (achievements), 12.5 (navbar/IA)** — still to build.
 > - ❌ **12.4 (photo proof) deferred out of v1.** `photo` exists in `PinType` but `collectPinHandle` rejects it.
 > - ❌ **Clubs/guilds are likely to be DROPPED for 2026.** The fan-out still writes them; do not invest new
 >   work in guild surfaces without checking first.
@@ -471,8 +484,10 @@ up is Firebase **Storage**, for photo uploads — see 12.4 — and only under ti
 
 ### 12.1 Map — becomes the app's main screen
 
-> **#13 was refined on 2026-07-17 and is `todo`.** Decisions 24–31 in task #9 are locked and bind this
-> section — read the task before the prose below.
+> **✅ SHIPPED (#13).** The `/map` screen, `getPins`, `hintRadius`, `usePinsData` and the pin sheet are
+> built. `leaflet`/`@types/leaflet` are now real deps; the 9 placeholder maps live in `public/maps/`
+> (#16 overwrites them with real art). The prose below is the design record; decisions 24–31 in task #9
+> remain the binding spec.
 
 - **Plain `.webp` images. No GPS, no geolocation, no map SDK in `package.json` today.** GPS was proposed
   again during refinement and **rejected**: it cannot distinguish MOK's floors indoors, and a misfiring

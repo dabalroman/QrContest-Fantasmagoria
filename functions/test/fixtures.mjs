@@ -24,6 +24,7 @@ export const PIN_CODE_VALUE = 20;
 export const PIN_CODE_CODE = 'PINCODE001';     // 10 chars, [A-Z0-9]
 export const PIN_CODE_NAME = 'Test pin (code)';
 export const PIN_CODE_DESCRIPTION = 'test pin';
+export const PIN_CODE_HINT_RADIUS = 120;       // getPins must carry this through (decision 26)
 
 export const PIN_RIDDLE_UID = 'test-pin-riddle';
 export const PIN_RIDDLE_VALUE = 15;
@@ -37,6 +38,16 @@ export const PIN_PHOTO_UID = 'test-pin-photo';
 
 export const PIN_UNAVAILABLE_UID = 'test-pin-unavailable';
 export const PIN_UNAVAILABLE_VALUE = 5;
+
+// Inactive code pin — getPins must drop it, and BOTH collect entry paths must report it identically
+// as 'pin is not active' (decision 28). There is no inactive pin without this fixture.
+export const PIN_INACTIVE_UID = 'test-pin-inactive';
+export const PIN_INACTIVE_CODE = 'PININACT01';  // 10 chars, [A-Z0-9]
+
+// Active but outside/inside its window — getPins returns both (window is filtered client-side); these
+// pin the timestamp-round-trip through Pin.fromRaw (which reads `._seconds`).
+export const PIN_FUTURE_UID = 'test-pin-future';
+export const PIN_WINDOWED_UID = 'test-pin-windowed';
 
 /**
  * A user doc as it looked before `amountOfCollectedPins` existed — written straight through the
@@ -127,6 +138,7 @@ export async function seedFixture () {
         groups: ['test'],
         mapId: 'test-map',
         coords: { x: 0, y: 0 },
+        hintRadius: PIN_CODE_HINT_RADIUS,
         value: PIN_CODE_VALUE,
         withQuestion: true,
         availableFrom: null,
@@ -145,6 +157,7 @@ export async function seedFixture () {
         groups: ['test'],
         mapId: 'test-map',
         coords: { x: 10, y: 10 },
+        hintRadius: null,
         value: PIN_RIDDLE_VALUE,
         withQuestion: false,
         availableFrom: null,
@@ -163,6 +176,7 @@ export async function seedFixture () {
         groups: ['test'],
         mapId: 'test-map',
         coords: { x: 20, y: 20 },
+        hintRadius: null,
         value: PIN_VISIT_VALUE,
         withQuestion: false,
         availableFrom: null,
@@ -181,6 +195,7 @@ export async function seedFixture () {
         groups: ['test'],
         mapId: 'test-map',
         coords: { x: 30, y: 30 },
+        hintRadius: null,
         value: 5,
         withQuestion: false,
         availableFrom: null,
@@ -199,6 +214,7 @@ export async function seedFixture () {
         groups: ['test'],
         mapId: 'test-map',
         coords: { x: 40, y: 40 },
+        hintRadius: null,
         value: 5,
         withQuestion: false,
         availableFrom: null,
@@ -218,10 +234,71 @@ export async function seedFixture () {
         groups: ['test'],
         mapId: 'test-map',
         coords: { x: 50, y: 50 },
+        hintRadius: null,
         value: PIN_UNAVAILABLE_VALUE,
         withQuestion: false,
         availableFrom: Timestamp.fromMillis(now - 2 * 60 * 60 * 1000),
         availableTo: Timestamp.fromMillis(now - 60 * 60 * 1000),
+        isActive: true,
+        code: null,
+        collectedBy: {}
+    });
+
+    // Inactive code pin — getPins drops it; both collect paths report 'pin is not active' (decision 28).
+    await db.collection('pins').doc(PIN_INACTIVE_UID).set({
+        uid: PIN_INACTIVE_UID,
+        name: 'Test pin (inactive)',
+        description: 'test pin',
+        clue: '',
+        type: 'code',
+        groups: ['test'],
+        mapId: 'test-map',
+        coords: { x: 60, y: 60 },
+        hintRadius: null,
+        value: 5,
+        withQuestion: false,
+        availableFrom: null,
+        availableTo: null,
+        isActive: false,
+        code: PIN_INACTIVE_CODE,
+        collectedBy: {}
+    });
+
+    // Active, opens in an hour — getPins returns it (window is filtered client-side).
+    await db.collection('pins').doc(PIN_FUTURE_UID).set({
+        uid: PIN_FUTURE_UID,
+        name: 'Test pin (future)',
+        description: 'test pin',
+        clue: '',
+        type: 'visit',
+        groups: ['test'],
+        mapId: 'test-map',
+        coords: { x: 70, y: 70 },
+        hintRadius: null,
+        value: 5,
+        withQuestion: false,
+        availableFrom: Timestamp.fromMillis(now + 60 * 60 * 1000),
+        availableTo: null,
+        isActive: true,
+        code: null,
+        collectedBy: {}
+    });
+
+    // Active, inside a live window — carries real timestamps for the Pin.fromRaw round-trip assertion.
+    await db.collection('pins').doc(PIN_WINDOWED_UID).set({
+        uid: PIN_WINDOWED_UID,
+        name: 'Test pin (windowed)',
+        description: 'test pin',
+        clue: '',
+        type: 'visit',
+        groups: ['test'],
+        mapId: 'test-map',
+        coords: { x: 80, y: 80 },
+        hintRadius: null,
+        value: 5,
+        withQuestion: false,
+        availableFrom: Timestamp.fromMillis(now - 60 * 60 * 1000),
+        availableTo: Timestamp.fromMillis(now + 60 * 60 * 1000),
         isActive: true,
         code: null,
         collectedBy: {}

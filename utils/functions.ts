@@ -1,6 +1,6 @@
 import { HttpsCallable, httpsCallable } from '@firebase/functions';
 import { functions } from '@/utils/firebase';
-import { RawCard, RawCollectedPin, RawQuestion } from '@/models/Raw';
+import { RawCard, RawCollectedPin, RawPin, RawQuestion } from '@/models/Raw';
 import { QuestionAnswerValue } from '@/functions/src/types/question';
 
 export const collectCardFunction: HttpsCallable<
@@ -12,6 +12,12 @@ export const collectPinFunction: HttpsCallable<
     { code?: string, pinUid?: string, answer?: string },
     { pin: RawCollectedPin, question: RawQuestion | null }
 > = httpsCallable(functions, 'collectPinHandle');
+
+// Read-only: the map's pin feed. Returns PublicPins (code + collectedBy stripped server-side).
+export const getPinsFunction: HttpsCallable<
+    {},
+    { pins: RawPin[] }
+> = httpsCallable(functions, 'getPinsHandle');
 
 export const answerQuestionFunction: HttpsCallable<
     { uid: string, answer: string },

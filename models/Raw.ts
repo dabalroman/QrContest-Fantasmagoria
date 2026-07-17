@@ -28,21 +28,24 @@ export interface RawQuestion {
     value: number
 }
 
+// Shape of a pin as it arrives from the getPinsHandle callable (a PublicPin, JSON-serialized).
+// `code` is DROPPED on purpose: getPins never returns it, and leaving it off the client type makes a
+// leak a compile error. `coords{x,y}` = pixels from the map image top-left, y down (see utils/maps.ts).
 export interface RawPin {
     uid: Uid,
     name: string,
-    code: string | undefined,
     type: PinType,
     groups: string[],
     mapId: string,
     coords: { x: number, y: number },
+    hintRadius: number | null,
     value: number,
     description: string,
-    clue: string | undefined,
+    clue: string,
     withQuestion: boolean,
     isActive: boolean,
-    availableFrom: RawFirestoreTimestamp | undefined,
-    availableTo: RawFirestoreTimestamp | undefined
+    availableFrom: RawFirestoreTimestamp | null,
+    availableTo: RawFirestoreTimestamp | null
 }
 
 export interface RawCollectedPin {

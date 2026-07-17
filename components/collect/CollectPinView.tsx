@@ -9,12 +9,15 @@ import Panel from '@/components/Panel';
 export default function CollectPinView ({
     pin,
     question,
-    goToQuestion
-}: { pin: CollectedPin, question?: Question | null, goToQuestion: () => void }) {
+    goToQuestion,
+    onDone
+}: { pin: CollectedPin, question?: Question | null, goToQuestion: () => void, onDone?: () => void }) {
+    // NavbarSuperButton prefers onClick over href, so /collect (no onDone) links to /map, while the map
+    // overlay passes onDone to close in place — a same-route push would not remount and would deadlock.
     useDynamicNavbar({
         icon: question ? faQuestion : faCheck,
-        href: !question ? Page.MAIN : undefined,
-        onClick: question ? goToQuestion : undefined,
+        href: !question ? Page.MAP : undefined,
+        onClick: question ? goToQuestion : onDone,
         animatePointsAdded: pin?.awardedPoints,
         animate: true,
         disabledSides: question !== null

@@ -1,9 +1,11 @@
 import '@/styles/globals.css';
+import 'leaflet/dist/leaflet.css';
 import type { AppProps } from 'next/app';
 import {
     CardsCacheContext,
     defaultNavbarConfig,
     NavbarConfigContext,
+    PinsCacheContext,
     Theme,
     ThemeContext,
     UserContext
@@ -21,6 +23,7 @@ import CardSet from '@/models/CardSet';
 import CardClue from '@/models/CardClue';
 import Metatags from '@/components/Metatags';
 import useUserData from '@/hooks/useUserData';
+import usePinsData from '@/hooks/usePinsData';
 import { UserRole } from '@/Enum/UserRole';
 import { useRouter } from 'next/router';
 import { Page } from '@/Enum/Page';
@@ -49,6 +52,7 @@ export default function App ({
     pageProps
 }: AppProps) {
     const userData = useUserData();
+    const pinsData = usePinsData();
     const router = useRouter();
     const [theme, setTheme] = useState<Theme>(null);
     const [cards, setCards] = useState<CollectionCache<Card> | null>(null);
@@ -91,6 +95,7 @@ export default function App ({
                         clues,
                         setClues
                     }}>
+                        <PinsCacheContext.Provider value={pinsData}>
                         <>
                             <Metatags title="QrContest"/>
                             <div
@@ -112,6 +117,7 @@ export default function App ({
                                 </AuthCheck>
                             </div>
                         </>
+                        </PinsCacheContext.Provider>
                     </CardsCacheContext.Provider>
                 </NavbarConfigContext.Provider>
             </ThemeContext.Provider>

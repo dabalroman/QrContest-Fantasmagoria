@@ -19,10 +19,13 @@ export interface PinCardData {
 export default class Pin extends FirebaseModel {
     uid: Uid;
     name: string;
+    // Source-dependent: null on the getPins/fromRaw path (the callable strips the secret), the real
+    // code on the fromFirestore path (#14's admin coord-picker, where admins can read `pins`).
     code: string | null;
     type: PinType;
     groups: string[];
     mapId: string;
+    // Pixels from the map image top-left, y down. utils/maps.ts owns the sole swap into Leaflet space.
     coords: PinCoords;
     value: number;
     description: string;
@@ -31,6 +34,8 @@ export default class Pin extends FirebaseModel {
     isActive: boolean;
     availableFrom: Date | null;
     availableTo: Date | null;
+    // CRS.Simple radius of the "somewhere here" area hint under a QR marker; null = precise point.
+    hintRadius: number | null;
 
     constructor (
         uid: Uid | null = null,
@@ -47,6 +52,7 @@ export default class Pin extends FirebaseModel {
         isActive: boolean = false,
         availableFrom: Date | null = null,
         availableTo: Date | null = null,
+        hintRadius: number | null = null,
     ) {
         super();
 
@@ -68,13 +74,14 @@ export default class Pin extends FirebaseModel {
         this.isActive = isActive;
         this.availableFrom = availableFrom;
         this.availableTo = availableTo;
+        this.hintRadius = hintRadius;
     }
 
     public static fromRaw (rawPin: RawPin): Pin {
         return new Pin(
             rawPin.uid,
             rawPin.name,
-            rawPin.code ?? null,
+            null,
             rawPin.type,
             rawPin.groups,
             rawPin.mapId,
@@ -89,7 +96,8 @@ export default class Pin extends FirebaseModel {
                 : null,
             rawPin.availableTo
                 ? Timestamp.fromMillis(rawPin.availableTo._seconds * 1000).toDate()
-                : null
+                : null,
+            rawPin.hintRadius ?? null
         );
     }
 
@@ -121,7 +129,8 @@ export default class Pin extends FirebaseModel {
             data.withQuestion,
             data.isActive,
             data.availableFrom?.toDate() ?? null,
-            data.availableTo?.toDate() ?? null
+            data.availableTo?.toDate() ?? null,
+            data.hintRadius ?? null
         );
     }
 }
