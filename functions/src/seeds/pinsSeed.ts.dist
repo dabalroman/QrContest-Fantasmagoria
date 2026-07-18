@@ -6,7 +6,7 @@ import { Pin, PinType } from '../types/pin';
 // This set exists to exercise every branch of collectPinHandle locally: a code pin with a question,
 // a plain code pin, a riddle, a visit, a feedback room, a time-limited pin and an inactive one.
 // Only `code` pins are reachable from /collect/:code; the rest need the map's pin UI (#13).
-const pinsSeed: Pin[] = [
+const flavoredPins: Pin[] = [
     {
         uid: 'smocze-leze',
         name: 'Smocze Leże',
@@ -126,7 +126,7 @@ const pinsSeed: Pin[] = [
         groups: ['2lo', 'bestiariusz'],
         mapId: '2lo-parter',
         coords: { x: 320, y: 480 },
-        hintRadius: 100,
+        hintRadius: null,
         value: 25,
         withQuestion: false,
         availableFrom: null,
@@ -137,5 +137,43 @@ const pinsSeed: Pin[] = [
         collectedBy: {}
     }
 ];
+
+// Dev-only bulk fixture (NOT real event content — #16 replaces this whole file). The flavored pins
+// above cap out around 80 collectible points and a single question, so the achievement ladder can't
+// be walked in the app. This generates enough always-available `code` pins — each carrying a question —
+// that one player can reach EVERY achievement: >1000 collectible points (Legenda @1000) and >30 drawable
+// questions (Puchacz @30 correct), which in turn feed Kolekcjoner and Maniak. Codes are predictable
+// (`TEST010000`…) so they're easy to punch in while testing. Spread across all 9 maps for coverage.
+const TEST_LADDER_MAP_IDS = [
+    'dwor',
+    'mok-piwnica', 'mok-parter', 'mok-pietro-1', 'mok-pietro-1-5', 'mok-pietro-2',
+    '2lo-parter', '2lo-pietro-1', '2lo-pietro-2'
+];
+const TEST_LADDER_PIN_COUNT = 40;
+const TEST_LADDER_PIN_VALUES = [30, 25, 20, 15, 10];   // cycles → 20 pts/pin avg → ~800 pts over 40 pins
+
+const testLadderPins: Pin[] = Array.from({ length: TEST_LADDER_PIN_COUNT }, (_unused, i): Pin => {
+    const n = String(i + 1).padStart(2, '0');
+    return {
+        uid: `test-ladder-${n}`,
+        name: `Punkt testowy ${n}`,
+        description: 'Testowy pin do przejścia całej drabinki osiągnięć. Prawdziwą treść dostarcza #16.',
+        clue: '',
+        type: PinType.CODE,
+        groups: ['test'],
+        mapId: TEST_LADDER_MAP_IDS[i % TEST_LADDER_MAP_IDS.length],
+        coords: { x: 120 + (i % 8) * 100, y: 120 + (i % 6) * 100 },
+        hintRadius: null,
+        value: TEST_LADDER_PIN_VALUES[i % TEST_LADDER_PIN_VALUES.length],
+        withQuestion: true,
+        availableFrom: null,
+        availableTo: null,
+        isActive: true,
+        code: `TEST${n}0000`,   // 10 chars, [A-Z0-9], unique per pin
+        collectedBy: {}
+    };
+});
+
+const pinsSeed: Pin[] = [...flavoredPins, ...testLadderPins];
 
 export default pinsSeed;
