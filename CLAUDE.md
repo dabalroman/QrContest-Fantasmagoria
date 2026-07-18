@@ -185,6 +185,7 @@ Collection names live in `Enum/FireDoc.ts` — **but that enum is incomplete.** 
 | `clues/{clueUid}` | ✅ `CLUES` | seed only | any authed user |
 | `ranking/{roundUid}` | ✅ `RANKING` | functions only | any authed user |
 | `guilds/{guildUid}` | ✅ `GUILDS` | functions only | any authed user |
+| `achievements/{uid}` | ✅ `ACHIEVEMENTS` | seed + admin console | any authed user — definitions are public |
 | `questions/questions` | ❌ | seed only | **nobody** (no rule → denied) |
 
 Two things worth internalising:
@@ -232,7 +233,7 @@ Every other mutation goes through an authenticated **callable Cloud Function**. 
 | `collectPinHandle` | `collectPinHandle.ts` | The 2026 replacement for `collectCardHandle` — **fork THIS for any new pin flow.** Two entry paths: `{code}` (global scanner/manual entry, cross-pin lookup filtered to `type == 'code'`) and `{pinUid, answer}` (the map's pin UI, validated against that one pin). Writes `collectedPins` + the pin's `collectedBy`, draws a question, awards via `awardPoints`. Rejects `feedback`/`photo` types. |
 | `answerQuestionHandle` | `answerQuestionHandle.ts` | Grades an answer server-side, awards `value` or `0`, fans out. Rejects re-answering. **Shared by cards and pins, unchanged.** |
 | `joinGuildHandle` | `joinGuildHandle.ts` | Moves the user between guilds, enforces the **4-hour cooldown**, moves the score contribution from the old guild to the new one. |
-| `seedDatabaseHandle` | `seedDatabaseHandle.ts` | Admin-only + **hardcoded password `'4064'`**. Seeds questions, cards, cardSets, ranking rounds, guilds, clues, **pins**. |
+| `seedDatabaseHandle` | `seedDatabaseHandle.ts` | Admin-only + **hardcoded password `'4064'`**. Seeds questions, cards, cardSets, ranking rounds, guilds, clues, **pins**, **achievements**. |
 | `updateRoundsHandle` | `index.ts` → `updateRoundsProcessor.ts` | Manual "force round update" from the admin panel. |
 | `autoUpdateRounds` | `index.ts` | **Scheduled**, cron `0 * * * *` (hourly). Marks finished rounds, stamps the top 3 users with `winnerInRound`. |
 
@@ -412,12 +413,20 @@ Firestore transactions and the score fan-out — nothing is mocked.
   the tests REQUIRE the `demo-` project id (under the real id the in-function admin SDK hangs ~60s then 500s).
   So stop the manual emulator before running the suite **or committing** (the pre-commit hook runs it).
   Stop it with **SIGINT to the `firebase` node process** (the one carrying `--export-on-exit`) and wait for
-  `✔ Export complete` — never `pkill` the java children, that loses the `.emulators` dump.
+  `✔ Export complete` — never `pkill` the java children, that loses the `.emulators` dump. ⚠️ Target the
+  **node** process (`pgrep -f "bin/firebase emulators:start"`), not the `sh -c` wrapper above it — the
+  wrapper does not forward SIGINT, so signalling it looks like it worked and the emulator keeps running.
+  The pre-commit hook also runs the FE build, so stop `npm run dev` too or the two contend on `.next`.
 - The canonical test asserts the score is identical in all four denormalized places after a collect + answer.
   **Every new point-granting feature must extend this suite** (see the fan-out warning in §12.2).
-- Current suite (**18 tests**): `scoring` (card fan-out), `rounds` (`winnerInRound` propagation), `pins`
-  (both entry paths, anti-bruteforce, dup guard, availability window, normalization, snapshot/secret-stripping)
-  and `counters` (legacy docs missing a counter — the §12.2 hydration rule).
+- Current suite (**31 tests**): `scoring` (card fan-out), `rounds` (`winnerInRound` propagation), `pins`
+  (both entry paths, anti-bruteforce, dup guard, availability window, normalization, snapshot/secret-stripping),
+  `counters` (legacy docs missing a counter — the §12.2 hydration rule) and `achievements` (threshold crossing +
+  4-place fan-out, bonus cascade, exactly-once, response payload, eval-throw, malformed definition).
+- `fixtures.mjs` helpers: `seedFixture` (also seeds the achievement definitions — every suite gets them, and
+  fixture awards stay under every threshold so the other suites are unaffected), `seedUser(uid, name, overrides)`
+  for presetting counters/score/`achievements`, `seedLegacyUser` for the missing-counter case, and
+  `seedInvalidAchievements` for the malformed-definition case.
 
 ## 10a. Firestore indexes
 
@@ -457,6 +466,12 @@ Things that are wrong-but-harmless today; fix opportunistically, don't be surpri
 - `pages/admin/edit-card.tsx` has a stray `console.log(formState.errors)`.
 - `pages/admin/cards.tsx` renders `comment` under the "Nazwa" header and `name` under "Ostatnia osoba" —
   the `<th>` order doesn't match the `<td>` order.
+- ⚠️ **Re-seeding wipes `collectedBy`.** `seedPins`/`seedCards` use a bare `.set()` (no `{merge: true}`, unlike
+  rounds/guilds/clues), so re-seeding resets every pin's/card's `collectedBy` to `{}` while
+  `users/{uid}/collectedPins|collectedCards` survives. The two then disagree: the
+  `assertPinIsNotAlreadyCollected` guard passes, then `transaction.create` hits `ALREADY_EXISTS` and the
+  handler remasks it as an opaque **`ABORTED` "error while collecting pin"**. Bites after any dev re-seed, and
+  would lose the finder list if re-seeded mid-event. Check the functions log before debugging an `ABORTED`.
 
 ---
 
@@ -478,7 +493,9 @@ Hosting stays on **Firebase**, same as last year. Read this section before plann
 >   per-page overridable), side tabs are Skanuj/Osiągnięcia/Ranking/Konto, the Collection tab is retired,
 >   signed-in users hitting `/` redirect to `/map`, and the collect screen moves scan/confirm in-page so the
 >   centre stays Map. A stub `/achievements` route ships with it; **#24 now depends on that route.**
-> - ⏳ **12.3 / #24 (achievements screen)** — still to build (fills the `/achievements` stub).
+> - ✅ **12.3 engine shipped as #23** — `achievements` collection (definitions as data), pure type-predicates,
+>   auto-grant inside `awardPoints`, `amountOfCorrectAnswers` counter. **#24 (screen) still to build** — it
+>   fills the `/achievements` stub and is now pure UI; **#30** (unlock toast) consumes the returned grants.
 > - ❌ **12.4 (photo proof) deferred out of v1.** `photo` exists in `PinType` but `collectPinHandle` rejects it.
 > - ❌ **Clubs/guilds are likely to be DROPPED for 2026.** The fan-out still writes them; do not invest new
 >   work in guild surfaces without checking first.
@@ -567,14 +584,40 @@ up is Firebase **Storage**, for photo uploads — see 12.4 — and only under ti
   registered in `functions/src/index.ts`, exported through `utils/functions.ts` as `collectPinFunction`.
   Any further pin flow (talk feedback, #12) forks **it**, not `collectCardHandle`.
 
-### 12.3 Achievements — replace the card gallery
+### 12.3 Achievements — ✅ ENGINE SHIPPED (#23); screen is #24, unlock toast is #30
 
-- Achievements take over the **gallery/collection** slot in the navigation (see 12.5).
-- If they only award badges, they can be a pure read model derived from counters already on the user doc
-  (`score`, `amountOfCollectedCards`, `amountOfAnsweredQuestions`, + a new quest counter) — no new collection,
-  no new callable, no new failure mode.
-- If they award **points**, they become another writer into the fan-out above and must go through the same
-  transactional action. Decide which before planning; the two are wildly different scopes.
+They **award points**, so granting routes through `awardPoints` like every other point source. The split
+that matters: **definitions are DATA, logic is CODE.**
+
+- `achievements/{uid}` is a readable collection (`{name, description, icon, group, type, target, bonus}`),
+  seeded from `achievementsSeed.ts` and editable straight in the Firestore console — a threshold can be
+  retuned mid-event with no redeploy, which is the whole reason it is data. **The committed seed stays the
+  source of truth**; fold any console edit back into it.
+- **Logic lives only in `functions/src/achievements/typePredicates.ts`** — `TYPE_COUNTERS`, one counter
+  accessor per `AchievementType` (`points` → `score`, `correctAnswers` → `amountOfCorrectAnswers`). Unlock
+  is always `counter(user) >= target`, so the unlock and #24's progress bar read the same number.
+  **Adding an achievement = one Firestore doc; adding a TYPE = code** (the union makes that compile-enforced).
+  Never `switch (uid)`; never let a predicate read Firestore or touch the tx.
+- ⚠️ **A bug here must never kill scoring** — it runs inside *every* `awardPoints` transaction, event-wide.
+  `evaluateAchievements(user, definitions)` is pure (no writes, does not mutate `user`, returns a grant LIST)
+  and is wrapped in try/catch; `applyGrant` — the only writer — runs **outside** the try, which is why a
+  mid-loop throw cannot half-apply a grant. Two stable, greppable log prefixes:
+  **`ACHIEVEMENTS_EVAL_FAILED`** and **`ACHIEVEMENTS_DEF_INVALID`** (a malformed doc is skipped *and* logged —
+  never a silent no-op, since the compiler cannot vouch for a Firestore doc).
+- `loadDefinitions` caches for **60s** (0 under `FUNCTIONS_EMULATOR` so e2e reads fresh) and serves
+  last-known-good on a failed fetch — scoring never blocks on it.
+- **Exactly-once guard = `users/{uid}.achievements[uid] = {grantedAt, bonus}`** — a map on the user doc
+  (already loaded per award, already live-synced to the client), not a subcollection. `bonus` records what was
+  *actually* awarded, so editing a definition later cannot rewrite history. **There is deliberately no
+  `collectedAchievements` clone**: definitions are public, so #24 shows ALL achievements (locked included) by
+  joining definitions × that map × live counters. Cards/pins clone only because their source is admin-only-read.
+- `awardPoints` returns `AchievementGrant[]`, surfaced by the collect/answer callables as `achievements`.
+  ⚠️ It **must be the return value of the `runTransaction` callback** — an outer closure array yields phantom
+  grants (and phantom toasts) when Firestore retries a contended tx body.
+- `User.fromFirestore` **skips achievement entries it cannot parse** rather than throwing: `useUserData`
+  subscribes to that doc, so one malformed entry would otherwise brick the whole app for that player.
+- Known accepted risk: a swallowed eval error on a player's *final* award loses that badge — there is no next
+  award to self-heal on. Mitigation is visibility (the log prefix), not machinery.
 
 ### 12.4 User photo uploads — private quest proof, manually reviewed
 
