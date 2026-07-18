@@ -20,6 +20,7 @@ export default function updateRanking(
                 score: user.score,
                 amountOfCollectedCards: user.amountOfCollectedCards,
                 amountOfAnsweredQuestions: user.amountOfAnsweredQuestions,
+                amountOfCorrectAnswers: user.amountOfCorrectAnswers,
                 amountOfCollectedPins: user.amountOfCollectedPins,
                 memberOf: user.memberOf,
                 winnerInRound: user.winnerInRound,

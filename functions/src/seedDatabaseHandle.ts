@@ -15,6 +15,8 @@ import cluesSeed from './seeds/cluesSeed';
 import { CardClue } from './types/cardClue';
 import pinsSeed from './seeds/pinsSeed';
 import { Pin } from './types/pin';
+import achievementsSeed from './seeds/achievementsSeed';
+import { Achievement } from './types/achievement';
 
 export const seedDatabaseHandle = onCall(async (req): Promise<{}> => {
     const data = req.data;
@@ -47,9 +49,18 @@ export const seedDatabaseHandle = onCall(async (req): Promise<{}> => {
     await seedRounds(db);
     await seedGuilds(db);
     await seedClues(db);
+    await seedAchievements(db);
 
     return { status: 'ok' };
 });
+
+async function seedAchievements(db: FirebaseFirestore.Firestore) {
+    logger.log('seedDatabaseHandle', 'seeding achievements');
+    await Promise.all(achievementsSeed.map((achievement: Achievement) =>
+        db.collection('achievements').doc(achievement.uid).set(achievement)
+    ));
+    logger.log('seedDatabaseHandle', 'seeding achievements done');
+}
 
 async function seedQuestions(db: FirebaseFirestore.Firestore) {
     logger.log('seedDatabaseHandle', 'seeding questions');

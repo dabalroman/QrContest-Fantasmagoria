@@ -69,5 +69,14 @@ service cloud.firestore {
 
             allow write: if false;
         }
+
+        // Achievement definitions hold nothing secret (name, icon, type, target, bonus), so unlike
+        // pins they are readable by any signed-in player — that is what lets the achievements screen
+        // show ALL achievements with progress, without a callable or a per-user clone.
+        match /achievements/{achievement} {
+            allow read: if request.auth != null;
+
+            allow write: if false;
+        }
     }
 }

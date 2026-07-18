@@ -77,8 +77,89 @@ export async function seedLegacyUser (uid, username) {
         .set({});
 }
 
+// Achievement definitions are DATA now, so the fixture seeds the real ones rather than relying on a
+// code registry. Kept in step with functions/src/seeds/achievementsSeed.ts; the tests are structural
+// and assert the mechanism, so they hold whatever the numbers are.
+export const ACH_SCORE_1 = { uid: 'score-1', target: 50, bonus: 5, name: 'Nowicjusz', icon: 'medal' };
+export const ACH_SCORE_2 = { uid: 'score-2', target: 150, bonus: 10, name: 'Tropiciel', icon: 'medal' };
+export const ACH_OWL_1 = { uid: 'owl-1', target: 5, bonus: 10, name: 'Sówka', icon: 'owl' };
+
+// Deliberately malformed — an unknown `type` and a `target` saved as a string. loadDefinitions must
+// skip BOTH and log ACHIEVEMENTS_DEF_INVALID rather than silently no-op or break scoring.
+export const ACH_BROKEN_TYPE_UID = 'broken-type';
+export const ACH_BROKEN_TARGET_UID = 'broken-target';
+
+export async function seedAchievements () {
+    const defs = [
+        { ...ACH_SCORE_1, description: 'test', group: 'score', type: 'points' },
+        { ...ACH_SCORE_2, description: 'test', group: 'score', type: 'points' },
+        { uid: 'score-3', name: 'Zbieracz', description: 'test', icon: 'medal', group: 'score', type: 'points', target: 300, bonus: 15 },
+        { ...ACH_OWL_1, description: 'test', group: 'owl', type: 'correctAnswers' }
+    ];
+
+    await Promise.all(defs.map((def) => db.collection('achievements').doc(def.uid).set(def)));
+}
+
+export async function seedInvalidAchievements () {
+    await db.collection('achievements').doc(ACH_BROKEN_TYPE_UID).set({
+        uid: ACH_BROKEN_TYPE_UID,
+        name: 'Zepsuty typ',
+        description: 'test',
+        icon: 'medal',
+        group: 'score',
+        type: 'somethingNobodyImplemented',   // not in ACHIEVEMENT_TYPES
+        target: 1,
+        bonus: 1000
+    });
+
+    await db.collection('achievements').doc(ACH_BROKEN_TARGET_UID).set({
+        uid: ACH_BROKEN_TARGET_UID,
+        name: 'Zepsuty próg',
+        description: 'test',
+        icon: 'medal',
+        group: 'score',
+        type: 'points',
+        target: '1',                          // string, not a number
+        bonus: 1000
+    });
+}
+
+/**
+ * A fully-formed user doc written straight through the admin SDK, so a test can preset counters or
+ * the achievements map (e.g. seed a score just below a cup threshold, or a malformed achievements
+ * field to force the evaluator to throw). `overrides` shallow-merges over the baseline shape.
+ */
+export async function seedUser (uid, username, overrides = {}) {
+    await db.collection('users').doc(uid).set({
+        uid,
+        username,
+        score: 0,
+        amountOfCollectedCards: 0,
+        amountOfAnsweredQuestions: 0,
+        amountOfCorrectAnswers: 0,
+        amountOfCollectedPins: 0,
+        achievements: {},
+        role: 'user',
+        memberOf: null,
+        winnerInRound: null,
+        updatedAt: FieldValue.serverTimestamp(),
+        lastGuildChangeAt: Timestamp.fromDate(new Date('2020/01/01')),
+        ...overrides
+    });
+
+    await db.collection('users-usernames').doc(username).set({ uid });
+
+    await db.collection('users').doc(uid)
+        .collection('collectedQuestions').doc('collectedQuestions')
+        .set({});
+}
+
 export async function seedFixture () {
     const now = Date.now();
+
+    // Every suite gets the achievement definitions: the fixture's awards (max 25 pts / 1 correct
+    // answer) stay below every threshold, so scoring/pins/counters/rounds must remain unaffected.
+    await seedAchievements();
 
     // Open round: started an hour ago, ends in a day → updateRanking will write to it.
     await db.collection('ranking').doc(ROUND_UID).set({

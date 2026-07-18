@@ -3,12 +3,14 @@ import {Card, CardCollectedBy, CollectedCard} from './types/card';
 import {CollectedCardQuestion, CollectedQuestions, PublicQuestion, Question, QuestionsDoc} from './types/question';
 import getCurrentUser from './actions/getCurrentUser';
 import awardPoints from './actions/awardPoints';
+import {AchievementGrant} from './types/achievement';
 import {HttpsError, onCall} from 'firebase-functions/v2/https';
 import * as logger from 'firebase-functions/logger';
 
 export const collectCardHandle = onCall(async (req): Promise<{
     card: CollectedCard,
-    question: PublicQuestion | null
+    question: PublicQuestion | null,
+    achievements: AchievementGrant[]
 }> => {
     const data = req.data;
     const auth = req.auth;
@@ -96,7 +98,9 @@ export const collectCardHandle = onCall(async (req): Promise<{
         .doc(card.uid);
 
     try {
-        await db.runTransaction(async (transaction) => {
+        // The grant list MUST be the return value of the transaction callback, never an outer closure
+        // array — a retried-then-discarded run would otherwise surface phantom grants (phantom toasts).
+        const grants = await db.runTransaction(async (transaction) => {
             //Collect card
             transaction.create(collectedCardRef, {
                 cardSet: card.cardSet,
@@ -133,13 +137,14 @@ export const collectCardHandle = onCall(async (req): Promise<{
                 }) as UpdateData<CollectedQuestions>);
             }
 
-            await awardPoints(db, transaction, userRef, user, card.value, {amountOfCollectedCards: 1});
+            return await awardPoints(db, transaction, userRef, user, card.value, {amountOfCollectedCards: 1});
         });
 
         logger.log('collectCardHandle', user.username, `card code ${codeAttempt} is valid`);
         return {
             card: (await collectedCardRef.get()).data() as CollectedCard,
-            question: question as PublicQuestion
+            question: question as PublicQuestion,
+            achievements: grants
         };
     } catch (error) {
         logger.error('collectCardHandle', 'error while collecting card: ' + error);

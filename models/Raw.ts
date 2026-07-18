@@ -59,3 +59,12 @@ export interface RawCollectedPin {
     talkName: string | undefined,
     rating: number | undefined
 }
+
+// An achievement granted during an award, as it arrives in a callable response (the #30 unlock toast
+// consumes it). `icon` is a string KEY the client maps to a FontAwesome icon — never an IconDefinition.
+export interface RawAchievementGrant {
+    uid: Uid,
+    name: string,
+    icon: string,
+    bonus: number
+}

@@ -3,13 +3,21 @@ import { DocumentSnapshot, SnapshotOptions } from '@firebase/firestore';
 import { isUserRole, UserRole } from '@/Enum/UserRole';
 import { GuildUid } from '@/models/Guild';
 
+// Unlocked achievements keyed by the achievement's uid. `bonus` is what was ACTUALLY awarded at the
+// time, so editing a definition later cannot rewrite history. The presentation (name/icon/target)
+// is NOT copied here — it is read live from the `achievements` collection and joined by the UI.
+export type UserAchievement = { grantedAt: Date, bonus: number };
+export type UserAchievements = { [achievementUid: string]: UserAchievement };
+
 export default class User extends FirebaseModel {
     uid: string;
     username: string;
     score: number;
     amountOfCollectedCards: number;
     amountOfAnsweredQuestions: number;
+    amountOfCorrectAnswers: number;
     amountOfCollectedPins: number;
+    achievements: UserAchievements;
     memberOf: GuildUid | null;
     role: UserRole;
     winnerInRound: string | null;
@@ -22,7 +30,9 @@ export default class User extends FirebaseModel {
         score: number = 0,
         amountOfCollectedCards: number = 0,
         amountOfAnsweredQuestions: number = 0,
+        amountOfCorrectAnswers: number = 0,
         amountOfCollectedPins: number = 0,
+        achievements: UserAchievements = {},
         memberOf: GuildUid | null = null,
         role: UserRole = UserRole.USER,
         winnerInRound: string | null = null,
@@ -36,7 +46,9 @@ export default class User extends FirebaseModel {
         this.score = score;
         this.amountOfCollectedCards = amountOfCollectedCards;
         this.amountOfAnsweredQuestions = amountOfAnsweredQuestions;
+        this.amountOfCorrectAnswers = amountOfCorrectAnswers;
         this.amountOfCollectedPins = amountOfCollectedPins;
+        this.achievements = achievements;
         this.memberOf = memberOf;
         this.role = role;
         this.winnerInRound = winnerInRound;
@@ -62,13 +74,30 @@ export default class User extends FirebaseModel {
             throw new Error(`Invalid value '${snapshot.data()?.role}' for user.role`);
         }
 
+        // An entry written under an older shape, or a partial write, must NOT take down the whole
+        // user-doc parse: useUserData subscribes to this, so a throw here bricks the app for that
+        // player. Unreadable entries are skipped — the server stays the source of truth for grants.
+        const achievements: UserAchievements = Object.entries(data.achievements ?? {})
+            .reduce((acc: UserAchievements, [uid, entry]: [string, any]) => {
+                if (typeof entry?.grantedAt?.toDate === 'function') {
+                    acc[uid] = {
+                        grantedAt: entry.grantedAt.toDate(),
+                        bonus: typeof entry.bonus === 'number' ? entry.bonus : 0
+                    };
+                }
+
+                return acc;
+            }, {});
+
         return new User(
             data.uid,
             data.username,
             data.score,
             data.amountOfCollectedCards,
             data.amountOfAnsweredQuestions,
+            data.amountOfCorrectAnswers ?? 0,
             data.amountOfCollectedPins,
+            achievements,
             data.memberOf,
             data.role,
             data.winnerInRound,

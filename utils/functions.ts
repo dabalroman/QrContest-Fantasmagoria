@@ -1,16 +1,16 @@
 import { HttpsCallable, httpsCallable } from '@firebase/functions';
 import { functions } from '@/utils/firebase';
-import { RawCard, RawCollectedPin, RawPin, RawQuestion } from '@/models/Raw';
+import { RawAchievementGrant, RawCard, RawCollectedPin, RawPin, RawQuestion } from '@/models/Raw';
 import { QuestionAnswerValue } from '@/functions/src/types/question';
 
 export const collectCardFunction: HttpsCallable<
     { code: string },
-    { card: RawCard, question: RawQuestion | null }
+    { card: RawCard, question: RawQuestion | null, achievements: RawAchievementGrant[] }
 > = httpsCallable(functions, 'collectCardHandle');
 
 export const collectPinFunction: HttpsCallable<
     { code?: string, pinUid?: string, answer?: string },
-    { pin: RawCollectedPin, question: RawQuestion | null }
+    { pin: RawCollectedPin, question: RawQuestion | null, achievements: RawAchievementGrant[] }
 > = httpsCallable(functions, 'collectPinHandle');
 
 // Read-only: the map's pin feed. Returns PublicPins (code + collectedBy stripped server-side).
@@ -21,7 +21,7 @@ export const getPinsFunction: HttpsCallable<
 
 export const answerQuestionFunction: HttpsCallable<
     { uid: string, answer: string },
-    { correct: boolean, correctAnswer: QuestionAnswerValue }
+    { correct: boolean, correctAnswer: QuestionAnswerValue, achievements: RawAchievementGrant[] }
 > = httpsCallable(functions, 'answerQuestionHandle');
 
 export const setupAccountFunction: HttpsCallable<
