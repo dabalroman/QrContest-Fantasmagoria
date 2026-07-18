@@ -45,3 +45,9 @@ pubsub-debug.log
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# local tooling & notes — never commit (this repo is public)
+.mcp.json
+tasks.db
+# the year-stamped convention plan doc; it lives in a separate repo
+*Fantasmagoria*.md
