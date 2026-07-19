@@ -7,6 +7,11 @@ import { Uid } from '@/types/global';
 
 export type PinCoords = { x: number, y: number };
 
+// Client-side shape of a finder entry. Only ever populated on the fromFirestore path (#14's admin
+// editor, where admins can read `pins` in full) — fromRaw (getPins/collectPinHandle) never carries it,
+// same as `code`, since PublicPin strips both by construction (decision 13).
+export type PinCollectedByEntry = { username: string, collectedAt: Date };
+
 // The subset PinCardComponent renders. Both Pin and CollectedPin satisfy it structurally, which is what
 // lets the map and the collect screen share one card component without an adapter. The description is
 // rendered by the caller in a Panel below the card, the way CollectCardView does it.
@@ -36,6 +41,10 @@ export default class Pin extends FirebaseModel {
     availableTo: Date | null;
     // CRS.Simple radius of the "somewhere here" area hint under a QR marker; null = precise point.
     hintRadius: number | null;
+    // Source-dependent like `code`: empty on the getPins/fromRaw path, the real finder map on the
+    // fromFirestore path. Used only by #14's admin editor (a non-empty map earns an extra confirm
+    // before a destructive edit/delete — the printed QR is already out there).
+    collectedBy: Record<string, PinCollectedByEntry>;
 
     constructor (
         uid: Uid | null = null,
@@ -53,6 +62,7 @@ export default class Pin extends FirebaseModel {
         availableFrom: Date | null = null,
         availableTo: Date | null = null,
         hintRadius: number | null = null,
+        collectedBy: Record<string, PinCollectedByEntry> = {},
     ) {
         super();
 
@@ -75,6 +85,7 @@ export default class Pin extends FirebaseModel {
         this.availableFrom = availableFrom;
         this.availableTo = availableTo;
         this.hintRadius = hintRadius;
+        this.collectedBy = collectedBy;
     }
 
     public static fromRaw (rawPin: RawPin): Pin {
@@ -130,7 +141,15 @@ export default class Pin extends FirebaseModel {
             data.isActive,
             data.availableFrom?.toDate() ?? null,
             data.availableTo?.toDate() ?? null,
-            data.hintRadius ?? null
+            data.hintRadius ?? null,
+            data.collectedBy
+                ? Object.fromEntries(Object.entries(data.collectedBy as Record<string, any>).map(
+                    ([uid, entry]) => [uid, {
+                        username: entry.username,
+                        collectedAt: entry.collectedAt?.toDate() ?? new Date()
+                    }]
+                ))
+                : {}
         );
     }
 }

@@ -154,12 +154,31 @@ export async function seedUser (uid, username, overrides = {}) {
         .set({});
 }
 
+// Pin group taxonomy for the admin editor's dropdown/validation (task #14). Every fixture pin above
+// tags itself 'test', so that group must exist or the (unrelated) pins suite's own fixture reads would
+// be inconsistent with upsertPinHandle's validation rule.
+export const PIN_GROUP_TEST_UID = 'test';
+export const PIN_GROUP_OTHER_UID = 'inne';
+
+export async function seedPinGroups () {
+    const groups = [
+        { uid: PIN_GROUP_TEST_UID, name: 'Test' },
+        { uid: PIN_GROUP_OTHER_UID, name: 'Inne' }
+    ];
+
+    await Promise.all(groups.map((group) => db.collection('pinGroups').doc(group.uid).set(group)));
+}
+
 export async function seedFixture () {
     const now = Date.now();
 
     // Every suite gets the achievement definitions: the fixture's awards (max 25 pts / 1 correct
     // answer) stay below every threshold, so scoring/pins/counters/rounds must remain unaffected.
     await seedAchievements();
+
+    // Every suite gets the pin group taxonomy too — the admin-pins suite needs it for validation,
+    // and it costs the others nothing (nothing reads pinGroups outside upsertPinHandle).
+    await seedPinGroups();
 
     // Open round: started an hour ago, ends in a day → updateRanking will write to it.
     await db.collection('ranking').doc(ROUND_UID).set({

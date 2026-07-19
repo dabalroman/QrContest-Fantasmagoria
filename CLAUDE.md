@@ -466,12 +466,18 @@ Things that are wrong-but-harmless today; fix opportunistically, don't be surpri
 - `pages/admin/edit-card.tsx` has a stray `console.log(formState.errors)`.
 - `pages/admin/cards.tsx` renders `comment` under the "Nazwa" header and `name` under "Ostatnia osoba" —
   the `<th>` order doesn't match the `<td>` order.
-- ⚠️ **Re-seeding wipes `collectedBy`.** `seedPins`/`seedCards` use a bare `.set()` (no `{merge: true}`, unlike
-  rounds/guilds/clues), so re-seeding resets every pin's/card's `collectedBy` to `{}` while
-  `users/{uid}/collectedPins|collectedCards` survives. The two then disagree: the
-  `assertPinIsNotAlreadyCollected` guard passes, then `transaction.create` hits `ALREADY_EXISTS` and the
-  handler remasks it as an opaque **`ABORTED` "error while collecting pin"**. Bites after any dev re-seed, and
-  would lose the finder list if re-seeded mid-event. Check the functions log before debugging an `ABORTED`.
+- ✅ **Fixed (task #14): re-seeding used to wipe `collectedBy`.** `seedPins`/`seedCards` used to `.set()`
+  with no `{merge: true}`, so re-seeding reset every pin's/card's `collectedBy` to `{}` while
+  `users/{uid}/collectedPins|collectedCards` survived — the two would then disagree and the next collect
+  surfaced an opaque `ABORTED` (`assertPinIsNotAlreadyCollected` passes, then `transaction.create` hits
+  `ALREADY_EXISTS`). ⚠️ **`{merge: true}` alone does NOT fix this**, and never did — a common
+  misconception. Firestore's merge does not skip a field just because its value is `{}`; the field being
+  *present in the payload at all* means "overwrite this path", so a seed literal carrying
+  `collectedBy: {}` still wipes existing finders even under `merge: true`. The actual fix
+  (`seedWithPreservedCollectedBy` in `seedDatabaseHandle.ts`) omits the `collectedBy` key from the
+  payload entirely for a doc that already exists (merge then leaves that path untouched), and only
+  writes an explicit `collectedBy: {}` on first creation. Regression net: `admin-pins.test.mjs`'s
+  re-seed test.
 
 ---
 

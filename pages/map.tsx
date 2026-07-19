@@ -1,17 +1,21 @@
 import { useContext, useEffect, useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
 import toast from 'react-hot-toast';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPenToSquare } from '@fortawesome/free-solid-svg-icons';
 import Metatags from '@/components/Metatags';
 import Loader from '@/components/Loader';
 import ScreenTitle from '@/components/ScreenTitle';
 import MapAreaToggle from '@/components/map/MapAreaToggle';
 import PinSheet from '@/components/map/PinSheet';
+import AdminMapEditor from '@/components/map/AdminMapEditor';
 import CollectPinView from '@/components/collect/CollectPinView';
 import QuestionPinView from '@/components/collect/QuestionPinView';
 import Pin from '@/models/Pin';
 import CollectedPin from '@/models/CollectedPin';
 import Question from '@/models/Question';
-import { PinsCacheContext, PinsCacheContextType } from '@/utils/context';
+import { PinsCacheContext, PinsCacheContextType, UserContext, UserContextType } from '@/utils/context';
+import { UserRole } from '@/Enum/UserRole';
 import { defaultMapId, getMap } from '@/utils/maps';
 import { getStoredLastMapId, saveLastMapId } from '@/utils/mapView';
 import { getCollectErrorMessage } from '@/utils/collectErrors';
@@ -47,10 +51,14 @@ function isPinVisibleNow (pin: Pin): boolean {
 
 export default function MapPage () {
     const { pins, collectedPins } = useContext<PinsCacheContextType>(PinsCacheContext);
+    const { user } = useContext<UserContextType>(UserContext);
+    const isAdmin = user?.role === UserRole.ADMIN;
 
     const [activeMapId, setActiveMapId] = useState<string>(defaultMapId);
     // Gate the canvas until we've read the stored floor, so it never mounts on Dwór and swaps a frame later.
     const [restored, setRestored] = useState<boolean>(false);
+    // Admin-only: swaps the play canvas for the pin editor, sharing the same area/floor picker.
+    const [editMode, setEditMode] = useState<boolean>(false);
     const [selectedPin, setSelectedPin] = useState<Pin | null>(null);
     const [overlayState, setOverlayState] = useState<MapOverlayState>(MapOverlayState.NONE);
     const [collectedPin, setCollectedPin] = useState<CollectedPin | null>(null);
@@ -78,6 +86,17 @@ export default function MapPage () {
     const onSelectFloor = (mapId: string) => {
         setActiveMapId(mapId);
         saveLastMapId(mapId);
+    };
+
+    // Entering edit mode drops any in-progress player collect so the two flows never overlap.
+    const toggleEditMode = () => {
+        if (!editMode) {
+            setSelectedPin(null);
+            setOverlayState(MapOverlayState.NONE);
+            setCollectedPin(null);
+            setQuestion(null);
+        }
+        setEditMode((value) => !value);
     };
 
     const onPinCollected = (collected: CollectedPin, drawnQuestion: Question | null) => {
@@ -122,25 +141,46 @@ export default function MapPage () {
         || overlayState === MapOverlayState.QUESTION_ANSWERED_MISTAKE;
 
     return (
-        <main className="grid grid-rows-layout h-dvh overflow-hidden">
+        <main className="relative h-dvh overflow-hidden">
             <Metatags title="Mapa"/>
 
-            <MapAreaToggle activeMapId={activeMapId} onSelect={onSelectFloor}/>
-
-            {/* z-0 makes a stacking context so Leaflet's internal z-indices never paint over the navbar. */}
-            <div className="relative overflow-hidden z-0">
-                {restored
-                    ? <MapCanvas
-                        pins={visiblePins}
-                        activeMapId={activeMapId}
-                        collectedUids={collectedUids}
-                        onPinClick={setSelectedPin}
-                    />
-                    : <Loader/>
+            {/* Map fills the whole area above the navbar; the selector floats over its top edge.
+                z-0 makes a stacking context so Leaflet's internal z-indices never paint over the navbar. */}
+            <div className="absolute inset-x-0 top-0 bottom-16 overflow-hidden z-0">
+                {!restored
+                    ? <Loader/>
+                    : editMode
+                        ? <AdminMapEditor activeMapId={activeMapId}/>
+                        : <MapCanvas
+                            pins={visiblePins}
+                            activeMapId={activeMapId}
+                            collectedUids={collectedUids}
+                            onPinClick={setSelectedPin}
+                        />
                 }
             </div>
 
-            {selectedPin && overlayState === MapOverlayState.NONE &&
+            <div className="absolute inset-x-0 top-0 z-10">
+                <MapAreaToggle
+                    activeMapId={activeMapId}
+                    onSelect={onSelectFloor}
+                    adminToggle={isAdmin &&
+                        <button
+                            onClick={toggleEditMode}
+                            className={'flex items-center gap-2 px-4 py-2 rounded-xl font-semibold shadow-panel '
+                                + 'transition-colors pointer-events-auto '
+                                + (editMode
+                                    ? 'bg-button-accent text-text-light'
+                                    : 'bg-panel-transparent text-text-accent backdrop-blur-md')}
+                        >
+                            <FontAwesomeIcon icon={faPenToSquare}/>
+                            Edycja
+                        </button>
+                    }
+                />
+            </div>
+
+            {!editMode && selectedPin && overlayState === MapOverlayState.NONE &&
                 <PinSheet
                     pin={selectedPin}
                     collected={collectedUids.has(selectedPin.uid)}

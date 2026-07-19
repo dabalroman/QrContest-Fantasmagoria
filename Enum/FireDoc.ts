@@ -9,5 +9,6 @@ export enum FireDoc {
     RANKING = 'ranking',
     GUILDS = 'guilds',
     PINS = 'pins',
+    PIN_GROUPS = 'pinGroups',
     ACHIEVEMENTS = 'achievements',
 }

@@ -17,6 +17,8 @@ import pinsSeed from './seeds/pinsSeed';
 import { Pin } from './types/pin';
 import achievementsSeed from './seeds/achievementsSeed';
 import { Achievement } from './types/achievement';
+import pinGroupsSeed from './seeds/pinGroupsSeed';
+import { PinGroup } from './types/pinGroup';
 
 export const seedDatabaseHandle = onCall(async (req): Promise<{}> => {
     const data = req.data;
@@ -44,6 +46,7 @@ export const seedDatabaseHandle = onCall(async (req): Promise<{}> => {
 
     await seedQuestions(db);
     await seedCards(db);
+    await seedPinGroups(db);
     await seedPins(db);
     await seedCardSets(db);
     await seedRounds(db);
@@ -53,6 +56,14 @@ export const seedDatabaseHandle = onCall(async (req): Promise<{}> => {
 
     return { status: 'ok' };
 });
+
+async function seedPinGroups(db: FirebaseFirestore.Firestore) {
+    logger.log('seedDatabaseHandle', 'seeding pin groups');
+    await Promise.all(pinGroupsSeed.map((pinGroup: PinGroup) =>
+        db.collection('pinGroups').doc(pinGroup.uid).set(pinGroup, { merge: true })
+    ));
+    logger.log('seedDatabaseHandle', 'seeding pin groups done');
+}
 
 async function seedAchievements(db: FirebaseFirestore.Firestore) {
     logger.log('seedDatabaseHandle', 'seeding achievements');
@@ -68,19 +79,40 @@ async function seedQuestions(db: FirebaseFirestore.Firestore) {
     logger.log('seedDatabaseHandle', 'seeding questions done');
 }
 
+// A bare .set() would reset every card's/pin's collectedBy to {} on re-seed while
+// users/{uid}/collectedCards|collectedPins survives, desyncing the two (see CLAUDE.md §11). The
+// tempting fix — `.set(doc, { merge: true })` while the seed literal still carries `collectedBy: {}` —
+// does NOT work: Firestore's merge treats "the key is present in the payload" as "overwrite this path",
+// regardless of whether its value is an empty object, so `collectedBy: {}` still wipes the existing
+// map. The only merge-safe fix is to OMIT the key entirely from the write for a doc that already
+// exists (merge then leaves that path untouched); a brand-new doc still gets an explicit `collectedBy`
+// so the field is never simply absent.
+async function seedWithPreservedCollectedBy<T extends { uid: string, collectedBy: unknown }> (
+    db: FirebaseFirestore.Firestore,
+    collection: string,
+    docs: T[]
+): Promise<void> {
+    await Promise.all(docs.map(async (doc) => {
+        const ref = db.collection(collection).doc(doc.uid);
+        const { collectedBy, ...rest } = doc;
+
+        if ((await ref.get()).exists) {
+            await ref.set(rest, { merge: true });
+        } else {
+            await ref.set(doc);
+        }
+    }));
+}
+
 async function seedCards(db: FirebaseFirestore.Firestore) {
     logger.log('seedDatabaseHandle', 'seeding cards');
-    await Promise.all(cardsSeed.map((card: Card) =>
-        db.collection('cards').doc(card.uid).set(card)
-    ));
+    await seedWithPreservedCollectedBy(db, 'cards', cardsSeed as Card[]);
     logger.log('seedDatabaseHandle', 'seeding cards done');
 }
 
 async function seedPins(db: FirebaseFirestore.Firestore) {
     logger.log('seedDatabaseHandle', 'seeding pins');
-    await Promise.all(pinsSeed.map((pin: Pin) =>
-        db.collection('pins').doc(pin.uid).set(pin)
-    ));
+    await seedWithPreservedCollectedBy(db, 'pins', pinsSeed as Pin[]);
     logger.log('seedDatabaseHandle', 'seeding pins done');
 }
 

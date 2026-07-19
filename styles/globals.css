@@ -71,6 +71,15 @@
 .pin-hint-circle--feedback { fill: var(--color-pin-feedback); stroke: var(--color-pin-feedback); }
 .pin-hint-circle--photo { fill: var(--color-pin-photo); stroke: var(--color-pin-photo); }
 
+/* Admin pin editor (#14) — the not-yet-saved marker at the tapped coords. */
+.pin-marker-draft {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 9999px;
+    border: 3px dashed #ffffff;
+    background: rgba(0, 0, 0, 0.35);
+}
+
 * {
     box-sizing: border-box;
     padding: 0;

@@ -48,6 +48,26 @@ export interface RawPin {
     availableTo: RawFirestoreTimestamp | null
 }
 
+// The complete authored field set the admin editor sends to upsertPinHandle — never a partial patch
+// (see decision in upsertPinHandle.ts). Dates travel as epoch ms (or null): a Timestamp/FieldValue
+// cannot cross the callable boundary, and the server turns ms into a Timestamp.
+export interface RawPinAuthoredFields {
+    name: string,
+    description: string,
+    clue: string,
+    type: PinType,
+    groups: string[],
+    mapId: string,
+    coords: { x: number, y: number },
+    hintRadius: number | null,
+    value: number,
+    withQuestion: boolean,
+    availableFrom: number | null,
+    availableTo: number | null,
+    isActive: boolean,
+    code: string | null
+}
+
 export interface RawCollectedPin {
     uid: Uid,
     name: string,

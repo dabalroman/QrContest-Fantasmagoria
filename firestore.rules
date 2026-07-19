@@ -78,5 +78,14 @@ service cloud.firestore {
 
             allow write: if false;
         }
+
+        // Pin group taxonomy — nothing secret (uid/name/icon), so unlike pins themselves it is
+        // readable by any signed-in client. Feeds the admin pin editor's group dropdown. Mutated only
+        // by the seed / Firestore console; upsertPinHandle reads it to validate a pin's groups[].
+        match /pinGroups/{pinGroup} {
+            allow read: if request.auth != null;
+
+            allow write: if false;
+        }
     }
 }

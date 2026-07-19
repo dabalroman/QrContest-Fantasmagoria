@@ -72,6 +72,12 @@ export function toLatLng (coords: PinCoords): LatLngTuple {
     return [-coords.y, coords.x];
 }
 
+// The only reverse of toLatLng — #14's map-tap-to-place-a-pin coord picker. Rounded to whole pixels:
+// coords are always authored/stored as integers (see PinCoords).
+export function fromLatLng (latlng: { lat: number, lng: number }): PinCoords {
+    return { x: Math.round(latlng.lng), y: Math.round(-latlng.lat) };
+}
+
 // Image extent in CRS.Simple space: top-left (-height,0) → bottom-right (0,width).
 export function imageBounds (map: MapDefinition): LatLngTuple[] {
     return [[-map.height, 0], [0, map.width]];
