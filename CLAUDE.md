@@ -8,6 +8,13 @@ answer quiz questions, join clubs, and climb a live leaderboard. Runs for ~3 day
 **The entire UI is in Polish.** All user-facing strings, toasts, panel titles, and error messages are Polish.
 Keep it that way — do not introduce English UI copy.
 
+⚠️ **The game's user-facing name is "Gra Konwentowa" (2026, task #35) — "QrContest" is only the repo/package/
+project id.** Never print "QrContest" in UI copy. Unlike the old indeclinable brand, "Gra Konwentowa" is a
+declinable Polish phrase and **must inflect by case** — nominative `Gra Konwentowa`, locative (after `w/o`)
+`Grze Konwentowej`, genitive `Gry Konwentowej`. A find-replace that ignores this produces broken grammar
+(`Nagrody w Gra Konwentowa`). The `QrContestSplash` identifier, `/dashboard/qrContest.webp`, the npm name and
+the `qrcontest2023` project id deliberately keep the old name.
+
 ---
 
 ## 1. Stack & versions
@@ -460,8 +467,6 @@ Fetch the live program yourself (no app needed):
 
 Things that are wrong-but-harmless today; fix opportunistically, don't be surprised by them:
 
-- `components/Metatags.tsx` still says **"Fantasmagoria 14"** everywhere (title, og, twitter) though the app
-  shipped as the 15th edition. It also has a leftover `twitter:site` of `@fireship_dev`.
 - `NEXT_PUBLIC_APPCHECK_*` env vars exist but App Check is never initialized.
 - `seedDatabaseHandle`'s password `'4064'` is a hardcoded literal in the source.
 - `FireDoc` is missing `questions` and `collectedQuestions`; those paths are string literals in the functions.
