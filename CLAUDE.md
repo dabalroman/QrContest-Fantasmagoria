@@ -399,6 +399,23 @@ and `PinType` values are bare (`'common'`, `'code'`) — hence `'card-' + tier` 
 Also note `content` only scans `./pages`, `./components`, `./layouts` — classes written in `utils/` or
 `models/` are invisible to Tailwind.
 
+### ⚠️ Never size a FontAwesome icon with `w-*` / `h-*`
+
+FA's stylesheet sets `.svg-inline--fa { height: 1em }` and `_app.tsx` imports it **after** `globals.css`.
+Equal specificity → source order wins → every Tailwind `h-*` on an icon is dead. `w-*` does apply, but with
+`height: 1em` the SVG's `preserveAspectRatio` scales the glyph to the height anyway, so **the icon always
+renders at the inherited font-size** and the class silently does nothing.
+**Size icons by font-size** — `text-3xl` on the wrapper (`Navbar.tsx`) or FA's `size` prop (`Loader.tsx`
+`size="3x"`, `ranking.tsx` `size="sm"`). Margins/colour utilities are unaffected; only `w-`/`h-` are.
+Known remaining offenders: the three pin components in task #42.
+
+### Accent colour takes opacity modifiers
+
+`text-accent` maps to `rgb(var(--color-primary-rgb) / <alpha-value>)`, so `bg-text-accent/20` and
+`border-text-accent/50` work. It needs the **channels** var (`--color-primary-rgb: 157 47 0`) alongside
+`--color-primary`; a bare `var()` cannot take alpha and Tailwind drops such variants **silently, generating
+no rule at all**. Any new palette entry that needs `/N` opacity must be declared as channels the same way.
+
 ---
 
 ## 9. Seeding
