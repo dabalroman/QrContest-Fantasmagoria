@@ -15,6 +15,8 @@ export default function Metatags({
 
             <meta name="description" content={description}/>
 
+            <meta name="google-site-verification" content="K49QwkS2Y54dgIa6Y_GL7KPvSwVdFPePUX3XQF-5AD4" />
+
             <meta name="twitter:card" content="summary" />
             <meta name="twitter:title" content='Gra Konwentowa - Fantasmagoria 16' />
             <meta name="twitter:description" content={description} />
