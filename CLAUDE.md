@@ -587,10 +587,13 @@ the 2026 code core is shipped end-to-end. Read it for the design record and the 
 > mid-event. Scope accordingly: fewer features, tested, beats more features, untested.
 >
 > **Status as of 2026-07-20 — the CODE CORE IS SHIPPED. What remains is content + polish:**
-> **#16** (author 50+ real pins, real 9-map art, balance pass — the long pole and #1 risk), **#33/#34/#36**
-> (regulamin / FAQ / landing-page copy still describes the retired card game), **#44** (feedback admin
+> **#16** (author 50+ real pins, real 9-map art, balance pass — the long pole and #1 risk), **#33/#34**
+> (regulamin / FAQ still describe the retired card game), **#44** (feedback admin
 > view), **#42** (dead `w-/h-` icon sizing on three pin components), **#38** (rated-talks achievements).
 > #19–#21 deferred; #22/#26 closed won't-do. **#43 shipped** — the admin panel is pin-era (see §11).
+> **#36 shipped** — the landing page is pin-era, and it left behind `components/PinTypeLegend.tsx`
+> (the five pin types, built from `PinMarkerIcon` + `getPinTypeFriendlyName`). **#33/#34 must reuse it
+> rather than restating the mechanics by hand** — that duplication is exactly how the three pages drift.
 >
 > - ✅ **12.2 shipped as pins** — the pin model, `collectPinHandle`, the pin visual system and the rewired
 >   collect screen are done and manually verified. Cards are retired (handler still deployed, UI orphaned).
@@ -616,8 +619,8 @@ the 2026 code core is shipped end-to-end. Read it for the design record and the 
 >   `CLUBS-DISABLED-2026`) and the per-club theme switcher deleted. The backend fan-out (`updateGuild`) still
 >   runs but is **write-only / unread** by the client — do not build new guild surfaces without re-enabling first.
 > - ✅ **Renamed to "Gra Konwentowa" (#35)** — see the banner at the top of this file for the inflection rule.
->   The rename covered `pages/index.tsx`, `rulebook.tsx` and the footer only; the *game-model* prose on those
->   pages is still card-era and is #33/#34/#36.
+>   The rename covered `pages/index.tsx`, `rulebook.tsx` and the footer only; the *game-model* prose was
+>   left card-era — fixed on the landing page by #36, still outstanding on regulamin/FAQ (#33/#34).
 >
 > ⚠️ **The task manager is the live source of truth, not this file.** Task **#9** is the epic/status board
 > for the 2026 edition — read it first for current status and the full list of locked decisions.
