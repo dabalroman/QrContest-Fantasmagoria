@@ -120,7 +120,7 @@ pages/            Next.js pages router. Top-level = player screens; auth/ and ad
 components/       Shared UI (Panel, Button, LinkButton, Loader, ScreenTitle, Metatags, AuthCheck, Navbar/)
                   plus per-feature folders: collect/, collection/, account/, ranking/, dashboard/, pin/
 models/           CLIENT-side domain classes. Extend FirebaseModel, carry Firestore converters.
-Enum/             CardTier, UserRole, FireDoc (collection names), Page (routes), AppTheme
+Enum/             CardTier, UserRole, FireDoc (collection names), Page (routes)
 hooks/            useUserData, useCollectedCards, useDynamicNavbar, useTheme, useAdminOnly
 utils/            firebase.ts (SDK init), functions.ts (typed callables), context.ts (React contexts),
                   date.ts (Polish pluralization + formatting), getGuildIcon.ts, getPinIcon.ts,
@@ -362,10 +362,13 @@ from the image top-left, y down; the sole `[-y, x]` swap into Leaflet space) liv
 
 ### Theming
 
-`Enum/AppTheme.ts` maps a `GuildUid` → a theme class (`theme-desert`, `theme-steel`, `theme-void`,
-`theme-water`, `theme-default`). `_app.tsx` puts that class on the root `<div>`; `styles/globals.css` then
-overrides `--color-primary` for that subtree. Tailwind colors (`text-text-accent`, `border-button-border`, …)
-are all defined **in terms of those CSS variables**, so the whole app recolors to the player's club.
+**The per-club theme switcher was REMOVED (task #32, 2026 edition)** — clubs are hidden, so `Enum/AppTheme.ts`,
+`hooks/useTheme.ts` and `ThemeContext` are deleted and `_app.tsx` no longer sets a theme class. The app now
+always renders the base palette from `styles/globals.css` `:root` (accent `--color-primary: #9D2F00`). Tailwind
+colors (`text-text-accent`, `border-button-border`, …) are still defined **in terms of those CSS variables**.
+The `--color-guild-*` tokens + `{bg,border,text,ring}-guild-*` Tailwind colors/safelist stay — the commented-out
+guild UI still references them, so re-enabling clubs is a diff-revert of that UI **plus** re-adding the switcher
+by hand (theme was deleted, not commented). See §12 and the `CLUBS-DISABLED-2026` markers.
 
 ### ⚠️ Tailwind safelist
 
@@ -503,8 +506,9 @@ Hosting stays on **Firebase**, same as last year. Read this section before plann
 >   auto-grant inside `awardPoints`, `amountOfCorrectAnswers` counter. **#24 (screen) still to build** — it
 >   fills the `/achievements` stub and is now pure UI; **#30** (unlock toast) consumes the returned grants.
 > - ❌ **12.4 (photo proof) deferred out of v1.** `photo` exists in `PinType` but `collectPinHandle` rejects it.
-> - ❌ **Clubs/guilds are likely to be DROPPED for 2026.** The fan-out still writes them; do not invest new
->   work in guild surfaces without checking first.
+> - ✅ **Clubs/guilds DROPPED from the UI for 2026 (task #32).** The guild UI is commented out (grep marker
+>   `CLUBS-DISABLED-2026`) and the per-club theme switcher deleted. The backend fan-out (`updateGuild`) still
+>   runs but is **write-only / unread** by the client — do not build new guild surfaces without re-enabling first.
 >
 > ⚠️ **The task manager is the live source of truth, not this file.** Task **#9** is the epic/status board
 > for the 2026 edition — read it first for current status and the full list of locked decisions.

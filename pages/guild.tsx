@@ -1,10 +1,28 @@
+import { useEffect } from 'react';
+import { useRouter } from 'next/router';
+import { Page } from '@/Enum/Page';
+
+// CLUBS-DISABLED-2026: clubs (kluby) are hidden for the 2026 edition. The club picker below is
+// unreachable from the UI; this route now just redirects to the account screen so a bookmarked
+// /guild URL cannot reach joinGuildFunction. Restore the original component (commented out below)
+// to re-enable clubs.
+export default function GuildPage () {
+    const router = useRouter();
+
+    useEffect(() => {
+        router.replace(Page.ACCOUNT)
+            .then();
+    }, [router]);
+
+    return null;
+}
+
+/* CLUBS-DISABLED-2026: original club picker — restore to re-enable clubs.
 import Panel from '@/components/Panel';
 import ScreenTitle from '@/components/ScreenTitle';
-import React, { useContext, useEffect, useState } from 'react';
-import { UserContext, UserContextType } from '@/utils/context';
+import React from 'react';
 import Metatags from '@/components/Metatags';
 import { firestore } from '@/utils/firebase';
-import { useRouter } from 'next/router';
 import { collection, onSnapshot, orderBy, query } from '@firebase/firestore';
 import { FireDoc } from '@/Enum/FireDoc';
 import Guild, {GuildUid} from '@/models/Guild';
@@ -14,7 +32,6 @@ import useDynamicNavbar from '@/hooks/useDynamicNavbar';
 import Loader from '@/components/Loader';
 import { joinGuildFunction } from '@/utils/functions';
 import toast from 'react-hot-toast';
-import { Page } from '@/Enum/Page';
 import getGuildIcon from '@/utils/getGuildIcon';
 
 export default function GuildPage () {
@@ -139,3 +156,4 @@ export default function GuildPage () {
         </main>
     );
 }
+*/

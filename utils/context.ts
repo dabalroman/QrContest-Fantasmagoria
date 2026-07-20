@@ -10,7 +10,6 @@ import CollectedPin from '@/models/CollectedPin';
 import {Page} from '@/Enum/Page';
 import {faMapLocationDot} from '@fortawesome/free-solid-svg-icons';
 import {NavbarConfig} from '@/components/Navbar/Navbar';
-import {AppTheme} from "@/Enum/AppTheme";
 
 export type AuthUser = FirebaseUser;
 
@@ -99,19 +98,5 @@ export interface NavbarConfigContextType {
 export const NavbarConfigContext: Context<NavbarConfigContextType> = createContext({
     navbarConfig: defaultNavbarConfig,
     setNavbarCenterAction: () => {
-    }
-});
-
-// ---- THEME ----
-export type Theme = AppTheme | null;
-
-export interface ThemeContextType {
-    theme: Theme;
-    setTheme: (theme: Theme) => void;
-}
-
-export const ThemeContext: Context<ThemeContextType> = createContext<ThemeContextType>({
-    theme: null,
-    setTheme: () => {
     }
 });

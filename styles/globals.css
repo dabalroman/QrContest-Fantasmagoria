@@ -31,28 +31,6 @@
     --color-pin-photo: #5B6B7C;
 }
 
-/* Liga graczy */
-.theme-steel {
-    --color-primary: var(--color-guild-steel);
-}
-
-/* Zakon memów */
-.theme-water {
-    --color-primary: var(--color-guild-water);
-}
-
-/* Klub Otaku */
-.theme-void {
-    --color-primary: var(--color-guild-void);
-}
-
-/* Bractwo kinomaniaków */
-.theme-desert {
-    --color-primary: var(--color-guild-desert);
-}
-
-.theme-default {}
-
 /* Map markers + hint circles (components/map). Plain CSS, not @apply — no purge, no safelist entry. */
 .pin-marker {
     background: transparent;

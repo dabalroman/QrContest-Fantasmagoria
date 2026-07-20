@@ -6,8 +6,6 @@ import {
     defaultNavbarConfig,
     NavbarConfigContext,
     PinsCacheContext,
-    Theme,
-    ThemeContext,
     UserContext
 } from '@/utils/context';
 import { Toaster } from 'react-hot-toast';
@@ -27,7 +25,6 @@ import usePinsData from '@/hooks/usePinsData';
 import { UserRole } from '@/Enum/UserRole';
 import { useRouter } from 'next/router';
 import { Page } from '@/Enum/Page';
-import { getThemeFromGuildUuid } from '@/Enum/AppTheme';
 
 config.autoAddCss = false;
 
@@ -54,7 +51,6 @@ export default function App ({
     const userData = useUserData();
     const pinsData = usePinsData();
     const router = useRouter();
-    const [theme, setTheme] = useState<Theme>(null);
     const [cards, setCards] = useState<CollectionCache<Card> | null>(null);
     const [cardSets, setCardSets] = useState<CollectionCache<CardSet> | null>(null);
     const [clues, setClues] = useState<CollectionCache<CardClue> | null>(null);
@@ -80,16 +76,8 @@ export default function App ({
         }
     }, [router, userData.userReady, userData.user]);
 
-    useEffect(() => {
-        setTheme(getThemeFromGuildUuid(userData.user?.memberOf ?? null));
-    }, [userData.authUser, userData.user]);
-
     return (
         <UserContext.Provider value={userData}>
-            <ThemeContext.Provider value={{
-                theme,
-                setTheme
-            }}>
                 <NavbarConfigContext.Provider value={{
                     navbarConfig: navbarCenterAction,
                     setNavbarCenterAction
@@ -109,8 +97,7 @@ export default function App ({
                                 className={
                                     `${imFellDoublePica.variable} ${imFellDoublePicaSC.variable} `
                                     + `${montserrat.variable} text-text-base `
-                                    + `font-base bg-image-default bg-fixed min-h-screen bg-image-mobile-position `
-                                    + theme
+                                    + `font-base bg-image-default bg-fixed min-h-screen bg-image-mobile-position`
                                 }
                             >
                                 <Navbar navbarConfig={navbarCenterAction}/>
@@ -127,7 +114,6 @@ export default function App ({
                         </PinsCacheContext.Provider>
                     </CardsCacheContext.Provider>
                 </NavbarConfigContext.Provider>
-            </ThemeContext.Provider>
         </UserContext.Provider>
     );
 }

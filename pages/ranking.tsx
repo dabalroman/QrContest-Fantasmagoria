@@ -12,7 +12,7 @@ import RankingRound, {GuildRankingRecord, UserRankingRecord} from '@/models/Rank
 import CurrentRoundPanel from '@/components/ranking/CurrentRoundPanel';
 import Button from '@/components/Button';
 import RoundRankingTable from '@/components/ranking/RoundRankingTable';
-import getGuildIcon from '@/utils/getGuildIcon';
+// CLUBS-DISABLED-2026: import getGuildIcon from '@/utils/getGuildIcon';
 
 export default function ScoreboardPage({}) {
     const {user} = useContext<UserContextType>(UserContext);
@@ -43,8 +43,10 @@ export default function ScoreboardPage({}) {
     const currentUserPlace: number = currentRound?.users
         .filter((record: UserRankingRecord) => RankingRound.isVisibleInRound(record, currentRound.uid))
         .findIndex((record: UserRankingRecord) => record.uid === user?.uid) ?? -1;
+    /* CLUBS-DISABLED-2026: club leaderboard hidden for the 2026 edition
     const currentGuildPlace: number = currentRound?.guilds
         .findIndex((guild: GuildRankingRecord) => guild.uid === user?.memberOf) ?? -1;
+    */
 
     return (
         <main className="grid grid-rows-layout items-center min-h-screen p-4">
@@ -66,6 +68,7 @@ export default function ScoreboardPage({}) {
                             : <p className="mt-2">Nie brałeś/aś udziału w tej rundzie.</p>
                     )}
 
+                    {/* CLUBS-DISABLED-2026: club membership messaging hidden for the 2026 edition
                     {!user?.memberOf && (
                         <p className="mt-4">
                             <span>Nie jesteś członkiem żadnego klubu.</span>
@@ -81,6 +84,7 @@ export default function ScoreboardPage({}) {
                             }
                         </p>
                     )}
+                    */}
                 </Panel>
 
                 {user?.winnerInRound &&
@@ -107,6 +111,7 @@ export default function ScoreboardPage({}) {
                     </Panel>
                 }
 
+                {/* CLUBS-DISABLED-2026: "Ranking klubów" panel hidden for the 2026 edition
                 <Panel title="Ranking klubów">
                     <div>
                         {currentRound?.guilds &&
@@ -151,6 +156,7 @@ export default function ScoreboardPage({}) {
                         </span>
                     </div>
                 </Panel>
+                */}
 
                 {currentRound &&
                     <Panel title="Ranking rundy" loading={loading}>

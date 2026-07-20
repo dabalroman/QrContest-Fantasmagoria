@@ -13,17 +13,19 @@ import toast from 'react-hot-toast';
 import { Page } from '@/Enum/Page';
 import { auth, firestore } from '@/utils/firebase';
 import { useRouter } from 'next/router';
-import Guild from '@/models/Guild';
-import { doc, onSnapshot } from '@firebase/firestore';
-import { FireDoc } from '@/Enum/FireDoc';
-import CurrentGuildPanel from '@/components/account/CurrentGuildPanel';
-import JoinGuildPanel from '@/components/account/JoinGuildPanel';
-import BetrayGuildPanel from '@/components/account/BetrayGuildPanel';
+// CLUBS-DISABLED-2026: club UI hidden for the 2026 edition
+// import Guild from '@/models/Guild';
+// import { doc, onSnapshot } from '@firebase/firestore';
+// import { FireDoc } from '@/Enum/FireDoc';
+// import CurrentGuildPanel from '@/components/account/CurrentGuildPanel';
+// import JoinGuildPanel from '@/components/account/JoinGuildPanel';
+// import BetrayGuildPanel from '@/components/account/BetrayGuildPanel';
 
 export default function AccountPage () {
     const router = useRouter();
     const { user } = useContext<UserContextType>(UserContext);
 
+    /* CLUBS-DISABLED-2026: guild subscription hidden for the 2026 edition
     const [guild, setGuild] = useState<Guild | null>(null);
     const [guildLoading, setGuildLoading] = useState<boolean>(false);
 
@@ -44,6 +46,7 @@ export default function AccountPage () {
             }
         );
     }, [user?.memberOf]);
+    */
 
     const AdminSection = () => (
         <Panel title="Admin">
@@ -99,7 +102,7 @@ export default function AccountPage () {
                     </div>
                 </Panel>
 
-                {user.memberOf === null && <JoinGuildPanel/>}
+                {/* CLUBS-DISABLED-2026: {user.memberOf === null && <JoinGuildPanel/>} */}
 
                 <Panel title="Nagrody">
                     <img src="/prize.webp" alt="prize" className="absolute right-0 bottom-0" style={{
@@ -132,8 +135,10 @@ export default function AccountPage () {
                     </p>
                 </Panel>
 
+                {/* CLUBS-DISABLED-2026: club panels hidden for the 2026 edition
                 {user.memberOf && guild && <CurrentGuildPanel guild={guild} loading={guildLoading}/>}
                 {user.memberOf && guild && <BetrayGuildPanel user={user} guild={guild}/>}
+                */}
 
                 <Panel title="Regulamin i pytania">
                     <p>

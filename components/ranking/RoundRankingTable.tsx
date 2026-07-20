@@ -2,8 +2,8 @@ import RankingRound, { UserRankingRecord } from '@/models/RankingRound';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faStar, faImagePortrait } from '@fortawesome/free-solid-svg-icons';
 import User from '@/models/User';
-import getGuildIcon from '@/utils/getGuildIcon';
-import { GuildUid } from '@/models/Guild';
+// CLUBS-DISABLED-2026: import getGuildIcon from '@/utils/getGuildIcon';
+// CLUBS-DISABLED-2026: import { GuildUid } from '@/models/Guild';
 import React from 'react';
 
 export default function RoundRankingTable ({
@@ -39,6 +39,7 @@ export default function RoundRankingTable ({
                             }>
                                 <td className="text-left">{index + 1}.</td>
                                 <td>
+                                    {/* CLUBS-DISABLED-2026: per-row guild icon hidden for the 2026 edition
                                     {
                                         record?.memberOf
                                             ? <FontAwesomeIcon
@@ -48,6 +49,7 @@ export default function RoundRankingTable ({
                                             />
                                             : <span className="w-5 inline-block"></span>
                                     }
+                                    */}
                                     {record.username}
                                 </td>
                                 <td>
