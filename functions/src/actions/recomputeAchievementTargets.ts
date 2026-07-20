@@ -1,13 +1,16 @@
 import { Firestore } from 'firebase-admin/firestore';
 import { logger } from 'firebase-functions';
 import { Achievement } from '../types/achievement';
-import { COLLECTIBLE_PIN_TYPES, Pin } from '../types/pin';
+import { Pin } from '../types/pin';
 import scopeKeys from './pinScopeKeys';
 
 /**
- * Recomputes the DERIVED `target` field on every `pinsInScope` achievement definition, so the
- * numerator (a player's `collectedPinsByScope[scope]`, incremented via the same `scopeKeys` helper)
- * and the denominator (this function) can never disagree.
+ * Recomputes the DERIVED `target` field on every `pinsInScope` achievement definition — the
+ * denominator to the player's `collectedPinsByScope[scope]` numerator.
+ *
+ * EVERY pin type counts, matching the award path, which increments the numerator for every type a
+ * player can complete (`photo` only once an admin approves it). Filtering by type here is what
+ * caused #45: the numerator counted `feedback`/`photo`, this did not, and badges unlocked early.
  *
  * Enumerates from the DEFINITIONS, not from a hardcoded map/group list: for each `pinsInScope` doc,
  * counts active pins whose scope keys include that doc's `scope`. A pin contributes iff
@@ -25,8 +28,7 @@ export default async function recomputeAchievementTargets(db: Firestore): Promis
         pinsSnapshot.docs.forEach((doc) => {
             const pin = doc.data() as Pin;
 
-            // Uncollectible types are excluded, not just inactive ones — see COLLECTIBLE_PIN_TYPES.
-            if (!pin.isActive || !COLLECTIBLE_PIN_TYPES.includes(pin.type)) {
+            if (!pin.isActive) {
                 return;
             }
 

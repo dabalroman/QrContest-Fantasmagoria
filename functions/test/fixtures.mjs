@@ -166,11 +166,10 @@ export async function seedScopedAchievement (scope, overrides = {}) {
 }
 
 // A dedicated pair of pins for the location-achievement suite, kept SEPARATE from the general fixture
-// pins above (which all share mapId 'test-map' / groups ['test']): that scope also contains a
-// feedback pin and a photo pin (collectPinHandle rejects both types) plus a pin outside its
-// availability window, so "collect every active pin in the scope" can never actually complete there.
-// These two are both `visit` type, always available, and isActive — fully collectible — so a test can
-// exhaust the scope and observe the achievement actually grant.
+// pins above (which all share mapId 'test-map' / groups ['test']): that scope contains a pin outside
+// its availability window, so "collect every active pin in the scope" can never complete there.
+// These two are both `visit` type, always available, and isActive, so a test can exhaust the scope
+// and observe the achievement actually grant.
 export const LOC_SCOPE_MAP_ID = 'loc-test-map';
 export const LOC_SCOPE_GROUP_UID = 'loc-test';
 export const LOC_PIN_A_UID = 'loc-test-pin-a';
@@ -198,6 +197,35 @@ export async function seedLocationScopePins () {
     });
     await db.collection('pins').doc(LOC_PIN_B_UID).set({
         uid: LOC_PIN_B_UID, name: 'Loc pin B', coords: { x: 1, y: 1 }, ...base
+    });
+}
+
+// #45: a feedback pin and a photo pin in the SAME scope as the pair above, raising its target from 2
+// to 4. Opt-in — seeding these unconditionally would break every `target === 2` assertion.
+export const LOC_PIN_FEEDBACK_UID = 'loc-test-pin-feedback';
+export const LOC_PIN_PHOTO_UID = 'loc-test-pin-photo';
+
+export async function seedLocationScopeExtraPins () {
+    const base = {
+        description: 'test pin',
+        clue: '',
+        groups: [LOC_SCOPE_GROUP_UID],
+        mapId: LOC_SCOPE_MAP_ID,
+        hintRadius: null,
+        value: 5,
+        withQuestion: false,
+        availableFrom: null,
+        availableTo: null,
+        isActive: true,
+        code: null,
+        collectedBy: {}
+    };
+
+    await db.collection('pins').doc(LOC_PIN_FEEDBACK_UID).set({
+        uid: LOC_PIN_FEEDBACK_UID, name: 'Loc pin feedback', type: 'feedback', coords: { x: 2, y: 2 }, ...base
+    });
+    await db.collection('pins').doc(LOC_PIN_PHOTO_UID).set({
+        uid: LOC_PIN_PHOTO_UID, name: 'Loc pin photo', type: 'photo', coords: { x: 3, y: 3 }, ...base
     });
 }
 

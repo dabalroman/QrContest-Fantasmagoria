@@ -1,5 +1,5 @@
 import {FieldValue, getFirestore, UpdateData} from 'firebase-admin/firestore';
-import {COLLECTIBLE_PIN_TYPES, CollectedPin, Pin, PinCollectedBy, PinType} from './types/pin';
+import {CollectedPin, Pin, PinCollectedBy, PinType} from './types/pin';
 import {CollectedCardQuestion, CollectedQuestions, PublicQuestion, Question, QuestionsDoc} from './types/question';
 import getCurrentUser from './actions/getCurrentUser';
 import awardPoints from './actions/awardPoints';
@@ -80,7 +80,8 @@ export const collectPinHandle = onCall(async (req): Promise<{
         pin = pinDoc.data() as Pin;
         const isFeedback = pin.type === PinType.FEEDBACK;
 
-        if (!COLLECTIBLE_PIN_TYPES.includes(pin.type) && !isFeedback) {
+        // Photo pins go through submitPhotoHandle — they award nothing until an admin approves.
+        if (pin.type === PinType.PHOTO) {
             logger.error('collectPinHandle', 'pin type is not supported yet', pin.type);
             throw new HttpsError('invalid-argument', 'pin type is not supported yet');
         }

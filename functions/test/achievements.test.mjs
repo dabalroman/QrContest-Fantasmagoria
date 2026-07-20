@@ -13,12 +13,12 @@ import {
     db, assertEmulatorReachable, resetEmulator, createAuthUserToken, callCallable
 } from './emulator.mjs';
 import {
-    seedFixture, seedUser, seedLegacyUser, seedInvalidAchievements,
-    seedScopedAchievement, seedLocationScopePins,
+    seedFixture, seedUser, seedLegacyUser, seedInvalidAchievements, seedPhotoObject,
+    seedScopedAchievement, seedLocationScopePins, seedLocationScopeExtraPins,
     GUILD_UID, ROUND_UID, CARD_CODE, QUESTION_CORRECT,
     PIN_VISIT_UID, PIN_CODE_CODE,
     PIN_GROUP_TEST_UID,
-    LOC_SCOPE_MAP_ID, LOC_PIN_A_UID, LOC_PIN_B_UID,
+    LOC_SCOPE_MAP_ID, LOC_PIN_A_UID, LOC_PIN_B_UID, LOC_PIN_FEEDBACK_UID, LOC_PIN_PHOTO_UID,
     ACH_SCORE_1, ACH_SCORE_2, ACH_OWL_1
 } from './fixtures.mjs';
 
@@ -319,4 +319,53 @@ test('deletePinHandle recomputes the derived target, lowering it', async () => {
     await callCallable('deletePinHandle', { pinUid: LOC_PIN_B_UID }, adminToken);
 
     assert.equal((await achievementDoc(def.uid)).target, 1, 'target recomputed after the delete');
+});
+
+// #45: the numerator counts feedback and photo collects, so the target must count those pins too.
+// Before the fix the target here was 2, and collecting the feedback pin alone unlocked the badge
+// with LOC_PIN_B still uncollected.
+test('feedback and photo pins raise the target, so a badge cannot unlock early', async () => {
+    const uid = 'ach-loc-mixed';
+    const token = await createAuthUserToken(uid);
+    const adminToken = await registerAdmin('ach-loc-mixed-admin', 'AchLocMixedAdmin');
+
+    await seedLocationScopePins();
+    await seedLocationScopeExtraPins();
+    const def = await seedScopedAchievement(`map:${LOC_SCOPE_MAP_ID}`);
+    await recomputeAchievementTargets(db);
+
+    assert.equal((await achievementDoc(def.uid)).target, 4, 'all four active pins count');
+
+    await seedUser(uid, 'AchLocMixed', { score: 0 });
+    await callCallable('joinGuildHandle', { guild: GUILD_UID }, token);
+
+    const a = await callCallable('collectPinHandle', { pinUid: LOC_PIN_A_UID }, token);
+    const b = await callCallable('collectPinHandle', { pinUid: LOC_PIN_B_UID }, token);
+    assert.deepEqual(a.achievements, [], 'no grant at 1/4');
+    assert.deepEqual(b.achievements, [], 'no grant at 2/4 — the old target');
+
+    const fb = await callCallable('collectPinHandle', {
+        pinUid: LOC_PIN_FEEDBACK_UID, rating: 4, talkName: 'Wyklad o smokach'
+    }, token);
+    assert.deepEqual(fb.achievements, [], 'no grant at 3/4');
+
+    // Pending photo: counts towards nothing until an admin approves it.
+    await seedPhotoObject(uid, LOC_PIN_PHOTO_UID);
+    const sub = await callCallable('submitPhotoHandle', { pinUid: LOC_PIN_PHOTO_UID }, token);
+    assert.equal(
+        (await userDoc(uid)).collectedPinsByScope[`map:${LOC_SCOPE_MAP_ID}`], 3,
+        'a pending photo does not move the scope counter'
+    );
+
+    const review = await callCallable(
+        'reviewPhotoHandle', { submissionUid: sub.submissionUid, decision: 'approve' }, adminToken
+    );
+    assert.deepEqual(review.achievements, [{
+        uid: def.uid, name: def.name, icon: def.icon, bonus: def.bonus
+    }], 'approving the last pin in the scope grants the badge');
+
+    const user = await userDoc(uid);
+    assert.equal(user.collectedPinsByScope[`map:${LOC_SCOPE_MAP_ID}`], 4);
+    assert.equal(user.score, 5 * 4 + def.bonus, 'four pins at 5 each plus the bonus');
+    assert.equal((await roundUser(uid)).score, user.score, 'bonus fanned out to the round');
 });

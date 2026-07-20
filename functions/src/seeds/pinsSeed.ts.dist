@@ -56,11 +56,9 @@ const mapPins: Pin[] = MAPS.flatMap((map, mapIndex) =>
     })
 );
 
-// Branch coverage for the non-`code` paths. Deliberately chosen NOT to make any badge unobtainable:
-//   - riddle and visit ARE collectible, so they simply raise their own map's target by one.
-//   - feedback and the inactive pin are EXCLUDED from every target — feedback because
-//     collectPinHandle refuses it (COLLECTIBLE_PIN_TYPES), inactive because it is not active.
-//     Counting either would leave its map's badge permanently one pin short of reachable.
+// Branch coverage for the non-`code` paths. Every ACTIVE pin here raises its map's badge target by
+// one, whatever its type — so each of these must stay genuinely completable, or its map's badge
+// goes with it. The inactive pin is the one exception: inactive pins count towards no target.
 const branchPins: Pin[] = [
     {
         uid: 'zagadka-alchemika',
@@ -140,9 +138,9 @@ const branchPins: Pin[] = [
         name: 'Pomnik Założyciela',
         description: 'Stoi tu od zawsze i patrzy surowo. Zrób sobie z nim zdjęcie na dowód, że tu dotarłeś/aś.',
         clue: '',
-        // The photo-proof branch (#19). Like feedback, `photo` is EXCLUDED from every achievement target
-        // (COLLECTIBLE_PIN_TYPES), so it can sit in any scope without making a badge unobtainable. The
-        // whole feature is inert until at least one photo pin is seeded — the kill-switch is "seed none".
+        // The photo-proof branch (#19). It counts towards its scopes' badge targets like any other pin,
+        // so those badges cannot complete until an admin approves the photo — keep photo pins out of a
+        // scope you need self-serve. The feature is inert until one is seeded: the kill-switch is "seed none".
         type: PinType.PHOTO,
         groups: ['dwor', 'targowisko'],
         mapId: 'dwor',

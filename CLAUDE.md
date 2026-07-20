@@ -503,14 +503,15 @@ Firestore transactions and the score fan-out — nothing is mocked.
   The pre-commit hook also runs the FE build, so stop `npm run dev` too or the two contend on `.next`.
 - The canonical test asserts the score is identical in all four denormalized places after a collect + answer.
   **Every new point-granting feature must extend this suite** (see the fan-out warning in §12.2).
-- Current suite (**76 tests across 8 files** — count with
+- Current suite (**77 tests across 8 files** — count with
   `grep -h '^test(' functions/test/*.test.mjs | wc -l`): `scoring` (card fan-out), `rounds` (`winnerInRound`
   propagation), `pins` (all three entry shapes, anti-bruteforce, dup guard, availability window, normalization,
   snapshot/secret-stripping), `admin-pins` (upsert/delete gates + validation, re-seed `collectedBy` preservation),
   `photos` (submit → pending → approve/reject, no-points-until-approve, reopen-on-reject, idempotency),
   `counters` (legacy docs missing a counter — the §12.2
   hydration rule), `achievements` (threshold crossing + 4-place fan-out, bonus cascade, exactly-once, response
-  payload, eval-throw, malformed definition) and `seed` (drives the REAL `seedDatabaseHandle` + real compiled
+  payload, eval-throw, malformed definition, location-badge targets counting every pin type) and `seed`
+  (drives the REAL `seedDatabaseHandle` + real compiled
   `../lib/seeds/*.js`, guards the task-#5 fire-and-forget: asserts every seeded collection's doc count === seed
   length on a single immediate query with NO settle/retry, plus the auth→password→admin gates).
 - `fixtures.mjs` helpers: `seedFixture` (also seeds the achievement definitions — every suite gets them, and
@@ -554,9 +555,11 @@ Things that are wrong-but-harmless today; fix opportunistically, don't be surpri
 - `pages/admin/edit-card.tsx` has a stray `console.log(formState.errors)`.
 - `pages/admin/cards.tsx` renders `comment` under the "Nazwa" header and `name` under "Ostatnia osoba" —
   the `<th>` order doesn't match the `<td>` order.
-- ⚠️ **Not harmless:** `functions/src/types/pin.ts` and `actions/pinScopeKeys.ts` carry comments that #12
-  invalidated — feedback pins DO have a collect flow now, and they increment a `pinsInScope` numerator whose
-  denominator excludes them. See §12.3. This one can grant a location badge early.
+- ✅ **Fixed (task #45): location badges used to unlock early.** `feedback` (since #12) and `photo` (on
+  approval) increment a `pinsInScope` numerator whose denominator counted only `code`/`riddle`/`visit`, so a
+  badge in a scope holding either type granted before the scope was finished. Both sides now count **every**
+  pin type and `COLLECTIBLE_PIN_TYPES` is gone — it was serving two different questions at once, which is
+  what let them drift. See §12.3.
 - There is still **no admin list/editor for pins** (only the map-native `PinEditorForm` + upsert/delete
   callables); the `/admin/*` screens are all card-era. Task #43.
 - ✅ **Fixed (task #14): re-seeding used to wipe `collectedBy`.** `seedPins`/`seedCards` used to `.set()`
@@ -698,14 +701,12 @@ that matters: **definitions are DATA, logic is CODE.**
   `getCurrentUser` hydrates it to `{}` separately). Unlike every other type, **`target` is DERIVED, not
   authored**: `recomputeAchievementTargets` recounts pins per scope and writes `target` onto the defs on
   every seed/`upsertPinHandle`/`deletePinHandle` (so authoring `target` on these is pointless — it's
-  overwritten). Only **`COLLECTIBLE_PIN_TYPES`** pins count toward the target (`code`/`riddle`/`visit`) —
-  a `photo` pin in a scope would otherwise make its badge unreachable.
-  ⚠️ **These two sets NO LONGER match, and the code comments still claim they do.** Since #12,
-  `collectPinHandle` accepts `COLLECTIBLE_PIN_TYPES` **plus `feedback`** (`!COLLECTIBLE_PIN_TYPES.includes(type)
-  && !isFeedback`), and it calls `scopeKeys(pin)` unconditionally — so collecting a feedback pin **increments
-  the numerator without raising the denominator**, and a location badge in a scope containing feedback pins can
-  unlock early. The stale comments are in `functions/src/types/pin.ts` (says feedback "has no collect flow yet")
-  and `actions/pinScopeKeys.ts` (claims numerator and denominator "can never disagree").
+  overwritten). ⚠️ **EVERY active pin type counts toward the target** (task #45) — `recomputeAchievementTargets`
+  filters on `isActive` alone, matching the award path, which calls `scopeKeys(pin)` for every type. Filtering
+  by type on one side only is exactly what made badges unlock early before #45, so **do not reintroduce a
+  type filter on either side.** Consequences worth knowing when authoring pins (#16): a `feedback` pin in a
+  scope means its badge needs the talk rated, and a **`photo` pin means the badge cannot complete until an
+  admin approves that photo** — keep photo pins out of any scope that must stay self-serve.
   `loadDefinitions` rejects a `pinsInScope` def with `target < 1` (a `>= 0`
   target auto-grants event-wide on a player's first award).
 - ⚠️ **A bug here must never kill scoring** — it runs inside *every* `awardPoints` transaction, event-wide.
