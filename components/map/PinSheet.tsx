@@ -1,6 +1,6 @@
 import { useForm } from 'react-hook-form';
-import { useState } from 'react';
-import { faBan, faCheck, faXmark } from '@fortawesome/free-solid-svg-icons';
+import { useRef, useState } from 'react';
+import { faArrowLeft, faCamera, faCheck, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Pin from '@/models/Pin';
 import CollectedPin from '@/models/CollectedPin';
@@ -9,7 +9,7 @@ import { PinType } from '@/Enum/PinType';
 import { collectPinFunction } from '@/utils/functions';
 import useDynamicNavbar from '@/hooks/useDynamicNavbar';
 import PinCardComponent from '@/components/pin/PinCardComponent';
-import PhotoPinCollect from '@/components/pin/PhotoPinCollect';
+import PhotoPinCollect, { PhotoPinCollectHandle } from '@/components/pin/PhotoPinCollect';
 import Panel from '@/components/Panel';
 import scheduleAchievementToasts from '@/utils/scheduleAchievementToasts';
 
@@ -36,6 +36,7 @@ export default function PinSheet ({
 }) {
     const [loading, setLoading] = useState<boolean>(false);
     const { register, handleSubmit } = useForm({ mode: 'onChange', defaultValues: { answer: '' } });
+    const photoCollectRef = useRef<PhotoPinCollectHandle>(null);
 
     const needsAnswer = pin.type === PinType.CODE || pin.type === PinType.RIDDLE;
     const isPhoto = pin.type === PinType.PHOTO;
@@ -43,6 +44,8 @@ export default function PinSheet ({
     const notSupported = pin.type === PinType.FEEDBACK;
     // The navbar centre collect button covers code/riddle/visit only — photo submits via its own panel.
     const canCollect = !collected && !notSupported && !isPhoto;
+    // A photo pin with no image sent yet: the centre button becomes the uploader.
+    const canUploadPhoto = isPhoto && !collected;
     const photoApproved = isPhoto && collected && (collectedPin?.awardedPoints ?? 0) > 0;
     const photoPending = isPhoto && collected && !photoApproved;
 
@@ -67,10 +70,19 @@ export default function PinSheet ({
             });
     };
 
+    // The centre super-button is always actionable now: collect (check) when collectable, open the photo
+    // picker (camera) for an un-submitted photo pin, otherwise back (arrow) to close the drawer. Distinct
+    // icons matter — useDynamicNavbar re-runs (and re-captures onClick) only when `icon` changes.
+    const centerIcon = canCollect ? faCheck : canUploadPhoto ? faCamera : faArrowLeft;
+    const centerOnClick = canCollect
+        ? handleSubmit(collect)
+        : canUploadPhoto
+            ? () => photoCollectRef.current?.openPicker()
+            : onClose;
+
     useDynamicNavbar({
-        icon: canCollect ? faCheck : faBan,
-        onClick: canCollect ? handleSubmit(collect) : undefined,
-        disabledCenter: !canCollect,
+        icon: centerIcon,
+        onClick: centerOnClick,
         disabledSides: true,
         animate: canCollect
     });
@@ -125,7 +137,7 @@ export default function PinSheet ({
                 }
 
                 {isPhoto && !collected &&
-                    <PhotoPinCollect pinUid={pin.uid} onSubmitted={() => undefined}/>
+                    <PhotoPinCollect ref={photoCollectRef} pinUid={pin.uid} onSubmitted={() => undefined}/>
                 }
 
                 {photoPending &&
