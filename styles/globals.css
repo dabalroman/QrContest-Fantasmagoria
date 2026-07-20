@@ -6,6 +6,8 @@
     color-scheme: light only;
 
     --color-primary: #9D2F00;
+    /* Same colour as channels, so Tailwind can inject alpha (text-accent/20). A bare var() cannot. */
+    --color-primary-rgb: 157 47 0;
     --color-dim: #5c5c5c;
     --color-text-light: #ffffff;
     --color-text-dark: #202020;

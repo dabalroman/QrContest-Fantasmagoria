@@ -1,11 +1,15 @@
+import { ReactNode } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faStar } from '@fortawesome/free-solid-svg-icons';
 import Achievement from '@/models/Achievement';
 import User from '@/models/User';
 import AchievementIcon from '@/components/achievements/AchievementIcon';
+import ProgressBar from '@/components/ProgressBar';
 import { AchievementType } from '@/functions/src/types/achievement';
 
-// Genitive-plural unit copy per achievement type, for the "740 / 1000 punktów" progress label.
-const PROGRESS_UNIT: Record<AchievementType, string> = {
-    points: 'punktów',
+// Genitive plural — invariant in the "740 / 1000 X" framing, so it needs no number agreement.
+const PROGRESS_UNIT: Record<AchievementType, ReactNode> = {
+    points: null,
     correctAnswers: 'poprawnych odpowiedzi',
     pinsInScope: 'odwiedzonych miejsc'
 };
@@ -21,6 +25,7 @@ export default function AchievementComponent ({
 
     const { current, target } = achievement.progressFor(user);
     const pct = target > 0 ? Math.round((current / target) * 100) : 0;
+    const unit = PROGRESS_UNIT[achievement.type];
 
     return (
         <div
@@ -30,27 +35,22 @@ export default function AchievementComponent ({
                 + (unlocked ? '' : 'grayscale opacity-60')
             }
         >
-            <div className="shrink-0 w-16 flex items-center justify-center text-text-accent">
-                <AchievementIcon iconKey={achievement.icon} className="w-12 h-12"/>
+            <div className="shrink-0 self-start pt-0.5 w-10 flex justify-center text-text-accent text-3xl">
+                <AchievementIcon iconKey={achievement.icon}/>
             </div>
             <div className="grow text-left">
                 <div className="flex justify-between items-baseline gap-2">
                     <h3 className="text-2xl font-semibold text-text-accent">{achievement.name}</h3>
                     <span className="text-xl font-bold text-text-accent whitespace-nowrap">
-                        +{earned ? earned.bonus : achievement.bonus}
+                        <FontAwesomeIcon icon={faStar} size="xs"/> {earned ? earned.bonus : achievement.bonus}
                     </span>
                 </div>
                 <p className="text-sm">{achievement.description}</p>
                 {!earned && <div className="mt-2">
-                    <div className="h-3 w-full rounded-full bg-text-accent/20 overflow-hidden">
-                        <div
-                            className="h-full rounded-full bg-text-accent"
-                            style={{ width: pct + '%' }}
-                        />
-                    </div>
-                    <p className="text-sm mt-1 text-right">
-                        {current} / {target} {PROGRESS_UNIT[achievement.type]}
-                    </p>
+                    <ProgressBar
+                        percentage={pct}
+                        label={<>{current} / {target}{unit && <> {unit}</>}</>}
+                    />
                 </div>}
             </div>
         </div>

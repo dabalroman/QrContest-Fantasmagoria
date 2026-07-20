@@ -1,4 +1,5 @@
 import Panel from '@/components/Panel';
+import ProgressBar from '@/components/ProgressBar';
 import RankingRound from '@/models/RankingRound';
 
 export default function CurrentRoundPanel ({
@@ -13,6 +14,14 @@ export default function CurrentRoundPanel ({
 
     const notStartedYet = percentage <= 0;
     const alreadyFinished = percentage >= 100;
+
+    let roundLabel = progressValue.toFixed(0) + '%';
+
+    if (notStartedYet) {
+        roundLabel = 'Runda jeszcze się nie rozpoczęła';
+    } else if (alreadyFinished) {
+        roundLabel = 'Runda została zakończona';
+    }
 
     return (
         <Panel
@@ -37,24 +46,12 @@ export default function CurrentRoundPanel ({
                             }
                         )}</div>
                     </div>
-                    <div className="h-8 w-full mt-2 border-card-border border-2 rounded-md relative">
-                        <div style={{ width: progressValue + '%' }}
-                             className={
-                                 'bg-card-border h-full absolute z-0'
-                                 + (!(notStartedYet || alreadyFinished) ? ' animate-pulse' : '')
-                             }>
-                        </div>
-                        <div className={'h-full w-full flex justify-center items-center'}>
-                            {notStartedYet &&
-                                <span className="z-10">Runda jeszcze się nie rozpoczęła</span>}
-                            {alreadyFinished &&
-                                <span className="text-text-accent z-10">Runda została zakończona</span>}
-                            {!(notStartedYet || alreadyFinished) &&
-                                <span className={"z-10" + (progressValue >= 50 ? ' text-text-accent' : '')}>
-                                    {progressValue.toFixed(0)}%
-                                </span>
-                            }
-                        </div>
+                    <div className="mt-2">
+                        <ProgressBar
+                            percentage={progressValue}
+                            label={roundLabel}
+                            pulse={!(notStartedYet || alreadyFinished)}
+                        />
                     </div>
                 </>
             )}

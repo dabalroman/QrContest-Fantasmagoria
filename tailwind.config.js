@@ -47,7 +47,7 @@ module.exports = {
                 'text-light': 'var(--color-text-light)',
                 'text-base': 'var(--color-text-dark)',
                 'text-dim': 'var(--color-dim)',
-                'text-accent': 'var(--color-primary)',
+                'text-accent': 'rgb(var(--color-primary-rgb) / <alpha-value>)',
 
                 'card-border': '#868686',
 
