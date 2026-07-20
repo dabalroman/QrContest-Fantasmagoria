@@ -5,6 +5,8 @@ import Panel from '@/components/Panel';
 import LinkButton from '@/components/LinkButton';
 import {Page} from '@/Enum/Page';
 import {UserContext, UserContextType} from '@/utils/context';
+import PinTypeLegend from '@/components/PinTypeLegend';
+import AchievementIcon from '@/components/achievements/AchievementIcon';
 
 export default function Home() {
     const {user} = useContext<UserContextType>(UserContext);
@@ -44,7 +46,7 @@ export default function Home() {
                         Gra Konwentowa
                     </h1>
                     <h2 className="text-3xl font-fancy" style={{textShadow: '0 4px 4px rgba(0,0,0,0.25)'}}>
-                        Zbierz je wszystkie!
+                        Konwent czeka na odkrywców!
                     </h2>
                 </div>
                 <div className="w-full p-4">
@@ -58,10 +60,11 @@ export default function Home() {
             >
                 <Panel title="Co to jest Gra Konwentowa?" className="text-justify">
                     <p className="pt-1">Gra Konwentowa to internetowa gra terenowa dla uczestników konwentu
-                        fantastyki Fantasmagoria. Twoje zadanie to poszukiwanie kodów QR
-                        ukrytych na terenie konwentu. Za każdą dodaną do kolekcji kartę otrzymasz punkty, a im więcej
-                        punktów zgromadzisz, tym wyżej znajdziesz się w rankingu. Miejsce na podium gwarantuje
-                        fantastyczną nagrodę!</p>
+                        fantastyki Fantasmagoria. Otwierasz mapę konwentu, a na niej czekają piny - miejsca,
+                        które trzeba odnaleźć i zdobyć. Jeden wymaga zeskanowania ukrytego kodu QR, inny
+                        rozwiązania zagadki, jeszcze inny po prostu tego, żebyś tam dotarł. Za każdy zdobyty
+                        pin otrzymasz punkty, a im więcej punktów zgromadzisz, tym wyżej znajdziesz się
+                        w rankingu. Miejsce na podium gwarantuje fantastyczną nagrodę!</p>
                     <p className="pt-4">Udział w konkursie jest całkowicie darmowy. Wszystko, czego potrzebujesz, to
                         smartfon z dostępem
                         do internetu.</p>
@@ -90,49 +93,29 @@ export default function Home() {
                     </p>
                 </Panel>
 
-                <Panel title="Karty">
-                    <p className="mb-4">
-                        W tym roku Twoim celem są znane cytaty! Każda karta to para unikalnej grafiki oraz genialnego
-                        tekstu, który odbił się szerokim echem w popkulturze. W Twojej kolekcji znajdziesz takie
-                        klasyki jak &quot;Niebieski kwiat i kolce&quot;, &quot;Jak to jest być skrybą?&quot;
-                        czy &quot;I&apos;m groot&quot;. Do znalezienia są aż 64 karty, więc pora ruszyć na łowy!
+                <Panel title="Piny">
+                    <p className="mb-4 text-justify">
+                        Teren konwentu to dziewięć map - od piwnicy MOK-u po Dwór. Każdy pin zdobywa się
+                        inaczej, a te znaczki zobaczysz później na mapie:
                     </p>
 
-                    <div className="grid grid-cols-3 gap-4 justify-items-center">
-                        <div
-                            className={
-                                'border-4 border-card-common rounded-xl bg-background bg-center bg-cover shadow-card'
-                            }
-                            style={{
-                                'backgroundImage': `url(/cards-thumbnails/luke-iam-your-thumbnail.webp)`,
-                                'height': '8.25rem',
-                                'aspectRatio': '2/3'
-                            }}
-                        >
-                        </div>
-                        <div
-                            className={
-                                'border-4 border-card-rare rounded-xl bg-background bg-center bg-cover shadow-card'
-                            }
-                            style={{
-                                'backgroundImage': `url(/cards-thumbnails/the-one-piece-thumbnail.webp)`,
-                                'height': '8.25rem',
-                                'aspectRatio': '2/3',
-                            }}
-                        >
-                        </div>
-                        <div
-                            className={
-                                'border-4 border-card-epic rounded-xl bg-background bg-center bg-cover shadow-card'
-                            }
-                            style={{
-                                'backgroundImage': `url(/cards-thumbnails/potezna-wichura-lamiac-thumbnail.webp)`,
-                                'height': '8.25rem',
-                                'aspectRatio': '2/3',
-                            }}
-                        >
-                        </div>
-                    </div>
+                    <PinTypeLegend/>
+                </Panel>
+
+                <Panel title="Osiągnięcia">
+                    <p className="text-justify">
+                        Za wyczyny w grze zdobywasz odznaki, a każda z nich to dodatkowe punkty. Nagradzają
+                        między innymi zwiedzanie kolejnych zakątków konwentu
+                        <AchievementIcon iconKey="map-pin" className="ml-2 text-text-accent"/>,
+                        wiedzę wykazaną w pytaniach
+                        <AchievementIcon iconKey="owl" className="mx-2 text-text-accent"/>
+                        czy kolejne progi zdobytych punktów
+                        <AchievementIcon iconKey="trophy" className="ml-2 text-text-accent"/>.
+                    </p>
+                    <p className="mt-2 text-justify">
+                        Wszystkie odznaki - te zdobyte i te, które dopiero przed Tobą - znajdziesz
+                        w zakładce &quot;Osiągnięcia&quot;.
+                    </p>
                 </Panel>
 
                 <Panel title="Rundy">
@@ -160,9 +143,9 @@ export default function Home() {
                         Specjalne podziękowania za pomoc w przygotowaniu konkursu kieruję do:
                     </p>
                     <ul className='list-disc list-outside pl-5'>
-                        <li><b>Igor S.</b> - Za przygotowanie grafik do kart</li>
-                        <li><b>Damian G.</b> - Za inspiracje do wielu z użytych cytatów</li>
-                        <li><b>Adam K.</b> - Za fenomenalne pomalowanie statuetek</li>
+                        <li><b>Maria D.</b> - Za narysowanie wszystkich map</li>
+                        <li><b>Marcin D.</b> - Za zaprojektowanie i wykonanie statuetek dla zwycięzców</li>
+                        <li><b>Adam K.</b> - Za pomoc w planowaniu i projektowaniu zadań</li>
                         <li><b>Adam A.</b> - Za pomoc techniczną</li>
                         <li><b>Wiktor K.</b> - Za Fantasmagorię!</li>
                     </ul>
