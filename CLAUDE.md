@@ -313,6 +313,12 @@ so the UI can render grey "not yet found" placeholders. The set with `uid === 's
 - **Reuse-first — don't reinvent.** Fork the nearest existing handler/model and match its idioms rather than
   inventing new patterns; never hand-roll what a shared action already does (route every point award through
   `functions/src/actions/awardPoints.ts`). Keeps the two type worlds + fan-out consistent.
+- ⚠️ **Comments: default to NONE.** A comment earns its place only by explaining something a competent reader
+  would still get wrong — a surprising constraint or a footgun a plausible "cleanup" would silently break.
+  Specifically **never**: a header/banner block on a new file or component saying what it is; a restatement of
+  structure the code already shows; a contrast with the previous implementation ("replaces the old X hack") or
+  any other conversation/changelog narration — git holds that. **The test:** delete the comment and reread the
+  code; if the reader still lands right, leave it deleted. One line where one line does.
 
 ### Routing & rewrites
 
