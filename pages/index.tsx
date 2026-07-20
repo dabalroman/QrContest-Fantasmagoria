@@ -56,6 +56,21 @@ export default function Home() {
                 style={{gridTemplateRows: '1fr'}}
                 id="readme"
             >
+                <Panel title="Co to jest Gra Konwentowa?" className="text-justify">
+                    <p className="pt-1">Gra Konwentowa to internetowa gra terenowa dla uczestników konwentu
+                        fantastyki Fantasmagoria. Twoje zadanie to poszukiwanie kodów QR
+                        ukrytych na terenie konwentu. Za każdą dodaną do kolekcji kartę otrzymasz punkty, a im więcej
+                        punktów zgromadzisz, tym wyżej znajdziesz się w rankingu. Miejsce na podium gwarantuje
+                        fantastyczną nagrodę!</p>
+                    <p className="pt-4">Udział w konkursie jest całkowicie darmowy. Wszystko, czego potrzebujesz, to
+                        smartfon z dostępem
+                        do internetu.</p>
+                    <p className="pt-4">Dołącz już teraz używając przycisków powyżej,
+                        lub przejdź do &quot;Pytania i odpowiedzi&quot; jeśli chcesz wiedzieć więcej.</p>
+                    <LinkButton href={Page.FAQ} className="w-full mt-4">Pytania i odpowiedzi</LinkButton>
+                    <LinkButton href={Page.RULEBOOK} className="w-full mt-4">Regulamin konkursu</LinkButton>
+                </Panel>
+
                 <Panel title="Nagrody w Grze Konwentowej">
                     <img src="/prize.webp" alt="prize" className="absolute right-0 bottom-0" style={{
                         zIndex: -1,
@@ -73,20 +88,6 @@ export default function Home() {
                         <span className="font-semibold text-text-accent">3. miejsce <br/> </span>
                         <span>2x 20 fantów</span>
                     </p>
-                </Panel>
-
-                <Panel title="Co to jest Gra Konwentowa?" className="text-justify">
-                    <p className="pt-1">Twoje zadanie to poszukiwanie kodów QR
-                        ukrytych na terenie konwentu. Za każdą dodaną do kolekcji kartę otrzymasz punkty, a im więcej
-                        punktów zgromadzisz, tym wyżej znajdziesz się w rankingu. Miejsce na podium gwarantuje
-                        fantastyczną nagrodę!</p>
-                    <p className="pt-4">Udział w konkursie jest całkowicie darmowy. Wszystko, czego potrzebujesz, to
-                        smartfon z dostępem
-                        do internetu.</p>
-                    <p className="pt-4">Dołącz już teraz używając przycisków powyżej,
-                        lub przejdź do &quot;Pytania i odpowiedzi&quot; jeśli chcesz wiedzieć więcej.</p>
-                    <LinkButton href={Page.FAQ} className="w-full mt-4">Pytania i odpowiedzi</LinkButton>
-                    <LinkButton href={Page.RULEBOOK} className="w-full mt-4">Regulamin konkursu</LinkButton>
                 </Panel>
 
                 <Panel title="Karty">

@@ -244,8 +244,10 @@ Every other mutation goes through an authenticated **callable Cloud Function**. 
 | `updateRoundsHandle` | `index.ts` → `updateRoundsProcessor.ts` | Manual "force round update" from the admin panel. |
 | `autoUpdateRounds` | `index.ts` | **Scheduled**, cron `0 * * * *` (hourly). Marks finished rounds, stamps the top 3 users with `winnerInRound`. |
 
-**Storage is fully locked down.** `storage.rules` is a blanket `allow read, write: if false;` and nothing in
-the app uploads anything today. `getStorage()` is initialized in `utils/firebase.ts` but unused.
+**Storage is locked down except one narrow match.** `storage.rules` is `allow read, write: if false;`
+everywhere EXCEPT `/users/{uid}/photos/{pinUid}` (owner + `<10MB` + `image/*`, overwrite allowed) — the
+photo-proof upload path (#19, §12.4). `getStorage()` is client-wired in `utils/firebase.ts` and used
+server-side via `functions/src/actions/photoStorage.ts`.
 
 ### Auth flow
 
@@ -513,7 +515,11 @@ Hosting stays on **Firebase**, same as last year. Read this section before plann
 > - ✅ **12.3 engine shipped as #23** — `achievements` collection (definitions as data), pure type-predicates,
 >   auto-grant inside `awardPoints`, `amountOfCorrectAnswers` counter. **#24 (screen) still to build** — it
 >   fills the `/achievements` stub and is now pure UI; **#30** (unlock toast) consumes the returned grants.
-> - ❌ **12.4 (photo proof) deferred out of v1.** `photo` exists in `PinType` but `collectPinHandle` rejects it.
+> - ✅ **12.4 shipped as photo-proof pins (#19)** — a `photo`-type pin: client uploads a downscaled image
+>   (Storage SDK, narrow owner-only `storage.rules`) → `submitPhotoHandle` marks it **pending, no points**
+>   → admin approves/rejects at `/admin/photo-review` → **points only on approve** via `awardPoints`.
+>   New `user.pendingScore` (score sibling, NOT a counter). `collectPinHandle` still rejects `photo`.
+>   Kill-switch = seed zero photo pins. See §12.4.
 > - ✅ **Clubs/guilds DROPPED from the UI for 2026 (task #32).** The guild UI is commented out (grep marker
 >   `CLUBS-DISABLED-2026`) and the per-club theme switcher deleted. The backend fan-out (`updateGuild`) still
 >   runs but is **write-only / unread** by the client — do not build new guild surfaces without re-enabling first.
@@ -649,16 +655,36 @@ that matters: **definitions are DATA, logic is CODE.**
 
 ### 12.4 User photo uploads — private quest proof, manually reviewed
 
+> **✅ SHIPPED as photo-proof pins (#19).** A `photo`-type pin, reachable ONLY from the `/map` pin sheet
+> (`collectPinHandle` still rejects `photo`). Flow: client downscales the shot (`utils/downscaleImage.ts`,
+> canvas ≤2048px q0.8) → `uploadBytes` to `users/{uid}/photos/{pinUid}` under a **narrow owner-only
+> `storage.rules`** (owner + `<10MB` + `image/*`, overwrite-allowed) → `submitPhotoHandle` validates the
+> pin, verifies the object exists, writes `collectedPins`(awardedPoints 0) + a `photoSubmissions` doc +
+> `user.pendingScore += value` — **no points, no fan-out**. Admin reviews at **`/admin/photo-review`**
+> (`getPhotoSubmissionsHandle`, admin-read-via-callable → 15s poll, photos via server-built
+> **download-token URLs**, no signBlob): **approve** → `reviewPhotoHandle` awards `sub.value` through the
+> shared `awardPoints` (full pipeline: score + 4-place fan-out + achievements + location scope counters)
+> and sets `awardedPoints`; **reject** → deletes `collectedPins` + the pin's `collectedBy` entry so the
+> pin **REOPENS** for retry. Both clear `pendingScore`; review is idempotent (transactional
+> pending-status check) and uses snapshotted `sub.value`/`sub.scopeKeys`, never re-reading the pin.
+> `user.pendingScore` is a **score sibling** (both type worlds + `getCurrentUser` default 0) shown ONLY on
+> the player's own ranking header as `+X oczekuje` — NOT a `UserCounterKey`, never fanned out, never in
+> leaderboard sort. `assertPin*` guards were extracted to `actions/assertPin.ts` (shared with
+> collectPinHandle). Kill-switch: seed zero photo pins → feature fully inert. Tests: `functions/test/photos.test.mjs`.
+> The prose below is the original design record.
+
 - Photos are **proof that a pin was collected.** They are **not** a social feature.
 - **Users cannot see other users' uploads.** No public gallery.
 - **Review is manual. Explicitly no AI moderation** — the cost would escalate quickly and it is not wanted.
   This implies an **admin review queue** and an approval state on the quest submission.
 - Upload from the device **gallery or taken in-app** (camera).
-- **`storage.rules` currently denies everything (`allow read, write: if false`).** This is the only place the
-  app will ever let a client write directly to Firebase infrastructure. Constrain hard: path-scope to the
-  uploader (`/users/{uid}/…`), cap `request.resource.size`, pin `contentType.matches('image/.*')`, and deny
-  reads to everyone but the owner and admins.
-- `getStorage()` is already initialized and emulator-wired in `utils/firebase.ts`; it's just unused today.
+- **`storage.rules` now opens ONE narrow match** (`/users/{uid}/photos/{pinUid}`: owner + `<10MB` +
+  `image/*`, overwrite allowed) — everything else stays `allow read, write: if false`. This is the only
+  place the app lets a client write directly to Firebase infrastructure. Admins read photos via
+  server-built download-token URLs, not a rule. Overwrite (not create-only) is deliberate: create-only has
+  an orphan trap where a dropped `submitPhotoHandle` call leaves an object the retry can't replace.
+- `getStorage()` is initialized + emulator-wired in `utils/firebase.ts` (client) and used server-side via
+  `functions/src/actions/photoStorage.ts` (bucket resolved from `FIREBASE_CONFIG`/`GCLOUD_PROJECT`).
 
 ### 12.5 Navigation / IA rework
 
