@@ -17,10 +17,15 @@ export type PinCoords = {
     y: number;
 }
 
+// `rating`/`talkName` live here, on the pin being rated, rather than on the player's collectedPins
+// snapshot: `pins` is admin-readable, so this is the only shape /admin/feedback can listen to live.
+// Present only on a feedback entry — absent, not null, everywhere else.
 export type PinCollectedBy = {
     [uid: string]: {
         username: string;
         collectedAt: FieldValue;
+        rating?: number;
+        talkName?: string;
     }
 }
 
@@ -77,6 +82,4 @@ export type CollectedPin = {
     type: PinType;
     collectedAt: Timestamp | FieldValue;
     awardedPoints: number;
-    talkName: string | null;
-    rating: number | null;
 }

@@ -182,6 +182,18 @@ test('photo pin is rejected (collect owned by #19\'s photo-proof flow, not colle
 
 // --- Feedback pins (#12) ---
 
+test('a non-feedback collect leaves rating and talkName off the collectedBy entry', async () => {
+    const uid = 'pin-player-feedback-0';
+    const token = await registerPlayer(uid, 'PinPlayerFeedback0');
+
+    await callCallable('collectPinHandle', { code: PIN_CODE_CODE }, token);
+
+    const entry = (await db.collection('pins').doc(PIN_CODE_UID).get()).data().collectedBy[uid];
+    assert.equal(entry.username, 'PinPlayerFeedback0');
+    assert.equal(entry.rating, undefined);
+    assert.equal(entry.talkName, undefined);
+});
+
 test('feedback pin awards and fans out, storing the rating and talkName', async () => {
     const uid = 'pin-player-feedback-1';
     const token = await registerPlayer(uid, 'PinPlayerFeedback1');
@@ -192,14 +204,19 @@ test('feedback pin awards and fans out, storing the rating and talkName', async 
         token
     );
     assert.equal(result.pin.awardedPoints, PIN_FEEDBACK_VALUE);
-    assert.equal(result.pin.rating, 4);
-    assert.equal(result.pin.talkName, 'Wyklad o smokach');
     assert.equal(result.question, null, 'a feedback pin never draws a question');
+
+    // The rating lives on the pin, not on the player's snapshot — that is what /admin/feedback listens to.
+    const entry = (await db.collection('pins').doc(PIN_FEEDBACK_UID).get()).data().collectedBy[uid];
+    assert.equal(entry.rating, 4);
+    assert.equal(entry.talkName, 'Wyklad o smokach');
+    assert.equal(entry.username, 'PinPlayerFeedback1', 'collectedBy keeps its finder fields');
+    assert.ok(entry.collectedAt, 'collectedBy keeps its timestamp');
 
     const collectedPin = (await db.collection('users').doc(uid)
         .collection('collectedPins').doc(PIN_FEEDBACK_UID).get()).data();
-    assert.equal(collectedPin.rating, 4);
-    assert.equal(collectedPin.talkName, 'Wyklad o smokach');
+    assert.equal(collectedPin.rating, undefined, 'collectedPins must not carry the rating');
+    assert.equal(collectedPin.talkName, undefined, 'collectedPins must not carry the talkName');
 
     const user = (await db.collection('users').doc(uid).get()).data();
     const round = (await db.collection('ranking').doc(ROUND_UID).get()).data();
@@ -214,12 +231,14 @@ test('feedback pin stores the trimmed talkName', async () => {
     const uid = 'pin-player-feedback-2';
     const token = await registerPlayer(uid, 'PinPlayerFeedback2');
 
-    const result = await callCallable(
+    await callCallable(
         'collectPinHandle',
         { pinUid: PIN_FEEDBACK_UID, rating: 5, talkName: '  Best panel ever  ' },
         token
     );
-    assert.equal(result.pin.talkName, 'Best panel ever');
+
+    const entry = (await db.collection('pins').doc(PIN_FEEDBACK_UID).get()).data().collectedBy[uid];
+    assert.equal(entry.talkName, 'Best panel ever');
 });
 
 test('feedback pin rejects a missing, zero, out-of-range or non-integer rating', async () => {

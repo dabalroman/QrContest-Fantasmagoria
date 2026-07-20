@@ -20,4 +20,5 @@ export enum Page {
     ADMIN_RECENTLY_COLLECTED = '/admin/recently-collected',
     ADMIN_USERS = '/admin/users',
     ADMIN_PHOTO_REVIEW = '/admin/photo-review',
+    ADMIN_FEEDBACK = '/admin/feedback',
 }

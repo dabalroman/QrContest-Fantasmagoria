@@ -12,8 +12,6 @@ export default class CollectedPin extends FirebaseModel {
     type: PinType;
     collectedAt: Date | null;
     awardedPoints: number;
-    talkName: string | null;
-    rating: number | null;
 
     constructor (
         uid: Uid = '',
@@ -23,8 +21,6 @@ export default class CollectedPin extends FirebaseModel {
         type: PinType = PinType.CODE,
         collectedAt: Date | null = null,
         awardedPoints: number = 0,
-        talkName: string | null = null,
-        rating: number | null = null,
     ) {
         super();
 
@@ -39,8 +35,6 @@ export default class CollectedPin extends FirebaseModel {
         this.type = type;
         this.collectedAt = collectedAt;
         this.awardedPoints = awardedPoints;
-        this.talkName = talkName;
-        this.rating = rating;
     }
 
     public static fromRaw (rawCollectedPin: RawCollectedPin): CollectedPin {
@@ -51,9 +45,7 @@ export default class CollectedPin extends FirebaseModel {
             rawCollectedPin.value,
             rawCollectedPin.type,
             Timestamp.fromMillis(rawCollectedPin.collectedAt._seconds * 1000).toDate(),
-            rawCollectedPin.awardedPoints,
-            rawCollectedPin.talkName ?? null,
-            rawCollectedPin.rating ?? null
+            rawCollectedPin.awardedPoints
         );
     }
 
@@ -78,9 +70,7 @@ export default class CollectedPin extends FirebaseModel {
             data.value,
             data.type,
             data.collectedAt?.toDate() ?? null,
-            data.awardedPoints,
-            data.talkName ?? null,
-            data.rating ?? null
+            data.awardedPoints
         );
     }
 }

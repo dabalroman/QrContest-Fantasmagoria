@@ -81,9 +81,7 @@ export const submitPhotoHandle = onCall(async (req): Promise<{ submissionUid: st
                 value,
                 type: pin.type,
                 collectedAt: FieldValue.serverTimestamp(),
-                awardedPoints: 0,        // 0 while pending — set to `value` on approval
-                talkName: null,
-                rating: null
+                awardedPoints: 0         // 0 while pending — set to `value` on approval
             });
 
             transaction.update<PinCollectedBy, PinCollectedBy>(pinRef, {

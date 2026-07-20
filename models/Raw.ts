@@ -75,9 +75,7 @@ export interface RawCollectedPin {
     value: number,
     type: PinType,
     collectedAt: RawFirestoreTimestamp,
-    awardedPoints: number,
-    talkName: string | undefined,
-    rating: number | undefined
+    awardedPoints: number
 }
 
 // One row of the admin photo-review queue as it arrives from getPhotoSubmissionsHandle (#19). Only the

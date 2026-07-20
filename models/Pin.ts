@@ -10,7 +10,13 @@ export type PinCoords = { x: number, y: number };
 // Client-side shape of a finder entry. Only ever populated on the fromFirestore path (#14's admin
 // editor, where admins can read `pins` in full) — fromRaw (getPins/collectPinHandle) never carries it,
 // same as `code`, since PublicPin strips both by construction (decision 13).
-export type PinCollectedByEntry = { username: string, collectedAt: Date };
+export type PinCollectedByEntry = {
+    username: string,
+    collectedAt: Date,
+    // Feedback pins only (#12) — null on every other type. /admin/feedback reads them from here.
+    rating: number | null,
+    talkName: string | null
+};
 
 // The subset PinCardComponent renders. Both Pin and CollectedPin satisfy it structurally, which is what
 // lets the map and the collect screen share one card component without an adapter. The description is
@@ -146,7 +152,9 @@ export default class Pin extends FirebaseModel {
                 ? Object.fromEntries(Object.entries(data.collectedBy as Record<string, any>).map(
                     ([uid, entry]) => [uid, {
                         username: entry.username,
-                        collectedAt: entry.collectedAt?.toDate() ?? new Date()
+                        collectedAt: entry.collectedAt?.toDate() ?? new Date(),
+                        rating: entry.rating ?? null,
+                        talkName: entry.talkName ?? null
                     }]
                 ))
                 : {}

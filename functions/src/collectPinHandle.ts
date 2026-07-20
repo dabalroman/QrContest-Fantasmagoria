@@ -185,16 +185,15 @@ export const collectPinHandle = onCall(async (req): Promise<{
                 value: pin.value,
                 type: pin.type,
                 collectedAt: FieldValue.serverTimestamp(),
-                awardedPoints: pin.value,
-                talkName: feedback?.talkName ?? null,
-                rating: feedback?.rating ?? null
+                awardedPoints: pin.value
             });
 
             // Update pin collectedBy
             transaction.update<PinCollectedBy, PinCollectedBy>(pinRef, {
                 [`collectedBy.${uid}`]: {
                     username: user.username,
-                    collectedAt: FieldValue.serverTimestamp()
+                    collectedAt: FieldValue.serverTimestamp(),
+                    ...(feedback ? { rating: feedback.rating, talkName: feedback.talkName } : {})
                 }
             } as UpdateData<PinCollectedBy>);
 
