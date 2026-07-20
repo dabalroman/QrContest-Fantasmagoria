@@ -616,6 +616,16 @@ that matters: **definitions are DATA, logic is CODE.**
   is always `counter(user) >= target`, so the unlock and #24's progress bar read the same number.
   **Adding an achievement = one Firestore doc; adding a TYPE = code** (the union makes that compile-enforced).
   Never `switch (uid)`; never let a predicate read Firestore or touch the tx.
+- **Location badges (#37) are the `pinsInScope` type** — one per map floor + per building. Counter is
+  `user.collectedPinsByScope[def.scope]` (a **map-valued** counter, incremented via `scopeKeys(pin)` =
+  `group:<g>` + `map:<mapId>`; it does NOT join the flat `UserCounterKey`/`USER_COUNTER_DEFAULTS` machinery —
+  `getCurrentUser` hydrates it to `{}` separately). Unlike every other type, **`target` is DERIVED, not
+  authored**: `recomputeAchievementTargets` recounts pins per scope and writes `target` onto the defs on
+  every seed/`upsertPinHandle`/`deletePinHandle` (so console-editing `target` on these is pointless — it's
+  overwritten). Only **`COLLECTIBLE_PIN_TYPES`** pins count (`code`/`riddle`/`visit`), the same set
+  `collectPinHandle` accepts — a `feedback`/`photo` pin in a scope would make its badge unreachable, so the
+  two read one shared constant. `loadDefinitions` rejects a `pinsInScope` def with `target < 1` (a `>= 0`
+  target auto-grants event-wide on a player's first award).
 - ⚠️ **A bug here must never kill scoring** — it runs inside *every* `awardPoints` transaction, event-wide.
   `evaluateAchievements(user, definitions)` is pure (no writes, does not mutate `user`, returns a grant LIST)
   and is wrapped in try/catch; `applyGrant` — the only writer — runs **outside** the try, which is why a
