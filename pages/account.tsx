@@ -50,8 +50,8 @@ export default function AccountPage () {
 
     const AdminSection = () => (
         <Panel title="Admin">
-            <LinkButton href={Page.ADMIN_RECENTLY_COLLECTED} className={'mt-4'}>Ostatnio zebrane karty</LinkButton>
-            <LinkButton href={Page.ADMIN_CARDS} className={'mt-4'}>Lista kart</LinkButton>
+            <LinkButton href={Page.ADMIN_RECENTLY_COLLECTED} className={'mt-4'}>Ostatnio zebrane pinezki</LinkButton>
+            <LinkButton href={Page.ADMIN_PINS} className={'mt-4'}>Lista pinezek</LinkButton>
             <LinkButton href={Page.ADMIN_USERS} className={'mt-4'}>Lista użytkowników</LinkButton>
             <LinkButton href={Page.ADMIN_PHOTO_REVIEW} className={'mt-4'}>Zdjęcia do weryfikacji</LinkButton>
             <LinkButton href={Page.DASHBOARD} className={'mt-4'}>Podgląd dashboardu</LinkButton>
@@ -93,6 +93,8 @@ export default function AccountPage () {
             <ScreenTitle>Profil</ScreenTitle>
             <Metatags title="Profil"/>
             <div>
+                {user.role === UserRole.ADMIN && <AdminSection/>}
+
                 <Panel title={user.username ?? '...'} className="text-center">
                     <div className="flex place-content-around text-4xl text-text-accent p-4">
                         <div>
@@ -173,8 +175,6 @@ export default function AccountPage () {
                         Wyloguj
                     </Button>
                 </Panel>
-
-                {user.role === UserRole.ADMIN && <AdminSection/>}
             </div>
         </main>
     );

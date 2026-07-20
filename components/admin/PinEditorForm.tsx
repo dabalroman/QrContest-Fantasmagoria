@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faXmark } from '@fortawesome/free-solid-svg-icons';
+import { faQrcode, faXmark } from '@fortawesome/free-solid-svg-icons';
 import Pin, { PinCoords } from '@/models/Pin';
 import PinGroup from '@/models/PinGroup';
 import { getPinTypeFriendlyName, PinType } from '@/Enum/PinType';
@@ -11,6 +11,7 @@ import { RawPinAuthoredFields } from '@/models/Raw';
 import { deletePinFunction, upsertPinFunction } from '@/utils/functions';
 import Panel from '@/components/Panel';
 import Button from '@/components/Button';
+import CodeScanner from '@/components/CodeScanner';
 
 type FormValues = {
     name: string;
@@ -64,8 +65,7 @@ const inputClass = 'rounded-xl block w-full p-2 border-2 border-input-border bg-
 // every field below has a value even in edit mode.
 //
 // The parent remounts this component (key={pin?.uid ?? 'draft'}) whenever the edited target changes,
-// so plain `defaultValues` are enough here — no setValue-from-effect dance like edit-card.tsx needs
-// (that page loads its doc asynchronously post-mount; here the pin is already in hand).
+// so plain `defaultValues` are enough here — the pin is already in hand at mount time.
 //
 // Coordinates are a plain editable X/Y pair rather than drag-to-reposition (CUTTABLE, skipped) — typing
 // a coordinate is the same "manual entry is the guaranteed path" principle the code field already
@@ -89,8 +89,9 @@ export default function PinEditorForm ({
 }) {
     const [saving, setSaving] = useState<boolean>(false);
     const [deleting, setDeleting] = useState<boolean>(false);
+    const [scanning, setScanning] = useState<boolean>(false);
 
-    const { register, handleSubmit, watch } = useForm<FormValues>({
+    const { register, handleSubmit, watch, setValue } = useForm<FormValues>({
         mode: 'onChange',
         defaultValues: {
             name: pin?.name ?? '',
@@ -290,17 +291,27 @@ export default function PinEditorForm ({
                         </div>
 
                         {needsCode(currentType) &&
-                            <label className="block">
+                            <div className="block">
                                 <span className="block pb-1">
                                     {currentType === PinType.CODE ? 'Kod' : 'Odpowiedź'}
                                 </span>
-                                <input
-                                    type="text"
-                                    className={inputClass + ' uppercase'}
-                                    placeholder={currentType === PinType.CODE ? 'ABCDEFGHIJ' : 'Twoja odpowiedź'}
-                                    {...register('code', { required: true })}
-                                />
-                            </label>
+                                <div className="relative">
+                                    <input
+                                        type="text"
+                                        className={inputClass + ' uppercase pr-12'}
+                                        placeholder={currentType === PinType.CODE ? 'ABCDEFGHIJ' : 'Twoja odpowiedź'}
+                                        {...register('code', { required: true })}
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setScanning(true)}
+                                        className="absolute right-2 top-1/2 -translate-y-1/2 text-xl text-text-accent"
+                                        aria-label="Skanuj kod"
+                                    >
+                                        <FontAwesomeIcon icon={faQrcode}/>
+                                    </button>
+                                </div>
+                            </div>
                         }
 
                         <div className="grid grid-cols-2 gap-3">
@@ -347,6 +358,23 @@ export default function PinEditorForm ({
                     </form>
                 </Panel>
             </div>
+
+            {scanning &&
+                <div className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-4 bg-black/90 p-4">
+                    <CodeScanner
+                        allowBareCode
+                        className="w-full max-w-lg rounded-2xl"
+                        onCode={(code) => {
+                            setValue('code', code, { shouldDirty: true });
+                            setScanning(false);
+                            toast.success('Kod zeskanowany.');
+                        }}
+                    />
+                    <Button type="button" className="w-full max-w-lg" onClick={() => setScanning(false)}>
+                        Anuluj
+                    </Button>
+                </div>
+            }
         </>
     );
 }

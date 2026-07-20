@@ -1,19 +1,25 @@
-import Card from '@/models/Card';
+import Pin from '@/models/Pin';
 import ScreenTitle from '@/components/ScreenTitle';
 import Panel from '@/components/Panel';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { Page } from '@/Enum/Page';
-import { collection, onSnapshot, query } from '@firebase/firestore';
+import { collection, onSnapshot } from '@firebase/firestore';
 import { firestore } from '@/utils/firebase';
 import { FireDoc } from '@/Enum/FireDoc';
 import useDynamicNavbar from '@/hooks/useDynamicNavbar';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import useAdminOnly from '@/hooks/useAdminOnly';
+import { saveLastMapId } from '@/utils/mapView';
+import toast from 'react-hot-toast';
 
-type RecentlyCollectedEntry = { uid: string, name: string, code: string, username: string, collectedAt: Date }
+type RecentlyCollectedEntry = { uid: string, name: string, mapId: string, username: string, collectedAt: Date }
 
-export default function RecentlyCollectedCardsAdminPage () {
+// ~60 pins × up to 150 finders is ~9k entries by day 3 — fine to fetch (onSnapshot ships deltas after
+// the first load), not fine to render on an admin phone. This is a "what just happened" feed.
+const MAX_RENDERED_ENTRIES = 500;
+
+export default function RecentlyCollectedPinsAdminPage () {
     useAdminOnly();
 
     const router = useRouter();
@@ -25,73 +31,76 @@ export default function RecentlyCollectedCardsAdminPage () {
     });
 
     useEffect(() => {
-        const q = query(collection(firestore, FireDoc.CARDS))
-            .withConverter(Card.getConverter());
-
         return onSnapshot(
-            q,
+            collection(firestore, FireDoc.PINS).withConverter(Pin.getConverter()),
             (snapshot) => {
-                const listOfEntries: RecentlyCollectedEntry[] = [];
+                const entries: RecentlyCollectedEntry[] = [];
 
-                snapshot.docs.map((doc) => doc.data() as Card)
-                    .forEach((card): Card => {
-                        const localEntries: RecentlyCollectedEntry[] =
-                            Object.values(card.collectedBy as any as { username: any, collectedAt: any })
-                                .map(({
-                                    username,
-                                    collectedAt
-                                }) => ({
-                                    uid: card.uid,
-                                    name: card.name,
-                                    code: card.code,
-                                    username,
-                                    collectedAt: collectedAt.toDate() ?? ''
-                                })) as RecentlyCollectedEntry[];
-
-                        listOfEntries.push(...localEntries);
-
-                        return card;
+                snapshot.docs.map((doc) => doc.data() as Pin)
+                    .forEach((pin) => {
+                        Object.values(pin.collectedBy).forEach(({ username, collectedAt }) => {
+                            entries.push({
+                                uid: pin.uid,
+                                name: pin.name,
+                                mapId: pin.mapId,
+                                username,
+                                collectedAt
+                            });
+                        });
                     });
 
-                listOfEntries.sort((a, b) => {
-                        return a.collectedAt > b.collectedAt
-                            ? -1
-                            : (a.collectedAt < b.collectedAt ? 1 : 0);
-                    }
-                );
+                entries.sort((a, b) => b.collectedAt.getTime() - a.collectedAt.getTime());
 
-                setListOfEntries(listOfEntries);
+                setListOfEntries(entries);
+            },
+            (error) => {
+                console.error(error);
+                toast.error('Nie udało się wczytać pinezek.');
             }
         );
     }, []);
 
+    const goToPin = (mapId: string) => {
+        saveLastMapId(mapId);
+        router.push(Page.MAP);
+    };
+
     return (
         <main className="grid grid-rows-layout items-center min-h-screen p-4">
-            <ScreenTitle>Ostatnio zebrane karty</ScreenTitle>
+            <ScreenTitle>Ostatnio zebrane pinezki</ScreenTitle>
 
-            <Panel title="" loading={!listOfEntries} className={'overflow-scroll'}>
+            <Panel title="" className={'overflow-scroll'}>
                 <table className="table-auto whitespace-nowrap min-w-full">
                     <thead>
                         <tr className="text-left">
-                            <th className="p-2">Karta</th>
+                            <th className="p-2">Pinezka</th>
                             <th className="p-2">Osoba</th>
                             <th className="p-2">Data</th>
-                            <th className="p-2"></th>
                         </tr>
                     </thead>
                     <tbody>
-                        {listOfEntries.map((entry, index) => (
-                            <tr key={entry.uid + entry.collectedAt} className={index % 2 ? 'bg-background' : ''}>
+                        {listOfEntries.slice(0, MAX_RENDERED_ENTRIES).map((entry, index) => (
+                            <tr
+                                key={entry.uid + entry.username + entry.collectedAt.getTime()}
+                                className={index % 2 ? 'bg-background' : ''}
+                            >
                                 <td className="p-2">
-                                    <a href={`${Page.ADMIN_EDIT_CARD}/${entry.code}`}>{entry.name}</a>
+                                    <button
+                                        type="button"
+                                        className="underline"
+                                        onClick={() => goToPin(entry.mapId)}
+                                    >{entry.name}</button>
                                 </td>
                                 <td className="p-2">{entry.username}</td>
                                 <td className="p-2">{entry.collectedAt.toLocaleString('pl-PL')}</td>
-                                <td></td>
                             </tr>
                         ))}
                     </tbody>
                 </table>
+
+                <p className="p-2 text-sm opacity-70">
+                    Pokazano {Math.min(listOfEntries.length, MAX_RENDERED_ENTRIES)} z {listOfEntries.length}
+                </p>
             </Panel>
         </main>
     );

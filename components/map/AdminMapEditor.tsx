@@ -102,7 +102,7 @@ export default function AdminMapEditor ({ activeMapId }: { activeMapId: string }
             {isEditing &&
                 <PinEditorForm
                     // Remount on target swap — plain defaultValues are then enough (no setValue effect
-                    // needed to re-sync mid-life, unlike edit-card.tsx's async-loaded-doc problem).
+                    // needed to re-sync mid-life).
                     key={selectedPin?.uid ?? 'draft'}
                     pin={selectedPin}
                     mapId={activeMapId}

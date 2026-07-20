@@ -14,10 +14,6 @@ const nextConfig = {
             {
                 source: '/clue/:cardId',
                 destination: '/clue'
-            },
-            {
-                source: '/admin/edit-card/:code',
-                destination: '/admin/edit-card'
             }
         ];
     }

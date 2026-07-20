@@ -1,5 +1,4 @@
-import { useContext, useEffect, useRef, useState } from 'react';
-import QrScanner from 'qr-scanner';
+import { useState } from 'react';
 import Panel from '@/components/Panel';
 import useDynamicNavbar from '@/hooks/useDynamicNavbar';
 import { faArrowLeft, faCheck } from '@fortawesome/free-solid-svg-icons';
@@ -7,64 +6,18 @@ import { useRouter } from 'next/router';
 import { Page } from '@/Enum/Page';
 import Metatags from '@/components/Metatags';
 import ScreenTitle from '@/components/ScreenTitle';
-import { UserContext, UserContextType } from '@/utils/context';
-import LinkButton from '@/components/LinkButton';
+import CodeScanner from '@/components/CodeScanner';
 
 export default function ScannerPage () {
-    const ref = useRef<HTMLVideoElement>(null);
     const [code, setCode] = useState<string | null>(null);
 
     const router = useRouter();
-    const { user } = useContext<UserContextType>(UserContext);
-    const qrScannerRef = useRef<QrScanner | null>(null);
 
     useDynamicNavbar({
         icon: code ? faCheck : faArrowLeft,
         animate: !!code,
         onClick: () => (code ? router.push(`${Page.COLLECT}/${code}`) : router.back())
     });
-
-    const handleCodeDetection = (code: string) => {
-        const collectUrl: string = process.env.NEXT_PUBLIC_CODE_COLLECT_URL ?? 'env-not-found';
-        const regex = /^[A-Za-z0-9]{8,10}$/;
-
-        if (code.includes(collectUrl)) {
-            code = code.replace(collectUrl, '');
-
-            if (regex.test(code)) {
-                setCode(code);
-            }
-        }
-    };
-
-    useEffect(() => {
-        let init = false;
-
-        qrScannerRef.current = ref.current ? new QrScanner(
-            ref.current,
-            (result) => handleCodeDetection(result.data),
-            {
-                maxScansPerSecond: 4,
-                preferredCamera: 'environment',
-                highlightCodeOutline: false,
-                highlightScanRegion: false,
-                returnDetailedScanResult: true
-            }
-        ) : null;
-
-        const interval = setInterval(() => {
-            if (!init && ref.current && qrScannerRef.current !== null) {
-                qrScannerRef.current?.start();
-                init = true;
-                clearInterval(interval);
-            }
-        }, 1000);
-
-        return () => {
-            qrScannerRef.current?.destroy();
-            clearInterval(interval);
-        };
-    }, []);
 
     return (
         <main className="grid grid-rows-layout items-center min-h-screen p-4">
@@ -90,12 +43,6 @@ export default function ScannerPage () {
                                 <p className="pt-3 text-xl">Wykryto kod</p>
                                 <p className="pt-3 text-3xl">{code}</p>
                                 <p className="pt-3">Kliknij, by użyć kodu!</p>
-                                {user?.isAdmin() &&
-                                    <LinkButton
-                                        className="mt-2"
-                                        href={`${Page.ADMIN_EDIT_CARD}/${code}`}
-                                    >Edytuj kod</LinkButton>
-                                }
                             </>
                         )}
                     </Panel>
@@ -120,7 +67,7 @@ export default function ScannerPage () {
                                 + (code !== null ? ' animate-flash' : '')
                             }
                         >
-                            <video ref={ref} className="w-full"></video>
+                            <CodeScanner onCode={setCode} className="w-full"/>
                         </div>
                     </div>
                 </div>

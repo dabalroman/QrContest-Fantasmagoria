@@ -91,12 +91,7 @@ export default class Card extends FirebaseModel {
     }
 
     protected static toFirestore (data: Card): object {
-        return {
-            code: data.code,
-            comment: data.comment,
-            withQuestion: data.withQuestion,
-            isActive: data.isActive,
-        };
+        throw new Error('Card is immutable.');
     }
 
     protected static fromFirestore (

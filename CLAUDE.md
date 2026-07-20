@@ -197,7 +197,7 @@ Collection names live in `Enum/FireDoc.ts` — **but that enum is incomplete.** 
 | `users/{uid}/collectedPins/{pinUid}` | ✅ `USERS__COLLECTED_PINS` | functions only | owner |
 | `users/{uid}/collectedQuestions/collectedQuestions` | ❌ | functions only | **nobody** (no rule → denied) |
 | `users-usernames/{username}` | ✅ `USERS_USERNAMES` | functions only | any authed user (uniqueness check) |
-| `cards/{cardUid}` | ✅ `CARDS` | functions + **admin `update`** | admins only |
+| `cards/{cardUid}` | ✅ `CARDS` | functions only | admins only |
 | `pins/{pinUid}` | ✅ `PINS` | functions + seed | **admins only** — the `code` is inline |
 | `pinGroups/{groupUid}` | ✅ `PIN_GROUPS` | seed only | any authed user — taxonomy, nothing secret |
 | `photoSubmissions/{subUid}` | ✅ `PHOTO_SUBMISSIONS` | functions only | **own submissions only** (`resource.data.userUid == uid`); admins go through the callable |
@@ -242,11 +242,11 @@ aggregate from scratch over all members each time rather than incrementing — d
 
 ## 6. Security model — **all client writes are denied**
 
-`firestore.rules` grants **`allow write: if false`** on every collection. The only exception is
-`cards`, where an **admin** may `update` (that's the in-app card editor at `/admin/edit-card/:code`,
-and `Card.toFirestore` correspondingly only serializes `code`, `comment`, `withQuestion`, `isActive`).
+`firestore.rules` grants **`allow write: if false`** on every collection — with no exception since task
+#43 retired the card editor (`Card.toFirestore` throws *"Card is immutable"* like the other read-only
+models).
 
-Every other mutation goes through an authenticated **callable Cloud Function**. They are declared once in
+Every mutation goes through an authenticated **callable Cloud Function**. They are declared once in
 `utils/functions.ts` as typed `httpsCallable` wrappers:
 
 | Callable | File | What it does |
@@ -376,7 +376,6 @@ Pretty URLs are produced by rewrites in `next.config.js` (there are **no** `[par
 /collect/:code        → /collect
 /collection/:cardId   → /collection
 /clue/:cardId         → /clue
-/admin/edit-card/:code → /admin/edit-card
 ```
 
 The page then reads the value off `router.query`. **Any new dynamic route must be added here**, and its path
@@ -552,16 +551,16 @@ Things that are wrong-but-harmless today; fix opportunistically, don't be surpri
 - `seedDatabaseHandle`'s password `'4064'` is a hardcoded literal in the source.
 - `FireDoc` is missing `questions` and `collectedQuestions`; those paths are string literals in the functions.
 - `TIME_BETWEEN_GUILD_CHANGES_MS` is defined twice (client + server) and can drift.
-- `pages/admin/edit-card.tsx` has a stray `console.log(formState.errors)`.
-- `pages/admin/cards.tsx` renders `comment` under the "Nazwa" header and `name` under "Ostatnia osoba" —
-  the `<th>` order doesn't match the `<td>` order.
 - ✅ **Fixed (task #45): location badges used to unlock early.** `feedback` (since #12) and `photo` (on
   approval) increment a `pinsInScope` numerator whose denominator counted only `code`/`riddle`/`visit`, so a
   badge in a scope holding either type granted before the scope was finished. Both sides now count **every**
   pin type and `COLLECTIBLE_PIN_TYPES` is gone — it was serving two different questions at once, which is
   what let them drift. See §12.3.
-- There is still **no admin list/editor for pins** (only the map-native `PinEditorForm` + upsert/delete
-  callables); the `/admin/*` screens are all card-era. Task #43.
+- ✅ **Fixed (task #43): the admin screens are pin-era.** `/admin/pins` (list) and
+  `/admin/recently-collected` (feed, capped at the newest 500 rows) read `pins` directly — admins may read
+  the collection, and `Pin.fromFirestore` hydrates the real `code` + `collectedBy`, so no callable is
+  involved. `/admin/cards` + `/admin/edit-card` are deleted; the pin editor gained a scan-to-fill button
+  (`components/CodeScanner.tsx`, shared with `/scanner`) in place of the scanner's old admin shortcut.
 - ✅ **Fixed (task #14): re-seeding used to wipe `collectedBy`.** `seedPins`/`seedCards` used to `.set()`
   with no `{merge: true}`, so re-seeding reset every pin's/card's `collectedBy` to `{}` while
   `users/{uid}/collectedPins|collectedCards` survived — the two would then disagree and the next collect
@@ -589,9 +588,9 @@ the 2026 code core is shipped end-to-end. Read it for the design record and the 
 >
 > **Status as of 2026-07-20 — the CODE CORE IS SHIPPED. What remains is content + polish:**
 > **#16** (author 50+ real pins, real 9-map art, balance pass — the long pole and #1 risk), **#33/#34/#36**
-> (regulamin / FAQ / landing-page copy still describes the retired card game), **#43/#44** (pin + feedback
-> admin views), **#42** (dead `w-/h-` icon sizing on three pin components), **#38** (rated-talks achievements).
-> #19–#21 deferred; #22/#26 closed won't-do.
+> (regulamin / FAQ / landing-page copy still describes the retired card game), **#44** (feedback admin
+> view), **#42** (dead `w-/h-` icon sizing on three pin components), **#38** (rated-talks achievements).
+> #19–#21 deferred; #22/#26 closed won't-do. **#43 shipped** — the admin panel is pin-era (see §11).
 >
 > - ✅ **12.2 shipped as pins** — the pin model, `collectPinHandle`, the pin visual system and the rewired
 >   collect screen are done and manually verified. Cards are retired (handler still deployed, UI orphaned).

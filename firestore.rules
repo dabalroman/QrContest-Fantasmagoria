@@ -33,7 +33,7 @@ service cloud.firestore {
         }
 
         match /cards/{cardId} {
-            allow read, update: if request.auth != null
+            allow read: if request.auth != null
                 && isUserAdmin();
 
             allow write: if false;
