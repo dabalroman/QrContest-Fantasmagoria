@@ -1,9 +1,12 @@
 # QrContest — Fantasmagoria
 
 A mobile-first web game played during the **Fantasmagoria** fantasy convention in Gniezno, Poland.
-Players hunt printed QR codes hidden around the convention grounds, scan them, collect digital cards,
-answer quiz questions, join clubs, and climb a live leaderboard. Runs for ~3 days a year, ~150 players,
-100k+ Firestore reads/writes over the event.
+Players explore an in-app map of the convention grounds, find **pins** (scan a hidden QR, solve a riddle,
+visit a place, rate a talk, photograph something), answer quiz questions, unlock achievements, and climb a
+live leaderboard. Runs for ~3 days a year, ~150 players, 100k+ Firestore reads/writes over the event.
+
+⚠️ **The 2025 card game and the club/guild system are RETIRED but still in the codebase** — see §7a before
+assuming a card or guild file is live.
 
 **The entire UI is in Polish.** All user-facing strings, toasts, panel titles, and error messages are Polish.
 Keep it that way — do not introduce English UI copy.
@@ -59,6 +62,8 @@ npm run dev
 npm run lint
 npm run build
 npx tsc --noEmit                       # fast client-tree typecheck (skips the full Next build)
+npm run verify                         # = scripts/hooks/pre-commit: the FULL pipeline (FE lint+typecheck+build,
+                                       #   BE lint+build+e2e, ~50-70s). Same ports as the emulator — see §9a.
 
 # Emulators (functions, firestore, auth, storage, pubsub) — imports/exports ./.emulators
 npm run emulators
@@ -84,7 +89,7 @@ Gotchas (from `Setup.md`, all real):
   until restarted. After any rename: `rm -rf lib && npm run build`, then restart the emulator.
 - **`npm run lint` is `next lint` — it does NOT cover `functions/`, and it never linted `.tsx`.** Components
   and the whole backend are effectively checked only by `tsc` and the pre-commit hook.
-- **A pre-commit hook runs the full pipeline** (FE typecheck + build, BE lint + build + e2e, ~50s) — see
+- **A pre-commit hook runs the full pipeline** (FE lint + typecheck + build, BE lint + build + e2e, ~50-70s) — see
   `scripts/hooks/pre-commit`. It **fails while a manual emulator is running**, because the e2e leg needs the
   same ports (see §9a).
 - Half-baked or weird deploy failures are almost always a stale `firebase-tools` — `npm i -g firebase-tools`.
@@ -101,7 +106,8 @@ Gotchas (from `Setup.md`, all real):
 `npm install` at the **root and in `functions/`** (two separate trees). Then, before `functions/` will compile:
 the real seed files (`functions/src/seeds/*.ts`) must exist — they're **gitignored** (`src/seeds/*.ts`) and shipped
 separately in a password-protected zip; only `*.ts.dist` placeholder templates are in git. `seedDatabaseHandle.ts`
-imports all six, so `tsc` fails outright without them. `.env.development` is also gitignored — copy `.env.dist` and
+imports all nine (rankingRounds, cardSets, questions, cards, guilds, clues, pins, pinGroups, achievements),
+so `tsc` fails outright without them. `.env.development` is also gitignored — copy `.env.dist` and
 set `NEXT_PUBLIC_EMULATOR=true`.
 
 ### Environment
@@ -125,16 +131,21 @@ reads `process.env`; everything else imports `configuration`. Notable vars:
 ```
 pages/            Next.js pages router. Top-level = player screens; auth/ and admin/ are sub-routes.
 components/       Shared UI (Panel, Button, LinkButton, Loader, ScreenTitle, Metatags, AuthCheck, Navbar/)
-                  plus per-feature folders: collect/, collection/, account/, ranking/, dashboard/, pin/
+                  plus per-feature folders: collect/, collection/, account/, ranking/, dashboard/,
+                  pin/, map/, achievements/, admin/
 models/           CLIENT-side domain classes. Extend FirebaseModel, carry Firestore converters.
 Enum/             CardTier, UserRole, FireDoc (collection names), Page (routes)
-hooks/            useUserData, useCollectedCards, useDynamicNavbar, useTheme, useAdminOnly
+hooks/            useUserData, useCollectedCards, usePinsData, useAchievements, useDynamicNavbar,
+                  useAdminOnly
 utils/            firebase.ts (SDK init), functions.ts (typed callables), context.ts (React contexts),
-                  date.ts (Polish pluralization + formatting), getGuildIcon.ts, getPinIcon.ts,
-                  randomArrayElement.ts
+                  date.ts (Polish pluralization + formatting), maps.ts (map registry), mapView.ts,
+                  downscaleImage.ts, collectErrors.ts, scheduleAchievementToasts.tsx,
+                  getGuildIcon.ts, getPinIcon.ts, getAchievementIcon.ts, randomArrayElement.ts
 types/            global.ts — Uid, StringMap
 functions/src/    Cloud Functions. Handlers at the root, actions/ for shared transaction helpers,
-                  types/ for the ADMIN-side types, seeds/ for the seed data, data/forbiddenPhrases.ts
+                  achievements/ for the grant engine, types/ for the ADMIN-side types, seeds/ for the
+                  seed data, data/forbiddenPhrases.ts
+public/maps/      The 9 map images (see §12.1). Filenames must match the registry in utils/maps.ts.
 public/           Static assets: cards/ (64), cards-thumbnails/ (64), cards-reverse/, guilds/,
                   guilds-thumbnails/, clues/, backgrounds/, dashboard/, ico/
 styles/globals.css  CSS variables + the guild theme classes
@@ -188,12 +199,17 @@ Collection names live in `Enum/FireDoc.ts` — **but that enum is incomplete.** 
 | `users-usernames/{username}` | ✅ `USERS_USERNAMES` | functions only | any authed user (uniqueness check) |
 | `cards/{cardUid}` | ✅ `CARDS` | functions + **admin `update`** | admins only |
 | `pins/{pinUid}` | ✅ `PINS` | functions + seed | **admins only** — the `code` is inline |
+| `pinGroups/{groupUid}` | ✅ `PIN_GROUPS` | seed only | any authed user — taxonomy, nothing secret |
+| `photoSubmissions/{subUid}` | ✅ `PHOTO_SUBMISSIONS` | functions only | **own submissions only** (`resource.data.userUid == uid`); admins go through the callable |
 | `cardSets/{setUid}` | ✅ `CARD_SET` | seed only | any authed user |
 | `clues/{clueUid}` | ✅ `CLUES` | seed only | any authed user |
 | `ranking/{roundUid}` | ✅ `RANKING` | functions only | any authed user |
 | `guilds/{guildUid}` | ✅ `GUILDS` | functions only | any authed user |
-| `achievements/{uid}` | ✅ `ACHIEVEMENTS` | seed + admin console | any authed user — definitions are public |
+| `achievements/{uid}` | ✅ `ACHIEVEMENTS` | seed (+ `recomputeAchievementTargets`) | any authed user — definitions are public |
 | `questions/questions` | ❌ | seed only | **nobody** (no rule → denied) |
+
+⚠️ `photoSubmissions` is the **only** collection whose read rule is neither "owner" via a `users/{uid}`
+subcollection nor a flat allow — it is a top-level collection filtered by a `userUid` field.
 
 Two things worth internalising:
 
@@ -237,10 +253,16 @@ Every other mutation goes through an authenticated **callable Cloud Function**. 
 |---|---|---|
 | `setupAccountHandle` | `setupAccountHandle.ts` | Creates the user doc + username reservation + empty `collectedQuestions`. Validates username (3–20 chars, a regex allowlist, and a `forbiddenPhrases` blocklist). |
 | `collectCardHandle` | `collectCardHandle.ts` | Validates a 10-char code against `cards` (`isActive == true`), rejects already-collected, optionally draws a random **unanswered** question, writes `collectedCards`, increments score, fans out to ranking + guild. **Cards are retired for 2026** — still deployed, but nothing in the UI calls it (see §12). |
-| `collectPinHandle` | `collectPinHandle.ts` | The 2026 replacement for `collectCardHandle` — **fork THIS for any new pin flow.** Two entry paths: `{code}` (global scanner/manual entry, cross-pin lookup filtered to `type == 'code'`) and `{pinUid, answer}` (the map's pin UI, validated against that one pin). Writes `collectedPins` + the pin's `collectedBy`, draws a question, awards via `awardPoints`. Rejects `feedback`/`photo` types. |
+| `collectPinHandle` | `collectPinHandle.ts` | The 2026 replacement for `collectCardHandle` — **fork THIS for any new pin flow.** Three entry shapes: `{code}` (global scanner/manual entry, cross-pin lookup filtered to `type == 'code'`), `{pinUid, answer}` (the map's pin UI, validated against that one pin), and `{pinUid, rating, talkName}` (feedback pins, #12 — skips the question draw entirely). Writes `collectedPins` + the pin's `collectedBy`, awards via `awardPoints`. Rejects `photo` (that routes through `submitPhotoHandle`). |
+| `getPinsHandle` | `getPinsHandle.ts` | **Read-only.** The map's pin feed — `pins` is admin-only read, so this is the client's only way in. Strips `code` + `collectedBy` via an explicit whitelist (`actions/toPublicPin.ts`), filters `isActive` + the `availableFrom/To` window. |
+| `upsertPinHandle` | `upsertPinHandle.ts` | **Admin-only.** Create/update a pin from the map-native editor (#14). Always the complete authored field set, never a partial patch. Validates `groups[]` against `pinGroups`, then runs `recomputeAchievementTargets`. |
+| `deletePinHandle` | `deletePinHandle.ts` | **Admin-only.** Deletes a pin, then `recomputeAchievementTargets`. Not transactional — no invariant to protect. |
+| `submitPhotoHandle` | `submitPhotoHandle.ts` | Photo-proof pins (#19). Client uploads to Storage first; this marks the pin **pending** — `collectedPins` with `awardedPoints: 0`, a `photoSubmissions` doc, `user.pendingScore += value`. **No points, no fan-out.** |
+| `reviewPhotoHandle` | `reviewPhotoHandle.ts` | **Admin-only.** Approve → awards via `awardPoints`; reject → deletes `collectedPins` + the pin's `collectedBy` entry so the pin **reopens**. Both clear `pendingScore`. Idempotent. |
+| `getPhotoSubmissionsHandle` | `getPhotoSubmissionsHandle.ts` | **Admin-only, read-only.** The pending review queue; photos come back as server-built download-token URLs (no signBlob). |
 | `answerQuestionHandle` | `answerQuestionHandle.ts` | Grades an answer server-side, awards `value` or `0`, fans out. Rejects re-answering. **Shared by cards and pins, unchanged.** |
 | `joinGuildHandle` | `joinGuildHandle.ts` | Moves the user between guilds, enforces the **4-hour cooldown**, moves the score contribution from the old guild to the new one. |
-| `seedDatabaseHandle` | `seedDatabaseHandle.ts` | Admin-only + **hardcoded password `'4064'`**. Seeds questions, cards, cardSets, ranking rounds, guilds, clues, **pins**, **achievements**. |
+| `seedDatabaseHandle` | `seedDatabaseHandle.ts` | Admin-only + **hardcoded password `'4064'`**. Seeds questions, cards, cardSets, ranking rounds, guilds, clues, **pins**, **pinGroups**, **achievements**, then `recomputeAchievementTargets`. |
 | `updateRoundsHandle` | `index.ts` → `updateRoundsProcessor.ts` | Manual "force round update" from the admin panel. |
 | `autoUpdateRounds` | `index.ts` | **Scheduled**, cron `0 * * * *` (hourly). Marks finished rounds, stamps the top 3 users with `winnerInRound`. |
 
@@ -269,7 +291,38 @@ Roles (`Enum/UserRole.ts`): `user`, `admin`, `dashboard`.
 
 ## 7. Game mechanics
 
-**Cards.** 5 tiers, fixed point values (`Enum/CardTier.ts` — duplicated in `functions/src/types/card.ts`):
+**Pins are the 2026 collectible** (`functions/src/types/pin.ts`). Five `PinType`s, each with its own collect
+flow, colour (`--color-pin-*`) and icon (`utils/getPinIcon.ts`):
+
+| Type | How it's collected | Entry point |
+|---|---|---|
+| `code` | scan/enter a printed QR code | `/collect/:code` **and** the map sheet |
+| `riddle` | type the answer to a riddle | map sheet only |
+| `visit` | just be there and tap collect | map sheet only |
+| `feedback` | rate a room's talk (`rating` 1–5 + `talkName`) | map sheet only |
+| `photo` | upload a photo, admin approves (#19) | map sheet only, via `submitPhotoHandle` |
+
+Points are per-pin (`value`), not tiered. `withQuestion: true` draws a quiz question on top (never for
+`feedback`). ⚠️ **Riddle answers are matched with `trim()` + `toUpperCase()` only** — no diacritic folding,
+no inner-whitespace collapse. Author answers short, single-token and ASCII-safe.
+
+**Achievements** award bonus points on top; see §12.3.
+
+**Questions.** Values `0 | 5 | 10 | 15`. Draws a *random question the user has not seen yet*; the pool is
+global, not per-pin. A wrong answer still burns the question (score 0) and still increments
+`amountOfAnsweredQuestions`. Shared by cards and pins.
+
+**Rounds.** `ranking/{uid}` docs with `from`/`to`. Points **carry over** between rounds. The hourly
+`autoUpdateRounds` marks a round `finished` and stamps `winnerInRound` on the top 3. A user with
+`winnerInRound` set is excluded from later rounds' prizes (but keeps playing).
+
+### 7a. Retired mechanics — code still present, UI gone
+
+Both of these still compile, still have handlers deployed, and still appear all over the repo. **Neither is
+reachable by a 2026 player.** Do not build on them; do not assume a change here affects the live game.
+
+**Cards** (retired 2026 — no navbar tab, nothing calls `collectCardFunction`). 5 tiers, fixed point values
+(`Enum/CardTier.ts` — duplicated in `functions/src/types/card.ts`):
 
 | Tier | Points | Polish name |
 |---|---|---|
@@ -280,27 +333,22 @@ Roles (`Enum/UserRole.ts`): `user`, `admin`, `dashboard`.
 | `mythical` | 50 | Mityczny |
 
 Card codes are **exactly 10 chars**, `[A-Z0-9]`, uppercased server-side, unique across `cards`,
-and gated by `isActive`. The QR code encodes `NEXT_PUBLIC_CODE_COLLECT_URL + code`.
-
-**Questions.** Values `0 | 5 | 10 | 15`. A card with `withQuestion: true` draws a *random question the user has
-not seen yet*; the pool is global, not per-card. A wrong answer still burns the question (score 0) and still
-increments `amountOfAnsweredQuestions`.
+and gated by `isActive`. The QR code encodes `NEXT_PUBLIC_CODE_COLLECT_URL + code` — **the same prefix and
+the same `/collect/:code` route the live `code` pins use**, so this env var still matters.
 
 **Card sets** (`cardSets`) group cards for the collection screen and declare how many of each tier they contain,
 so the UI can render grey "not yet found" placeholders. The set with `uid === 'secret'` is special-cased in
 `components/collection/CardsSetComponent.tsx`: instead of anonymous placeholders it renders **clues**
 (`clues` collection) linking to `/clue/:cardId`, each a riddle pointing at a hidden mythical/legendary card.
 
-**Clubs** (called *guilds* in code, *kluby* in the UI — the rename was cosmetic). Four fixed uids:
-`guild-desert`, `guild-steel`, `guild-water`, `guild-void`. Purely cosmetic for the player's own chances.
-- Guild **power** = `round(score / amountOfMembers)` — the guild leaderboard sorts by power, not raw score,
-  so a small club can win.
-- Changing clubs has a **4-hour cooldown** (`TIME_BETWEEN_GUILD_CHANGES_MS`, defined **twice**:
+**Clubs** (dropped from the UI for 2026 — task #32, grep marker `CLUBS-DISABLED-2026`). Called *guilds* in
+code, *kluby* in the UI. Four fixed uids: `guild-desert`, `guild-steel`, `guild-water`, `guild-void`.
+- Guild **power** = `round(score / amountOfMembers)` — the guild leaderboard sorted by power, not raw score.
+- Changing clubs had a **4-hour cooldown** (`TIME_BETWEEN_GUILD_CHANGES_MS`, defined **twice**:
   `models/Guild.ts` and `functions/src/joinGuildHandle.ts`).
-
-**Rounds.** `ranking/{uid}` docs with `from`/`to`. Points **carry over** between rounds. The hourly
-`autoUpdateRounds` marks a round `finished` and stamps `winnerInRound` on the top 3. A user with
-`winnerInRound` set is excluded from later rounds' prizes (but keeps playing to complete the collection).
+- ⚠️ **The `updateGuild` fan-out still runs on every award** — write-only, never read by the client.
+  Re-enabling clubs is a diff-revert of the commented UI **plus** re-adding the theme switcher by hand
+  (theme was deleted, not commented).
 
 ---
 
@@ -396,8 +444,8 @@ Dev looks fine either way — the only honest check is to grep the built CSS:
 `npm run build && grep -o '\.bg-pin-code' .next/static/css/*.css`.
 Note the prefix asymmetry: `GuildUid` values already embed their prefix (`'guild-desert'`), while `CardTier`
 and `PinType` values are bare (`'common'`, `'code'`) — hence `'card-' + tier` / `'pin-' + pin.type`.
-Also note `content` only scans `./pages`, `./components`, `./layouts` — classes written in `utils/` or
-`models/` are invisible to Tailwind.
+Also note `content` only scans `./pages`, `./components` and `./layouts` (which **does not exist**) — classes
+written in `utils/` or `models/` are invisible to Tailwind.
 
 ### ⚠️ Never size a FontAwesome icon with `w-*` / `h-*`
 
@@ -407,7 +455,8 @@ Equal specificity → source order wins → every Tailwind `h-*` on an icon is d
 renders at the inherited font-size** and the class silently does nothing.
 **Size icons by font-size** — `text-3xl` on the wrapper (`Navbar.tsx`) or FA's `size` prop (`Loader.tsx`
 `size="3x"`, `ranking.tsx` `size="sm"`). Margins/colour utilities are unaffected; only `w-`/`h-` are.
-Known remaining offenders: the three pin components in task #42.
+Known remaining offenders (task #42): `components/map/PinMarkerIcon.tsx`,
+`components/pin/PinCardComponent.tsx`, `components/collect/QuestionPinView.tsx`.
 
 ### Accent colour takes opacity modifiers
 
@@ -454,9 +503,12 @@ Firestore transactions and the score fan-out — nothing is mocked.
   The pre-commit hook also runs the FE build, so stop `npm run dev` too or the two contend on `.next`.
 - The canonical test asserts the score is identical in all four denormalized places after a collect + answer.
   **Every new point-granting feature must extend this suite** (see the fan-out warning in §12.2).
-- Current suite (**52 tests**): `scoring` (card fan-out), `rounds` (`winnerInRound` propagation), `pins`
-  (both entry paths, anti-bruteforce, dup guard, availability window, normalization, snapshot/secret-stripping),
-  `admin-pins` (upsert/delete gates + validation), `counters` (legacy docs missing a counter — the §12.2
+- Current suite (**76 tests across 8 files** — count with
+  `grep -h '^test(' functions/test/*.test.mjs | wc -l`): `scoring` (card fan-out), `rounds` (`winnerInRound`
+  propagation), `pins` (all three entry shapes, anti-bruteforce, dup guard, availability window, normalization,
+  snapshot/secret-stripping), `admin-pins` (upsert/delete gates + validation, re-seed `collectedBy` preservation),
+  `photos` (submit → pending → approve/reject, no-points-until-approve, reopen-on-reject, idempotency),
+  `counters` (legacy docs missing a counter — the §12.2
   hydration rule), `achievements` (threshold crossing + 4-place fan-out, bonus cascade, exactly-once, response
   payload, eval-throw, malformed definition) and `seed` (drives the REAL `seedDatabaseHandle` + real compiled
   `../lib/seeds/*.js`, guards the task-#5 fire-and-forget: asserts every seeded collection's doc count === seed
@@ -502,6 +554,11 @@ Things that are wrong-but-harmless today; fix opportunistically, don't be surpri
 - `pages/admin/edit-card.tsx` has a stray `console.log(formState.errors)`.
 - `pages/admin/cards.tsx` renders `comment` under the "Nazwa" header and `name` under "Ostatnia osoba" —
   the `<th>` order doesn't match the `<td>` order.
+- ⚠️ **Not harmless:** `functions/src/types/pin.ts` and `actions/pinScopeKeys.ts` carry comments that #12
+  invalidated — feedback pins DO have a collect flow now, and they increment a `pinsInScope` numerator whose
+  denominator excludes them. See §12.3. This one can grant a location badge early.
+- There is still **no admin list/editor for pins** (only the map-native `PinEditorForm` + upsert/delete
+  callables); the `/admin/*` screens are all card-era. Task #43.
 - ✅ **Fixed (task #14): re-seeding used to wipe `collectedBy`.** `seedPins`/`seedCards` used to `.set()`
   with no `{merge: true}`, so re-seeding reset every pin's/card's `collectedBy` to `{}` while
   `users/{uid}/collectedPins|collectedCards` survived — the two would then disagree and the next collect
@@ -517,27 +574,37 @@ Things that are wrong-but-harmless today; fix opportunistically, don't be surpri
 
 ---
 
-## 12. Planned expansion (2026 / 16th edition)
+## 12. The 2026 / 16th edition — mostly shipped
 
-Hosting stays on **Firebase**, same as last year. Read this section before planning any of it.
+Hosting stays on **Firebase**, same as last year. **This section is now mostly history, not a plan** —
+the 2026 code core is shipped end-to-end. Read it for the design record and the binding constraints
+(§12.0 especially); read **task #9** for what is actually left.
 
 > **The 2026 event goes live around 2026-07-24.** It is a physical convention — the date does not move.
 > The app only runs for ~3 days and does 100k+ ops in that window; there is no calm redeploy window
 > mid-event. Scope accordingly: fewer features, tested, beats more features, untested.
 >
-> **Status as of 2026-07-17 — this section is now part plan, part history:**
+> **Status as of 2026-07-20 — the CODE CORE IS SHIPPED. What remains is content + polish:**
+> **#16** (author 50+ real pins, real 9-map art, balance pass — the long pole and #1 risk), **#33/#34/#36**
+> (regulamin / FAQ / landing-page copy still describes the retired card game), **#43/#44** (pin + feedback
+> admin views), **#42** (dead `w-/h-` icon sizing on three pin components), **#38** (rated-talks achievements).
+> #19–#21 deferred; #22/#26 closed won't-do.
+>
 > - ✅ **12.2 shipped as pins** — the pin model, `collectPinHandle`, the pin visual system and the rewired
 >   collect screen are done and manually verified. Cards are retired (handler still deployed, UI orphaned).
+>   The **feedback-pin flow (#12)** landed too: `{pinUid, rating, talkName}`, no question draw.
+>   ⚠️ Its data is **written and never read** — an admin view is task #44.
 > - ✅ **12.1 shipped as the `/map` screen (#13)** — Leaflet `CRS.Simple` over 9 maps, the `getPins`
 >   read callable (strips `code` + `collectedBy`), the `hintRadius` field, `usePinsData` (getPins poll +
 >   live `collectedPins`), and the per-type pin sheet. `/` stays the public landing.
 > - ✅ **12.5 shipped as the navbar/IA rework (#25)** — centre super-button defaults to **Map** (still
 >   per-page overridable), side tabs are Skanuj/Osiągnięcia/Ranking/Konto, the Collection tab is retired,
->   signed-in users hitting `/` redirect to `/map`, and the collect screen moves scan/confirm in-page so the
->   centre stays Map. A stub `/achievements` route ships with it; **#24 now depends on that route.**
-> - ✅ **12.3 engine shipped as #23** — `achievements` collection (definitions as data), pure type-predicates,
->   auto-grant inside `awardPoints`, `amountOfCorrectAnswers` counter. **#24 (screen) still to build** — it
->   fills the `/achievements` stub and is now pure UI; **#30** (unlock toast) consumes the returned grants.
+>   signed-in users hitting `/` redirect to `/map` (in `_app.tsx`, not `index.tsx`), and the collect screen
+>   moves scan/confirm in-page so the centre stays Map.
+> - ✅ **12.3 shipped whole** — the engine (#23: definitions as data, pure type-predicates, auto-grant inside
+>   `awardPoints`), the **screen** (#24, `/achievements` + `useAchievements`) and the **unlock toast** (#30,
+>   plain `react-hot-toast` via `utils/scheduleAchievementToasts.tsx`). Location badges (#37) shipped as the
+>   `pinsInScope` type.
 > - ✅ **12.4 shipped as photo-proof pins (#19)** — a `photo`-type pin: client uploads a downscaled image
 >   (Storage SDK, narrow owner-only `storage.rules`) → `submitPhotoHandle` marks it **pending, no points**
 >   → admin approves/rejects at `/admin/photo-review` → **points only on approve** via `awardPoints`.
@@ -546,6 +613,9 @@ Hosting stays on **Firebase**, same as last year. Read this section before plann
 > - ✅ **Clubs/guilds DROPPED from the UI for 2026 (task #32).** The guild UI is commented out (grep marker
 >   `CLUBS-DISABLED-2026`) and the per-club theme switcher deleted. The backend fan-out (`updateGuild`) still
 >   runs but is **write-only / unread** by the client — do not build new guild surfaces without re-enabling first.
+> - ✅ **Renamed to "Gra Konwentowa" (#35)** — see the banner at the top of this file for the inflection rule.
+>   The rename covered `pages/index.tsx`, `rulebook.tsx` and the footer only; the *game-model* prose on those
+>   pages is still card-era and is #33/#34/#36.
 >
 > ⚠️ **The task manager is the live source of truth, not this file.** Task **#9** is the epic/status board
 > for the 2026 edition — read it first for current status and the full list of locked decisions.
@@ -557,47 +627,23 @@ Only Cloud Functions may mutate data, and **anything that awards points must be 
 No new feature may open a client write path to game state. (The one client write surface that *does* open
 up is Firebase **Storage**, for photo uploads — see 12.4 — and only under tight constraints.)
 
-### 12.1 Map — becomes the app's main screen
+### 12.1 Map — the app's main screen
 
-> **✅ SHIPPED (#13).** The `/map` screen, `getPins`, `hintRadius`, `usePinsData` and the pin sheet are
-> built. `leaflet`/`@types/leaflet` are now real deps; the 9 placeholder maps live in `public/maps/`
-> (#16 overwrites them with real art). The prose below is the design record; decisions 24–31 in task #9
-> remain the binding spec.
+> **✅ SHIPPED (#13).** Mechanics live in §8 (caching, `utils/maps.ts`) and §6 (`getPinsHandle`).
+> Only the still-binding decisions are kept here; decisions 24–31 in task #9 are the full spec.
 
-- **Plain `.webp` images. No GPS, no geolocation, no map SDK in `package.json` today.** GPS was proposed
-  again during refinement and **rejected**: it cannot distinguish MOK's floors indoors, and a misfiring
-  geofence is unfixable mid-event.
-- Shows the area **outside** the convention *and* the buildings.
-- ⚠️ **The map set is NINE images, not six — and it is NOT "each building has 3 floors"** (that earlier claim
-  was wrong). **Dwór** is a standalone *city* map belonging to no building; **MOK** has 5 levels (Piwnica,
-  Parter, Piętro 1, **Piętro 1.5**, Piętro 2); **2LO** has 3 (Parter, Piętro 1, Piętro 2). The registry
-  (`mapId` → area, floor label, file, dimensions) lives in `utils/maps.ts`, and the toggle is **peer areas
-  + a per-building floor strip** (Dwór shows no strip). Markers are modelled `(mapId, coords{x,y})` — already
-  on `Pin` — plus **`hintRadius`**, a new field making a QR marker an *area* hint rather than a precise dot.
-- Markers are **RPG-game style** points of interest, not real-world pins.
-- Images are static assets → they live in `public/` and are served off Firebase Hosting's CDN, the same way
-  the 64 card images already are. Bulk static image serving is a proven path in this repo.
-- Pan/zoom/marker hit-testing is custom work. **Decided: Leaflet + `CRS.Simple`** (non-geographic image + markers).
-- **The data layer already exists — do not rebuild it.** The `pins` model, its `mapId` + `coords {x,y}` fields
-  and `collectPinHandle`'s `{pinUid, answer}` entry path were built for this screen. What the map still owes:
-  - a **`getPins` callable** — `pins` is admin-only read, so the client cannot query it. It **must strip both
-    `code` (the secret) and `collectedBy` (a uid→username map of every finder: privacy leak + unbounded payload)**
-    via an **explicit field whitelist — never `...pinDoc.data()`**. Filters `isActive` **and** the
-    `availableFrom/To` window server-side.
-  - **reuse `components/pin/PinCardComponent.tsx`** for the pin-click sheet — it is the same card the collect
-    screen shows after a scan, deliberately. Reuse `utils/getPinIcon.ts` and the `--color-pin-*` palette too;
-    do not invent a second pin colour scheme for markers.
-  - a pin cache. `useCollectedCards` / `CardsCacheContext` is **card-only** — there is no pin equivalent yet.
-    ⚠️ **Mirror `useUserData` (live), NOT `useCollectedCards` (one-shot):** `collectedPins` gets a live
-    `onSnapshot`; only `getPins` is one-shot. The card cache can be one-shot because you collect on `/collect`
-    and view on `/collection` — two screens. The map is **both at once**, so scanner→map→scanner has no
-    natural invalidation point. A listener is also cheaper than refetching the subcollection per collect.
-  - the route: **`/map`** (`Page.MAP`, static — no rewrite). `/` stays the **public landing**; the pin sheet is
-    in-map with **no route of its own**.
-- Only `code` pins are reachable from `/collect/:code`. **`riddle` / `visit` / `feedback` pins have no other
-  entry point than this screen**, so they are untestable until it exists.
+- **Plain `.webp` images, Leaflet + `CRS.Simple`. No GPS, ever.** Geolocation was proposed twice and
+  **rejected**: it cannot distinguish MOK's floors indoors, and a misfiring geofence is unfixable mid-event.
+- ⚠️ **The map set is NINE images, and it is NOT "each building has 3 floors."** **Dwór** is a standalone
+  *city* map belonging to no building; **MOK** has 5 levels (Piwnica, Parter, Piętro 1, **Piętro 1.5**,
+  Piętro 2); **2LO** has 3 (Parter, Piętro 1, Piętro 2). `utils/maps.ts` is canonical. Swapping placeholder
+  art for real art is **overwriting files in `public/maps/`, no code change**, as long as filenames match.
+- `hintRadius` makes a marker an *area* hint rather than a precise dot — used for `code` pins, whose QR is
+  hidden "somewhere around here". `null` = precise point.
+- Only `code` pins are reachable from `/collect/:code`. **`riddle` / `visit` / `feedback` / `photo` pins have
+  no entry point other than the map's pin sheet.**
 
-### 12.2 Quests / tasks → **SHIPPED as pins**
+### 12.2 The point-award contract (shipped with pins) — **binds every future feature**
 
 > ✅ **This section is now history, not a plan.** "Quests" never shipped as a separate entity — they became
 > **pins** (`pins/{pinUid}`, `collectPinHandle`, `users/{uid}/collectedPins`). There is no `questHandle`, no
@@ -631,29 +677,36 @@ up is Firebase **Storage**, for photo uploads — see 12.4 — and only under ti
   registered in `functions/src/index.ts`, exported through `utils/functions.ts` as `collectPinFunction`.
   Any further pin flow (talk feedback, #12) forks **it**, not `collectCardHandle`.
 
-### 12.3 Achievements — ✅ ENGINE SHIPPED (#23); screen is #24, unlock toast is #30
+### 12.3 Achievements — ✅ FULLY SHIPPED (engine #23, screen #24, unlock toast #30, location badges #37)
 
 They **award points**, so granting routes through `awardPoints` like every other point source. The split
 that matters: **definitions are DATA, logic is CODE.**
 
 - `achievements/{uid}` is a readable collection (`{name, description, icon, group, type, target, bonus}`),
-  seeded from `achievementsSeed.ts` and editable straight in the Firestore console — a threshold can be
-  retuned mid-event with no redeploy, which is the whole reason it is data. **The committed seed stays the
-  source of truth**; fold any console edit back into it.
+  seeded from `achievementsSeed.ts`. Definitions are data so a threshold can be retuned **by editing the seed
+  and re-seeding**, with no redeploy of logic. ⚠️ **Do not hand-edit these in the Firestore console** — the
+  committed seed is the source of truth and a console edit is invisible to git and silently lost on the next
+  seed. (`pinsInScope` targets are additionally overwritten by `recomputeAchievementTargets`.)
 - **Logic lives only in `functions/src/achievements/typePredicates.ts`** — `TYPE_COUNTERS`, one counter
   accessor per `AchievementType` (`points` → `score`, `correctAnswers` → `amountOfCorrectAnswers`). Unlock
   is always `counter(user) >= target`, so the unlock and #24's progress bar read the same number.
   **Adding an achievement = one Firestore doc; adding a TYPE = code** (the union makes that compile-enforced).
   Never `switch (uid)`; never let a predicate read Firestore or touch the tx.
 - **Location badges (#37) are the `pinsInScope` type** — one per map floor + per building. Counter is
-  `user.collectedPinsByScope[def.scope]` (a **map-valued** counter, incremented via `scopeKeys(pin)` =
+  `user.collectedPinsByScope[def.scope]` (a **map-valued** counter, incremented via `actions/pinScopeKeys.ts` =
   `group:<g>` + `map:<mapId>`; it does NOT join the flat `UserCounterKey`/`USER_COUNTER_DEFAULTS` machinery —
   `getCurrentUser` hydrates it to `{}` separately). Unlike every other type, **`target` is DERIVED, not
   authored**: `recomputeAchievementTargets` recounts pins per scope and writes `target` onto the defs on
-  every seed/`upsertPinHandle`/`deletePinHandle` (so console-editing `target` on these is pointless — it's
-  overwritten). Only **`COLLECTIBLE_PIN_TYPES`** pins count (`code`/`riddle`/`visit`), the same set
-  `collectPinHandle` accepts — a `feedback`/`photo` pin in a scope would make its badge unreachable, so the
-  two read one shared constant. `loadDefinitions` rejects a `pinsInScope` def with `target < 1` (a `>= 0`
+  every seed/`upsertPinHandle`/`deletePinHandle` (so authoring `target` on these is pointless — it's
+  overwritten). Only **`COLLECTIBLE_PIN_TYPES`** pins count toward the target (`code`/`riddle`/`visit`) —
+  a `photo` pin in a scope would otherwise make its badge unreachable.
+  ⚠️ **These two sets NO LONGER match, and the code comments still claim they do.** Since #12,
+  `collectPinHandle` accepts `COLLECTIBLE_PIN_TYPES` **plus `feedback`** (`!COLLECTIBLE_PIN_TYPES.includes(type)
+  && !isFeedback`), and it calls `scopeKeys(pin)` unconditionally — so collecting a feedback pin **increments
+  the numerator without raising the denominator**, and a location badge in a scope containing feedback pins can
+  unlock early. The stale comments are in `functions/src/types/pin.ts` (says feedback "has no collect flow yet")
+  and `actions/pinScopeKeys.ts` (claims numerator and denominator "can never disagree").
+  `loadDefinitions` rejects a `pinsInScope` def with `target < 1` (a `>= 0`
   target auto-grants event-wide on a player's first award).
 - ⚠️ **A bug here must never kill scoring** — it runs inside *every* `awardPoints` transaction, event-wide.
   `evaluateAchievements(user, definitions)` is pure (no writes, does not mutate `user`, returns a grant LIST)
@@ -676,7 +729,7 @@ that matters: **definitions are DATA, logic is CODE.**
 - Known accepted risk: a swallowed eval error on a player's *final* award loses that badge — there is no next
   award to self-heal on. Mitigation is visibility (the log prefix), not machinery.
 
-### 12.4 User photo uploads — private quest proof, manually reviewed
+### 12.4 User photo uploads — private pin proof, manually reviewed
 
 > **✅ SHIPPED as photo-proof pins (#19).** A `photo`-type pin, reachable ONLY from the `/map` pin sheet
 > (`collectPinHandle` still rejects `photo`). Flow: client downscales the shot (`utils/downscaleImage.ts`,
@@ -694,14 +747,10 @@ that matters: **definitions are DATA, logic is CODE.**
 > the player's own ranking header as `+X oczekuje` — NOT a `UserCounterKey`, never fanned out, never in
 > leaderboard sort. `assertPin*` guards were extracted to `actions/assertPin.ts` (shared with
 > collectPinHandle). Kill-switch: seed zero photo pins → feature fully inert. Tests: `functions/test/photos.test.mjs`.
-> The prose below is the original design record.
 
-- Photos are **proof that a pin was collected.** They are **not** a social feature.
-- **Users cannot see other users' uploads.** No public gallery.
-- **Review is manual. Explicitly no AI moderation** — the cost would escalate quickly and it is not wanted.
-  This implies an **admin review queue** and an approval state on the quest submission.
-- Upload from the device **gallery or taken in-app** (camera).
-- **`storage.rules` now opens ONE narrow match** (`/users/{uid}/photos/{pinUid}`: owner + `<10MB` +
+- Photos are **proof that a pin was collected** — not a social feature. **No public gallery; users cannot see
+  each other's uploads.** Review is manual: **explicitly no AI moderation** (cost, and not wanted).
+- **`storage.rules` opens exactly ONE narrow match** (`/users/{uid}/photos/{pinUid}`: owner + `<10MB` +
   `image/*`, overwrite allowed) — everything else stays `allow read, write: if false`. This is the only
   place the app lets a client write directly to Firebase infrastructure. Admins read photos via
   server-built download-token URLs, not a rule. Overwrite (not create-only) is deliberate: create-only has
@@ -709,25 +758,7 @@ that matters: **definitions are DATA, logic is CODE.**
 - `getStorage()` is initialized + emulator-wired in `utils/firebase.ts` (client) and used server-side via
   `functions/src/actions/photoStorage.ts` (bucket resolved from `FIREBASE_CONFIG`/`GCLOUD_PROJECT`).
 
-### 12.5 Navigation / IA rework
-
-> **✅ SHIPPED (#25).** The navbar/IA rework is done and committed — see the **§8 Navbar** section for the
-> shipped behaviour (Map-default centre, Skanuj/Osiągnięcia/Ranking/Konto side tabs, retired gallery,
-> `repeat(2, 1fr) 120px repeat(2, 1fr)` grid, signed-in `/`→`/map` redirect, in-page collect scan/confirm).
-> The prose below is the original design record.
-
-The bottom navbar was **full**: 4 side tabs (account / ranking / collection / collect) plus the center
-"super button", on a hard-coded `gridTemplateColumns: 'repeat(4, 1fr) 120px'`. The 2026 layout changes:
-
-- **Map becomes the main screen.**
-- **The card gallery is replaced by achievements.**
-- **Ranking and the user profile stay.**
-- **Scanning moves** — it is no longer the primary action.
-
-Cards themselves are not going away; only their navbar slot is. Anything touching `Navbar.tsx` must also
-update `Enum/Page.ts` and, for new dynamic routes, the rewrites in `next.config.js`.
-
-### Checklist for adding *any* new entity (map marker, quest, achievement)
+### Checklist for adding *any* new entity (pin type, achievement, collection)
 
 1. `Enum/FireDoc.ts` — add the collection name.
 2. `firestore.rules` — add a `match` block. **Default to `allow read: if request.auth != null; allow write: if false;`**
