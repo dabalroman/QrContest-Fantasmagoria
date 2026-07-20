@@ -3,6 +3,7 @@ import { HttpsError, onCall } from 'firebase-functions/v2/https';
 import * as logger from 'firebase-functions/logger';
 import assertAdmin from './actions/assertAdmin';
 import toPublicPin from './actions/toPublicPin';
+import recomputeAchievementTargets from './actions/recomputeAchievementTargets';
 import mapIds from './data/mapIds';
 import { Pin, PinCollectedBy, PinCoords, PinType, PublicPin } from './types/pin';
 import { PinGroup } from './types/pinGroup';
@@ -121,6 +122,12 @@ export const upsertPinHandle = onCall(async (req): Promise<{ pin: PublicPin }> =
         });
 
         logger.log('upsertPinHandle', `pin ${uid} saved`);
+
+        // Covers create, edit AND deactivate — the pin set just changed shape. Never throws (see the
+        // doc comment on recomputeAchievementTargets), so a target-recompute hiccup cannot turn a
+        // successfully-saved pin into a reported error below.
+        await recomputeAchievementTargets(db);
+
         const saved = (await pinRef.get()).data() as Pin;
         return { pin: toPublicPin(saved) };
     } catch (error) {

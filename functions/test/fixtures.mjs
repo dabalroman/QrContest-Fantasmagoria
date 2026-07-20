@@ -124,6 +124,65 @@ export async function seedInvalidAchievements () {
     });
 }
 
+// Location achievements (task #37) — mirrors seedAchievements above. `scope` is a pinScopeKeys.ts key
+// (`map:<mapId>` / `group:<groupUid>`); `target` is DERIVED in production (recomputeAchievementTargets
+// overwrites it), so the fixture seeds `0` and tests call the recompute themselves before asserting.
+export const ACH_LOCATION_UID = 'test-location-achievement';
+
+export async function seedScopedAchievement (scope, overrides = {}) {
+    const def = {
+        uid: ACH_LOCATION_UID,
+        name: 'Testowy odkrywca',
+        description: 'test',
+        icon: 'map-pin',
+        group: 'location',
+        type: 'pinsInScope',
+        scope,
+        target: 0,
+        bonus: 20,
+        ...overrides
+    };
+
+    await db.collection('achievements').doc(def.uid).set(def);
+    return def;
+}
+
+// A dedicated pair of pins for the location-achievement suite, kept SEPARATE from the general fixture
+// pins above (which all share mapId 'test-map' / groups ['test']): that scope also contains a
+// feedback pin and a photo pin (collectPinHandle rejects both types) plus a pin outside its
+// availability window, so "collect every active pin in the scope" can never actually complete there.
+// These two are both `visit` type, always available, and isActive — fully collectible — so a test can
+// exhaust the scope and observe the achievement actually grant.
+export const LOC_SCOPE_MAP_ID = 'loc-test-map';
+export const LOC_SCOPE_GROUP_UID = 'loc-test';
+export const LOC_PIN_A_UID = 'loc-test-pin-a';
+export const LOC_PIN_B_UID = 'loc-test-pin-b';
+
+export async function seedLocationScopePins () {
+    const base = {
+        description: 'test pin',
+        clue: '',
+        type: 'visit',
+        groups: [LOC_SCOPE_GROUP_UID],
+        mapId: LOC_SCOPE_MAP_ID,
+        hintRadius: null,
+        value: 5,
+        withQuestion: false,
+        availableFrom: null,
+        availableTo: null,
+        isActive: true,
+        code: null,
+        collectedBy: {}
+    };
+
+    await db.collection('pins').doc(LOC_PIN_A_UID).set({
+        uid: LOC_PIN_A_UID, name: 'Loc pin A', coords: { x: 0, y: 0 }, ...base
+    });
+    await db.collection('pins').doc(LOC_PIN_B_UID).set({
+        uid: LOC_PIN_B_UID, name: 'Loc pin B', coords: { x: 1, y: 1 }, ...base
+    });
+}
+
 /**
  * A fully-formed user doc written straight through the admin SDK, so a test can preset counters or
  * the achievements map (e.g. seed a score just below a cup threshold, or a malformed achievements

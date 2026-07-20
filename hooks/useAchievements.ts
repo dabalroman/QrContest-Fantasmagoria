@@ -5,10 +5,13 @@ import { FireDoc } from '@/Enum/FireDoc';
 import Achievement from '@/models/Achievement';
 
 // Fetch-on-mount, deliberately NOT parked in a session-wide context (unlike useCollectedCards /
-// CardsCacheContext). Definitions are data so a threshold can be retuned in the Firestore console
-// mid-event; refetching on every mount of /achievements — 9 tiny docs — self-heals such an edit on
-// the next screen open. `user.achievements` + counters still arrive live via useUserData, so a new
-// unlock shows immediately without any refetch here.
+// CardsCacheContext). Definitions are data so most fields can still be retuned in the Firestore
+// console mid-event with no redeploy (name/description/bonus/etc. — see achievementsSeed.ts); a
+// `pinsInScope` definition's `target` is the one exception, since it is DERIVED and gets silently
+// overwritten on the next pin-set change (task #37, recomputeAchievementTargets). Refetching on every
+// mount of /achievements — a couple dozen tiny docs — self-heals such an edit on the next screen open.
+// `user.achievements` + counters still arrive live via useUserData, so a new unlock shows immediately
+// without any refetch here.
 export default function useAchievements () {
     const [achievements, setAchievements] = useState<Achievement[] | null>(null);
     const [loading, setLoading] = useState<boolean>(true);

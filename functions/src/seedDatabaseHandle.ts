@@ -19,6 +19,7 @@ import achievementsSeed from './seeds/achievementsSeed';
 import { Achievement } from './types/achievement';
 import pinGroupsSeed from './seeds/pinGroupsSeed';
 import { PinGroup } from './types/pinGroup';
+import recomputeAchievementTargets from './actions/recomputeAchievementTargets';
 
 export const seedDatabaseHandle = onCall(async (req): Promise<{}> => {
     const data = req.data;
@@ -53,6 +54,10 @@ export const seedDatabaseHandle = onCall(async (req): Promise<{}> => {
     await seedGuilds(db);
     await seedClues(db);
     await seedAchievements(db);
+
+    // MUST come after seedAchievements: that seed uses a bare .set(), which would otherwise clobber
+    // the recomputed target back to the authored `target: 0`.
+    await recomputeAchievementTargets(db);
 
     return { status: 'ok' };
 });

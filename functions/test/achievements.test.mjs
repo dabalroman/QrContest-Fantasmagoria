@@ -14,14 +14,31 @@ import {
 } from './emulator.mjs';
 import {
     seedFixture, seedUser, seedLegacyUser, seedInvalidAchievements,
+    seedScopedAchievement, seedLocationScopePins,
     GUILD_UID, ROUND_UID, CARD_CODE, QUESTION_CORRECT,
     PIN_VISIT_UID, PIN_CODE_CODE,
+    PIN_GROUP_TEST_UID,
+    LOC_SCOPE_MAP_ID, LOC_PIN_A_UID, LOC_PIN_B_UID,
     ACH_SCORE_1, ACH_SCORE_2, ACH_OWL_1
 } from './fixtures.mjs';
+
+// Imported straight from the compiled lib, same idiom as seed.test.mjs's seed modules: there is no
+// callable wrapping this action (it is invoked internally by seedDatabaseHandle/upsertPinHandle/
+// deletePinHandle), so tests that need to trigger it standalone call it directly against the shared
+// Firestore emulator instance.
+import recomputeAchievementTargetsMod from '../lib/actions/recomputeAchievementTargets.js';
+const recomputeAchievementTargets = recomputeAchievementTargetsMod.default ?? recomputeAchievementTargetsMod;
 
 const userDoc = (uid) => db.collection('users').doc(uid).get().then((s) => s.data());
 const roundUser = (uid) => db.collection('ranking').doc(ROUND_UID).get().then((s) => s.data().users[uid]);
 const guildDoc = () => db.collection('guilds').doc(GUILD_UID).get().then((s) => s.data());
+const achievementDoc = (uid) => db.collection('achievements').doc(uid).get().then((s) => s.data());
+
+async function registerAdmin (uid, username) {
+    const token = await createAuthUserToken(uid);
+    await seedUser(uid, username, { role: 'admin' });
+    return token;
+}
 
 before(async () => {
     await assertEmulatorReachable();
@@ -180,4 +197,126 @@ test('a legacy user doc (no achievements / no correct-answer counter) collects c
     const round = await roundUser(uid);
     assert.equal(user.score, 5, 'points land for a legacy doc');
     assert.equal(round.amountOfCorrectAnswers, 0, 'new counter hydrates to 0 in the fan-out');
+});
+
+// --- Location achievements (task #37): pin.groups[]/mapId scopes, derived target ---
+
+test('a scope-completing collect grants the location badge and fans it to all four places', async () => {
+    const uid = 'ach-loc-complete';
+    const token = await createAuthUserToken(uid);
+
+    await seedLocationScopePins();
+    const def = await seedScopedAchievement(`map:${LOC_SCOPE_MAP_ID}`);
+    await recomputeAchievementTargets(db);
+
+    assert.equal((await achievementDoc(def.uid)).target, 2, 'two collectible pins in scope');
+
+    await seedUser(uid, 'AchLocComplete', { score: 0 });
+    await callCallable('joinGuildHandle', { guild: GUILD_UID }, token);
+
+    // First pin: partial progress, no grant yet.
+    const first = await callCallable('collectPinHandle', { pinUid: LOC_PIN_A_UID }, token);
+    assert.deepEqual(first.achievements, [], 'scope not yet complete');
+
+    // Second pin completes the scope -> grants in the SAME transaction.
+    const second = await callCallable('collectPinHandle', { pinUid: LOC_PIN_B_UID }, token);
+    assert.deepEqual(second.achievements, [{
+        uid: def.uid, name: def.name, icon: def.icon, bonus: def.bonus
+    }]);
+
+    const expected = 5 + 5 + def.bonus; // both pins' `value` (5 each) plus the badge bonus
+    const user = await userDoc(uid);
+    const round = await roundUser(uid);
+    const guild = await guildDoc();
+
+    assert.equal(user.score, expected, 'user.score');
+    assert.equal(round.score, expected, 'ranking round copy');
+    assert.equal(guild.members[uid].score, expected, 'guild member copy');
+    assert.equal(guild.score, expected, 'guild aggregate');
+    assert.equal(user.collectedPinsByScope[`map:${LOC_SCOPE_MAP_ID}`], 2, 'per-scope counter');
+    assert.ok(user.achievements[def.uid], 'stamped exactly once');
+});
+
+test('partial progress across a scope does not grant', async () => {
+    const uid = 'ach-loc-partial';
+    const token = await createAuthUserToken(uid);
+
+    await seedLocationScopePins();
+    const def = await seedScopedAchievement(`map:${LOC_SCOPE_MAP_ID}`);
+    await recomputeAchievementTargets(db);
+
+    await seedUser(uid, 'AchLocPartial', { score: 0 });
+
+    const res = await callCallable('collectPinHandle', { pinUid: LOC_PIN_A_UID }, token);
+    assert.deepEqual(res.achievements, [], 'only one of two pins collected');
+
+    const user = await userDoc(uid);
+    assert.equal(user.collectedPinsByScope[`map:${LOC_SCOPE_MAP_ID}`], 1, 'counter reflects the one collect');
+    assert.equal(Object.keys(user.achievements ?? {}).length, 0, 'nothing stamped');
+});
+
+test('a target < 1 (empty scope) grants nothing, even on a first award', async () => {
+    const uid = 'ach-loc-empty';
+    const token = await createAuthUserToken(uid);
+
+    // Scope matches no pin at all -> recompute leaves target at 0 -> loadDefinitions must reject it
+    // outright, so it can never be evaluated as `counter(0) >= target(0)`.
+    const def = await seedScopedAchievement('map:does-not-exist', { uid: 'test-location-empty' });
+    await recomputeAchievementTargets(db);
+    assert.equal((await achievementDoc(def.uid)).target, 0, 'no pins in this scope');
+
+    await seedUser(uid, 'AchLocEmpty', { score: 0 });
+
+    // Any award at all is enough to exercise a first-time evaluation for this user.
+    const res = await callCallable('collectPinHandle', { pinUid: PIN_VISIT_UID }, token);
+    assert.ok(
+        !res.achievements.some((grant) => grant.uid === def.uid),
+        'a zero-target scope definition must never appear in a grant list'
+    );
+
+    const user = await userDoc(uid);
+    assert.ok(!(def.uid in (user.achievements ?? {})), 'nothing stamped for the empty-scope def');
+});
+
+test('upsertPinHandle recomputes the derived target', async () => {
+    const adminToken = await registerAdmin('ach-loc-upsert-admin', 'AchLocUpsertAdmin');
+
+    const def = await seedScopedAchievement('map:dwor', { uid: 'test-location-dwor' });
+    await recomputeAchievementTargets(db);
+    assert.equal((await achievementDoc(def.uid)).target, 0, 'no dwor pins exist yet');
+
+    await callCallable('upsertPinHandle', {
+        pinUid: null,
+        fields: {
+            name: 'Nowa lokalizacyjna pinezka',
+            description: 'opis',
+            clue: '',
+            type: 'visit',
+            groups: [PIN_GROUP_TEST_UID],
+            mapId: 'dwor',
+            coords: { x: 1, y: 1 },
+            hintRadius: null,
+            value: 5,
+            withQuestion: false,
+            availableFrom: null,
+            availableTo: null,
+            isActive: true,
+            code: null
+        }
+    }, adminToken);
+
+    assert.equal((await achievementDoc(def.uid)).target, 1, 'target recomputed after the upsert');
+});
+
+test('deletePinHandle recomputes the derived target, lowering it', async () => {
+    const adminToken = await registerAdmin('ach-loc-delete-admin', 'AchLocDeleteAdmin');
+
+    await seedLocationScopePins();
+    const def = await seedScopedAchievement(`map:${LOC_SCOPE_MAP_ID}`, { uid: 'test-location-delete' });
+    await recomputeAchievementTargets(db);
+    assert.equal((await achievementDoc(def.uid)).target, 2, 'two pins in scope before the delete');
+
+    await callCallable('deletePinHandle', { pinUid: LOC_PIN_B_UID }, adminToken);
+
+    assert.equal((await achievementDoc(def.uid)).target, 1, 'target recomputed after the delete');
 });

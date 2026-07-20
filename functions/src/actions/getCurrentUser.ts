@@ -18,6 +18,6 @@ export default async function getCurrentUser(
 
     return [
         userRef as DocumentReference<User, User>,
-        {achievements: {}, ...USER_COUNTER_DEFAULTS, ...userSnapshot.data()} as User
+        {achievements: {}, collectedPinsByScope: {}, ...USER_COUNTER_DEFAULTS, ...userSnapshot.data()} as User
     ];
 }

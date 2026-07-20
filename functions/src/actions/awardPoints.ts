@@ -1,6 +1,6 @@
 import {User, UserCounterKey} from '../types/user';
 import {logger} from 'firebase-functions';
-import {DocumentReference, FieldValue, Firestore, Transaction, UpdateData} from 'firebase-admin/firestore';
+import {DocumentReference, FieldPath, FieldValue, Firestore, Transaction, UpdateData} from 'firebase-admin/firestore';
 import updateRanking from './updateRanking';
 import updateGuild from './updateGuild';
 import evaluateAchievements from '../achievements/evaluateAchievements';
@@ -17,6 +17,10 @@ import {AchievementGrant} from '../types/achievement';
  * Every point source — card collect, question answer, pin collect — must go through here so the
  * leaderboard cannot silently desync. Reads the `ranking` collection exactly once per award. Returns
  * the achievements granted this award, so the caller can surface them in its callable response (#30).
+ *
+ * `scopeCounters` increments `user.collectedPinsByScope[key]` for each key (task #37's location
+ * achievements) — it is deliberately NOT fanned out to RankingRoundUser/GuildMember, unlike the flat
+ * `counters` map, since no leaderboard surfaces per-scope pin counts.
  */
 export default async function awardPoints(
     db: Firestore,
@@ -24,15 +28,20 @@ export default async function awardPoints(
     userRef: DocumentReference<User>,
     user: User,
     points: number,
-    counters: Partial<Record<UserCounterKey, number>> = {}
+    counters: Partial<Record<UserCounterKey, number>> = {},
+    scopeCounters: string[] = []
 ): Promise<AchievementGrant[]> {
     const counterKeys = Object.keys(counters) as UserCounterKey[];
 
     // Apply the base award to the in-memory user FIRST, so achievement predicates evaluate against
-    // post-award values (a collect that crosses a point cup unlocks it in the same transaction).
+    // post-award values (a collect that crosses a point cup unlocks it in the same transaction, and a
+    // scope-completing pin collect can unlock a `pinsInScope` achievement the same way).
     user.score += points;
     counterKeys.forEach((key) => {
         user[key] += counters[key] as number;
+    });
+    scopeCounters.forEach((key) => {
+        user.collectedPinsByScope[key] = (user.collectedPinsByScope[key] ?? 0) + 1;
     });
 
     // Evaluate achievements. Definitions are data (cached, last-known-good on failure) but the
@@ -62,6 +71,23 @@ export default async function awardPoints(
         ...counterIncrements,
         updatedAt: FieldValue.serverTimestamp()
     } as UpdateData<User>));
+
+    // Scope counters go in a SEPARATE update call using FieldPath objects, not dotted strings — a
+    // scope key like `map:mok-parter` contains a `:`, which is unambiguous as a FieldPath segment but
+    // would raise an escaping question as part of a dotted path string.
+    if (scopeCounters.length > 0) {
+        const scopeFieldsAndValues = scopeCounters.flatMap((key) => [
+            new FieldPath('collectedPinsByScope', key),
+            FieldValue.increment(1)
+        ]);
+
+        transaction.update(
+            userRef,
+            scopeFieldsAndValues[0] as FieldPath,
+            scopeFieldsAndValues[1],
+            ...scopeFieldsAndValues.slice(2)
+        );
+    }
 
     // Applier — the only achievements writer, OUTSIDE the eval try (purity contract).
     grants.forEach((grant) => applyGrant(transaction, userRef, grant));

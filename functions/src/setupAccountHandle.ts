@@ -64,6 +64,7 @@ export const setupAccountHandle = onCall(async (req): Promise<{ user: User }> =>
         amountOfAnsweredQuestions: 0,
         amountOfCorrectAnswers: 0,
         amountOfCollectedPins: 0,
+        collectedPinsByScope: {},
         achievements: {},
         role: UserRole.USER,
         memberOf: null,

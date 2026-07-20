@@ -1,6 +1,8 @@
 import {
+    faBuilding,
     faCrown,
     faGraduationCap,
+    faMapPin,
     faMedal,
     faTrophy,
     IconDefinition
@@ -26,6 +28,14 @@ export default function getAchievementIcon (iconKey: string): IconDefinition {
 
     if (iconKey === 'owl') {
         return faGraduationCap;
+    }
+
+    if (iconKey === 'map-pin') {
+        return faMapPin;
+    }
+
+    if (iconKey === 'building') {
+        return faBuilding;
     }
 
     return faMedal;

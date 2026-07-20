@@ -44,7 +44,7 @@ export default function evaluateAchievements(
             // Validated by loadDefinitions; the guard keeps a bad doc from throwing on the hot path.
             const counter = TYPE_COUNTERS[definition.type];
 
-            if (!counter || counter(working) < definition.target) {
+            if (!counter || counter(working, definition) < definition.target) {
                 continue;
             }
 

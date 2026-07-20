@@ -25,6 +25,11 @@ export type User = {
     amountOfAnsweredQuestions: number,
     amountOfCorrectAnswers: number,
     amountOfCollectedPins: number,
+    // Per-scope pin collect counter, keyed by a pinScopeKeys.ts key (e.g. `map:mok-parter`,
+    // `group:mok`). Feeds the `pinsInScope` achievement type only — it is NOT a UserCounterKey/
+    // USER_COUNTER_DEFAULTS member (that Record is total over a fixed key set; this is an open map),
+    // so it is hydrated separately in getCurrentUser.
+    collectedPinsByScope: Record<string, number>,
     achievements: UserAchievements,
     role: UserRole,
     memberOf: GuildUid | null,

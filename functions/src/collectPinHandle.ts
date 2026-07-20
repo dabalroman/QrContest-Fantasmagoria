@@ -1,8 +1,9 @@
 import {FieldValue, getFirestore, Timestamp, UpdateData} from 'firebase-admin/firestore';
-import {CollectedPin, Pin, PinCollectedBy, PinType} from './types/pin';
+import {COLLECTIBLE_PIN_TYPES, CollectedPin, Pin, PinCollectedBy, PinType} from './types/pin';
 import {CollectedCardQuestion, CollectedQuestions, PublicQuestion, Question, QuestionsDoc} from './types/question';
 import getCurrentUser from './actions/getCurrentUser';
 import awardPoints from './actions/awardPoints';
+import scopeKeys from './actions/pinScopeKeys';
 import {AchievementGrant} from './types/achievement';
 import {HttpsError, onCall} from 'firebase-functions/v2/https';
 import * as logger from 'firebase-functions/logger';
@@ -44,7 +45,7 @@ export const collectPinHandle = onCall(async (req): Promise<{
 
         pin = pinDoc.data() as Pin;
 
-        if (pin.type === PinType.FEEDBACK || pin.type === PinType.PHOTO) {
+        if (!COLLECTIBLE_PIN_TYPES.includes(pin.type)) {
             logger.error('collectPinHandle', 'pin type is not supported yet', pin.type);
             throw new HttpsError('invalid-argument', 'pin type is not supported yet');
         }
@@ -172,7 +173,9 @@ export const collectPinHandle = onCall(async (req): Promise<{
                 }) as UpdateData<CollectedQuestions>);
             }
 
-            return await awardPoints(db, transaction, userRef, user, pin.value, {amountOfCollectedPins: 1});
+            return await awardPoints(
+                db, transaction, userRef, user, pin.value, {amountOfCollectedPins: 1}, scopeKeys(pin)
+            );
         });
 
         logger.log('collectPinHandle', user.username, `pin ${pin.uid} collected`);

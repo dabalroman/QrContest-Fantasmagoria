@@ -17,6 +17,9 @@ export default class User extends FirebaseModel {
     amountOfAnsweredQuestions: number;
     amountOfCorrectAnswers: number;
     amountOfCollectedPins: number;
+    // Per-scope pin collect counter, keyed by a pinScopeKeys.ts key (`map:<mapId>` / `group:<uid>`).
+    // Feeds the `pinsInScope` achievement type's progress bar — mirrors functions/src/types/user.ts.
+    collectedPinsByScope: Record<string, number>;
     achievements: UserAchievements;
     memberOf: GuildUid | null;
     role: UserRole;
@@ -32,6 +35,7 @@ export default class User extends FirebaseModel {
         amountOfAnsweredQuestions: number = 0,
         amountOfCorrectAnswers: number = 0,
         amountOfCollectedPins: number = 0,
+        collectedPinsByScope: Record<string, number> = {},
         achievements: UserAchievements = {},
         memberOf: GuildUid | null = null,
         role: UserRole = UserRole.USER,
@@ -48,6 +52,7 @@ export default class User extends FirebaseModel {
         this.amountOfAnsweredQuestions = amountOfAnsweredQuestions;
         this.amountOfCorrectAnswers = amountOfCorrectAnswers;
         this.amountOfCollectedPins = amountOfCollectedPins;
+        this.collectedPinsByScope = collectedPinsByScope;
         this.achievements = achievements;
         this.memberOf = memberOf;
         this.role = role;
@@ -97,6 +102,7 @@ export default class User extends FirebaseModel {
             data.amountOfAnsweredQuestions,
             data.amountOfCorrectAnswers ?? 0,
             data.amountOfCollectedPins,
+            data.collectedPinsByScope ?? {},
             achievements,
             data.memberOf,
             data.role,

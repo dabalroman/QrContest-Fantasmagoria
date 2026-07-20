@@ -102,6 +102,133 @@ const achievementsSeed: Achievement[] = [
         type: 'correctAnswers',
         target: 30,
         bonus: 30
+    },
+
+    // Location badges (task #37) — one per map floor, plus one per whole building. `target` here is
+    // DERIVED, not human-authored: functions/src/actions/recomputeAchievementTargets.ts overwrites it
+    // on every pin create/edit/delete/re-seed to the current count of active pins in that `scope`
+    // (a pinScopeKeys.ts key). The `0` below is only ever live for the instant between this seed write
+    // and the recompute that immediately follows it in seedDatabaseHandle.
+    {
+        uid: 'location-dwor',
+        name: 'Dworzanin',
+        description: 'Odwiedź wszystkie pinezki na terenie Dworu.',
+        icon: 'map-pin',
+        group: 'location',
+        type: 'pinsInScope',
+        scope: 'map:dwor',
+        target: 0,
+        bonus: 15
+    },
+    {
+        uid: 'location-mok-piwnica',
+        name: 'Kret',
+        description: 'Odwiedź wszystkie pinezki w piwnicy MOK-u.',
+        icon: 'map-pin',
+        group: 'location',
+        type: 'pinsInScope',
+        scope: 'map:mok-piwnica',
+        target: 0,
+        bonus: 15
+    },
+    {
+        uid: 'location-mok-parter',
+        name: 'Piechur',
+        description: 'Odwiedź wszystkie pinezki na parterze MOK-u.',
+        icon: 'map-pin',
+        group: 'location',
+        type: 'pinsInScope',
+        scope: 'map:mok-parter',
+        target: 0,
+        bonus: 15
+    },
+    {
+        uid: 'location-mok-pietro-1',
+        name: 'Wspinacz',
+        description: 'Odwiedź wszystkie pinezki na 1. piętrze MOK-u.',
+        icon: 'map-pin',
+        group: 'location',
+        type: 'pinsInScope',
+        scope: 'map:mok-pietro-1',
+        target: 0,
+        bonus: 15
+    },
+    {
+        uid: 'location-mok-pietro-1-5',
+        name: 'Duch Półpiętra',
+        description: 'Odwiedź wszystkie pinezki na półpiętrze (1.5) MOK-u.',
+        icon: 'map-pin',
+        group: 'location',
+        type: 'pinsInScope',
+        scope: 'map:mok-pietro-1-5',
+        target: 0,
+        bonus: 15
+    },
+    {
+        uid: 'location-mok-pietro-2',
+        name: 'Podniebny',
+        description: 'Odwiedź wszystkie pinezki na 2. piętrze MOK-u.',
+        icon: 'map-pin',
+        group: 'location',
+        type: 'pinsInScope',
+        scope: 'map:mok-pietro-2',
+        target: 0,
+        bonus: 15
+    },
+    {
+        uid: 'location-2lo-parter',
+        name: 'Świeżak',
+        description: 'Odwiedź wszystkie pinezki na parterze 2LO.',
+        icon: 'map-pin',
+        group: 'location',
+        type: 'pinsInScope',
+        scope: 'map:2lo-parter',
+        target: 0,
+        bonus: 15
+    },
+    {
+        uid: 'location-2lo-pietro-1',
+        name: 'Kujon',
+        description: 'Odwiedź wszystkie pinezki na 1. piętrze 2LO.',
+        icon: 'map-pin',
+        group: 'location',
+        type: 'pinsInScope',
+        scope: 'map:2lo-pietro-1',
+        target: 0,
+        bonus: 15
+    },
+    {
+        uid: 'location-2lo-pietro-2',
+        name: 'Absolwent',
+        description: 'Odwiedź wszystkie pinezki na 2. piętrze 2LO.',
+        icon: 'map-pin',
+        group: 'location',
+        type: 'pinsInScope',
+        scope: 'map:2lo-pietro-2',
+        target: 0,
+        bonus: 15
+    },
+    {
+        uid: 'location-building-mok',
+        name: 'Władca MOK-u',
+        description: 'Odwiedź wszystkie pinezki w całym MOK-u.',
+        icon: 'building',
+        group: 'location',
+        type: 'pinsInScope',
+        scope: 'group:mok',
+        target: 0,
+        bonus: 40
+    },
+    {
+        uid: 'location-building-2lo',
+        name: 'Władca 2LO',
+        description: 'Odwiedź wszystkie pinezki w całym 2LO.',
+        icon: 'building',
+        group: 'location',
+        type: 'pinsInScope',
+        scope: 'group:2lo',
+        target: 0,
+        bonus: 40
     }
 ];
 

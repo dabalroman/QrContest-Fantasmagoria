@@ -7,9 +7,10 @@ import { AchievementType } from '@/functions/src/types/achievement';
 // Mirrors functions/src/achievements/typePredicates.ts. Unlocking is decided server-side and is never
 // trusted from here — this exists so a LOCKED achievement can render a progress bar against the same
 // counter the server thresholds on, which is why the two must stay in step.
-const TYPE_COUNTERS: Record<AchievementType, (user: User) => number> = {
+const TYPE_COUNTERS: Record<AchievementType, (user: User, achievement: Achievement) => number> = {
     points: (user) => user.score,
-    correctAnswers: (user) => user.amountOfCorrectAnswers
+    correctAnswers: (user) => user.amountOfCorrectAnswers,
+    pinsInScope: (user, achievement) => user.collectedPinsByScope[achievement.scope ?? ''] ?? 0
 };
 
 export default class Achievement extends FirebaseModel {
@@ -21,6 +22,9 @@ export default class Achievement extends FirebaseModel {
     type: AchievementType;
     target: number;
     bonus: number;
+    // Only meaningful for type === 'pinsInScope' — a pinScopeKeys.ts scope key. See
+    // functions/src/actions/recomputeAchievementTargets.ts.
+    scope?: string;
 
     constructor (
         uid: Uid,
@@ -30,7 +34,8 @@ export default class Achievement extends FirebaseModel {
         group: string = '',
         type: AchievementType = 'points',
         target: number = 0,
-        bonus: number = 0
+        bonus: number = 0,
+        scope?: string
     ) {
         super();
 
@@ -42,6 +47,7 @@ export default class Achievement extends FirebaseModel {
         this.type = type;
         this.target = target;
         this.bonus = bonus;
+        this.scope = scope;
     }
 
     protected static toFirestore (data: Achievement): object {
@@ -66,7 +72,8 @@ export default class Achievement extends FirebaseModel {
             data.group,
             data.type,
             data.target,
-            data.bonus
+            data.bonus,
+            data.scope
         );
     }
 
@@ -79,7 +86,7 @@ export default class Achievement extends FirebaseModel {
         const counter = TYPE_COUNTERS[this.type];
 
         return {
-            current: Math.min(counter ? counter(user) : 0, this.target),
+            current: Math.min(counter ? counter(user, this) : 0, this.target),
             target: this.target
         };
     }

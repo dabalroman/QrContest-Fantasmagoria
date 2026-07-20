@@ -47,6 +47,11 @@ export default async function loadDefinitions(db: Firestore): Promise<Achievemen
  * A definition is untrusted data — the compiler cannot vouch for a Firestore doc. An unknown `type`,
  * a `target` saved as the string "50", or a missing field would otherwise be a SILENT no-op that
  * looks shipped but isn't. So every reject is logged under a stable, alertable prefix.
+ *
+ * `target < 1` is rejected outright, not just for `pinsInScope`: `counter >= 0` is true for every
+ * player on their FIRST award, so a zero-target definition would mass-grant event-wide, silently and
+ * irreversibly. This is reachable for a `pinsInScope` def — a fresh seed before any pin exists leaves
+ * its derived target at 0 until the first recompute.
  */
 function isValidDefinition(definition: Achievement): boolean {
     const isValid = isNonEmptyString(definition?.uid)
@@ -54,7 +59,9 @@ function isValidDefinition(definition: Achievement): boolean {
         && isNonEmptyString(definition?.icon)
         && ACHIEVEMENT_TYPES.includes(definition?.type)
         && isFiniteNumber(definition?.target)
-        && isFiniteNumber(definition?.bonus);
+        && definition.target >= 1
+        && isFiniteNumber(definition?.bonus)
+        && (definition?.type !== 'pinsInScope' || isNonEmptyString(definition?.scope));
 
     if (!isValid) {
         logger.error('ACHIEVEMENTS_DEF_INVALID', {

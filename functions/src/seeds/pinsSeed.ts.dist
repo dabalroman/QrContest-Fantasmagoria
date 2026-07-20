@@ -2,47 +2,66 @@
 import { Timestamp } from 'firebase-admin/firestore';
 import { Pin, PinType } from '../types/pin';
 
-// Dev fixture. The real 50+ pins — real codes, real coords, real map ids — are authored in #16.
-// This set exists to exercise every branch of collectPinHandle locally: a code pin with a question,
-// a plain code pin, a riddle, a visit, a feedback room, a time-limited pin and an inactive one.
-// Only `code` pins are reachable from /collect/:code; the rest need the map's pin UI (#13).
-const flavoredPins: Pin[] = [
-    {
-        uid: 'smocze-leze',
-        name: 'Smocze Leże',
-        description: 'Podobno śpi tu smok. Podobno — bo nikt, kto zapuścił się głębiej, nie wrócił z tą samą liczbą brwi.',
-        clue: '',
-        type: PinType.CODE,
-        groups: ['mok', 'bestiariusz'],
-        mapId: 'mok-pietro-2',
-        coords: { x: 420, y: 180 },
-        hintRadius: 120,
-        value: 30,
-        withQuestion: true,
-        availableFrom: null,
-        availableTo: null,
-        isActive: true,
-        code: 'SMOK000001',
-        collectedBy: {}
-    },
-    {
-        uid: 'kuznia-krasnoludow',
-        name: 'Kuźnia Krasnoludów',
-        description: 'Młot uderza w kowadło od trzech dni bez przerwy. Kowal twierdzi, że to dopiero rozgrzewka.',
-        clue: '',
-        type: PinType.CODE,
-        groups: ['mok', 'rzemioslo'],
-        mapId: 'mok-parter',
-        coords: { x: 150, y: 300 },
-        hintRadius: 90,
-        value: 20,
-        withQuestion: false,
-        availableFrom: null,
-        availableTo: null,
-        isActive: true,
-        code: 'KUZNIA0001',
-        collectedBy: {}
-    },
+// Dev fixture. The real pins — real codes, real coords, real map ids — are authored in #16.
+//
+// Shaped for TESTABILITY, not flavour: the location achievements (#37) score a whole map or a whole
+// building, so this gives every one of the 9 maps the SAME small number of collectible pins. Four is
+// deliberate — enough that a floor badge is a real errand, few enough to walk in a minute.
+//
+// Codes are predictable, so they can be typed straight into /collect without reading this file:
+//   <TAG>000000<n>  →  DWO0000001, MPA0000003, LP20000004, …
+// Every generated pin carries a question, so the answer ladder (Puchacz @30 correct) is reachable
+// too, and 36 pins x ~22 pts plus question points clears 1000 (Legenda) on their own.
+//
+// Resulting achievement targets, all of them actually reachable:
+//   map:dwor 6, map:mok-pietro-1 5, every other map:* 4
+//   group:mok 21, group:2lo 12, group:dwor 5
+const MAPS: { mapId: string, tag: string, group: string }[] = [
+    { mapId: 'dwor', tag: 'DWO', group: 'dwor' },
+    { mapId: 'mok-piwnica', tag: 'MPI', group: 'mok' },
+    { mapId: 'mok-parter', tag: 'MPA', group: 'mok' },
+    { mapId: 'mok-pietro-1', tag: 'MP1', group: 'mok' },
+    { mapId: 'mok-pietro-1-5', tag: 'MPH', group: 'mok' },
+    { mapId: 'mok-pietro-2', tag: 'MP2', group: 'mok' },
+    { mapId: '2lo-parter', tag: 'LPA', group: '2lo' },
+    { mapId: '2lo-pietro-1', tag: 'LP1', group: '2lo' },
+    { mapId: '2lo-pietro-2', tag: 'LP2', group: '2lo' }
+];
+
+const PINS_PER_MAP = 4;
+const PIN_VALUES = [30, 25, 20, 15];
+
+const mapPins: Pin[] = MAPS.flatMap((map, mapIndex) =>
+    Array.from({ length: PINS_PER_MAP }, (_unused, slot): Pin => {
+        const n = slot + 1;
+
+        return {
+            uid: `${map.mapId}-${n}`,
+            name: `${map.tag} ${n}`,
+            description: 'Testowa pinezka do przechodzenia osiągnięć lokalizacyjnych. Prawdziwą treść dostarcza #16.',
+            clue: '',
+            type: PinType.CODE,
+            groups: [map.group],
+            mapId: map.mapId,
+            coords: { x: 150 + slot * 200, y: 150 + (mapIndex % 4) * 160 },
+            hintRadius: null,
+            value: PIN_VALUES[slot % PIN_VALUES.length],
+            withQuestion: true,
+            availableFrom: null,
+            availableTo: null,
+            isActive: true,
+            code: `${map.tag}000000${n}`,
+            collectedBy: {}
+        };
+    })
+);
+
+// Branch coverage for the non-`code` paths. Deliberately chosen NOT to make any badge unobtainable:
+//   - riddle and visit ARE collectible, so they simply raise their own map's target by one.
+//   - feedback and the inactive pin are EXCLUDED from every target — feedback because
+//     collectPinHandle refuses it (COLLECTIBLE_PIN_TYPES), inactive because it is not active.
+//     Counting either would leave its map's badge permanently one pin short of reachable.
+const branchPins: Pin[] = [
     {
         uid: 'zagadka-alchemika',
         name: 'Zagadka Alchemika',
@@ -51,7 +70,7 @@ const flavoredPins: Pin[] = [
         type: PinType.RIDDLE,
         groups: ['mok', 'rzemioslo'],
         mapId: 'mok-pietro-1',
-        coords: { x: 260, y: 240 },
+        coords: { x: 260, y: 620 },
         hintRadius: null,
         value: 15,
         withQuestion: false,
@@ -69,7 +88,7 @@ const flavoredPins: Pin[] = [
         type: PinType.VISIT,
         groups: ['dwor', 'targowisko'],
         mapId: 'dwor',
-        coords: { x: 540, y: 420 },
+        coords: { x: 540, y: 620 },
         hintRadius: null,
         value: 5,
         withQuestion: false,
@@ -87,7 +106,7 @@ const flavoredPins: Pin[] = [
         type: PinType.FEEDBACK,
         groups: ['2lo', 'prelekcje'],
         mapId: '2lo-parter',
-        coords: { x: 200, y: 160 },
+        coords: { x: 200, y: 620 },
         hintRadius: null,
         value: 5,
         withQuestion: false,
@@ -98,34 +117,14 @@ const flavoredPins: Pin[] = [
         collectedBy: {}
     },
     {
-        uid: 'nocny-patrol',
-        name: 'Nocny Patrol',
-        description: 'Straż obchodzi mury tylko po zmroku. Za dnia nie ma tu nikogo — poza wroną, która niczego nie podpisze.',
-        clue: '',
-        type: PinType.CODE,
-        groups: ['dwor', 'nocne'],
-        mapId: 'dwor',
-        coords: { x: 610, y: 300 },
-        hintRadius: 150,
-        value: 10,
-        withQuestion: false,
-        // Time-limited: the night of the event. Outside this window collectPinHandle throws
-        // 'pin is not available yet' / 'pin is no longer available' — what #17 builds its UI on.
-        availableFrom: Timestamp.fromDate(new Date('2026-07-25T20:00:00+02:00')),
-        availableTo: Timestamp.fromDate(new Date('2026-07-26T02:00:00+02:00')),
-        isActive: true,
-        code: 'NOCPATROL1',
-        collectedBy: {}
-    },
-    {
         uid: 'zapomniana-krypta',
         name: 'Zapomniana Krypta',
         description: 'Zejście zasypano lata temu. Ktoś jednak wciąż zostawia przy wejściu świeże kwiaty.',
         clue: '',
         type: PinType.CODE,
         groups: ['2lo', 'bestiariusz'],
-        mapId: '2lo-parter',
-        coords: { x: 320, y: 480 },
+        mapId: '2lo-pietro-2',
+        coords: { x: 320, y: 620 },
         hintRadius: null,
         value: 25,
         withQuestion: false,
@@ -135,45 +134,33 @@ const flavoredPins: Pin[] = [
         isActive: false,
         code: 'KRYPTA0001',
         collectedBy: {}
+    },
+    {
+        uid: 'nocny-patrol',
+        name: 'Nocny Patrol',
+        description: 'Straż obchodzi mury tylko po zmroku. Za dnia nie ma tu nikogo — poza wroną, która niczego nie podpisze.',
+        clue: '',
+        type: PinType.CODE,
+        groups: ['nocne'],
+        mapId: 'dwor',
+        coords: { x: 610, y: 700 },
+        hintRadius: 150,
+        value: 10,
+        withQuestion: false,
+        // Carries an availability window so #17's UI has something to render, but the window is
+        // deliberately WIDE OPEN in dev.
+        // ⚠️ A window is NOT excluded from an achievement target (that is by design — the badge tracks
+        // the eventual full set, not what happens to be live). So a pin whose window is SHUT silently
+        // makes its map's badge unobtainable for the duration. Keep dev windows open, and cover the
+        // shut-window branches in the e2e suite instead (fixtures.mjs PIN_FUTURE / PIN_UNAVAILABLE).
+        availableFrom: Timestamp.fromDate(new Date('2026-07-01T00:00:00+02:00')),
+        availableTo: Timestamp.fromDate(new Date('2026-08-31T23:59:59+02:00')),
+        isActive: true,
+        code: 'NOCPATROL1',
+        collectedBy: {}
     }
 ];
 
-// Dev-only bulk fixture (NOT real event content — #16 replaces this whole file). The flavored pins
-// above cap out around 80 collectible points and a single question, so the achievement ladder can't
-// be walked in the app. This generates enough always-available `code` pins — each carrying a question —
-// that one player can reach EVERY achievement: >1000 collectible points (Legenda @1000) and >30 drawable
-// questions (Puchacz @30 correct), which in turn feed Kolekcjoner and Maniak. Codes are predictable
-// (`TEST010000`…) so they're easy to punch in while testing. Spread across all 9 maps for coverage.
-const TEST_LADDER_MAP_IDS = [
-    'dwor',
-    'mok-piwnica', 'mok-parter', 'mok-pietro-1', 'mok-pietro-1-5', 'mok-pietro-2',
-    '2lo-parter', '2lo-pietro-1', '2lo-pietro-2'
-];
-const TEST_LADDER_PIN_COUNT = 40;
-const TEST_LADDER_PIN_VALUES = [30, 25, 20, 15, 10];   // cycles → 20 pts/pin avg → ~800 pts over 40 pins
-
-const testLadderPins: Pin[] = Array.from({ length: TEST_LADDER_PIN_COUNT }, (_unused, i): Pin => {
-    const n = String(i + 1).padStart(2, '0');
-    return {
-        uid: `test-ladder-${n}`,
-        name: `Punkt testowy ${n}`,
-        description: 'Testowy pin do przejścia całej drabinki osiągnięć. Prawdziwą treść dostarcza #16.',
-        clue: '',
-        type: PinType.CODE,
-        groups: ['test'],
-        mapId: TEST_LADDER_MAP_IDS[i % TEST_LADDER_MAP_IDS.length],
-        coords: { x: 120 + (i % 8) * 100, y: 120 + (i % 6) * 100 },
-        hintRadius: null,
-        value: TEST_LADDER_PIN_VALUES[i % TEST_LADDER_PIN_VALUES.length],
-        withQuestion: true,
-        availableFrom: null,
-        availableTo: null,
-        isActive: true,
-        code: `TEST${n}0000`,   // 10 chars, [A-Z0-9], unique per pin
-        collectedBy: {}
-    };
-});
-
-const pinsSeed: Pin[] = [...flavoredPins, ...testLadderPins];
+const pinsSeed: Pin[] = [...mapPins, ...branchPins];
 
 export default pinsSeed;

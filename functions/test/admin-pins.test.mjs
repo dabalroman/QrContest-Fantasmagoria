@@ -163,12 +163,13 @@ test('re-seeding preserves a pin\'s collectedBy', async () => {
     await callCallable('seedDatabaseHandle', { password: '4064' }, adminToken);
 
     const playerToken = await registerPlayer('reseed-finder', 'ReseedFinder');
-    await callCallable('collectPinHandle', { code: 'SMOK000001' }, playerToken);
+    // A stable code/uid pair from the real pin seed (map:mok-pietro-2, slot 1).
+    await callCallable('collectPinHandle', { code: 'MP20000001' }, playerToken);
 
     // Re-seed — must NOT wipe the finder (seedPins now uses set(pin, { merge: true })).
     await callCallable('seedDatabaseHandle', { password: '4064' }, adminToken);
 
-    const pin = (await db.collection('pins').doc('smocze-leze').get()).data();
+    const pin = (await db.collection('pins').doc('mok-pietro-2-1').get()).data();
     assert.ok(pin.collectedBy['reseed-finder'], 'collectedBy must survive a re-seed');
 });
 

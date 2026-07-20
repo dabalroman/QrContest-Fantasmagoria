@@ -15,10 +15,13 @@ export default function applyGrant(
     userRef: DocumentReference<User>,
     grant: AchievementGrant
 ): void {
+    // Cast through `unknown`: adding `collectedPinsByScope` (an open Record<string, number>) to User
+    // makes UpdateData<User>'s dotted-path union ambiguous enough that TS refuses the direct cast,
+    // even though this dynamic `achievements.${uid}` key is a perfectly valid dotted path at runtime.
     transaction.update<User, User>(userRef, {
         [`achievements.${grant.uid}`]: {
             grantedAt: FieldValue.serverTimestamp(),
             bonus: grant.bonus
         }
-    } as UpdateData<User>);
+    } as unknown as UpdateData<User>);
 }

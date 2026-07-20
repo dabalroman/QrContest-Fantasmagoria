@@ -6,7 +6,8 @@ import { AchievementType } from '@/functions/src/types/achievement';
 // Genitive-plural unit copy per achievement type, for the "740 / 1000 punktów" progress label.
 const PROGRESS_UNIT: Record<AchievementType, string> = {
     points: 'punktów',
-    correctAnswers: 'poprawnych odpowiedzi'
+    correctAnswers: 'poprawnych odpowiedzi',
+    pinsInScope: 'odwiedzonych miejsc'
 };
 
 export default function AchievementComponent ({
