@@ -122,7 +122,7 @@ export default function FaqPage() {
                 <Panel title={'Pytania i odpowiedzi'}>
                     <p className="text-justify">
                         Tu znajdziesz listę pytań i odpowiedzi na różne aspekty konkursu
-                        &quot;QrContest - Zbierz je wszystkie!&quot;
+                        &quot;Gra Konwentowa - Zbierz je wszystkie!&quot;
                         W razie potrzeby możesz skontaktować się bezpośrednio z organizatorem konkursu przez
                         email <a href="mailto:dabalroman@gmail.com" className="underline">dabalroman@gmail.com</a> lub
                         przez <a href="https://m.me/roman.dabal" className="underline">messenger</a>.

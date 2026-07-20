@@ -41,7 +41,7 @@ export default function Home() {
                     <h1 className="text-6xl font-fancy-capitals p-1"
                         style={{textShadow: '0 4px 4px rgba(0,0,0,0.25)'}}
                     >
-                        QrContest
+                        Gra Konwentowa
                     </h1>
                     <h2 className="text-3xl font-fancy" style={{textShadow: '0 4px 4px rgba(0,0,0,0.25)'}}>
                         Zbierz je wszystkie!
@@ -56,7 +56,7 @@ export default function Home() {
                 style={{gridTemplateRows: '1fr'}}
                 id="readme"
             >
-                <Panel title="Nagrody w QrContest">
+                <Panel title="Nagrody w Grze Konwentowej">
                     <img src="/prize.webp" alt="prize" className="absolute right-0 bottom-0" style={{
                         zIndex: -1,
                         maxHeight: '80%'
@@ -75,7 +75,7 @@ export default function Home() {
                     </p>
                 </Panel>
 
-                <Panel title="Co to jest QrContest?" className="text-justify">
+                <Panel title="Co to jest Gra Konwentowa?" className="text-justify">
                     <p className="pt-1">Twoje zadanie to poszukiwanie kodów QR
                         ukrytych na terenie konwentu. Za każdą dodaną do kolekcji kartę otrzymasz punkty, a im więcej
                         punktów zgromadzisz, tym wyżej znajdziesz się w rankingu. Miejsce na podium gwarantuje
@@ -136,7 +136,7 @@ export default function Home() {
 
                 <Panel title="Rundy">
                     <p className="text-justify">
-                        W każdym konkursie musi być nagroda - a w QrContest mamy ich aż sześć!
+                        W każdym konkursie musi być nagroda - a w Grze Konwentowej mamy ich aż sześć!
                     </p>
                     <p className="mt-2 text-justify">
                         Konkurs podzielony jest na dwie rundy. Daty rozpoczęcia i zakończenia każdej z nich znajdziesz
@@ -151,7 +151,8 @@ export default function Home() {
 
                 <Panel title="Organizatorzy">
                     <p className="text-justify">
-                        Organizatorem konkursu &quot;QrContest&quot; na 15. Konwencie Fantastyki Fantasmagoria jest
+                        Organizatorem konkursu &quot;Gra Konwentowa&quot; na 16. Konwencie Fantastyki
+                        Fantasmagoria jest
                         <b> Roman Dąbal.</b>
                     </p>
                     <p className="mt-4 text-justify">
@@ -167,7 +168,7 @@ export default function Home() {
                 </Panel>
             </div>
             <p className="text-center p-2 w-full text-sm">
-                QrContest 2025 - Roman Dąbal dla 15. Konwent Fantastyki Fantasmagoria w Gnieźnie.<br/>
+                Gra Konwentowa 2026 - Roman Dąbal dla 16. Konwent Fantastyki Fantasmagoria w Gnieźnie.<br/>
                 Wszelkie prawa zastrzeżone.
             </p>
         </main>

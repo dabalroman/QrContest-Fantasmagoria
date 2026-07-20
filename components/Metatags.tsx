@@ -2,21 +2,23 @@ import Head from 'next/head';
 
 export default function Metatags({
     title = '',
-    description = 'QrContest - Fantasmagoria 16',
+    description = 'Gra Konwentowa - Fantasmagoria 16',
     image = '',
 }) {
     return (
         <Head>
-            <title>{title ? `${title} - QrContest - Fantasmagoria 16` : 'QrContest - Fantasmagoria 16'}</title>
+            <title>
+                {title ? `${title} - Gra Konwentowa - Fantasmagoria 16` : 'Gra Konwentowa - Fantasmagoria 16'}
+            </title>
 
             <meta name="description" content={description}/>
 
             <meta name="twitter:card" content="summary" />
-            <meta name="twitter:title" content='QrContest - Fantasmagoria 16' />
+            <meta name="twitter:title" content='Gra Konwentowa - Fantasmagoria 16' />
             <meta name="twitter:description" content={description} />
             <meta name="twitter:image" content={image} />
 
-            <meta property="og:title" content='QrContest - Fantasmagoria 16' />
+            <meta property="og:title" content='Gra Konwentowa - Fantasmagoria 16' />
             <meta property="og:description" content={description} />
             <meta property="og:image" content={image} />
 

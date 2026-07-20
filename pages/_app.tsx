@@ -92,7 +92,7 @@ export default function App ({
                     }}>
                         <PinsCacheContext.Provider value={pinsData}>
                         <>
-                            <Metatags title="QrContest"/>
+                            <Metatags title="Gra Konwentowa"/>
                             <div
                                 className={
                                     `${imFellDoublePica.variable} ${imFellDoublePicaSC.variable} `

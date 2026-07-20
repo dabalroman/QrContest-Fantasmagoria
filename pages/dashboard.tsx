@@ -55,7 +55,7 @@ const getFantasmagoriaProgram = async (): Promise<FantasmagoriaProgramEntry[]> =
         .then((response) => response.json());
 
     const blacklist = [
-        'QrContest',
+        'Gra Konwentowa',
         'Przygotowanie Cosplay'
     ];
 
