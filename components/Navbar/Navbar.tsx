@@ -51,7 +51,7 @@ export default function Navbar ({ navbarConfig }: { navbarConfig: NavbarConfig }
                 disabled={navbarConfig.disabledSides}
             />
             <NavbarButton
-                href={Page.ACHIEVEMENTS} icon={faMedal}
+                href={Page.ACHIEVEMENTS} icon={faTrophy}
                 disabled={navbarConfig.disabledSides}
             />
             <NavbarSuperButton
@@ -64,7 +64,7 @@ export default function Navbar ({ navbarConfig }: { navbarConfig: NavbarConfig }
             <div className="relative">
                 <NavbarButton
                     href={Page.RANKING}
-                    icon={faTrophy}
+                    icon={faMedal}
                     disabled={navbarConfig.disabledSides}
                     className={navbarConfig.animatePointsAdded ? 'animate-[pulse_1s_ease-in-out_4]' : ''}
                 />
