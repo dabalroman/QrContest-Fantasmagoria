@@ -12,7 +12,7 @@ export const collectCardFunction: HttpsCallable<
 > = httpsCallable(functions, 'collectCardHandle');
 
 export const collectPinFunction: HttpsCallable<
-    { code?: string, pinUid?: string, answer?: string },
+    { code?: string, pinUid?: string, answer?: string, rating?: number, talkName?: string },
     { pin: RawCollectedPin, question: RawQuestion | null, achievements: RawAchievementGrant[] }
 > = httpsCallable(functions, 'collectPinHandle');
 

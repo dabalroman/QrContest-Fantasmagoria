@@ -10,7 +10,9 @@ const collectErrorsDictionary: StringMap = {
     'pin is not available yet': 'To miejsce nie jest jeszcze dostępne.',
     'pin is no longer available': 'To miejsce nie jest już dostępne.',
     'pin type is not supported yet': 'Ten typ miejsca będzie dostępny wkrótce.',
-    'wrong answer': 'Błędna odpowiedź!'
+    'wrong answer': 'Błędna odpowiedź!',
+    'rating is invalid': 'Wybierz ocenę od 1 do 5 gwiazdek.',
+    'talkName is invalid': 'Podaj nazwę prelekcji — od 10 do 255 znaków.'
 };
 
 export function getCollectErrorMessage (error: Error): string {

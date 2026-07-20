@@ -14,7 +14,7 @@ import {
     PIN_CODE_UID, PIN_CODE_VALUE, PIN_CODE_CODE, PIN_CODE_NAME, PIN_CODE_DESCRIPTION, PIN_CODE_HINT_RADIUS,
     PIN_RIDDLE_UID, PIN_RIDDLE_VALUE, PIN_RIDDLE_ANSWER,
     PIN_VISIT_UID, PIN_VISIT_VALUE,
-    PIN_FEEDBACK_UID, PIN_PHOTO_UID,
+    PIN_FEEDBACK_UID, PIN_FEEDBACK_VALUE, PIN_FEEDBACK_WITHQ_UID, PIN_PHOTO_UID,
     PIN_UNAVAILABLE_UID,
     PIN_INACTIVE_UID, PIN_INACTIVE_CODE,
     PIN_FUTURE_UID, PIN_WINDOWED_UID
@@ -170,18 +170,120 @@ test('wrong code / wrong riddle answer is rejected, no write, retry still possib
     assert.equal(result.pin.awardedPoints, PIN_RIDDLE_VALUE);
 });
 
-test('feedback and photo pins are rejected (not implemented yet)', async () => {
+test('photo pin is rejected (collect owned by #19\'s photo-proof flow, not collectPinHandle)', async () => {
     const uid = 'pin-player-9';
     const token = await registerPlayer(uid, 'PinPlayer9');
 
     await assert.rejects(
-        () => callCallable('collectPinHandle', { pinUid: PIN_FEEDBACK_UID }, token),
-        /not supported/i
-    );
-    await assert.rejects(
         () => callCallable('collectPinHandle', { pinUid: PIN_PHOTO_UID }, token),
         /not supported/i
     );
+});
+
+// --- Feedback pins (#12) ---
+
+test('feedback pin awards and fans out, storing the rating and talkName', async () => {
+    const uid = 'pin-player-feedback-1';
+    const token = await registerPlayer(uid, 'PinPlayerFeedback1');
+
+    const result = await callCallable(
+        'collectPinHandle',
+        { pinUid: PIN_FEEDBACK_UID, rating: 4, talkName: 'Wyklad o smokach' },
+        token
+    );
+    assert.equal(result.pin.awardedPoints, PIN_FEEDBACK_VALUE);
+    assert.equal(result.pin.rating, 4);
+    assert.equal(result.pin.talkName, 'Wyklad o smokach');
+    assert.equal(result.question, null, 'a feedback pin never draws a question');
+
+    const collectedPin = (await db.collection('users').doc(uid)
+        .collection('collectedPins').doc(PIN_FEEDBACK_UID).get()).data();
+    assert.equal(collectedPin.rating, 4);
+    assert.equal(collectedPin.talkName, 'Wyklad o smokach');
+
+    const user = (await db.collection('users').doc(uid).get()).data();
+    const round = (await db.collection('ranking').doc(ROUND_UID).get()).data();
+
+    assert.equal(user.score, PIN_FEEDBACK_VALUE, 'user.score');
+    assert.equal(user.amountOfCollectedPins, 1, 'user.amountOfCollectedPins');
+    assert.equal(round.users[uid].score, PIN_FEEDBACK_VALUE, 'ranking round copy score');
+    assert.equal(round.users[uid].amountOfCollectedPins, 1, 'ranking round copy counter');
+});
+
+test('feedback pin stores the trimmed talkName', async () => {
+    const uid = 'pin-player-feedback-2';
+    const token = await registerPlayer(uid, 'PinPlayerFeedback2');
+
+    const result = await callCallable(
+        'collectPinHandle',
+        { pinUid: PIN_FEEDBACK_UID, rating: 5, talkName: '  Best panel ever  ' },
+        token
+    );
+    assert.equal(result.pin.talkName, 'Best panel ever');
+});
+
+test('feedback pin rejects a missing, zero, out-of-range or non-integer rating', async () => {
+    const uid = 'pin-player-feedback-3';
+    const token = await registerPlayer(uid, 'PinPlayerFeedback3');
+
+    for (const rating of [undefined, 0, 6, 2.5]) {
+        await assert.rejects(
+            () => callCallable(
+                'collectPinHandle',
+                { pinUid: PIN_FEEDBACK_UID, rating, talkName: 'Wyklad o smokach' },
+                token
+            ),
+            /rating is invalid/i
+        );
+    }
+});
+
+test('feedback pin rejects a missing, too-short, over-long or forbidden-phrase talkName', async () => {
+    const uid = 'pin-player-feedback-4';
+    const token = await registerPlayer(uid, 'PinPlayerFeedback4');
+
+    for (const talkName of [undefined, 'krotka', '   krotka   ', 'x'.repeat(256), 'kurwa']) {
+        await assert.rejects(
+            () => callCallable(
+                'collectPinHandle',
+                { pinUid: PIN_FEEDBACK_UID, rating: 3, talkName },
+                token
+            ),
+            /talkName is invalid/i
+        );
+    }
+});
+
+test('a feedback pin cannot be submitted twice, still respects active/window guards', async () => {
+    const uid = 'pin-player-feedback-5';
+    const token = await registerPlayer(uid, 'PinPlayerFeedback5');
+
+    await callCallable('collectPinHandle', { pinUid: PIN_FEEDBACK_UID, rating: 3, talkName: 'Wyklad o smokach' }, token);
+    await assert.rejects(
+        () => callCallable('collectPinHandle', { pinUid: PIN_FEEDBACK_UID, rating: 3, talkName: 'Wyklad o smokach' }, token),
+        /already/i
+    );
+
+    await assert.rejects(
+        () => callCallable('collectPinHandle', { pinUid: PIN_INACTIVE_UID, rating: 3 }, token),
+        /not active/i
+    );
+    await assert.rejects(
+        () => callCallable('collectPinHandle', { pinUid: PIN_UNAVAILABLE_UID, rating: 3 }, token),
+        /available/i
+    );
+});
+
+test('a feedback pin never draws a question even with withQuestion: true', async () => {
+    const uid = 'pin-player-feedback-6';
+    const token = await registerPlayer(uid, 'PinPlayerFeedback6');
+
+    const result = await callCallable(
+        'collectPinHandle',
+        { pinUid: PIN_FEEDBACK_WITHQ_UID, rating: 3, talkName: 'Wyklad o smokach' },
+        token
+    );
+    assert.equal(result.question, null);
 });
 
 test('normalization: surrounding whitespace and case do not matter', async () => {
@@ -221,7 +323,7 @@ test('getPins returns active pins and drops inactive ones', async () => {
     // Null-window pins are the whole game; this is the regression net against the Firestore
     // null-ordering trap (a `where('availableTo', ...)` query would silently drop them).
     assert.ok(uids.includes(PIN_VISIT_UID), 'null-window pin present');
-    assert.ok(uids.includes(PIN_FEEDBACK_UID), 'feedback pin still renders (collect owned by #12)');
+    assert.ok(uids.includes(PIN_FEEDBACK_UID), 'feedback pin still renders');
     assert.ok(uids.includes(PIN_PHOTO_UID), 'photo pin still renders');
     assert.ok(!uids.includes(PIN_INACTIVE_UID), 'inactive pin dropped server-side');
 });

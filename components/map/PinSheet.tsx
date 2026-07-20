@@ -10,8 +10,13 @@ import { collectPinFunction } from '@/utils/functions';
 import useDynamicNavbar from '@/hooks/useDynamicNavbar';
 import PinCardComponent from '@/components/pin/PinCardComponent';
 import PhotoPinCollect, { PhotoPinCollectHandle } from '@/components/pin/PhotoPinCollect';
+import StarRating from '@/components/pin/StarRating';
 import Panel from '@/components/Panel';
 import scheduleAchievementToasts from '@/utils/scheduleAchievementToasts';
+
+// Mirrors collectPinHandle's validateFeedback — the server rejects anything shorter.
+const MIN_TALK_NAME_LENGTH = 10;
+const MAX_TALK_NAME_LENGTH = 255;
 
 // The marker-click sheet. Reuses the SAME card the collect screen shows (decision 18) — Pin satisfies
 // PinCardData structurally, so it passes straight in. The collect control is react-hook-form, NOT
@@ -35,26 +40,32 @@ export default function PinSheet ({
     onError: (error: Error) => void
 }) {
     const [loading, setLoading] = useState<boolean>(false);
-    const { register, handleSubmit } = useForm({ mode: 'onChange', defaultValues: { answer: '' } });
+    const { register, handleSubmit, setValue, watch } = useForm({
+        mode: 'onChange',
+        defaultValues: { answer: '', talkName: '', rating: 0 }
+    });
     const photoCollectRef = useRef<PhotoPinCollectHandle>(null);
 
     const needsAnswer = pin.type === PinType.CODE || pin.type === PinType.RIDDLE;
     const isPhoto = pin.type === PinType.PHOTO;
-    // Photo pins have their own in-panel capture flow; feedback (#12) is still unimplemented.
-    const notSupported = pin.type === PinType.FEEDBACK;
-    // The navbar centre collect button covers code/riddle/visit only — photo submits via its own panel.
-    const canCollect = !collected && !notSupported && !isPhoto;
+    const isFeedback = pin.type === PinType.FEEDBACK;
+    // The navbar centre collect button covers code/riddle/visit/feedback — photo submits via its own panel.
+    const canCollect = !collected && !isPhoto;
     // A photo pin with no image sent yet: the centre button becomes the uploader.
     const canUploadPhoto = isPhoto && !collected;
     const photoApproved = isPhoto && collected && (collectedPin?.awardedPoints ?? 0) > 0;
     const photoPending = isPhoto && collected && !photoApproved;
+    const feedbackReady = !isFeedback
+        || (watch('rating') >= 1 && watch('talkName').trim().length >= MIN_TALK_NAME_LENGTH);
 
-    const collect = (data: { answer: string }) => {
+    const collect = (data: { answer: string, talkName: string, rating: number }) => {
         setLoading(true);
 
         collectPinFunction(needsAnswer
             ? { pinUid: pin.uid, answer: data.answer }
-            : { pinUid: pin.uid }
+            : isFeedback
+                ? { pinUid: pin.uid, rating: data.rating, talkName: data.talkName }
+                : { pinUid: pin.uid }
         )
             .then((result) => {
                 setLoading(false);
@@ -84,7 +95,8 @@ export default function PinSheet ({
         icon: centerIcon,
         onClick: centerOnClick,
         disabledSides: true,
-        animate: canCollect
+        disabledCenter: canCollect && !feedbackReady,
+        animate: canCollect && feedbackReady
     });
 
     return (
@@ -130,7 +142,33 @@ export default function PinSheet ({
                     </Panel>
                 }
 
-                {canCollect && !needsAnswer &&
+                {canCollect && isFeedback &&
+                    <Panel title="Oceń prelekcję" loading={loading}>
+                        <form onSubmit={handleSubmit(collect)}>
+                            <p className="text-center font-semibold mb-2">Jak oceniasz tę prelekcję?</p>
+                            <StarRating value={watch('rating')} onChange={(value) => setValue('rating', value)}/>
+                            <label className="block mt-4">
+                                <span className="block text-center mb-1">
+                                    Jak nazywa się prelekcja, na której byłaś / byłeś?
+                                </span>
+                                <input
+                                    type="text"
+                                    maxLength={MAX_TALK_NAME_LENGTH}
+                                    placeholder="Nazwa prelekcji"
+                                    className="rounded-xl block w-full p-1 border-2 border-input-border text-center
+                                        bg-input-background text-text-accent text-lg shadow-inner-input
+                                        font-semibold"
+                                    {...register('talkName')}
+                                />
+                            </label>
+                            <p className="text-center pt-2">
+                                Ocenę możesz wystawić tylko raz.
+                            </p>
+                        </form>
+                    </Panel>
+                }
+
+                {canCollect && !needsAnswer && !isFeedback &&
                     <Panel loading={loading}>
                         <p className="text-center font-semibold">Jesteś na miejscu? Kliknij przycisk, by zaliczyć.</p>
                     </Panel>
@@ -151,12 +189,6 @@ export default function PinSheet ({
                 {photoApproved &&
                     <Panel>
                         <p className="text-center font-semibold">Zdjęcie zaakceptowane!</p>
-                    </Panel>
-                }
-
-                {notSupported &&
-                    <Panel>
-                        <p className="text-center font-semibold">Wkrótce</p>
                     </Panel>
                 }
 

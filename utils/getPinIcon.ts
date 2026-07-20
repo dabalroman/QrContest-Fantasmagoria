@@ -2,9 +2,9 @@ import {PinType} from '@/Enum/PinType';
 import {
     faCamera,
     faLocationDot,
+    faMicrophone,
     faPuzzlePiece,
     faQrcode,
-    faStar,
     IconDefinition
 } from '@fortawesome/free-solid-svg-icons';
 
@@ -22,7 +22,7 @@ export default function getPinIcon(pinType: PinType): IconDefinition {
     }
 
     if (pinType === PinType.FEEDBACK) {
-        return faStar;
+        return faMicrophone;
     }
 
     return faCamera;

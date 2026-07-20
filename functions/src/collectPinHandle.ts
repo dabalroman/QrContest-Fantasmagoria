@@ -8,8 +8,40 @@ import { assertPinIsActive, assertPinIsAvailable, assertPinIsNotAlreadyCollected
 import {AchievementGrant} from './types/achievement';
 import {HttpsError, onCall} from 'firebase-functions/v2/https';
 import * as logger from 'firebase-functions/logger';
+import forbiddenPhrases from './data/forbiddenPhrases';
 
 const normalize = (s: string): string => s.trim().toUpperCase();
+
+const MIN_TALK_NAME_LENGTH = 10;
+const MAX_TALK_NAME_LENGTH = 255;
+
+function checkForForbiddenPhrases(text: string): boolean {
+    const lower = text.toLowerCase();
+    return forbiddenPhrases.some((phrase) => lower.includes(phrase));
+}
+
+function validateFeedback(ratingRaw: unknown, talkNameRaw: unknown): { rating: number, talkName: string } {
+    if (typeof ratingRaw !== 'number' || !Number.isInteger(ratingRaw) || ratingRaw < 1 || ratingRaw > 5) {
+        logger.error('collectPinHandle', 'rating is invalid', ratingRaw);
+        throw new HttpsError('invalid-argument', 'rating is invalid');
+    }
+
+    if (typeof talkNameRaw !== 'string') {
+        logger.error('collectPinHandle', 'talkName is invalid');
+        throw new HttpsError('invalid-argument', 'talkName is invalid');
+    }
+
+    const talkName = talkNameRaw.trim();
+
+    if (talkName.length < MIN_TALK_NAME_LENGTH
+        || talkName.length > MAX_TALK_NAME_LENGTH
+        || checkForForbiddenPhrases(talkName)) {
+        logger.error('collectPinHandle', 'talkName is invalid');
+        throw new HttpsError('invalid-argument', 'talkName is invalid');
+    }
+
+    return { rating: ratingRaw, talkName };
+}
 
 export const collectPinHandle = onCall(async (req): Promise<{
     pin: CollectedPin,
@@ -33,6 +65,7 @@ export const collectPinHandle = onCall(async (req): Promise<{
 
     let pinRef: FirebaseFirestore.DocumentReference;
     let pin: Pin;
+    let feedback: { rating: number, talkName: string } | null = null;
 
     if (pinUid) {
         // Pin-UI path (map): the pin is already known, validate against THAT pin's code only.
@@ -45,8 +78,9 @@ export const collectPinHandle = onCall(async (req): Promise<{
         }
 
         pin = pinDoc.data() as Pin;
+        const isFeedback = pin.type === PinType.FEEDBACK;
 
-        if (!COLLECTIBLE_PIN_TYPES.includes(pin.type)) {
+        if (!COLLECTIBLE_PIN_TYPES.includes(pin.type) && !isFeedback) {
             logger.error('collectPinHandle', 'pin type is not supported yet', pin.type);
             throw new HttpsError('invalid-argument', 'pin type is not supported yet');
         }
@@ -55,7 +89,9 @@ export const collectPinHandle = onCall(async (req): Promise<{
         assertPinIsAvailable(pin);
         assertPinIsNotAlreadyCollected(pin, uid);
 
-        if (pin.type !== PinType.VISIT) {
+        if (isFeedback) {
+            feedback = validateFeedback(data.rating, data.talkName);
+        } else if (pin.type !== PinType.VISIT) {
             if (answerAttempt === null || pin.code === null || normalize(answerAttempt) !== normalize(pin.code)) {
                 logger.warn('collectPinHandle', 'wrong answer', {pinUid: pin.uid, uid});
                 throw new HttpsError('invalid-argument', 'wrong answer');
@@ -106,7 +142,7 @@ export const collectPinHandle = onCall(async (req): Promise<{
         .collection('collectedQuestions')
         .doc('collectedQuestions');
 
-    if (pin.withQuestion) {
+    if (pin.withQuestion && pin.type !== PinType.FEEDBACK) {
         const questionsDoc = await questionsRef.get();
         const questionsData = questionsDoc.data() as QuestionsDoc;
         const questions = Object.values(questionsData) as Question[];
@@ -149,8 +185,8 @@ export const collectPinHandle = onCall(async (req): Promise<{
                 type: pin.type,
                 collectedAt: FieldValue.serverTimestamp(),
                 awardedPoints: pin.value,
-                talkName: null,
-                rating: null
+                talkName: feedback?.talkName ?? null,
+                rating: feedback?.rating ?? null
             });
 
             // Update pin collectedBy

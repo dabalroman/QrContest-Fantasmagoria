@@ -34,6 +34,8 @@ export const PIN_VISIT_UID = 'test-pin-visit';
 export const PIN_VISIT_VALUE = 5;
 
 export const PIN_FEEDBACK_UID = 'test-pin-feedback';
+export const PIN_FEEDBACK_VALUE = 5;
+export const PIN_FEEDBACK_WITHQ_UID = 'test-pin-feedback-withq';
 export const PIN_PHOTO_UID = 'test-pin-photo';
 export const PIN_PHOTO_VALUE = 5;
 
@@ -371,8 +373,28 @@ export async function seedFixture () {
         mapId: 'test-map',
         coords: { x: 30, y: 30 },
         hintRadius: null,
-        value: 5,
+        value: PIN_FEEDBACK_VALUE,
         withQuestion: false,
+        availableFrom: null,
+        availableTo: null,
+        isActive: true,
+        code: null,
+        collectedBy: {}
+    });
+
+    // A feedback pin with withQuestion: true — D3 requires it never draws one regardless of the flag.
+    await db.collection('pins').doc(PIN_FEEDBACK_WITHQ_UID).set({
+        uid: PIN_FEEDBACK_WITHQ_UID,
+        name: 'Test pin (feedback, withQuestion)',
+        description: 'test pin',
+        clue: '',
+        type: 'feedback',
+        groups: ['test'],
+        mapId: 'test-map',
+        coords: { x: 31, y: 31 },
+        hintRadius: null,
+        value: PIN_FEEDBACK_VALUE,
+        withQuestion: true,
         availableFrom: null,
         availableTo: null,
         isActive: true,
