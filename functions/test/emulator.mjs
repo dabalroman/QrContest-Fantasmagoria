@@ -18,19 +18,26 @@ export const REGION = 'europe-west1';
 
 const FIRESTORE_HOST = '127.0.0.1:8080';
 const AUTH_HOST = '127.0.0.1:9099';
+const STORAGE_HOST = '127.0.0.1:9199';
 const FUNCTIONS_BASE = `http://127.0.0.1:5001/${PROJECT_ID}/${REGION}`;
+
+// The bucket the photo-proof suite (#19) reads/writes. The function resolves the same default from
+// FIREBASE_CONFIG/GCLOUD_PROJECT (`${project}.appspot.com`), so both sides agree on one bucket.
+export const STORAGE_BUCKET = `${PROJECT_ID}.appspot.com`;
 
 // Must be set before admin initializes so it targets the emulator, not the live project.
 process.env.FIRESTORE_EMULATOR_HOST = FIRESTORE_HOST;
 process.env.FIREBASE_AUTH_EMULATOR_HOST = AUTH_HOST;
+process.env.STORAGE_EMULATOR_HOST = `http://${STORAGE_HOST}`;
 process.env.GCLOUD_PROJECT = PROJECT_ID;
 
 if (admin.apps.length === 0) {
-    admin.initializeApp({ projectId: PROJECT_ID });
+    admin.initializeApp({ projectId: PROJECT_ID, storageBucket: STORAGE_BUCKET });
 }
 
 export const db = admin.firestore();
 export const auth = admin.auth();
+export const bucket = admin.storage().bucket();
 
 /** Fail fast with a clear message if the emulator isn't up. */
 export async function assertEmulatorReachable () {

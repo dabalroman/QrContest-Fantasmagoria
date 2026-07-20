@@ -21,6 +21,11 @@ export type User = {
     uid: string,
     username: string,
     score: number,
+    // Points from photo submissions awaiting admin review (#19). A score SIBLING, not a leaderboard
+    // field: it never fans out to ranking/guilds and never affects sort — the ranking header shows it
+    // only on the player's OWN row. Deliberately NOT a UserCounterKey (see USER_COUNTER_DEFAULTS),
+    // so it is hydrated separately in getCurrentUser, the way collectedPinsByScope is.
+    pendingScore: number,
     amountOfCollectedCards: number,
     amountOfAnsweredQuestions: number,
     amountOfCorrectAnswers: number,

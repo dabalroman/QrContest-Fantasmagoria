@@ -3,7 +3,7 @@
 // one collectible card that carries a question, and the questions doc.
 
 import admin from 'firebase-admin';
-import { db } from './emulator.mjs';
+import { db, bucket } from './emulator.mjs';
 
 const { Timestamp, FieldValue } = admin.firestore;
 
@@ -35,6 +35,22 @@ export const PIN_VISIT_VALUE = 5;
 
 export const PIN_FEEDBACK_UID = 'test-pin-feedback';
 export const PIN_PHOTO_UID = 'test-pin-photo';
+export const PIN_PHOTO_VALUE = 5;
+
+/**
+ * Seed a Storage object at the derived photo path, the way the client's uploadBytes would — including
+ * the `firebaseStorageDownloadTokens` custom metadata the emulator auto-creates on a real upload, so
+ * getPhotoSubmissionsHandle can build a download-token URL. submitPhotoHandle's object-exists check
+ * needs this present before it will accept a submit (#19).
+ */
+export async function seedPhotoObject (userUid, pinUid, token = 'test-token') {
+    await bucket.file(`users/${userUid}/photos/${pinUid}`).save(Buffer.from('fake-image-bytes'), {
+        metadata: {
+            contentType: 'image/jpeg',
+            metadata: { firebaseStorageDownloadTokens: token }
+        }
+    });
+}
 
 export const PIN_UNAVAILABLE_UID = 'test-pin-unavailable';
 export const PIN_UNAVAILABLE_VALUE = 5;
@@ -374,7 +390,7 @@ export async function seedFixture () {
         mapId: 'test-map',
         coords: { x: 40, y: 40 },
         hintRadius: null,
-        value: 5,
+        value: PIN_PHOTO_VALUE,
         withQuestion: false,
         availableFrom: null,
         availableTo: null,

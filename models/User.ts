@@ -13,6 +13,10 @@ export default class User extends FirebaseModel {
     uid: string;
     username: string;
     score: number;
+    // Points from photo submissions awaiting admin review (#19). Display-only: shown as `+X oczekuje`
+    // on the player's own ranking header, never added to score or used in leaderboard sort. Mirrors
+    // functions/src/types/user.ts.
+    pendingScore: number;
     amountOfCollectedCards: number;
     amountOfAnsweredQuestions: number;
     amountOfCorrectAnswers: number;
@@ -31,6 +35,7 @@ export default class User extends FirebaseModel {
         uid: string,
         username: string = '',
         score: number = 0,
+        pendingScore: number = 0,
         amountOfCollectedCards: number = 0,
         amountOfAnsweredQuestions: number = 0,
         amountOfCorrectAnswers: number = 0,
@@ -48,6 +53,7 @@ export default class User extends FirebaseModel {
         this.uid = uid;
         this.username = username;
         this.score = score;
+        this.pendingScore = pendingScore;
         this.amountOfCollectedCards = amountOfCollectedCards;
         this.amountOfAnsweredQuestions = amountOfAnsweredQuestions;
         this.amountOfCorrectAnswers = amountOfCorrectAnswers;
@@ -98,6 +104,7 @@ export default class User extends FirebaseModel {
             data.uid,
             data.username,
             data.score,
+            data.pendingScore ?? 0,
             data.amountOfCollectedCards,
             data.amountOfAnsweredQuestions,
             data.amountOfCorrectAnswers ?? 0,

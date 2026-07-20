@@ -13,6 +13,9 @@ import {collectPinHandle} from './collectPinHandle';
 import {getPinsHandle} from './getPinsHandle';
 import {upsertPinHandle} from './upsertPinHandle';
 import {deletePinHandle} from './deletePinHandle';
+import {submitPhotoHandle} from './submitPhotoHandle';
+import {reviewPhotoHandle} from './reviewPhotoHandle';
+import {getPhotoSubmissionsHandle} from './getPhotoSubmissionsHandle';
 import {onSchedule} from "firebase-functions/scheduler";
 import {logger} from "firebase-functions";
 import updateRoundsProcessor from "./updateRoundsProcessor";
@@ -20,7 +23,8 @@ import {onCall} from "firebase-functions/https";
 
 export {
     setupAccountHandle, seedDatabaseHandle, collectCardHandle, answerQuestionHandle, joinGuildHandle,
-    collectPinHandle, getPinsHandle, upsertPinHandle, deletePinHandle
+    collectPinHandle, getPinsHandle, upsertPinHandle, deletePinHandle,
+    submitPhotoHandle, reviewPhotoHandle, getPhotoSubmissionsHandle
 };
 
 export const updateRoundsHandle = onCall(async (): Promise<{}> => {

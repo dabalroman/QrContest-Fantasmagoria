@@ -9,6 +9,7 @@ import { PinType } from '@/Enum/PinType';
 import { collectPinFunction } from '@/utils/functions';
 import useDynamicNavbar from '@/hooks/useDynamicNavbar';
 import PinCardComponent from '@/components/pin/PinCardComponent';
+import PhotoPinCollect from '@/components/pin/PhotoPinCollect';
 import Panel from '@/components/Panel';
 import scheduleAchievementToasts from '@/utils/scheduleAchievementToasts';
 
@@ -19,12 +20,16 @@ import scheduleAchievementToasts from '@/utils/scheduleAchievementToasts';
 export default function PinSheet ({
     pin,
     collected,
+    collectedPin,
     onClose,
     onCollected,
     onError
 }: {
     pin: Pin,
     collected: boolean,
+    // The player's own collectedPins snapshot for this pin (present iff `collected`). Its
+    // awardedPoints distinguishes a pending photo (0) from an approved one (> 0) with no extra read.
+    collectedPin?: CollectedPin | null,
     onClose: () => void,
     onCollected: (collectedPin: CollectedPin, question: Question | null) => void,
     onError: (error: Error) => void
@@ -33,8 +38,13 @@ export default function PinSheet ({
     const { register, handleSubmit } = useForm({ mode: 'onChange', defaultValues: { answer: '' } });
 
     const needsAnswer = pin.type === PinType.CODE || pin.type === PinType.RIDDLE;
-    const notSupported = pin.type === PinType.FEEDBACK || pin.type === PinType.PHOTO;
-    const canCollect = !collected && !notSupported;
+    const isPhoto = pin.type === PinType.PHOTO;
+    // Photo pins have their own in-panel capture flow; feedback (#12) is still unimplemented.
+    const notSupported = pin.type === PinType.FEEDBACK;
+    // The navbar centre collect button covers code/riddle/visit only — photo submits via its own panel.
+    const canCollect = !collected && !notSupported && !isPhoto;
+    const photoApproved = isPhoto && collected && (collectedPin?.awardedPoints ?? 0) > 0;
+    const photoPending = isPhoto && collected && !photoApproved;
 
     const collect = (data: { answer: string }) => {
         setLoading(true);
@@ -114,13 +124,31 @@ export default function PinSheet ({
                     </Panel>
                 }
 
+                {isPhoto && !collected &&
+                    <PhotoPinCollect pinUid={pin.uid} onSubmitted={() => undefined}/>
+                }
+
+                {photoPending &&
+                    <Panel>
+                        <p className="text-center font-semibold">
+                            Zdjęcie wysłane — oczekuje na weryfikację. Punkty zostaną dodane po zaakceptowaniu zdjęcia.
+                        </p>
+                    </Panel>
+                }
+
+                {photoApproved &&
+                    <Panel>
+                        <p className="text-center font-semibold">Zdjęcie zaakceptowane!</p>
+                    </Panel>
+                }
+
                 {notSupported &&
                     <Panel>
                         <p className="text-center font-semibold">Wkrótce</p>
                     </Panel>
                 }
 
-                {collected &&
+                {collected && !isPhoto &&
                     <Panel>
                         <p className="text-center font-semibold">To miejsce masz już odwiedzone!</p>
                     </Panel>

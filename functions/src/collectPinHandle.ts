@@ -1,9 +1,10 @@
-import {FieldValue, getFirestore, Timestamp, UpdateData} from 'firebase-admin/firestore';
+import {FieldValue, getFirestore, UpdateData} from 'firebase-admin/firestore';
 import {COLLECTIBLE_PIN_TYPES, CollectedPin, Pin, PinCollectedBy, PinType} from './types/pin';
 import {CollectedCardQuestion, CollectedQuestions, PublicQuestion, Question, QuestionsDoc} from './types/question';
 import getCurrentUser from './actions/getCurrentUser';
 import awardPoints from './actions/awardPoints';
 import scopeKeys from './actions/pinScopeKeys';
+import { assertPinIsActive, assertPinIsAvailable, assertPinIsNotAlreadyCollected } from './actions/assertPin';
 import {AchievementGrant} from './types/achievement';
 import {HttpsError, onCall} from 'firebase-functions/v2/https';
 import * as logger from 'firebase-functions/logger';
@@ -189,33 +190,3 @@ export const collectPinHandle = onCall(async (req): Promise<{
         throw new HttpsError('aborted', 'error while collecting pin');
     }
 });
-
-function assertPinIsActive(pin: Pin): void {
-    if (!pin.isActive) {
-        logger.error('collectPinHandle', 'pin is not active', pin.uid);
-        throw new HttpsError('not-found', 'pin is not active');
-    }
-}
-
-function assertPinIsAvailable(pin: Pin): void {
-    const now = Date.now();
-
-    if (pin.availableFrom && (pin.availableFrom as Timestamp).toDate().getTime() > now) {
-        logger.error('collectPinHandle', 'pin is not available yet', pin.uid);
-        throw new HttpsError('failed-precondition', 'pin is not available yet');
-    }
-
-    if (pin.availableTo && (pin.availableTo as Timestamp).toDate().getTime() < now) {
-        logger.error('collectPinHandle', 'pin is no longer available', pin.uid);
-        throw new HttpsError('failed-precondition', 'pin is no longer available');
-    }
-}
-
-function assertPinIsNotAlreadyCollected(pin: Pin, uid: string): void {
-    const isAlreadyCollected = pin.collectedBy && uid in pin.collectedBy;
-
-    if (isAlreadyCollected) {
-        logger.error('collectPinHandle', 'pin is already collected');
-        throw new HttpsError('already-exists', 'pin is already collected');
-    }
-}

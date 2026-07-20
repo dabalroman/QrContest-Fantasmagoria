@@ -53,6 +53,7 @@ export default function AccountPage () {
             <LinkButton href={Page.ADMIN_RECENTLY_COLLECTED} className={'mt-4'}>Ostatnio zebrane karty</LinkButton>
             <LinkButton href={Page.ADMIN_CARDS} className={'mt-4'}>Lista kart</LinkButton>
             <LinkButton href={Page.ADMIN_USERS} className={'mt-4'}>Lista użytkowników</LinkButton>
+            <LinkButton href={Page.ADMIN_PHOTO_REVIEW} className={'mt-4'}>Zdjęcia do weryfikacji</LinkButton>
             <LinkButton href={Page.DASHBOARD} className={'mt-4'}>Podgląd dashboardu</LinkButton>
 
             <Button className="w-full mt-4" onClick={() => {

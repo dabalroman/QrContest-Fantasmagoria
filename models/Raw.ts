@@ -80,6 +80,21 @@ export interface RawCollectedPin {
     rating: number | undefined
 }
 
+// One row of the admin photo-review queue as it arrives from getPhotoSubmissionsHandle (#19). Only the
+// fields the queue renders — `photoUrl` is a server-built Firebase download-token URL (no signBlob),
+// null when the object's token metadata could not be read. There is no full client model: like RawPin,
+// the queue goes straight through the callable.
+export interface RawPhotoSubmission {
+    submissionUid: Uid,
+    userUid: Uid,
+    username: string,
+    pinUid: Uid,
+    pinName: string,
+    value: number,
+    submittedAt: RawFirestoreTimestamp,
+    photoUrl: string | null
+}
+
 // An achievement granted during an award, as it arrives in a callable response (the #30 unlock toast
 // consumes it). `icon` is a string KEY the client maps to a FontAwesome icon — never an IconDefinition.
 export interface RawAchievementGrant {

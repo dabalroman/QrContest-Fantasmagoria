@@ -62,6 +62,13 @@ export default function ScoreboardPage({}) {
                         <div><FontAwesomeIcon className="px-1" icon={faStar} size="sm"/>&nbsp;{user?.score}</div>
                     </div>
 
+                    {/* Photo submissions awaiting review (#19) — display-only, never affects score/sort. */}
+                    {user && user.pendingScore > 0 &&
+                        <p className="text-text-dim">
+                            +{Math.max(0, user.pendingScore)} oczekuje na weryfikację
+                        </p>
+                    }
+
                     {!user?.winnerInRound && (
                         currentUserPlace !== -1
                             ? <p className="mt-2">Jesteś na <b>{currentUserPlace + 1}.</b> miejscu w rankingu!</p>

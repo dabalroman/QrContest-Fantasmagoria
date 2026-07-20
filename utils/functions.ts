@@ -1,7 +1,8 @@
 import { HttpsCallable, httpsCallable } from '@firebase/functions';
 import { functions } from '@/utils/firebase';
 import {
-    RawAchievementGrant, RawCard, RawCollectedPin, RawPin, RawPinAuthoredFields, RawQuestion
+    RawAchievementGrant, RawCard, RawCollectedPin, RawPhotoSubmission, RawPin, RawPinAuthoredFields,
+    RawQuestion
 } from '@/models/Raw';
 import { QuestionAnswerValue } from '@/functions/src/types/question';
 
@@ -33,6 +34,25 @@ export const deletePinFunction: HttpsCallable<
     { pinUid: string },
     { status: string }
 > = httpsCallable(functions, 'deletePinHandle');
+
+// Photo-proof pins (#19). The client uploads the downscaled blob to Storage FIRST (Firebase Storage
+// SDK, narrow owner-only rule), then calls this to mark the pin pending — no points yet.
+export const submitPhotoFunction: HttpsCallable<
+    { pinUid: string },
+    { submissionUid: string, status: string }
+> = httpsCallable(functions, 'submitPhotoHandle');
+
+// Admin-only: approve (awards points) or reject (reopens the pin for retry) a pending submission.
+export const reviewPhotoFunction: HttpsCallable<
+    { submissionUid: string, decision: 'approve' | 'reject' },
+    { status: string, achievements: RawAchievementGrant[] }
+> = httpsCallable(functions, 'reviewPhotoHandle');
+
+// Admin-only: the pending photo-review queue. Photos come as server-built download-token URLs.
+export const getPhotoSubmissionsFunction: HttpsCallable<
+    {},
+    { submissions: RawPhotoSubmission[] }
+> = httpsCallable(functions, 'getPhotoSubmissionsHandle');
 
 export const answerQuestionFunction: HttpsCallable<
     { uid: string, answer: string },

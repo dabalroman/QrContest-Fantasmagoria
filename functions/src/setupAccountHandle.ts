@@ -60,6 +60,7 @@ export const setupAccountHandle = onCall(async (req): Promise<{ user: User }> =>
         uid: uid,
         username: username,
         score: 0,
+        pendingScore: 0,
         amountOfCollectedCards: 0,
         amountOfAnsweredQuestions: 0,
         amountOfCorrectAnswers: 0,

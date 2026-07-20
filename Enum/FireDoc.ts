@@ -11,4 +11,5 @@ export enum FireDoc {
     PINS = 'pins',
     PIN_GROUPS = 'pinGroups',
     ACHIEVEMENTS = 'achievements',
+    PHOTO_SUBMISSIONS = 'photoSubmissions',
 }

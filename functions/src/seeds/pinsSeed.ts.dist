@@ -136,6 +136,27 @@ const branchPins: Pin[] = [
         collectedBy: {}
     },
     {
+        uid: 'pomnik-zalozyciela',
+        name: 'Pomnik Założyciela',
+        description: 'Stoi tu od zawsze i patrzy surowo. Zrób sobie z nim zdjęcie na dowód, że tu dotarłeś/aś.',
+        clue: '',
+        // The photo-proof branch (#19). Like feedback, `photo` is EXCLUDED from every achievement target
+        // (COLLECTIBLE_PIN_TYPES), so it can sit in any scope without making a badge unobtainable. The
+        // whole feature is inert until at least one photo pin is seeded — the kill-switch is "seed none".
+        type: PinType.PHOTO,
+        groups: ['dwor', 'targowisko'],
+        mapId: 'dwor',
+        coords: { x: 420, y: 500 },
+        hintRadius: null,
+        value: 20,
+        withQuestion: false,
+        availableFrom: null,
+        availableTo: null,
+        isActive: true,
+        code: null,
+        collectedBy: {}
+    },
+    {
         uid: 'nocny-patrol',
         name: 'Nocny Patrol',
         description: 'Straż obchodzi mury tylko po zmroku. Za dnia nie ma tu nikogo — poza wroną, która niczego nie podpisze.',

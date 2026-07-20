@@ -72,6 +72,12 @@ export default function MapPage () {
         () => new Set((collectedPins?.get() ?? []).map((pin) => pin.uid)),
         [collectedPins]
     );
+    // uid -> the player's collectedPins snapshot, so the sheet can read awardedPoints (0 = a photo pin
+    // still pending review, > 0 = approved) without an extra read.
+    const collectedByUid = useMemo(
+        () => new Map((collectedPins?.get() ?? []).map((pin) => [pin.uid, pin])),
+        [collectedPins]
+    );
 
     // Restore the last floor once, after mount — not in the useState initializer, which would run during
     // SSR and cause a hydration mismatch. An unknown/renamed mapId is ignored (falls back to defaultMapId).
@@ -184,6 +190,7 @@ export default function MapPage () {
                 <PinSheet
                     pin={selectedPin}
                     collected={collectedUids.has(selectedPin.uid)}
+                    collectedPin={collectedByUid.get(selectedPin.uid) ?? null}
                     onClose={() => setSelectedPin(null)}
                     onCollected={onPinCollected}
                     onError={onCollectError}
