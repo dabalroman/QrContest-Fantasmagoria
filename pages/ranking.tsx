@@ -4,7 +4,7 @@ import Panel from '@/components/Panel';
 import React, {useContext, useEffect, useState} from 'react';
 import {UserContext, UserContextType} from '@/utils/context';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
-import {faBolt, faStar, faImagePortrait, faUser} from '@fortawesome/free-solid-svg-icons';
+import {faBolt, faStar, faLocationDot, faUser} from '@fortawesome/free-solid-svg-icons';
 import {collection, onSnapshot, orderBy, query} from '@firebase/firestore';
 import {firestore} from '@/utils/firebase';
 import {FireDoc} from '@/Enum/FireDoc';
@@ -56,8 +56,8 @@ export default function ScoreboardPage({}) {
                 <Panel title={user?.username ?? '...'} loading={loading} className="text-center">
                     <div className="flex place-content-around text-4xl text-text-accent p-4">
                         <div>
-                            <FontAwesomeIcon className="px-1" icon={faImagePortrait} size="sm"/>&nbsp;
-                            {user?.amountOfCollectedCards}
+                            <FontAwesomeIcon className="px-1" icon={faLocationDot} size="sm"/>&nbsp;
+                            {user?.amountOfCollectedPins}
                         </div>
                         <div><FontAwesomeIcon className="px-1" icon={faStar} size="sm"/>&nbsp;{user?.score}</div>
                     </div>

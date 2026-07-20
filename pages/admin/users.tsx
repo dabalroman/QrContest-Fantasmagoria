@@ -46,7 +46,7 @@ export default function UsersAdminPage () {
                         <tr className="text-left">
                             <th className="p-2">Nick</th>
                             <th className="p-2">Wynik</th>
-                            <th className="p-2"># kart</th>
+                            <th className="p-2"># pinezek</th>
                             <th className="p-2"># pytań</th>
                             <th className="p-2">Klub</th>
                             <th className="p-2">Ostatnia akcja</th>
@@ -57,7 +57,7 @@ export default function UsersAdminPage () {
                             <tr key={user.uid} className={index % 2 ? 'bg-background' : ''}>
                                 <td className="p-2">{user.username}</td>
                                 <td className="p-2">{user.score}</td>
-                                <td className="p-2">{user.amountOfCollectedCards}</td>
+                                <td className="p-2">{user.amountOfCollectedPins}</td>
                                 <td className="p-2">{user.amountOfAnsweredQuestions}</td>
                                 <td className="p-2">{user.memberOf}</td>
                                 <td className="p-2">{user.updatedAt.toLocaleString('pl-PL')}</td>

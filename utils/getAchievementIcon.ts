@@ -2,7 +2,7 @@ import {
     faBuilding,
     faCrown,
     faGraduationCap,
-    faMapPin,
+    faLocationDot,
     faMedal,
     faTrophy,
     IconDefinition
@@ -31,7 +31,7 @@ export default function getAchievementIcon (iconKey: string): IconDefinition {
     }
 
     if (iconKey === 'map-pin') {
-        return faMapPin;
+        return faLocationDot;
     }
 
     if (iconKey === 'building') {
