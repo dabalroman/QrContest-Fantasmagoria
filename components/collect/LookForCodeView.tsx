@@ -11,6 +11,7 @@ import { Page } from '@/Enum/Page';
 import Button, { ButtonState } from '@/components/Button';
 import LinkButton from '@/components/LinkButton';
 import toast from 'react-hot-toast';
+import scheduleAchievementToasts from '@/utils/scheduleAchievementToasts';
 
 export default function LookForCodeView ({
     code = null,
@@ -46,6 +47,8 @@ export default function LookForCodeView ({
             .then((result) => {
                 setLoading(false);
                 reset();
+
+                scheduleAchievementToasts(result.data.achievements);
 
                 onCodeValid(
                     CollectedPin.fromRaw(result.data.pin),

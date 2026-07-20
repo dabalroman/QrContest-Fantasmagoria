@@ -10,6 +10,7 @@ import { collectPinFunction } from '@/utils/functions';
 import useDynamicNavbar from '@/hooks/useDynamicNavbar';
 import PinCardComponent from '@/components/pin/PinCardComponent';
 import Panel from '@/components/Panel';
+import scheduleAchievementToasts from '@/utils/scheduleAchievementToasts';
 
 // The marker-click sheet. Reuses the SAME card the collect screen shows (decision 18) — Pin satisfies
 // PinCardData structurally, so it passes straight in. The collect control is react-hook-form, NOT
@@ -44,6 +45,7 @@ export default function PinSheet ({
         )
             .then((result) => {
                 setLoading(false);
+                scheduleAchievementToasts(result.data.achievements);
                 onCollected(
                     CollectedPin.fromRaw(result.data.pin),
                     result.data.question ? Question.fromRaw(result.data.question) : null

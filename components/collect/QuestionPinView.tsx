@@ -10,6 +10,7 @@ import useDynamicNavbar from '@/hooks/useDynamicNavbar';
 import { Page } from '@/Enum/Page';
 import Loader from '@/components/Loader';
 import getPinIcon from '@/utils/getPinIcon';
+import scheduleAchievementToasts from '@/utils/scheduleAchievementToasts';
 
 export default function QuestionPinView ({
     pin,
@@ -59,6 +60,7 @@ export default function QuestionPinView ({
         })
             .then((result) => {
                 setLoading(false);
+                scheduleAchievementToasts(result.data.achievements);
                 setCorrectAnswer(result.data.correctAnswer);
                 onAnswer(result.data.correct);
             })
