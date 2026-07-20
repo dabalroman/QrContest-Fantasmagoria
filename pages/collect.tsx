@@ -2,13 +2,15 @@ import Metatags from '@/components/Metatags';
 import CollectedPin from '@/models/CollectedPin';
 import ScreenTitle from '@/components/ScreenTitle';
 import toast from 'react-hot-toast';
-import { useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Question from '@/models/Question';
 import QuestionPinView from '@/components/collect/QuestionPinView';
 import CollectPinView from '@/components/collect/CollectPinView';
 import LookForCodeView from '@/components/collect/LookForCodeView';
 import { getCollectErrorMessage } from '@/utils/collectErrors';
+import { PinsCacheContext, PinsCacheContextType } from '@/utils/context';
+import { saveLastMapId } from '@/utils/mapView';
 
 enum CollectPageState {
     LOOK_FOR_CODE,
@@ -23,6 +25,24 @@ export default function CollectPage () {
     const [state, setState] = useState<CollectPageState>(CollectPageState.LOOK_FOR_CODE);
     const [pin, setPin] = useState<CollectedPin | null>(null);
     const [question, setQuestion] = useState<Question | null>(null);
+
+    const { pins } = useContext<PinsCacheContextType>(PinsCacheContext);
+
+    // The navbar super-button here just links to /map (see CollectPinView / QuestionPinView), and /map
+    // restores whatever floor was last viewed. So once a code is collected, remember ITS floor — the
+    // CollectedPin snapshot carries no mapId, but the pins cache does (keyed by the same uid). Runs on
+    // [pin, pins] so a cache that finishes loading after the collect still resolves the floor before the
+    // player taps through. If the pin isn't in the cache yet, /map falls back to the last floor as before.
+    useEffect(() => {
+        if (pin === null || pins === null) {
+            return;
+        }
+
+        const fullPin = pins.get().find((candidate) => candidate.uid === pin.uid);
+        if (fullPin) {
+            saveLastMapId(fullPin.mapId);
+        }
+    }, [pin, pins]);
 
     const router = useRouter();
     let { code } = router.query as { code: string | string[] | undefined | null };
