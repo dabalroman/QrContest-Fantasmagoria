@@ -429,10 +429,13 @@ Firestore transactions and the score fan-out — nothing is mocked.
   The pre-commit hook also runs the FE build, so stop `npm run dev` too or the two contend on `.next`.
 - The canonical test asserts the score is identical in all four denormalized places after a collect + answer.
   **Every new point-granting feature must extend this suite** (see the fan-out warning in §12.2).
-- Current suite (**31 tests**): `scoring` (card fan-out), `rounds` (`winnerInRound` propagation), `pins`
+- Current suite (**52 tests**): `scoring` (card fan-out), `rounds` (`winnerInRound` propagation), `pins`
   (both entry paths, anti-bruteforce, dup guard, availability window, normalization, snapshot/secret-stripping),
-  `counters` (legacy docs missing a counter — the §12.2 hydration rule) and `achievements` (threshold crossing +
-  4-place fan-out, bonus cascade, exactly-once, response payload, eval-throw, malformed definition).
+  `admin-pins` (upsert/delete gates + validation), `counters` (legacy docs missing a counter — the §12.2
+  hydration rule), `achievements` (threshold crossing + 4-place fan-out, bonus cascade, exactly-once, response
+  payload, eval-throw, malformed definition) and `seed` (drives the REAL `seedDatabaseHandle` + real compiled
+  `../lib/seeds/*.js`, guards the task-#5 fire-and-forget: asserts every seeded collection's doc count === seed
+  length on a single immediate query with NO settle/retry, plus the auth→password→admin gates).
 - `fixtures.mjs` helpers: `seedFixture` (also seeds the achievement definitions — every suite gets them, and
   fixture awards stay under every threshold so the other suites are unaffected), `seedUser(uid, name, overrides)`
   for presetting counters/score/`achievements`, `seedLegacyUser` for the missing-counter case, and
