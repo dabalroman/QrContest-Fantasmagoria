@@ -7,7 +7,7 @@ import { auth, storage } from '@/utils/firebase';
 import { submitPhotoFunction } from '@/utils/functions';
 import downscaleImage from '@/utils/downscaleImage';
 import Button, { ButtonState } from '@/components/Button';
-import Panel from '@/components/Panel';
+import SheetSection from '@/components/map/SheetSection';
 
 // Imperative handle so the PinSheet's centre super-button can open the OS Camera/Gallery chooser — the
 // same action as the in-panel upload button (the picker lives here, next to the preview/upload state).
@@ -85,7 +85,7 @@ const PhotoPinCollect = forwardRef<PhotoPinCollectHandle, {
     };
 
     return (
-        <Panel title="Zrób zdjęcie" loading={uploading}>
+        <SheetSection title="Zrób zdjęcie" loading={uploading}>
             <input
                 ref={inputRef}
                 type="file"
@@ -130,7 +130,7 @@ const PhotoPinCollect = forwardRef<PhotoPinCollectHandle, {
                     </div>
                 </div>
             }
-        </Panel>
+        </SheetSection>
     );
 });
 

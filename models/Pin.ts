@@ -18,9 +18,9 @@ export type PinCollectedByEntry = {
     talkName: string | null
 };
 
-// The subset PinCardComponent renders. Both Pin and CollectedPin satisfy it structurally, which is what
-// lets the map and the collect screen share one card component without an adapter. The description is
-// rendered by the caller in a Panel below the card, the way CollectCardView does it.
+// The subset PinIdentityStrip renders. Both Pin and CollectedPin satisfy it structurally, which is what
+// lets the map and the collect screen share one component without an adapter. The description is
+// rendered by the caller in a Panel below the strip.
 export interface PinCardData {
     type: PinType;
     name: string;

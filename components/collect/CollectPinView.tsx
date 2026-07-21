@@ -1,10 +1,11 @@
-import PinCardComponent from '@/components/pin/PinCardComponent';
 import CollectedPin from '@/models/CollectedPin';
 import Question from '@/models/Question';
 import { faCheck, faQuestion } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import useDynamicNavbar from '@/hooks/useDynamicNavbar';
 import { Page } from '@/Enum/Page';
 import Panel from '@/components/Panel';
+import getPinIcon from '@/utils/getPinIcon';
 
 export default function CollectPinView ({
     pin,
@@ -24,10 +25,18 @@ export default function CollectPinView ({
     });
 
     return (
-        <div className="relative h-full flex flex-col">
-            <PinCardComponent pin={pin} className="z-20 relative top-3 grow w-full"/>
-            <Panel margin={false} className="text-justify relative top-6 z-0 rounded-3xl">
-                <p className='whitespace-pre-line text-center font-semibold'>{pin.description}</p>
+        <div className="relative h-full flex flex-col items-center justify-center gap-4">
+            <div
+                className={
+                    'flex h-28 w-28 items-center justify-center rounded-full shadow-panel animate-flash '
+                    + `bg-pin-${pin.type} text-text-light`
+                }
+            >
+                <FontAwesomeIcon icon={getPinIcon(pin.type)} className="text-5xl"/>
+            </div>
+            <p className="text-3xl font-fancy-capitals text-text-accent text-center px-4">{pin.name}</p>
+            <Panel className="text-justify w-full">
+                <p className="whitespace-pre-line text-center font-semibold">{pin.description}</p>
             </Panel>
         </div>
     );

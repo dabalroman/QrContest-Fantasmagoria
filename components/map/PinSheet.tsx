@@ -8,17 +8,18 @@ import Question from '@/models/Question';
 import { PinType } from '@/Enum/PinType';
 import { collectPinFunction } from '@/utils/functions';
 import useDynamicNavbar from '@/hooks/useDynamicNavbar';
-import PinCardComponent from '@/components/pin/PinCardComponent';
+import PinIdentityStrip from '@/components/pin/PinIdentityStrip';
 import PhotoPinCollect, { PhotoPinCollectHandle } from '@/components/pin/PhotoPinCollect';
 import StarRating from '@/components/pin/StarRating';
-import Panel from '@/components/Panel';
+import SheetSection from '@/components/map/SheetSection';
 import scheduleAchievementToasts from '@/utils/scheduleAchievementToasts';
+import { getMap, MAP_AREA_LABELS } from '@/utils/maps';
 
 // Mirrors collectPinHandle's validateFeedback — the server rejects anything shorter.
 const MIN_TALK_NAME_LENGTH = 10;
 const MAX_TALK_NAME_LENGTH = 255;
 
-// The marker-click sheet. Reuses the SAME card the collect screen shows (decision 18) — Pin satisfies
+// The marker-click sheet. Reuses the SAME strip the collect screen shows (decision 18) — Pin satisfies
 // PinCardData structurally, so it passes straight in. The collect control is react-hook-form, NOT
 // useState: useDynamicNavbar captures onClick once and excludes it from deps, so a useState value
 // would submit stale; RHF's handleSubmit reads a ref-backed store, so the stale closure is harmless.
@@ -53,6 +54,12 @@ export default function PinSheet ({
     const canCollect = !collected && !isPhoto;
     // A photo pin with no image sent yet: the centre button becomes the uploader.
     const canUploadPhoto = isPhoto && !collected;
+    // Dwór is a city map with no floors (floorLabel null), so it renders as just the area name.
+    const pinMap = getMap(pin.mapId);
+    const locationLabel = pinMap
+        ? [MAP_AREA_LABELS[pinMap.area], pinMap.floorLabel].filter(Boolean).join(' · ')
+        : '';
+
     const photoApproved = isPhoto && collected && (collectedPin?.awardedPoints ?? 0) > 0;
     const photoPending = isPhoto && collected && !photoApproved;
     const feedbackReady = !isFeedback
@@ -106,28 +113,31 @@ export default function PinSheet ({
                 className="fixed inset-x-0 bottom-0 z-40 max-h-[85vh] overflow-y-auto rounded-t-3xl
                     bg-background p-4 pb-32 shadow-panel"
             >
-                <button
-                    onClick={onClose}
-                    className="absolute right-4 top-4 z-10 text-text-accent"
-                    aria-label="Zamknij"
-                >
-                    <FontAwesomeIcon icon={faXmark} size="2x"/>
-                </button>
+                <div className="flex items-center justify-between">
+                    <span className="text-sm text-text-base opacity-70">{locationLabel}</span>
+                    <button onClick={onClose} className="text-text-accent" aria-label="Zamknij">
+                        <FontAwesomeIcon icon={faXmark} size="2x"/>
+                    </button>
+                </div>
 
-                <PinCardComponent pin={pin} className="w-44 mx-auto"/>
+                <PinIdentityStrip pin={pin} className="mt-2"/>
 
-                <Panel className="text-justify mt-4">
+                <SheetSection>
                     <p className="whitespace-pre-line text-center font-semibold">{pin.description}</p>
-                </Panel>
+                </SheetSection>
 
                 {pin.clue &&
-                    <Panel title="Wskazówka" className="text-justify">
-                        <p className="whitespace-pre-line">{pin.clue}</p>
-                    </Panel>
+                    <SheetSection title="Wskazówka">
+                        <p className="whitespace-pre-line text-justify">{pin.clue}</p>
+                    </SheetSection>
                 }
 
                 {canCollect && needsAnswer &&
-                    <Panel title={pin.type === PinType.CODE ? 'Wpisz kod' : 'Rozwiąż zagadkę'} loading={loading}>
+                    <SheetSection
+                        title={pin.type === PinType.CODE ? 'Wpisz kod' : 'Rozwiąż zagadkę'}
+                        loading={loading}
+                        raised
+                    >
                         <form onSubmit={handleSubmit(collect)}>
                             <input
                                 type="text"
@@ -139,11 +149,11 @@ export default function PinSheet ({
                             />
                             <p className="text-center pt-2">Kliknij przycisk, by potwierdzić.</p>
                         </form>
-                    </Panel>
+                    </SheetSection>
                 }
 
                 {canCollect && isFeedback &&
-                    <Panel title="Oceń prelekcję" loading={loading}>
+                    <SheetSection title="Oceń prelekcję" loading={loading} raised>
                         <form onSubmit={handleSubmit(collect)}>
                             <p className="text-center font-semibold mb-2">Jak oceniasz tę prelekcję?</p>
                             <StarRating value={watch('rating')} onChange={(value) => setValue('rating', value)}/>
@@ -165,13 +175,13 @@ export default function PinSheet ({
                                 Ocenę możesz wystawić tylko raz.
                             </p>
                         </form>
-                    </Panel>
+                    </SheetSection>
                 }
 
                 {canCollect && !needsAnswer && !isFeedback &&
-                    <Panel loading={loading}>
+                    <SheetSection loading={loading} raised>
                         <p className="text-center font-semibold">Jesteś na miejscu? Kliknij przycisk, by zaliczyć.</p>
-                    </Panel>
+                    </SheetSection>
                 }
 
                 {isPhoto && !collected &&
@@ -179,23 +189,23 @@ export default function PinSheet ({
                 }
 
                 {photoPending &&
-                    <Panel>
+                    <SheetSection raised>
                         <p className="text-center font-semibold">
                             Zdjęcie wysłane — oczekuje na weryfikację. Punkty zostaną dodane po zaakceptowaniu zdjęcia.
                         </p>
-                    </Panel>
+                    </SheetSection>
                 }
 
                 {photoApproved &&
-                    <Panel>
+                    <SheetSection raised>
                         <p className="text-center font-semibold">Zdjęcie zaakceptowane!</p>
-                    </Panel>
+                    </SheetSection>
                 }
 
                 {collected && !isPhoto &&
-                    <Panel>
+                    <SheetSection raised>
                         <p className="text-center font-semibold">To miejsce masz już odwiedzone!</p>
-                    </Panel>
+                    </SheetSection>
                 }
             </div>
         </>

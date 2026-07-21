@@ -55,7 +55,7 @@ export default function CollectPage () {
         if (question) {
             toast('To miejsce kryje pytanie!', { icon: '🎲' });
         } else {
-            toast.success('Miejsce zaliczone!');
+            toast.success(`Miejsce zaliczone! +${pin.awardedPoints} pkt`, { icon: '⭐' });
         }
 
         setState(question ? CollectPageState.PIN_FOUND_WITH_QUESTION : CollectPageState.PIN_FOUND);

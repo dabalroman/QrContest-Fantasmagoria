@@ -1,15 +1,14 @@
 import CollectedPin from '@/models/CollectedPin';
 import Question from '@/models/Question';
 import Button, { ButtonState } from '@/components/Button';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCheck, faStar, faQuestion } from '@fortawesome/free-solid-svg-icons';
+import { faCheck, faQuestion } from '@fortawesome/free-solid-svg-icons';
 import { useState } from 'react';
 import { answerQuestionFunction } from '@/utils/functions';
 import { QuestionAnswerValue } from '@/functions/src/types/question';
 import useDynamicNavbar from '@/hooks/useDynamicNavbar';
 import { Page } from '@/Enum/Page';
-import Loader from '@/components/Loader';
-import getPinIcon from '@/utils/getPinIcon';
+import Panel from '@/components/Panel';
+import PinIdentityStrip from '@/components/pin/PinIdentityStrip';
 import scheduleAchievementToasts from '@/utils/scheduleAchievementToasts';
 
 export default function QuestionPinView ({
@@ -70,99 +69,53 @@ export default function QuestionPinView ({
             });
     };
 
-    const pinColorScheme = 'pin-' + pin.type;
-
     return (
         <div className="relative h-full flex flex-col">
-            <div
-                className={
-                    'border-8 rounded-3xl shadow-panel top-3'
-                    + ' bg-panel-transparent relative'
-                    + ` border-${pinColorScheme}`
-                    + ' '
-                }
-                style={{
-                    'minHeight': '200px',
-                    'objectFit': 'contain',
-                    'overflow': 'scroll',
-                    'transformStyle': 'preserve-3d',
-                    'transform': 'scale(0.9)',
-                    'filter': 'drop-shadow(8px 8px 10px rgba(0,0,0,0.5))'
-                }}
-            >
-                <div className="absolute top-0 left-0" style={{
-                    top: '-4px',
-                    left: '-4px'
-                }}>
-                    <div
-                        className={
-                            'border-4 border-b-8 border-r-8 rounded-xl shadow-card '
-                            + 'rounded-tl-3xl rounded-tr-none rounded-bl-none '
-                            + 'flex items-center justify-center text-text-light '
-                            + `border-${pinColorScheme} bg-${pinColorScheme}`
-                        }
-                        style={{
-                            'height': '8.25rem',
-                            'width': '5.5rem'
-                        }}
-                    >
-                        <FontAwesomeIcon icon={getPinIcon(pin.type)} className="w-1/2 h-1/2"/>
-                    </div>
-                </div>
-                <div
-                    className={`bg-${pinColorScheme}`
-                        + ' text-text-light text-3xl font-semibold p-4 pl-24 flex justify-end'}
-                >
-                    <span>
-                        <FontAwesomeIcon icon={faStar} size="sm"/> {question.value}
-                    </span>
-                </div>
-                <div className="p-4 mt-20">
-                    <p className="text-center text-xl mb-8">
-                        {question.question}
-                    </p>
+            <PinIdentityStrip pin={{ ...pin, value: question.value }} className="mt-4"/>
+            <Panel loading={loading}>
+                <p className="text-center text-xl mb-8">
+                    {question.question}
+                </p>
 
-                    {scrambledAnswers.map(([answerKey, answerText]: string[]) => {
-                        let buttonState = loading ? ButtonState.DISABLED : ButtonState.ENABLED;
+                {scrambledAnswers.map(([answerKey, answerText]: string[]) => {
+                    let buttonState = loading ? ButtonState.DISABLED : ButtonState.ENABLED;
 
-                        if (answerKey == selectedAnswer) {
-                            if (correctAnswer === null) {
-                                buttonState = ButtonState.PENDING;
+                    if (answerKey == selectedAnswer) {
+                        if (correctAnswer === null) {
+                            buttonState = ButtonState.PENDING;
+                        } else {
+                            if (answerKey !== correctAnswer) {
+                                buttonState = ButtonState.INCORRECT;
                             } else {
-                                if (answerKey !== correctAnswer) {
-                                    buttonState = ButtonState.INCORRECT;
-                                } else {
-                                    buttonState = ButtonState.CORRECT;
-                                }
+                                buttonState = ButtonState.CORRECT;
                             }
                         }
+                    }
 
-                        if (answerKey == correctAnswer) {
-                            buttonState = ButtonState.CORRECT;
-                        }
+                    if (answerKey == correctAnswer) {
+                        buttonState = ButtonState.CORRECT;
+                    }
 
-                        return (
-                            <Button
-                                key={answerKey}
-                                className={`w-full mt-4 text-xl`}
-                                onClick={() => answerQuestion(answerKey as QuestionAnswerValue)}
-                                state={buttonState}
-                                style={{
-                                    'filter':
-                                        (!selectedAnswer || answerKey === selectedAnswer
-                                            ? 'contrast(1)'
-                                            : 'contrast(0.8)'),
-                                    'transform':
-                                        (!selectedAnswer || answerKey === selectedAnswer ? 'scale(1)' : 'scale(0.9)')
-                                }}
-                            >
-                                {answerText}
-                            </Button>
-                        );
-                    })}
-                </div>
-                {loading && <Loader/>}
-            </div>
+                    return (
+                        <Button
+                            key={answerKey}
+                            className={`w-full mt-4 text-xl`}
+                            onClick={() => answerQuestion(answerKey as QuestionAnswerValue)}
+                            state={buttonState}
+                            style={{
+                                'filter':
+                                    (!selectedAnswer || answerKey === selectedAnswer
+                                        ? 'contrast(1)'
+                                        : 'contrast(0.8)'),
+                                'transform':
+                                    (!selectedAnswer || answerKey === selectedAnswer ? 'scale(1)' : 'scale(0.9)')
+                            }}
+                        >
+                            {answerText}
+                        </Button>
+                    );
+                })}
+            </Panel>
         </div>
     );
 }

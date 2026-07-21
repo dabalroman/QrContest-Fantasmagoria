@@ -114,7 +114,7 @@ export default function MapPage () {
             toast('To miejsce kryje pytanie!', { icon: '🎲' });
             setOverlayState(MapOverlayState.PIN_FOUND_WITH_QUESTION);
         } else {
-            toast.success('Miejsce zaliczone!');
+            toast.success(`Miejsce zaliczone! +${collected.awardedPoints} pkt`, { icon: '⭐' });
             setOverlayState(MapOverlayState.PIN_FOUND);
         }
     };
