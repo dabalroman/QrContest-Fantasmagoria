@@ -19,8 +19,6 @@ type FormValues = {
     clue: string;
     type: PinType;
     groups: string[];
-    coordsX: number;
-    coordsY: number;
     tier: CardTier;
     hintRadius: string;
     withQuestion: boolean;
@@ -67,14 +65,16 @@ const inputClass = 'rounded-xl block w-full p-2 border-2 border-input-border bg-
 // The parent remounts this component (key={pin?.uid ?? 'draft'}) whenever the edited target changes,
 // so plain `defaultValues` are enough here — the pin is already in hand at mount time.
 //
-// Coordinates are a plain editable X/Y pair rather than drag-to-reposition (CUTTABLE, skipped) — typing
-// a coordinate is the same "manual entry is the guaranteed path" principle the code field already
-// follows. Re-tapping the map only ever starts a NEW pin, never moves this one.
+// Coordinates are deliberately NOT form fields: the parent owns them so arming placement can hide this
+// drawer (`hidden`) instead of unmounting it, which would discard every unsaved edit. `coords` is read
+// straight into the payload at submit time, so it needs no react-hook-form round trip.
 export default function PinEditorForm ({
     pin,
     mapId,
     coords,
     groups,
+    hidden,
+    onRequestMove,
     onSaved,
     onDeleted,
     onCancel
@@ -83,6 +83,8 @@ export default function PinEditorForm ({
     mapId: string,
     coords: PinCoords,
     groups: PinGroup[],
+    hidden: boolean,
+    onRequestMove: () => void,
     onSaved: () => void,
     onDeleted: () => void,
     onCancel: () => void
@@ -99,8 +101,6 @@ export default function PinEditorForm ({
             clue: pin?.clue ?? '',
             type: pin?.type ?? PinType.CODE,
             groups: pin?.groups ?? [],
-            coordsX: coords.x,
-            coordsY: coords.y,
             tier: pin ? tierFromValue(pin.value) : CardTier.COMMON,
             hintRadius: String(pin?.hintRadius ?? 0),
             withQuestion: pin?.withQuestion ?? false,
@@ -139,7 +139,7 @@ export default function PinEditorForm ({
                 type: values.type,
                 groups: values.groups ?? [],
                 mapId,
-                coords: { x: Number(values.coordsX), y: Number(values.coordsY) },
+                coords,
                 hintRadius: Number(values.hintRadius) > 0 ? Number(values.hintRadius) : null,
                 value: getCardTierValue(values.tier),
                 withQuestion: values.withQuestion,
@@ -184,10 +184,13 @@ export default function PinEditorForm ({
 
     return (
         <>
-            <div className="fixed inset-0 z-30 bg-black/40" onClick={onCancel}/>
             <div
-                className="fixed inset-x-0 bottom-0 z-40 max-h-[85vh] overflow-y-auto rounded-t-3xl
-                    bg-background p-4 pb-32 shadow-panel"
+                className={'fixed inset-0 z-30 bg-black/40 ' + (hidden ? 'invisible' : '')}
+                onClick={onCancel}
+            />
+            <div
+                className={'fixed inset-x-0 bottom-0 z-40 max-h-[85vh] overflow-y-auto rounded-t-3xl '
+                    + 'bg-background p-4 pb-32 shadow-panel ' + (hidden ? 'invisible' : '')}
             >
                 <button
                     onClick={onCancel}
@@ -242,29 +245,9 @@ export default function PinEditorForm ({
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-3">
-                            <label className="block">
-                                <span className="block pb-1">Współrzędna X</span>
-                                <input
-                                    type="number"
-                                    className={inputClass}
-                                    {...register('coordsX', { required: true, valueAsNumber: true })}
-                                />
-                            </label>
-                            <label className="block">
-                                <span className="block pb-1">Współrzędna Y</span>
-                                <input
-                                    type="number"
-                                    className={inputClass}
-                                    {...register('coordsY', { required: true, valueAsNumber: true })}
-                                />
-                            </label>
-                        </div>
-
-                        <p className="text-sm opacity-70 -mt-2">
-                            Piętro: {mapId}. Aby umieścić NOWĄ pinezkę gdzie indziej, zamknij formularz
-                            i stuknij mapę ponownie — tę pinezkę przesuniesz, poprawiając X/Y ręcznie.
-                        </p>
+                        <Button type="button" className="w-full" onClick={onRequestMove}>
+                            Przesuń na mapie
+                        </Button>
 
                         <div className="grid grid-cols-2 gap-3">
                             <label className="block">
@@ -278,11 +261,14 @@ export default function PinEditorForm ({
                                 </select>
                             </label>
                             <label className="block">
-                                <span className="block pb-1">Promień podpowiedzi</span>
+                                <span className="block pb-1">Promień</span>
                                 <input
                                     type="number"
                                     min={0}
-                                    step={1}
+                                    // Units, not pixels (1 = 1% of the map) — so the sane range is
+                                    // single digits, and max stops a pixel-era value covering the floor.
+                                    max={100}
+                                    step={0.5}
                                     placeholder="0 = brak"
                                     className={inputClass}
                                     {...register('hintRadius')}

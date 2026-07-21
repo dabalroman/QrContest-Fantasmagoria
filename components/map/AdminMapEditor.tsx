@@ -26,7 +26,11 @@ export default function AdminMapEditor ({ activeMapId }: { activeMapId: string }
     const [pins, setPins] = useState<Pin[] | null>(null);
     const [groups, setGroups] = useState<PinGroup[] | null>(null);
     const [selectedPin, setSelectedPin] = useState<Pin | null>(null);
-    const [draftCoords, setDraftCoords] = useState<PinCoords | null>(null);
+    // Staged position of whatever is under edit — a brand-new pin, or a moved existing one. Owned here
+    // rather than in the form so arming placement can HIDE the drawer instead of unmounting it: the form
+    // is remounted by `key` below, so an unmount would throw away every unsaved field edit.
+    const [pendingCoords, setPendingCoords] = useState<PinCoords | null>(null);
+    const [placing, setPlacing] = useState<boolean>(false);
 
     useEffect(() => {
         return onSnapshot(
@@ -58,18 +62,27 @@ export default function AdminMapEditor ({ activeMapId }: { activeMapId: string }
     );
 
     const onMapClick = (coords: PinCoords) => {
+        // Armed: stage the tap for the pin already under edit and bring the drawer back. Nothing is
+        // written until the form's Zapisz, so a mis-tap is undone by pressing Przesuń and tapping again.
+        if (placing) {
+            setPendingCoords(coords);
+            setPlacing(false);
+            return;
+        }
+
         setSelectedPin(null);
-        setDraftCoords(coords);
+        setPendingCoords(coords);
     };
 
     const onPinClick = (pin: Pin) => {
-        setDraftCoords(null);
+        setPendingCoords(null);
         setSelectedPin(pin);
     };
 
     const closeEditor = () => {
         setSelectedPin(null);
-        setDraftCoords(null);
+        setPendingCoords(null);
+        setPlacing(false);
     };
 
     const onSaved = () => {
@@ -82,7 +95,7 @@ export default function AdminMapEditor ({ activeMapId }: { activeMapId: string }
         closeEditor();
     };
 
-    const isEditing = selectedPin !== null || draftCoords !== null;
+    const isEditing = selectedPin !== null || pendingCoords !== null;
 
     if (!pins) {
         return <Loader/>;
@@ -96,18 +109,30 @@ export default function AdminMapEditor ({ activeMapId }: { activeMapId: string }
                 collectedUids={inactiveUids}
                 onPinClick={onPinClick}
                 onMapClick={onMapClick}
-                draft={draftCoords ? { coords: draftCoords, hintRadius: null } : null}
+                draft={pendingCoords ? { coords: pendingCoords, hintRadius: null } : null}
+                placing={placing}
             />
+
+            {placing &&
+                <div className="absolute inset-x-0 bottom-0 z-20 p-3 text-center pointer-events-none">
+                    <span className="inline-block px-4 py-2 rounded-xl font-semibold shadow-panel
+                        bg-panel-transparent text-text-accent backdrop-blur-md">
+                        Stuknij mapę, aby ustawić pinezkę.
+                    </span>
+                </div>
+            }
 
             {isEditing &&
                 <PinEditorForm
                     // Remount on target swap — plain defaultValues are then enough (no setValue effect
-                    // needed to re-sync mid-life).
+                    // needed to re-sync mid-life). Placement only HIDES it, so edits survive a move.
                     key={selectedPin?.uid ?? 'draft'}
                     pin={selectedPin}
                     mapId={activeMapId}
-                    coords={draftCoords ?? selectedPin?.coords ?? { x: 0, y: 0 }}
+                    coords={pendingCoords ?? selectedPin?.coords ?? { x: 0, y: 0 }}
                     groups={groups ?? []}
+                    hidden={placing}
+                    onRequestMove={() => setPlacing(true)}
                     onSaved={onSaved}
                     onDeleted={onDeleted}
                     onCancel={closeEditor}

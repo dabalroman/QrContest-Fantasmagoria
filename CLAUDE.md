@@ -454,8 +454,7 @@ Equal specificity → source order wins → every Tailwind `h-*` on an icon is d
 renders at the inherited font-size** and the class silently does nothing.
 **Size icons by font-size** — `text-3xl` on the wrapper (`Navbar.tsx`) or FA's `size` prop (`Loader.tsx`
 `size="3x"`, `ranking.tsx` `size="sm"`). Margins/colour utilities are unaffected; only `w-`/`h-` are.
-Known remaining offenders (task #42): `components/map/PinMarkerIcon.tsx`,
-`components/pin/PinCardComponent.tsx`, `components/collect/QuestionPinView.tsx`.
+Known remaining offender (task #42): `components/map/PinMarkerIcon.tsx` — #47 removed the other two.
 
 ### Accent colour takes opacity modifiers
 
@@ -644,7 +643,11 @@ up is Firebase **Storage**, for photo uploads — see 12.4 — and only under ti
   Piętro 2); **2LO** has 3 (Parter, Piętro 1, Piętro 2). `utils/maps.ts` is canonical. Swapping placeholder
   art for real art is **overwriting files in `public/maps/`, no code change**, as long as filenames match.
 - `hintRadius` makes a marker an *area* hint rather than a precise dot — used for `code` pins, whose QR is
-  hidden "somewhere around here". `null` = precise point.
+  hidden "somewhere around here". `null` = precise point. ⚠️ It is authored in **map-relative units, not
+  pixels**: 1 unit = 1% of the map's shorter side, converted at render time by `hintRadiusToPixels`
+  (`utils/maps.ts`). So typical values are single digits, the same value means the same share of the floor
+  on every map, and swapping in higher-resolution art doesn't shrink every hint circle. Unlike `coords`,
+  which stay absolute pixels.
 - Only `code` pins are reachable from `/collect/:code`. **`riddle` / `visit` / `feedback` / `photo` pins have
   no entry point other than the map's pin sheet.**
 

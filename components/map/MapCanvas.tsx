@@ -3,17 +3,17 @@ import { useEffect, useMemo, useRef } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import debounce from 'lodash.debounce';
 import Pin, { PinCoords } from '@/models/Pin';
-import { fromLatLng, getMap, imageBounds, toLatLng } from '@/utils/maps';
+import { fromLatLng, getMap, hintRadiusToPixels, imageBounds, toLatLng } from '@/utils/maps';
 import { getStoredView, saveView } from '@/utils/mapView';
 import PinMarkerIcon from '@/components/map/PinMarkerIcon';
 
 // The ONLY file that value-imports leaflet (it touches `window` at module scope), so pages/map.tsx
 // must load it via next/dynamic with ssr:false.
 //
-// `onMapClick`/`draft` are additive, admin-only props (#14's map-native pin editor) — both default to
-// undefined/null so the player call site (pages/map.tsx) is unchanged. `collectedUids` doubles as a
-// generic "dim + suppress hint circle" set: the admin editor passes INACTIVE pin uids through it
-// instead of adding a new prop.
+// `onMapClick`/`draft`/`placing` are additive, admin-only props (#14's map-native pin editor) — all
+// default to undefined/null/false so the player call site (pages/map.tsx) is unchanged. `collectedUids`
+// doubles as a generic "dim + suppress hint circle" set: the admin editor passes INACTIVE pin uids
+// through it instead of adding a new prop.
 // Only ever a temporary floor while measuring the overview zoom — low enough that no map canvas
 // can fit at it, so it never clamps the measurement.
 const UNCLAMPED_MIN_ZOOM = -10;
@@ -28,14 +28,16 @@ export default function MapCanvas ({
     collectedUids,
     onPinClick,
     onMapClick,
-    draft = null
+    draft = null,
+    placing = false
 }: {
     pins: Pin[],
     activeMapId: string,
     collectedUids: Set<string>,
     onPinClick: (pin: Pin) => void,
     onMapClick?: (coords: PinCoords) => void,
-    draft?: { coords: PinCoords, hintRadius: number | null } | null
+    draft?: { coords: PinCoords, hintRadius: number | null } | null,
+    placing?: boolean
 }) {
     const containerRef = useRef<HTMLDivElement | null>(null);
     const mapRef = useRef<L.Map | null>(null);
@@ -154,7 +156,8 @@ export default function MapCanvas ({
     useEffect(() => {
         const map = mapRef.current;
         const layerGroup = layerGroupRef.current;
-        if (!map || !layerGroup) {
+        const mapDefinition = getMap(activeMapId);
+        if (!map || !layerGroup || !mapDefinition) {
             return;
         }
 
@@ -167,7 +170,7 @@ export default function MapCanvas ({
 
                 if (pin.hintRadius !== null && !collected) {
                     L.circle(toLatLng(pin.coords), {
-                        radius: pin.hintRadius,
+                        radius: hintRadiusToPixels(mapDefinition, pin.hintRadius),
                         interactive: false,
                         className: `pin-hint-circle pin-hint-circle--${pin.type}`
                     }).addTo(layerGroup);
@@ -183,12 +186,16 @@ export default function MapCanvas ({
                         className: 'pin-marker',
                         iconSize: [40, 40],
                         iconAnchor: [20, 20]
-                    })
+                    }),
+                    // While placing, a tap landing on a marker must reach the map underneath. Leaflet's
+                    // own CSS keeps .leaflet-marker-icon pointer-events:none until `interactive` adds
+                    // .leaflet-interactive, so dropping the flag is enough — no z-index or hit-test work.
+                    interactive: !placing
                 })
                     .on('click', () => onPinClickRef.current(pin))
                     .addTo(layerGroup);
             });
-    }, [activeMapId, pins, collectedUids]);
+    }, [activeMapId, pins, collectedUids, placing]);
 
     // Admin-only draft marker for the not-yet-saved pin (#14). Always assumed to be on the currently
     // active floor — it only ever exists right after a tap on THIS canvas. The live hint-radius circle

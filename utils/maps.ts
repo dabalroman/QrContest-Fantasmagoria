@@ -87,6 +87,16 @@ export function fromLatLng (latlng: { lat: number, lng: number }): PinCoords {
     return { x: Math.round(latlng.lng), y: Math.round(-latlng.lat) };
 }
 
+// hintRadius is authored in map-relative units, NOT pixels: 1 unit = 1% of the shorter side, so the
+// same value covers the same share of the floor on every map and survives an art resolution swap
+// (the one thing absolute coords can't — see the width/height warning at the top of this file).
+// Shorter side, so a radius can never overshoot the map on one axis while fitting on the other.
+const HINT_RADIUS_UNITS_PER_MAP = 100;
+
+export function hintRadiusToPixels (map: MapDefinition, radius: number): number {
+    return radius * Math.min(map.width, map.height) / HINT_RADIUS_UNITS_PER_MAP;
+}
+
 // Image extent in CRS.Simple space: top-left (-height,0) → bottom-right (0,width).
 export function imageBounds (map: MapDefinition): LatLngTuple[] {
     return [[-map.height, 0], [0, map.width]];
