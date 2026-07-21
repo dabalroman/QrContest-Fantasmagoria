@@ -14,6 +14,14 @@ import PinMarkerIcon from '@/components/map/PinMarkerIcon';
 // undefined/null so the player call site (pages/map.tsx) is unchanged. `collectedUids` doubles as a
 // generic "dim + suppress hint circle" set: the admin editor passes INACTIVE pin uids through it
 // instead of adding a new prop.
+// Only ever a temporary floor while measuring the overview zoom — low enough that no map canvas
+// can fit at it, so it never clamps the measurement.
+const UNCLAMPED_MIN_ZOOM = -10;
+
+// In CRS.Simple zoom 0 is one image pixel per CSS pixel, so this caps zoom-in at the art's native
+// resolution — past it you are magnifying pixels, not revealing detail.
+const NATIVE_ZOOM = 0;
+
 export default function MapCanvas ({
     pins,
     activeMapId,
@@ -122,11 +130,17 @@ export default function MapCanvas ({
         }
 
         map.setMaxBounds(bounds.pad(0.05));
+        // getBoundsZoom clamps its result to the CURRENT minZoom (0 by default), so asking it for the
+        // overview of an image wider than the viewport returns 0 and pins minZoom there permanently.
+        // Drop the limit before measuring.
+        map.setMinZoom(UNCLAMPED_MIN_ZOOM);
         // minZoom = the overview (whole image visible), recomputed per floor and set BEFORE any restore so
         // a stored zoom can never sit below the overview. A stored center/zoom outside the current art is
         // clamped by minZoom + maxBounds.
         const fitZoom = map.getBoundsZoom(bounds);
         map.setMinZoom(fitZoom);
+        // Never below the overview: art smaller than the viewport fits at a zoom above native.
+        map.setMaxZoom(Math.max(fitZoom, NATIVE_ZOOM));
 
         const stored = getStoredView(activeMapId);
         if (stored) {
