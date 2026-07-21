@@ -190,7 +190,10 @@ export default function MapCanvas ({
                     // While placing, a tap landing on a marker must reach the map underneath. Leaflet's
                     // own CSS keeps .leaflet-marker-icon pointer-events:none until `interactive` adds
                     // .leaflet-interactive, so dropping the flag is enough — no z-index or hit-test work.
-                    interactive: !placing
+                    interactive: !placing,
+                    // Leaflet stacks markers by latitude, so reordering this loop would not help; the
+                    // offset is what keeps a collected pin from covering one still to find.
+                    zIndexOffset: collected ? -1000 : 0
                 })
                     .on('click', () => onPinClickRef.current(pin))
                     .addTo(layerGroup);
