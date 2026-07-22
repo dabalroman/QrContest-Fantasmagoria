@@ -33,6 +33,12 @@
     --color-pin-photo: #5B6B7C;
 }
 
+/* _app.tsx imports leaflet.css AFTER this file, so a bare .leaflet-container ties on specificity and
+   loses to leaflet's own `background: #ddd`. The html prefix is what makes this win - do not drop it. */
+html .leaflet-container {
+    background: #fffaf4;
+}
+
 /* Map markers + hint circles (components/map). Plain CSS, not @apply - no purge, no safelist entry. */
 .pin-marker {
     background: transparent;
