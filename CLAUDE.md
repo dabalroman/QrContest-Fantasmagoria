@@ -294,7 +294,7 @@ Roles (`Enum/UserRole.ts`): `user`, `admin`, `dashboard`.
 
 ## 7. Game mechanics
 
-**Pins are the 2026 collectible** (`functions/src/types/pin.ts`). Five `PinType`s, each with its own collect
+**Pins are the 2026 collectible** (`functions/src/types/pin.ts`). Six `PinType`s, each with its own collect
 flow, colour (`--color-pin-*`) and icon (`utils/getPinIcon.ts`):
 
 | Type | How it's collected | Entry point |
@@ -304,6 +304,14 @@ flow, colour (`--color-pin-*`) and icon (`utils/getPinIcon.ts`):
 | `visit` | just be there and tap collect | map sheet only |
 | `feedback` | rate a room's talk (`rating` 1–5 + `talkName`) | map sheet only |
 | `photo` | upload a photo, admin approves (#19) | map sheet only, via `submitPhotoHandle` |
+| `ghost` | type a 10-char code hidden in the app's own copy (#60) | `/collect/:code` **and** the map sheet |
+
+⚠️ **`code` and `ghost` are the ONLY types the global `/collect` input resolves** — the scanner path queries
+`type in [code, ghost]`, deliberately excluding `riddle`, whose free-text answer would otherwise be
+brute-forceable across every pin. That holds only because every ghost code is a 10-char `[A-Z0-9]` string
+(`upsertPinHandle` enforces the same `CODE_PATTERN` for both, and their codes must not collide) — the length
+check runs *before* the query. Ghosts are deliberately **omitted from `PinTypeLegend`**: finding one is a
+surprise, so the legend renders five of the six.
 
 Points are per-pin (`value`), not tiered. `withQuestion: true` draws a quiz question on top (never for
 `feedback`). ⚠️ **Riddle answers are matched with `trim()` + `toUpperCase()` only** — no diacritic folding,
@@ -621,12 +629,16 @@ the 2026 code core is shipped end-to-end. Read it for the design record and the 
 >
 > **Status as of 2026-07-20 — the CODE CORE IS SHIPPED. What remains is content + polish:**
 > **#16** (author 50+ real pins, real 9-map art, balance pass — the long pole and #1 risk), **#33/#34**
-> (regulamin / FAQ still describe the retired card game), **#44** (feedback admin
+> (regulamin / FAQ still describe the retired card game — ⚠️ but the two reward codes printed in their copy
+> are now LIVE `ghost` pins (#60), so a rewrite must not drop or alter them: `pages/rulebook.tsx` carries
+> `PB944GH25M` as-is, and `pages/faq.tsx` prints `9DG76W9SGN` whose pin stores the **reverse**,
+> `NGS9W67GD9` — that inversion is the joke and the seed is the source of truth), **#44** (feedback admin
 > view), **#42** (dead `w-/h-` icon sizing on three pin components), **#38** (rated-talks achievements).
 > #19–#21 deferred; #22/#26 closed won't-do. **#43 shipped** — the admin panel is pin-era (see §11).
 > **#36 shipped** — the landing page is pin-era, and it left behind `components/PinTypeLegend.tsx`
-> (the five pin types, built from `PinMarkerIcon` + `getPinTypeFriendlyName`). **#33/#34 must reuse it
-> rather than restating the mechanics by hand** — that duplication is exactly how the three pages drift.
+> (the pin types, built from `PinMarkerIcon` + `getPinTypeFriendlyName`, with `ghost` filtered out).
+> **#33/#34 must reuse it rather than restating the mechanics by hand** — that duplication is exactly how
+> the three pages drift.
 >
 > - ✅ **12.2 shipped as pins** — the pin model, `collectPinHandle`, the pin visual system and the rewired
 >   collect screen are done and manually verified. Cards are retired (handler still deployed, UI orphaned).
@@ -750,8 +762,12 @@ that matters: **definitions are DATA, logic is CODE.**
   every seed/`upsertPinHandle`/`deletePinHandle` (so authoring `target` on these is pointless — it's
   overwritten). ⚠️ **EVERY active pin type counts toward the target** (task #45) — `recomputeAchievementTargets`
   filters on `isActive` alone, matching the award path, which calls `scopeKeys(pin)` for every type. Filtering
-  by type on one side only is exactly what made badges unlock early before #45, so **do not reintroduce a
-  type filter on either side.** Consequences worth knowing when authoring pins (#16): a `feedback` pin in a
+  by type on **one side only** is exactly what made badges unlock early before #45 — the rule is that the two
+  sides must agree, which they do by both reading `scopeKeys` and neither filtering around it. The one
+  deliberate exception lives *inside* that helper, so both sides still drop it together: **`ghost` omits its
+  `map:<mapId>` key** (#60) — a ghost sits on a map image only because a marker needs coordinates, and must
+  not inflate that floor's badge. It still counts towards its `group:` scopes.
+  Consequences worth knowing when authoring pins (#16): a `feedback` pin in a
   scope means its badge needs the talk rated, and a **`photo` pin means the badge cannot complete until an
   admin approves that photo** — keep photo pins out of any scope that must stay self-serve.
   `loadDefinitions` rejects a `pinsInScope` def with `target < 1` (a `>= 0`
