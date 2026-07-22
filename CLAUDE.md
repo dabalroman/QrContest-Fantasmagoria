@@ -499,11 +499,20 @@ Firestore transactions and the score fan-out — nothing is mocked.
   **node** process (`pgrep -f "bin/firebase emulators:start"`), not the `sh -c` wrapper above it — the
   wrapper does not forward SIGINT, so signalling it looks like it worked and the emulator keeps running.
   The pre-commit hook also runs the FE build, so stop `npm run dev` too or the two contend on `.next`.
+- ⚠️ **A concurrency test must race two DIFFERENT callables.** The functions emulator queues concurrent
+  invocations of the *same* function, so firing one callable twice via `Promise.all` silently serializes —
+  the second call reads post-commit state, the race never happens, and the test passes **against the unfixed
+  code**. Task #55's net (`award-concurrency.test.mjs`) hit exactly this: `collectPinHandle` against itself
+  was a false green; `reviewPhotoHandle` against `collectPinHandle` reproduces. **Always falsify a
+  concurrency test** — restore the pre-fix file (`git checkout HEAD -- <file>`), rebuild, run the single test
+  (`./scripts/emu-test.sh node --test functions/test/<x>.test.mjs`) and confirm it FAILS before trusting it.
 - The canonical test asserts the score is identical in all four denormalized places after a collect + answer.
   **Every new point-granting feature must extend this suite** (see the fan-out warning in §12.2).
-- Current suite (**77 tests across 8 files** — count with
+- Current suite (**81 tests across 9 files** — count with
   `grep -h '^test(' functions/test/*.test.mjs | wc -l`): `scoring` (card fan-out), `rounds` (`winnerInRound`
-  propagation), `pins` (all three entry shapes, anti-bruteforce, dup guard, availability window, normalization,
+  propagation + the auth/admin gate on `updateRoundsHandle`), `award-concurrency` (overlapping same-user awards
+  grant an achievement bonus exactly once — the §12.2 read-set rule),
+  `pins` (all three entry shapes, anti-bruteforce, dup guard, availability window, normalization,
   snapshot/secret-stripping), `admin-pins` (upsert/delete gates + validation, re-seed `collectedBy` preservation),
   `photos` (submit → pending → approve/reject, no-points-until-approve, reopen-on-reject, idempotency),
   `counters` (legacy docs missing a counter — the §12.2
@@ -673,6 +682,14 @@ up is Firebase **Storage**, for photo uploads — see 12.4 — and only under ti
   `updateRanking(rounds, tx, user)` / `updateGuild(db, rounds, tx, user)` take the pre-fetched rounds snapshot;
   the two non-award callers (`setupAccountHandle`, `joinGuildHandle`) fetch it inline and pass it.
   → **Route every point award through `awardPoints`, do not hand-roll another copy of the fan-out.**
+- ⚠️ **Every award transaction must open with `readUserInTransaction(transaction, userRef)`** (exported from
+  `actions/getCurrentUser.ts`) and pass THAT user to `awardPoints` — task #55. `getCurrentUser` reads the doc
+  *before* the transaction, so without an in-transaction read the tx has no read-set on the user doc and
+  concurrent same-user awards don't serialize: each sees the same pre-award snapshot, each judges an achievement
+  threshold newly crossed, and each folds the bonus into its own `increment` — permanent, non-self-healing
+  double-count. It **must be the first op in the callback, before any `transaction.set/update/create`**
+  (Firestore forbids a read after a write), which is why the domain writes follow it rather than precede it.
+  The read lives in the callers, not inside `awardPoints`, for exactly that ordering reason.
 - **User counters are normalized on hydration, not per-award.** A user doc written before a counter existed
   lacks that field, and `getCurrentUser` casts `doc.data() as User` — so the type would otherwise lie.
   `getCurrentUser` spreads `USER_COUNTER_DEFAULTS` (`functions/src/types/user.ts`, next to the `UserCounterKey`
