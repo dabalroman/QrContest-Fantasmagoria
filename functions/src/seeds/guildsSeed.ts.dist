@@ -39,7 +39,7 @@ const guildsSeed: Guild[] = [
     {
         uid: 'guild-steel',
         name: 'Liga Graczy',
-        description: 'Dołącz na własne ryzyko – DLC z przyjaciółmi sprzedawane osobno.',
+        description: 'Dołącz na własne ryzyko - DLC z przyjaciółmi sprzedawane osobno.',
         score: 0,
         amountOfMembers: 0,
         amountOfCollectedCards: 0,

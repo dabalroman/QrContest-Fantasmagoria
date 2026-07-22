@@ -2,15 +2,15 @@ import { Achievement } from '../types/achievement';
 
 // The achievement definitions. These are DATA: `type` selects one of the engine's pure counter
 // accessors (functions/src/achievements/typePredicates.ts) and `target` is the threshold, so adding
-// an achievement of an existing type means adding an entry here — no engine change, no new branch.
+// an achievement of an existing type means adding an entry here - no engine change, no new branch.
 //
 // This seed is the SOURCE OF TRUTH. Mid-event you may edit a doc straight in the Firestore console
-// (that is the whole point of definitions being data — there is no redeploy window), but fold any
+// (that is the whole point of definitions being data - there is no redeploy window), but fold any
 // such change back into this file afterwards so the reviewed record stays accurate.
 //
-// `icon` is a string KEY the client maps to a FontAwesome icon — never an IconDefinition.
+// `icon` is a string KEY the client maps to a FontAwesome icon - never an IconDefinition.
 const achievementsSeed: Achievement[] = [
-    // Point cups — counter is user.score.
+    // Point cups - counter is user.score.
     {
         uid: 'score-1',
         name: 'Nowicjusz',
@@ -72,7 +72,7 @@ const achievementsSeed: Achievement[] = [
         bonus: 50
     },
 
-    // Answer owls — counter is user.amountOfCorrectAnswers (wrong answers do not count).
+    // Answer owls - counter is user.amountOfCorrectAnswers (wrong answers do not count).
     {
         uid: 'owl-1',
         name: 'Sówka',
@@ -104,7 +104,7 @@ const achievementsSeed: Achievement[] = [
         bonus: 30
     },
 
-    // Location badges (task #37) — one per map floor, plus one per whole building. `target` here is
+    // Location badges (task #37) - one per map floor, plus one per whole building. `target` here is
     // DERIVED, not human-authored: functions/src/actions/recomputeAchievementTargets.ts overwrites it
     // on every pin create/edit/delete/re-seed to the current count of active pins in that `scope`
     // (a pinScopeKeys.ts key). The `0` below is only ever live for the instant between this seed write

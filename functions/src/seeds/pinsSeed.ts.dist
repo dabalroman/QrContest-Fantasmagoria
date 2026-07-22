@@ -2,16 +2,16 @@
 import { Timestamp } from 'firebase-admin/firestore';
 import { Pin, PinType } from '../types/pin';
 
-// Dev fixture, dumped from a hand-placed emulator session — the coords are real positions on the real
+// Dev fixture, dumped from a hand-placed emulator session - the coords are real positions on the real
 // floor art, not the generated grid this file used to carry. The real pins (real codes, real content)
 // are authored in #16, which replaces this wholesale.
 //
 // Dev codes stay predictable so a tester can type one straight into /collect without reading the file:
 //   <TAG>000000<n>  →  DWO0000001, MPA0000003, LP20000004, …
 // They are ALSO appended to every code pin's description ("Kod: …"). Strip that when authoring the real
-// content — the code must not be public then.
+// content - the code must not be public then.
 //
-// hintRadius is in map-relative units (1 = 1% of the map's shorter side), NOT pixels — see
+// hintRadius is in map-relative units (1 = 1% of the map's shorter side), NOT pixels - see
 // hintRadiusToPixels in utils/maps.ts. Single-digit values are the normal range.
 //
 // Covers every PinType, one inactive pin, and one availability window, so the branch paths stay exercised.

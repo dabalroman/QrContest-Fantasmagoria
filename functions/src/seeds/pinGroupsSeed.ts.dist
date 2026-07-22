@@ -8,7 +8,7 @@ import { PinGroup } from '../types/pinGroup';
 // (that is the whole point of definitions being data), but fold any such change back into this file
 // afterwards so the reviewed record stays accurate.
 //
-// Keep this list a superset of every `groups[]` value used in pinsSeed.ts(.dist) — 'test' included,
+// Keep this list a superset of every `groups[]` value used in pinsSeed.ts(.dist) - 'test' included,
 // since the dev/test-ladder fixture pins tag themselves with it.
 const pinGroupsSeed: PinGroup[] = [
     { uid: 'mok', name: 'MOK' },
