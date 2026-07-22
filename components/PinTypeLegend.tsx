@@ -4,16 +4,18 @@ import PinMarkerIcon from '@/components/map/PinMarkerIcon';
 const PIN_TYPE_DESCRIPTIONS: Record<PinType, string> = {
     [PinType.CODE]: 'Zeskanuj kod QR ukryty gdzieś w pobliżu.',
     [PinType.RIDDLE]: 'Rozwiąż zagadkę i wpisz hasło.',
-    [PinType.VISIT]: 'Po prostu dotrzyj na miejsce.',
+    [PinType.VISIT]: 'Dotrzyj we wskazane miejsce.',
     [PinType.FEEDBACK]: 'Oceń wysłuchaną prelekcję.',
-    [PinType.PHOTO]: 'Zrób zdjęcie i wyślij je z aplikacji.',
+    [PinType.PHOTO]: 'Zrób zdjęcie, a punkty dostaniesz po chwili.',
     [PinType.GHOST]: 'Miejsce, którego nie ma. Kodu szukaj gdzie indziej niż na mapie.'
 };
+
+const LISTED_PIN_TYPES = Object.values(PinType).filter((type) => type !== PinType.GHOST);
 
 export default function PinTypeLegend () {
     return (
         <ul className="flex flex-col gap-3">
-            {Object.values(PinType).map((type: PinType) => (
+            {LISTED_PIN_TYPES.map((type: PinType) => (
                 <li key={type} className="flex items-center gap-3">
                     <div className="shrink-0">
                         <PinMarkerIcon type={type}/>

@@ -30,7 +30,7 @@ export default function FaqPage() {
         },
         {
             question: 'Czym są piny?',
-            answer: 'Piny to zaznaczone na mapie miejsca, a każdy z nich zdobywa się inaczej. Jeden wymaga zeskanowania ukrytego kodu QR, drugi rozwiązania zagadki, trzeci po prostu dotarcia na miejsce, czwarty oceny wysłuchanej prelekcji, a piąty przysłania zdjęcia. Sposób zdobycia rozpoznasz po ikonie pinu, a szczegóły znajdziesz w opisie, który pojawi się po jego dotknięciu.'
+            answer: 'Piny to zaznaczone na mapie miejsca, a każdy z nich zdobywa się inaczej. Jeden wymaga zeskanowania ukrytego kodu QR, drugi rozwiązania zagadki, trzeci dotarcia na miejsce, czwarty oceny wysłuchanej prelekcji, a piąty przysłania zdjęcia. Sposób zdobycia rozpoznasz po ikonie pinu, a szczegóły znajdziesz w opisie, który pojawi się po jego dotknięciu.'
         },
         {
             question: 'Gdzie mogę znaleźć piny?',
