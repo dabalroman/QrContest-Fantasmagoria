@@ -86,7 +86,7 @@ async function seedQuestions(db: FirebaseFirestore.Firestore) {
 
 // A bare .set() would reset every card's/pin's collectedBy to {} on re-seed while
 // users/{uid}/collectedCards|collectedPins survives, desyncing the two (see CLAUDE.md §11). The
-// tempting fix — `.set(doc, { merge: true })` while the seed literal still carries `collectedBy: {}` —
+// tempting fix - `.set(doc, { merge: true })` while the seed literal still carries `collectedBy: {}` -
 // does NOT work: Firestore's merge treats "the key is present in the payload" as "overwrite this path",
 // regardless of whether its value is an empty object, so `collectedBy: {}` still wipes the existing
 // map. The only merge-safe fix is to OMIT the key entirely from the write for a doc that already

@@ -1,4 +1,4 @@
-// Per-device persistence of the map's active floor + per-floor pan/zoom (task #29). localStorage only —
+// Per-device persistence of the map's active floor + per-floor pan/zoom (task #29). localStorage only -
 // no callable, no Firestore (all client writes are denied; a per-gesture server write for cosmetic UI
 // state is not worth the op budget). Mirrors the direct-localStorage idiom in components/Panel.tsx.
 
@@ -37,7 +37,7 @@ function write (store: MapViewStore): void {
     try {
         window.localStorage.setItem(STORAGE_KEY, JSON.stringify(store));
     } catch {
-        // Quota / private-mode / disabled storage — persistence is best-effort, never fatal.
+        // Quota / private-mode / disabled storage - persistence is best-effort, never fatal.
     }
 }
 

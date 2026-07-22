@@ -8,12 +8,12 @@ import { Uid } from '@/types/global';
 export type PinCoords = { x: number, y: number };
 
 // Client-side shape of a finder entry. Only ever populated on the fromFirestore path (#14's admin
-// editor, where admins can read `pins` in full) — fromRaw (getPins/collectPinHandle) never carries it,
+// editor, where admins can read `pins` in full) - fromRaw (getPins/collectPinHandle) never carries it,
 // same as `code`, since PublicPin strips both by construction (decision 13).
 export type PinCollectedByEntry = {
     username: string,
     collectedAt: Date,
-    // Feedback pins only (#12) — null on every other type. /admin/feedback reads them from here.
+    // Feedback pins only (#12) - null on every other type. /admin/feedback reads them from here.
     rating: number | null,
     talkName: string | null
 };
@@ -49,7 +49,7 @@ export default class Pin extends FirebaseModel {
     hintRadius: number | null;
     // Source-dependent like `code`: empty on the getPins/fromRaw path, the real finder map on the
     // fromFirestore path. Used only by #14's admin editor (a non-empty map earns an extra confirm
-    // before a destructive edit/delete — the printed QR is already out there).
+    // before a destructive edit/delete - the printed QR is already out there).
     collectedBy: Record<string, PinCollectedByEntry>;
 
     constructor (

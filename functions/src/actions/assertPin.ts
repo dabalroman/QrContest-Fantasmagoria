@@ -4,7 +4,7 @@ import { Timestamp } from 'firebase-admin/firestore';
 import { Pin } from '../types/pin';
 
 // Shared pin guards, extracted verbatim from collectPinHandle so submitPhotoHandle (#19) reuses the
-// EXACT same validation — a photo submit must reject an inactive/unavailable/already-collected pin the
+// EXACT same validation - a photo submit must reject an inactive/unavailable/already-collected pin the
 // same way a collect does. The HttpsError messages are unchanged (the e2e suite matches on them).
 
 export function assertPinIsActive(pin: Pin): void {

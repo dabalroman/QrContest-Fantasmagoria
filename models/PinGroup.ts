@@ -2,7 +2,7 @@ import FirebaseModel from '@/models/FirebaseModel';
 import { DocumentSnapshot, SnapshotOptions } from '@firebase/firestore';
 import { Uid } from '@/types/global';
 
-// Read-only taxonomy entry — mirrors models/Achievement.ts. Feeds the admin pin editor's group
+// Read-only taxonomy entry - mirrors models/Achievement.ts. Feeds the admin pin editor's group
 // dropdown; nothing else reads this today.
 export default class PinGroup extends FirebaseModel {
     uid: Uid;

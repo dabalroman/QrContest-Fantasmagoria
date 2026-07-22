@@ -1,4 +1,4 @@
-// Admin pin editor (task #14) — upsertPinHandle + deletePinHandle. Mirrors pins.test.mjs: mints real
+// Admin pin editor (task #14) - upsertPinHandle + deletePinHandle. Mirrors pins.test.mjs: mints real
 // ID tokens, POSTs to the actual callables, and asserts against real Firestore documents. The
 // load-bearing assertion is that an edit (or a re-seed) can never wipe a pin's collectedBy finder map.
 
@@ -31,7 +31,7 @@ async function registerPlayer (uid, username) {
 }
 
 // Written straight through the admin SDK (bypasses setupAccountHandle), same idiom as
-// counters.test.mjs's seedLegacyUser — the assertAdmin guard only needs a user doc with role: 'admin'.
+// counters.test.mjs's seedLegacyUser - the assertAdmin guard only needs a user doc with role: 'admin'.
 async function registerAdmin (uid, username) {
     const token = await createAuthUserToken(uid);
     await seedUser(uid, username, { role: 'admin' });
@@ -166,7 +166,7 @@ test('re-seeding preserves a pin\'s collectedBy', async () => {
     // A stable code/uid pair from the real pin seed (map:mok-pietro-2, slot 1).
     await callCallable('collectPinHandle', { code: 'MP20000001' }, playerToken);
 
-    // Re-seed — must NOT wipe the finder (seedPins now uses set(pin, { merge: true })).
+    // Re-seed - must NOT wipe the finder (seedPins now uses set(pin, { merge: true })).
     await callCallable('seedDatabaseHandle', { password: '4064' }, adminToken);
 
     const pin = (await db.collection('pins').doc('mok-pietro-2-1').get()).data();

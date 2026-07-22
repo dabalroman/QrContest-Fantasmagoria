@@ -5,7 +5,7 @@ import { Pin } from '../types/pin';
 import scopeKeys from './pinScopeKeys';
 
 /**
- * Recomputes the DERIVED `target` field on every `pinsInScope` achievement definition — the
+ * Recomputes the DERIVED `target` field on every `pinsInScope` achievement definition - the
  * denominator to the player's `collectedPinsByScope[scope]` numerator.
  *
  * EVERY pin type counts, matching the award path, which increments the numerator for every type a
@@ -14,7 +14,7 @@ import scopeKeys from './pinScopeKeys';
  *
  * Enumerates from the DEFINITIONS, not from a hardcoded map/group list: for each `pinsInScope` doc,
  * counts active pins whose scope keys include that doc's `scope`. A pin contributes iff
- * `isActive === true` — `availableFrom`/`availableTo` are ignored on purpose, the achievement tracks
+ * `isActive === true` - `availableFrom`/`availableTo` are ignored on purpose, the achievement tracks
  * the eventual full set, not what happens to be live right now.
  *
  * CRITICAL: must NEVER throw. Called from inside upsertPinHandle's success path, where the

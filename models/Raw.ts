@@ -48,7 +48,7 @@ export interface RawPin {
     availableTo: RawFirestoreTimestamp | null
 }
 
-// The complete authored field set the admin editor sends to upsertPinHandle — never a partial patch
+// The complete authored field set the admin editor sends to upsertPinHandle - never a partial patch
 // (see decision in upsertPinHandle.ts). Dates travel as epoch ms (or null): a Timestamp/FieldValue
 // cannot cross the callable boundary, and the server turns ms into a Timestamp.
 export interface RawPinAuthoredFields {
@@ -79,7 +79,7 @@ export interface RawCollectedPin {
 }
 
 // One row of the admin photo-review queue as it arrives from getPhotoSubmissionsHandle (#19). Only the
-// fields the queue renders — `photoUrl` is a server-built Firebase download-token URL (no signBlob),
+// fields the queue renders - `photoUrl` is a server-built Firebase download-token URL (no signBlob),
 // null when the object's token metadata could not be read. There is no full client model: like RawPin,
 // the queue goes straight through the callable.
 export interface RawPhotoSubmission {
@@ -94,7 +94,7 @@ export interface RawPhotoSubmission {
 }
 
 // An achievement granted during an award, as it arrives in a callable response (the #30 unlock toast
-// consumes it). `icon` is a string KEY the client maps to a FontAwesome icon — never an IconDefinition.
+// consumes it). `icon` is a string KEY the client maps to a FontAwesome icon - never an IconDefinition.
 export interface RawAchievementGrant {
     uid: Uid,
     name: string,

@@ -22,14 +22,14 @@ export default function AchievementsPage () {
     const ready = !loading && user && achievements;
 
     // Flat list, no group headers: sort so same-type achievements cluster (by group) and each run
-    // climbs its ladder (by target). Headers are deliberately deferred — this order makes them purely
+    // climbs its ladder (by target). Headers are deliberately deferred - this order makes them purely
     // additive later.
     const sorted = achievements
         ? [...achievements].sort((a: Achievement, b: Achievement) =>
             a.group.localeCompare(b.group) || a.target - b.target)
         : [];
 
-    // Sums the STORED grant bonus, never the definition's current one — retuning a definition later
+    // Sums the STORED grant bonus, never the definition's current one - retuning a definition later
     // must not rewrite what a player was actually awarded.
     const total = achievements?.length ?? 0;
     const unlocked = ready ? achievements.filter((a: Achievement) => a.isUnlockedBy(user)).length : 0;

@@ -4,7 +4,7 @@ import Loader from '@/components/Loader';
 // Panel's counterpart for the map sheet. Panel is a 30%-alpha light grey that needs the background
 // image behind it; the drawer is a solid fill, so a Panel there resolves to within 6/255 of its own
 // surface and reads as nothing. `raised` goes LIGHTER than the drawer rather than darker (~18 L* of
-// separation), and exactly one section per sheet gets it — whatever the player must act on, or the
+// separation), and exactly one section per sheet gets it - whatever the player must act on, or the
 // terminal status when there is nothing left to do. Keeps Panel's `loading` contract, which is
 // functional: it blocks pointer events while a collect is in flight.
 export default function SheetSection ({

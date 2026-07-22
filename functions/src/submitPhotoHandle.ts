@@ -12,7 +12,7 @@ import * as logger from 'firebase-functions/logger';
 // The `photo`-type pin submit path (#19). The client has ALREADY uploaded the downscaled blob to
 // Storage at users/{uid}/photos/{pinUid} (under the narrow owner-only storage.rules) before calling
 // this. We validate the pin server-side (never trusting the client), verify the object exists, then
-// mark the pin PENDING — no points. Points are awarded only later by reviewPhotoHandle on approval.
+// mark the pin PENDING - no points. Points are awarded only later by reviewPhotoHandle on approval.
 //
 // A photo pin is reachable ONLY from the map's pin sheet (the {pinUid} path); collectPinHandle keeps
 // rejecting `photo`, so the two flows never overlap.
@@ -52,7 +52,7 @@ export const submitPhotoHandle = onCall(async (req): Promise<{ submissionUid: st
     assertPinIsAvailable(pin);
     assertPinIsNotAlreadyCollected(pin, uid);
 
-    // Verify the object the client claims to have uploaded actually exists — a submit with no prior
+    // Verify the object the client claims to have uploaded actually exists - a submit with no prior
     // upload is rejected. This is a Storage READ (works against the emulator under the narrow rule).
     const storagePath = photoStoragePath(uid, pinUid);
     const [objectExists] = await photoBucket().file(storagePath).exists();
@@ -61,7 +61,7 @@ export const submitPhotoHandle = onCall(async (req): Promise<{ submissionUid: st
         throw new HttpsError('failed-precondition', 'photo not uploaded');
     }
 
-    // Captured ONCE — used for BOTH the pendingScore increment and the submission snapshot, so they can
+    // Captured ONCE - used for BOTH the pendingScore increment and the submission snapshot, so they can
     // never disagree.
     const value = pin.value;
 
@@ -70,7 +70,7 @@ export const submitPhotoHandle = onCall(async (req): Promise<{ submissionUid: st
 
     try {
         await db.runTransaction(async (transaction) => {
-            // Greying the map marker (collectedPins) is written ONLY here, only after the upload — so a
+            // Greying the map marker (collectedPins) is written ONLY here, only after the upload - so a
             // dropped step leaves no partial state; the client shows an error and the retry overwrites
             // the same Storage object. transaction.create ALSO bounds pending to ≤1 per (player, pin):
             // it throws ALREADY_EXISTS if the snapshot is already present.
@@ -81,7 +81,7 @@ export const submitPhotoHandle = onCall(async (req): Promise<{ submissionUid: st
                 value,
                 type: pin.type,
                 collectedAt: FieldValue.serverTimestamp(),
-                awardedPoints: 0         // 0 while pending — set to `value` on approval
+                awardedPoints: 0         // 0 while pending - set to `value` on approval
             });
 
             transaction.update<PinCollectedBy, PinCollectedBy>(pinRef, {
@@ -107,7 +107,7 @@ export const submitPhotoHandle = onCall(async (req): Promise<{ submissionUid: st
             };
             transaction.create(submissionRef, submission);
 
-            // No score, no fan-out, no counter — those all happen on approval.
+            // No score, no fan-out, no counter - those all happen on approval.
             transaction.update<User, User>(userRef, {
                 pendingScore: FieldValue.increment(value),
                 updatedAt: FieldValue.serverTimestamp()

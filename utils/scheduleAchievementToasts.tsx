@@ -3,7 +3,7 @@ import { RawAchievementGrant } from '@/models/Raw';
 import AchievementIcon from '@/components/achievements/AchievementIcon';
 
 // Fires one celebratory toast per newly-unlocked achievement after a collect/answer. Reuses the plain
-// react-hot-toast API (like `toast('...', { icon: '🎲' })` elsewhere) — a default toast already is the
+// react-hot-toast API (like `toast('...', { icon: '🎲' })` elsewhere) - a default toast already is the
 // single-line accent pill we want, so no bespoke component and no Tailwind safelist concern.
 //
 // Timing is deliberate: hold ~1.2s so the navbar `+points` beat lands first, then stagger the toasts so

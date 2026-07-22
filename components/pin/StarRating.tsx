@@ -1,7 +1,7 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faStar } from '@fortawesome/free-solid-svg-icons';
 
-// Empty stars are the solid faStar at low opacity — the repo has no free-regular-svg-icons dependency.
+// Empty stars are the solid faStar at low opacity - the repo has no free-regular-svg-icons dependency.
 export default function StarRating ({
     value,
     onChange,

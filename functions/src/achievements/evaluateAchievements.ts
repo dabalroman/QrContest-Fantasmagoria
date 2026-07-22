@@ -5,7 +5,7 @@ import { TYPE_COUNTERS } from './typePredicates';
 /**
  * PURE achievement evaluator (rule 1). Given the user and the loaded definitions it returns the
  * achievements to grant this award. It performs NO Firestore reads or writes, touches no transaction,
- * and does NOT mutate the caller's `user` — awardPoints applies the returned LIST afterwards.
+ * and does NOT mutate the caller's `user` - awardPoints applies the returned LIST afterwards.
  *
  * That separation is load-bearing, not stylistic: because nothing here is applied, a throw mid-loop
  * cannot half-grant an achievement or leave `user.score` inflated relative to the fan-out. The worst
@@ -23,7 +23,7 @@ export default function evaluateAchievements(
     const granted = new Set<string>();
 
     // Shallow copy: only `score` is advanced, and the caller's user is left untouched. Reading
-    // `user.achievements` also throws here if the field is malformed — a failure awardPoints swallows.
+    // `user.achievements` also throws here if the field is malformed - a failure awardPoints swallows.
     const working: User = { ...user };
 
     const isUnlocked = (uid: string): boolean => granted.has(uid) || (uid in user.achievements);

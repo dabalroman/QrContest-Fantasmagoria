@@ -16,17 +16,17 @@ const MapCanvas = dynamic(() => import('@/components/map/MapCanvas'), {
 });
 
 // The admin editing surface, swapped into /map when an admin flips edit mode. Structurally last year's
-// card editor made map-native: the map IS the list — tap a marker to edit it, tap empty map to create
+// card editor made map-native: the map IS the list - tap a marker to edit it, tap empty map to create
 // one at those coords. The parent (/map) owns the area/floor picker and passes the active floor in;
 // this component owns only the editing state, so play mode and edit mode share one picker.
 export default function AdminMapEditor ({ activeMapId }: { activeMapId: string }) {
-    // Full docs, incl. the real `code` AND inactive drafts — getPins strips both, which is exactly what
+    // Full docs, incl. the real `code` AND inactive drafts - getPins strips both, which is exactly what
     // a player must never see but the editor needs. Accepted trade-off: secrets live in the admin
     // phone's memory (codes are on physical stickers anyway).
     const [pins, setPins] = useState<Pin[] | null>(null);
     const [groups, setGroups] = useState<PinGroup[] | null>(null);
     const [selectedPin, setSelectedPin] = useState<Pin | null>(null);
-    // Staged position of whatever is under edit — a brand-new pin, or a moved existing one. Owned here
+    // Staged position of whatever is under edit - a brand-new pin, or a moved existing one. Owned here
     // rather than in the form so arming placement can HIDE the drawer instead of unmounting it: the form
     // is remounted by `key` below, so an unmount would throw away every unsaved field edit.
     const [pendingCoords, setPendingCoords] = useState<PinCoords | null>(null);
@@ -55,7 +55,7 @@ export default function AdminMapEditor ({ activeMapId }: { activeMapId: string }
     }, []);
 
     // Reuse of collectedUids: the editor passes INACTIVE pins through it, so an inactive pin is greyed
-    // on the canvas and its hint circle suppressed — no new prop needed.
+    // on the canvas and its hint circle suppressed - no new prop needed.
     const inactiveUids = useMemo(
         () => new Set((pins ?? []).filter((pin) => !pin.isActive).map((pin) => pin.uid)),
         [pins]
@@ -124,7 +124,7 @@ export default function AdminMapEditor ({ activeMapId }: { activeMapId: string }
 
             {isEditing &&
                 <PinEditorForm
-                    // Remount on target swap — plain defaultValues are then enough (no setValue effect
+                    // Remount on target swap - plain defaultValues are then enough (no setValue effect
                     // needed to re-sync mid-life). Placement only HIDES it, so edits survive a move.
                     key={selectedPin?.uid ?? 'draft'}
                     pin={selectedPin}

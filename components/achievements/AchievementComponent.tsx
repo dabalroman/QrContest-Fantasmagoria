@@ -7,7 +7,7 @@ import AchievementIcon from '@/components/achievements/AchievementIcon';
 import ProgressBar from '@/components/ProgressBar';
 import { AchievementType } from '@/functions/src/types/achievement';
 
-// Genitive plural — invariant in the "740 / 1000 X" framing, so it needs no number agreement.
+// Genitive plural - invariant in the "740 / 1000 X" framing, so it needs no number agreement.
 const PROGRESS_UNIT: Record<AchievementType, ReactNode> = {
     points: null,
     correctAnswers: 'poprawnych odpowiedzi',

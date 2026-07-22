@@ -3,7 +3,7 @@ import { getMap, getMapsInArea, MAP_AREA_LABELS, MAP_AREAS } from '@/utils/maps'
 
 // Peer areas on top; picking MOK/2LO reveals that building's floor strip (rendered from the registry,
 // so adding a level is one line). Dwór has no floors → no strip. `adminToggle` is an optional slot
-// rendered above the area row — /map drops the admin edit-mode switch in here so it sits with the picker.
+// rendered above the area row - /map drops the admin edit-mode switch in here so it sits with the picker.
 export default function MapAreaToggle ({
     activeMapId,
     onSelect,

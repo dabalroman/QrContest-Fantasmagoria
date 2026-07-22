@@ -135,7 +135,7 @@ export default function LookForCodeView ({
                         {
                             formState.errors.code?.message || currentInput.length === 0
                                 ? formState.errors.code?.message
-                                : 'Kod gotowy — potwierdź poniżej!'
+                                : 'Kod gotowy - potwierdź poniżej!'
                         }
                     </p>
 

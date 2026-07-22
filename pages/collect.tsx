@@ -29,7 +29,7 @@ export default function CollectPage () {
     const { pins } = useContext<PinsCacheContextType>(PinsCacheContext);
 
     // The navbar super-button here just links to /map (see CollectPinView / QuestionPinView), and /map
-    // restores whatever floor was last viewed. So once a code is collected, remember ITS floor — the
+    // restores whatever floor was last viewed. So once a code is collected, remember ITS floor - the
     // CollectedPin snapshot carries no mapId, but the pins cache does (keyed by the same uid). Runs on
     // [pin, pins] so a cache that finishes loading after the collect still resolves the floor before the
     // player taps through. If the pin isn't in the cache yet, /map falls back to the last floor as before.

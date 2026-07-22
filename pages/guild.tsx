@@ -17,7 +17,7 @@ export default function GuildPage () {
     return null;
 }
 
-/* CLUBS-DISABLED-2026: original club picker — restore to re-enable clubs.
+/* CLUBS-DISABLED-2026: original club picker - restore to re-enable clubs.
 import Panel from '@/components/Panel';
 import ScreenTitle from '@/components/ScreenTitle';
 import React from 'react';

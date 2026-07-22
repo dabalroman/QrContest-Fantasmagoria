@@ -5,7 +5,7 @@ import { AchievementGrant } from '../types/achievement';
 /**
  * The ONLY writer of an achievement grant. Stamps `achievements.<uid>` on the user doc; that entry IS
  * the exactly-once dup guard read back by evaluateAchievements. Runs OUTSIDE the evaluator's
- * try/catch — the evaluator is pure and only computes the list.
+ * try/catch - the evaluator is pure and only computes the list.
  *
  * `bonus` records what was actually awarded, so editing a definition later cannot rewrite history.
  * The points themselves are folded into awardPoints' single score write; this records the badge alone.

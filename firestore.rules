@@ -71,7 +71,7 @@ service cloud.firestore {
         }
 
         // Achievement definitions hold nothing secret (name, icon, type, target, bonus), so unlike
-        // pins they are readable by any signed-in player — that is what lets the achievements screen
+        // pins they are readable by any signed-in player - that is what lets the achievements screen
         // show ALL achievements with progress, without a callable or a per-user clone.
         match /achievements/{achievement} {
             allow read: if request.auth != null;
@@ -80,7 +80,7 @@ service cloud.firestore {
         }
 
         // Photo-proof submissions (#19). The owner may read their OWN submissions (so the map pin sheet
-        // could show pending/approved/rejected) — admins read the whole queue through the
+        // could show pending/approved/rejected) - admins read the whole queue through the
         // getPhotoSubmissionsHandle callable. All writes go through the submit/review callables.
         match /photoSubmissions/{submissionId} {
             allow read: if request.auth != null
@@ -89,7 +89,7 @@ service cloud.firestore {
             allow write: if false;
         }
 
-        // Pin group taxonomy — nothing secret (uid/name/icon), so unlike pins themselves it is
+        // Pin group taxonomy - nothing secret (uid/name/icon), so unlike pins themselves it is
         // readable by any signed-in client. Feeds the admin pin editor's group dropdown. Mutated only
         // by the seed / Firestore console; upsertPinHandle reads it to validate a pin's groups[].
         match /pinGroups/{pinGroup} {

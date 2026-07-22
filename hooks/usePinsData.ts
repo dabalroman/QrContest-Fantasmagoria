@@ -9,8 +9,8 @@ import { getPinsFunction } from '@/utils/functions';
 import { collection, onSnapshot } from '@firebase/firestore';
 import { FireDoc } from '@/Enum/FireDoc';
 
-// The map is the first screen that both collects AND views pins at once, so — unlike the one-shot card
-// cache — it must stay fresh. `pins` is admin-only read (the code is inline), so it cannot be a client
+// The map is the first screen that both collects AND views pins at once, so - unlike the one-shot card
+// cache - it must stay fresh. `pins` is admin-only read (the code is inline), so it cannot be a client
 // listener; freshness is a poll + tab-focus refetch instead. Only `collectedPins` is a true listener.
 const PINS_REFETCH_INTERVAL_MS = 15 * 60 * 1000;
 
@@ -21,7 +21,7 @@ export default function usePinsData (): PinsCacheContextType {
     const [pinsLoading, setPinsLoading] = useState<boolean>(false);
     const [pinsError, setPinsError] = useState<boolean>(false);
 
-    // Freshness / failure-retry ONLY — never coupled to a collect. A player's own collect greys its
+    // Freshness / failure-retry ONLY - never coupled to a collect. A player's own collect greys its
     // marker through the collectedPins listener below, so there is NO setCollectedPins(null) anywhere.
     const reloadPins = useCallback(() => {
         if (!auth.currentUser) {

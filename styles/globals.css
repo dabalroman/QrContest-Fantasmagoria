@@ -33,7 +33,7 @@
     --color-pin-photo: #5B6B7C;
 }
 
-/* Map markers + hint circles (components/map). Plain CSS, not @apply — no purge, no safelist entry. */
+/* Map markers + hint circles (components/map). Plain CSS, not @apply - no purge, no safelist entry. */
 .pin-marker {
     background: transparent;
     border: none;
@@ -51,7 +51,7 @@
 .pin-hint-circle--feedback { fill: var(--color-pin-feedback); stroke: var(--color-pin-feedback); }
 .pin-hint-circle--photo { fill: var(--color-pin-photo); stroke: var(--color-pin-photo); }
 
-/* Admin pin editor (#14) — the not-yet-saved marker at the tapped coords. */
+/* Admin pin editor (#14) - the not-yet-saved marker at the tapped coords. */
 .pin-marker-draft {
     width: 2.5rem;
     height: 2.5rem;

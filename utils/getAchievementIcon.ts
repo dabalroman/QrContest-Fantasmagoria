@@ -8,7 +8,7 @@ import {
     IconDefinition
 } from '@fortawesome/free-solid-svg-icons';
 
-// `icon` on an achievement definition is a string KEY (never an IconDefinition — nothing serializes an
+// `icon` on an achievement definition is a string KEY (never an IconDefinition - nothing serializes an
 // icon over the wire), so the client maps it here. Mirrors utils/getPinIcon.ts. Shared with #30's
 // unlock toast, so keep it a plain key→icon lookup with a safe fallback for an unknown/edited key.
 // Note: FontAwesome free-solid has no owl (faOwl is Pro-only); faGraduationCap stands in for the

@@ -2,7 +2,7 @@ import FantasmagoriaProgramEntry from '@/models/FantasmagoriaProgramEntry';
 import { getTimeHourAndMinutes } from '@/utils/date';
 
 // Permanent attractions (game zones, exhibitions, all-day booths) run for many hours and mostly
-// start at opening time — they would flood the scrolling agenda list. Show only events with a real
+// start at opening time - they would flood the scrolling agenda list. Show only events with a real
 // time slot. RPG sessions last at most 5h, so a 6h cutoff never clips them.
 const MAX_AGENDA_ENTRY_DURATION_HOURS = 6;
 

@@ -12,7 +12,7 @@ import * as logger from 'firebase-functions/logger';
 
 // Admin review of a pending photo submission (#19). Idempotent: the pending-status check is a
 // TRANSACTIONAL read, so a double-click or a second admin can never double-award or double-reopen.
-// Uses the SNAPSHOTTED sub.value / sub.scopeKeys — it never re-reads the pin, so a mid-event pin
+// Uses the SNAPSHOTTED sub.value / sub.scopeKeys - it never re-reads the pin, so a mid-event pin
 // edit/deletion cannot change what gets awarded.
 //
 //  - approve → award sub.value through the shared awardPoints (real score + 4-place fan-out +
@@ -51,7 +51,7 @@ export const reviewPhotoHandle = onCall(async (req): Promise<{ status: string, a
 
     try {
         const grants = await db.runTransaction<AchievementGrant[]>(async (transaction) => {
-            // Idempotency guard — a TRANSACTIONAL read, so a concurrent review forces a retry that sees
+            // Idempotency guard - a TRANSACTIONAL read, so a concurrent review forces a retry that sees
             // the now-non-pending status and throws below.
             const freshSub = (await transaction.get(submissionRef)).data() as PhotoSubmission;
             if (freshSub.status !== PhotoSubmissionStatus.PENDING) {
@@ -70,14 +70,14 @@ export const reviewPhotoHandle = onCall(async (req): Promise<{ status: string, a
                 });
                 transaction.update(collectedPinRef, { awardedPoints: sub.value });
 
-                // Route through the shared action — real score + 4-place fan-out + achievements +
+                // Route through the shared action - real score + 4-place fan-out + achievements +
                 // location scope counters. Never hand-roll the fan-out.
                 return await awardPoints(
                     db, transaction, userRef, user, sub.value, { amountOfCollectedPins: 1 }, sub.scopeKeys
                 );
             }
 
-            // reject — REOPEN the pin for retry.
+            // reject - REOPEN the pin for retry.
             transaction.update(submissionRef, {
                 status: PhotoSubmissionStatus.REJECTED,
                 reviewedAt: FieldValue.serverTimestamp(),
@@ -91,7 +91,7 @@ export const reviewPhotoHandle = onCall(async (req): Promise<{ status: string, a
             return [];
         });
 
-        // Best-effort Storage hygiene on reject — outside the transaction (Storage is not transactional).
+        // Best-effort Storage hygiene on reject - outside the transaction (Storage is not transactional).
         // A failure here is logged, never fatal: the game state is already correct.
         if (decision === 'reject') {
             try {
