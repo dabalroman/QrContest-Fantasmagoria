@@ -28,6 +28,15 @@ const screenTypeWeights = {
     [ScreenType.Agenda]: 0.42
 };
 
+// Event and Agenda render nothing at all without program data, so a failed first fetch would
+// leave the kiosk blank 82% of the cycle. Until a fetch succeeds, cycle only the screens that
+// need no program.
+const programFreeScreenTypeWeights = {
+    [ScreenType.FantasmagoriaSplash]: 0.35,
+    [ScreenType.QrContestSplash]: 0.45,
+    [ScreenType.News]: 0.2
+};
+
 const colorThemes = [
     'rgba(44, 41, 67, 0.8)',
     'rgba(54, 20, 24, 0.8)',
@@ -40,57 +49,71 @@ const colorThemes = [
     'rgba(23, 23, 23, 0.8)'
 ];
 
-const getFantasmagoriaProgram = async (): Promise<FantasmagoriaProgramEntry[]> => {
-    const data = await fetch(
-        process.env.NEXT_PUBLIC_DASHBOARD_API_URL ?? '',
-        {
-            method: 'POST',
-            headers: { 'content-type': 'application/json-rpc' },
-            body: JSON.stringify({
-                'id': null,
-                'method': 'GetKonwent2026Program'
-            })
-        }
-    )
-        .then((response) => response.json());
-
-    const blacklist = [
-        'Gra Konwentowa',
-        'Przygotowanie Cosplay'
-    ];
-
-    const now = new Date();
-
-    return data.result
-        .map((raw: RawFantasmagoriaProgramEntry) => FantasmagoriaProgramEntry.fromRaw(raw))
-        .filter((entry: FantasmagoriaProgramEntry) => entry.dateEnd >= now)
-        .filter((entry: FantasmagoriaProgramEntry) => entry.title
-            && blacklist.every((word: string) => !entry.title.includes(word)))
-        .map((entry: FantasmagoriaProgramEntry) => {
-
-            const description = entry.description;
-            const cutIndex = description.indexOf(' ', 400);
-
-            if (cutIndex !== -1) {
-                entry.description = description.slice(0, cutIndex) + '...';
+const getFantasmagoriaProgram = async (): Promise<FantasmagoriaProgramEntry[] | null> => {
+    try {
+        const data = await fetch(
+            process.env.NEXT_PUBLIC_DASHBOARD_API_URL ?? '',
+            {
+                method: 'POST',
+                headers: { 'content-type': 'application/json-rpc' },
+                body: JSON.stringify({
+                    'id': null,
+                    'method': 'GetKonwent2026Program'
+                })
             }
-
-            return entry;
-        })
-        .sort((a: FantasmagoriaProgramEntry, b: FantasmagoriaProgramEntry) =>
-            a.title > b.title ? 1 : (a.title < b.title ? -1 : 0)
         )
-        .sort((a: FantasmagoriaProgramEntry, b: FantasmagoriaProgramEntry) =>
-            a.dateStart > b.dateStart ? 1 : (a.dateStart < b.dateStart ? -1 : 0)
-        );
+            .then((response) => response.json());
+
+        if (!Array.isArray(data?.result)) {
+            console.error('Fantasmagoria program response has no result array', data);
+
+            return null;
+        }
+
+        const blacklist = [
+            'Gra Konwentowa',
+            'Przygotowanie Cosplay'
+        ];
+
+        const now = new Date();
+
+        return data.result
+            .map((raw: RawFantasmagoriaProgramEntry) => FantasmagoriaProgramEntry.fromRaw(raw))
+            .filter((entry: FantasmagoriaProgramEntry) => entry.dateEnd >= now)
+            .filter((entry: FantasmagoriaProgramEntry) => entry.title
+                && blacklist.every((word: string) => !entry.title.includes(word)))
+            .map((entry: FantasmagoriaProgramEntry) => {
+
+                const description = entry.description;
+                const cutIndex = description.indexOf(' ', 400);
+
+                if (cutIndex !== -1) {
+                    entry.description = description.slice(0, cutIndex) + '...';
+                }
+
+                return entry;
+            })
+            .sort((a: FantasmagoriaProgramEntry, b: FantasmagoriaProgramEntry) =>
+                a.title > b.title ? 1 : (a.title < b.title ? -1 : 0)
+            )
+            .sort((a: FantasmagoriaProgramEntry, b: FantasmagoriaProgramEntry) =>
+                a.dateStart > b.dateStart ? 1 : (a.dateStart < b.dateStart ? -1 : 0)
+            );
+    } catch (error) {
+        console.error(error);
+
+        return null;
+    }
 };
 
-const getRandomScreenType = () => {
+const getRandomScreenType = (hasProgramEntries: boolean) => {
+    const weights = hasProgramEntries ? screenTypeWeights : programFreeScreenTypeWeights;
+
     return parseInt(
         getRandomArrayElementWithWeights(
-            Object.keys(screenTypeWeights) as string[],
-            Object.values(screenTypeWeights)
-        ) as string ?? ScreenType.Event
+            Object.keys(weights) as string[],
+            Object.values(weights)
+        ) as string ?? ScreenType.QrContestSplash
     ) as ScreenType;
 };
 
@@ -113,10 +136,12 @@ export default function DashboardPage () {
     }, [router, user]);
 
     useEffect(() => {
-        setScreenType(getRandomScreenType());
+        const hasProgramEntries = programEntries.length > 0;
+
+        setScreenType(getRandomScreenType(hasProgramEntries));
 
         const timeout = setInterval(() => {
-            setScreenType(getRandomScreenType());
+            setScreenType(getRandomScreenType(hasProgramEntries));
             setCurrentTheme(getRandomArrayElement(colorThemes) as string);
         }, cycleScreenEveryMs);
 
@@ -124,11 +149,20 @@ export default function DashboardPage () {
     }, [programEntries]);
 
     useEffect(() => {
-        (async () => setProgramEntries(await getFantasmagoriaProgram()))();
+        // A failed refetch keeps the previously fetched program - it changes rarely, and a blank
+        // kiosk is worse than a slightly stale one.
+        const refreshProgram = async () => {
+            const entries = await getFantasmagoriaProgram();
 
-        const fetchTimeout = setInterval(async () => {
-            setProgramEntries(await getFantasmagoriaProgram());
-        }, fetchNewDataEveryMs);
+            if (entries) {
+                setProgramEntries(entries);
+            }
+        };
+
+        refreshProgram()
+            .then();
+
+        const fetchTimeout = setInterval(refreshProgram, fetchNewDataEveryMs);
 
         return () => clearInterval(fetchTimeout);
     }, []);
