@@ -14,12 +14,12 @@ export default function PinMarkerIcon ({
         <div
             className={
                 'w-10 h-10 rounded-full border-2 border-white shadow-card '
-                + 'flex items-center justify-center text-text-light '
+                + 'flex items-center justify-center text-text-light text-lg '
                 + `bg-${scheme} `
                 + (collected ? 'opacity-50 grayscale' : '')
             }
         >
-            <FontAwesomeIcon icon={getPinIcon(type)} className="w-1/2 h-1/2"/>
+            <FontAwesomeIcon icon={getPinIcon(type)}/>
         </div>
     );
 }

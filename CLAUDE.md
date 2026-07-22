@@ -454,7 +454,6 @@ Equal specificity → source order wins → every Tailwind `h-*` on an icon is d
 renders at the inherited font-size** and the class silently does nothing.
 **Size icons by font-size** — `text-3xl` on the wrapper (`Navbar.tsx`) or FA's `size` prop (`Loader.tsx`
 `size="3x"`, `ranking.tsx` `size="sm"`). Margins/colour utilities are unaffected; only `w-`/`h-` are.
-Known remaining offender (task #42): `components/map/PinMarkerIcon.tsx` — #47 removed the other two.
 
 ### Accent colour takes opacity modifiers
 
