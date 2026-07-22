@@ -167,8 +167,11 @@ export default function AccountPage () {
                     </p>
                     <Button
                         onClick={async () => {
-                            await router.push(Page.MAIN);
+                            // Sign out BEFORE navigating: on Page.MAIN _app redirects a ready user
+                            // to the map, so leaving the sign-out until after the push lands the
+                            // now-anonymous visitor on /map, which AuthCheck answers with a 404.
                             await auth.signOut();
+                            await router.replace(Page.MAIN);
                             toast.success('Wylogowano pomyślnie.');
                         }}
                         className="w-full"
