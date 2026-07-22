@@ -77,7 +77,8 @@ module.exports = {
                 'pin-riddle': 'var(--color-pin-riddle)',
                 'pin-visit': 'var(--color-pin-visit)',
                 'pin-feedback': 'var(--color-pin-feedback)',
-                'pin-photo': 'var(--color-pin-photo)'
+                'pin-photo': 'var(--color-pin-photo)',
+                'pin-ghost': 'var(--color-pin-ghost)'
             },
             keyframes: {
                 pointsAdded: {
@@ -175,21 +176,25 @@ module.exports = {
         'border-pin-visit',
         'border-pin-feedback',
         'border-pin-photo',
+        'border-pin-ghost',
         'bg-pin-code',
         'bg-pin-riddle',
         'bg-pin-visit',
         'bg-pin-feedback',
         'bg-pin-photo',
+        'bg-pin-ghost',
         'ring-pin-code',
         'ring-pin-riddle',
         'ring-pin-visit',
         'ring-pin-feedback',
         'ring-pin-photo',
+        'ring-pin-ghost',
         'text-pin-code',
         'text-pin-riddle',
         'text-pin-visit',
         'text-pin-feedback',
         'text-pin-photo',
+        'text-pin-ghost',
     ],
     plugins: []
 };

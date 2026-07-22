@@ -1,6 +1,7 @@
 import {
     faBuilding,
     faCrown,
+    faGhost,
     faGraduationCap,
     faLocationDot,
     faMedal,
@@ -36,6 +37,10 @@ export default function getAchievementIcon (iconKey: string): IconDefinition {
 
     if (iconKey === 'building') {
         return faBuilding;
+    }
+
+    if (iconKey === 'ghost') {
+        return faGhost;
     }
 
     return faMedal;

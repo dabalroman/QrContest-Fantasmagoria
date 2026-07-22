@@ -48,6 +48,7 @@ function validFields (overrides = {}) {
         mapId: 'dwor',
         coords: { x: 100, y: 200 },
         hintRadius: null,
+        clueImage: null,
         value: 10,
         withQuestion: false,
         availableFrom: null,
@@ -239,6 +240,68 @@ test('a malformed code is rejected for a code pin', async () => {
         () => callCallable(
             'upsertPinHandle',
             { pinUid: null, fields: validFields({ type: 'code', code: 'short' }) },
+            adminToken
+        ),
+        /invalid/i
+    );
+});
+
+test('a ghost pin takes the code shape, not a riddle\'s free text', async () => {
+    const adminToken = await registerAdmin('admin-ghost-1', 'AdminGhost1');
+
+    await assert.rejects(
+        () => callCallable(
+            'upsertPinHandle',
+            { pinUid: null, fields: validFields({ name: 'Zly duch', type: 'ghost', code: 'duch' }) },
+            adminToken
+        ),
+        /invalid/i
+    );
+
+    const result = await callCallable(
+        'upsertPinHandle',
+        { pinUid: null, fields: validFields({ name: 'Dobry duch', type: 'ghost', code: 'GHOSTCODE1' }) },
+        adminToken
+    );
+    assert.equal(result.pin.type, 'ghost');
+});
+
+test('a ghost code collides with a code pin\'s code', async () => {
+    const adminToken = await registerAdmin('admin-ghost-2', 'AdminGhost2');
+
+    await assert.rejects(
+        () => callCallable(
+            'upsertPinHandle',
+            { pinUid: null, fields: validFields({ name: 'Duch kolizja', type: 'ghost', code: PIN_CODE_CODE }) },
+            adminToken
+        ),
+        /already in use/i
+    );
+});
+
+// The necklace pin's planned edit (swap in the printed code) must not drop its picture.
+test('clueImage survives an edit round trip and rejects a non-slug', async () => {
+    const adminToken = await registerAdmin('admin-ghost-3', 'AdminGhost3');
+
+    const created = await callCallable(
+        'upsertPinHandle',
+        { pinUid: null, fields: validFields({ name: 'Z obrazkiem', clueImage: 'naszyjnik' }) },
+        adminToken
+    );
+    assert.equal(created.pin.clueImage, 'naszyjnik');
+
+    const edited = await callCallable(
+        'upsertPinHandle',
+        { pinUid: created.pin.uid, fields: validFields({ name: 'Z obrazkiem', clueImage: 'naszyjnik', value: 50 }) },
+        adminToken
+    );
+    assert.equal(edited.pin.clueImage, 'naszyjnik');
+    assert.equal(edited.pin.value, 50);
+
+    await assert.rejects(
+        () => callCallable(
+            'upsertPinHandle',
+            { pinUid: null, fields: validFields({ name: 'Zly obrazek', clueImage: '../secret' }) },
             adminToken
         ),
         /invalid/i

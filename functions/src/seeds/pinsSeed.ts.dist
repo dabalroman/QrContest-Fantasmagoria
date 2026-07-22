@@ -789,6 +789,71 @@ const pinsSeed: Pin[] = [
         isActive: false,
         code: 'KRYPTA0001',
         collectedBy: {}
+    },
+    // The three ghosts (#60). Unlike every other pin these are real 2026 content, not fixture: their
+    // codes are the ones already printed in the FAQ and the regulamin, so #16's rewrite must carry
+    // them over. Parked in the empty bottom-left corner of the Dwór image because a marker needs
+    // coordinates, not because anything is there - pinScopeKeys drops their map: key for that reason.
+    // The FAQ code is stored REVERSED: the page prints 9DG76W9SGN and the joke is that you must turn
+    // it around. Neither description names its page, and neither carries its code.
+    {
+        uid: 'widmo-ciekawskiego',
+        name: 'Widmo Ciekawskiego',
+        description: 'Za życia zadawał pytania szybciej, niż ktokolwiek zdążył odpowiedzieć. Umarł w połowie zdania i wciąż czeka na resztę. Ktoś spisał wszystkie odpowiedzi, ale jedna z nich kłamie mu prosto w twarz.',
+        clue: '',
+        type: PinType.GHOST,
+        groups: ['zaswiaty'],
+        mapId: 'dwor',
+        coords: { x: 60, y: 650 },
+        hintRadius: null,
+        clueImage: null,
+        value: 15,
+        withQuestion: false,
+        availableFrom: null,
+        availableTo: null,
+        isActive: true,
+        code: 'NGS9W67GD9',
+        collectedBy: {}
+    },
+    {
+        uid: 'zjawa-drobnego-druku',
+        name: 'Zjawa Drobnego Druku',
+        description: 'Spisała wszystko, czego nikt nie czyta, i dlatego nie zaznała spokoju. Obiecuje nagrodę każdemu, kto dobrnie do końca. Jak dotąd nie musiała nikomu zapłacić.',
+        clue: '',
+        type: PinType.GHOST,
+        groups: ['zaswiaty'],
+        mapId: 'dwor',
+        coords: { x: 60, y: 730 },
+        hintRadius: null,
+        clueImage: null,
+        value: 20,
+        withQuestion: false,
+        availableFrom: null,
+        availableTo: null,
+        isActive: true,
+        code: 'PB944GH25M',
+        collectedBy: {}
+    },
+    // ORGSRIDDLE is a placeholder: the organiser asks the riddle in person and hands solvers a printed
+    // QR, so swap in the real code from /admin/pins once it exists - no re-seed, no deploy.
+    {
+        uid: 'zakleta-w-wisiorku',
+        name: 'Zaklęta w Wisiorku',
+        description: 'Zamknięto ją w srebrze i zawieszono na szyi kogoś, kto o tym nie wie. Znajdź nosiciela, odpowiedz na jego pytanie, a duch odwdzięczy się kodem.',
+        clue: '',
+        type: PinType.GHOST,
+        groups: ['zaswiaty'],
+        mapId: 'dwor',
+        coords: { x: 150, y: 690 },
+        hintRadius: null,
+        clueImage: 'naszyjnik',
+        value: 50,
+        withQuestion: false,
+        availableFrom: null,
+        availableTo: null,
+        isActive: true,
+        code: 'ORGSRIDDLE',
+        collectedBy: {}
     }
 ];
 

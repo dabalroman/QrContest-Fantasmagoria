@@ -21,6 +21,7 @@ type FormValues = {
     groups: string[];
     tier: CardTier;
     hintRadius: string;
+    clueImage: string;
     withQuestion: boolean;
     isActive: boolean;
     availableFrom: string;
@@ -29,7 +30,13 @@ type FormValues = {
 };
 
 function needsCode (type: PinType): boolean {
-    return type === PinType.CODE || type === PinType.RIDDLE;
+    return type === PinType.CODE || type === PinType.RIDDLE || type === PinType.GHOST;
+}
+
+// A ghost stores a printed 10-char code, not a free-text riddle answer - so it gets the code label,
+// and with it the scan-to-fill button that is how the real code gets entered once the QR is printed.
+function entersCode (type: PinType): boolean {
+    return type === PinType.CODE || type === PinType.GHOST;
 }
 
 // Points are picked by rarity, reusing the card tier scale (Enum/CardTier). The pin still stores a
@@ -103,6 +110,7 @@ export default function PinEditorForm ({
             groups: pin?.groups ?? [],
             tier: pin ? tierFromValue(pin.value) : CardTier.COMMON,
             hintRadius: String(pin?.hintRadius ?? 0),
+            clueImage: pin?.clueImage ?? '',
             withQuestion: pin?.withQuestion ?? false,
             isActive: pin?.isActive ?? true,
             availableFrom: toDatetimeLocal(pin?.availableFrom ?? null),
@@ -141,6 +149,7 @@ export default function PinEditorForm ({
                 mapId,
                 coords,
                 hintRadius: Number(values.hintRadius) > 0 ? Number(values.hintRadius) : null,
+                clueImage: values.clueImage.trim() || null,
                 value: getCardTierValue(values.tier),
                 withQuestion: values.withQuestion,
                 isActive: values.isActive,
@@ -218,6 +227,16 @@ export default function PinEditorForm ({
                         </label>
 
                         <label className="block">
+                            <span className="block pb-1">Obrazek wskazówki</span>
+                            <input
+                                type="text"
+                                className={inputClass}
+                                placeholder="nazwa pliku z /pin-clues, bez .webp"
+                                {...register('clueImage')}
+                            />
+                        </label>
+
+                        <label className="block">
                             <span className="block pb-1">Typ</span>
                             <select className={inputClass} {...register('type')}>
                                 {Object.values(PinType).map((type) => (
@@ -279,13 +298,13 @@ export default function PinEditorForm ({
                         {needsCode(currentType) &&
                             <div className="block">
                                 <span className="block pb-1">
-                                    {currentType === PinType.CODE ? 'Kod' : 'Odpowiedź'}
+                                    {entersCode(currentType) ? 'Kod' : 'Odpowiedź'}
                                 </span>
                                 <div className="relative">
                                     <input
                                         type="text"
                                         className={inputClass + ' uppercase pr-12'}
-                                        placeholder={currentType === PinType.CODE ? 'ABCDEFGHIJ' : 'Twoja odpowiedź'}
+                                        placeholder={entersCode(currentType) ? 'ABCDEFGHIJ' : 'Twoja odpowiedź'}
                                         {...register('code', { required: true })}
                                     />
                                     <button

@@ -47,6 +47,8 @@ export default class Pin extends FirebaseModel {
     availableTo: Date | null;
     // CRS.Simple radius of the "somewhere here" area hint under a QR marker; null = precise point.
     hintRadius: number | null;
+    // Slug of a picture rendered with the clue (`/pin-clues/<slug>.webp`); null = text-only clue.
+    clueImage: string | null;
     // Source-dependent like `code`: empty on the getPins/fromRaw path, the real finder map on the
     // fromFirestore path. Used only by #14's admin editor (a non-empty map earns an extra confirm
     // before a destructive edit/delete - the printed QR is already out there).
@@ -68,6 +70,7 @@ export default class Pin extends FirebaseModel {
         availableFrom: Date | null = null,
         availableTo: Date | null = null,
         hintRadius: number | null = null,
+        clueImage: string | null = null,
         collectedBy: Record<string, PinCollectedByEntry> = {},
     ) {
         super();
@@ -91,6 +94,7 @@ export default class Pin extends FirebaseModel {
         this.availableFrom = availableFrom;
         this.availableTo = availableTo;
         this.hintRadius = hintRadius;
+        this.clueImage = clueImage;
         this.collectedBy = collectedBy;
     }
 
@@ -114,7 +118,8 @@ export default class Pin extends FirebaseModel {
             rawPin.availableTo
                 ? Timestamp.fromMillis(rawPin.availableTo._seconds * 1000).toDate()
                 : null,
-            rawPin.hintRadius ?? null
+            rawPin.hintRadius ?? null,
+            rawPin.clueImage ?? null
         );
     }
 
@@ -148,6 +153,7 @@ export default class Pin extends FirebaseModel {
             data.availableFrom?.toDate() ?? null,
             data.availableTo?.toDate() ?? null,
             data.hintRadius ?? null,
+            data.clueImage ?? null,
             data.collectedBy
                 ? Object.fromEntries(Object.entries(data.collectedBy as Record<string, any>).map(
                     ([uid, entry]) => [uid, {

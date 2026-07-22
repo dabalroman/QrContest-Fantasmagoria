@@ -107,13 +107,16 @@ export const collectPinHandle = onCall(async (req): Promise<{
             throw new HttpsError('invalid-argument', 'code is invalid');
         }
 
-        // type == 'code' is the anti-bruteforce rule: a riddle's `code` holds a guessable
-        // free-text answer, so a cross-pin lookup would let players solve riddles they never found.
+        // The type filter is the anti-bruteforce rule: a riddle's `code` holds a guessable free-text
+        // answer, so a cross-pin lookup would let players solve riddles they never found. GHOST joins
+        // CODE here because every ghost code is a 10-char [A-Z0-9] string like a printed one, so the
+        // length check above already covers it - the two pages that carry a ghost code tell readers to
+        // type it in, and this is the input they type it into.
         // isActive is NOT queried here (decision 28): an inactive pin must report 'pin is not active',
         // the same as the pin-UI path, rather than the misleading 'pin code is invalid'.
         const pinSnapshot = await db.collection('pins')
             .where('code', '==', normalizedCode)
-            .where('type', '==', PinType.CODE)
+            .where('type', 'in', [PinType.CODE, PinType.GHOST])
             .get();
 
         if (pinSnapshot.empty) {

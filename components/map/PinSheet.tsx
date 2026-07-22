@@ -47,7 +47,11 @@ export default function PinSheet ({
     });
     const photoCollectRef = useRef<PhotoPinCollectHandle>(null);
 
-    const needsAnswer = pin.type === PinType.CODE || pin.type === PinType.RIDDLE;
+    const needsAnswer = pin.type === PinType.CODE || pin.type === PinType.RIDDLE
+        || pin.type === PinType.GHOST;
+    // A ghost's riddle is asked in person and the prize IS a printed code, so it prompts like a QR pin
+    // rather than like a riddle.
+    const entersCode = pin.type === PinType.CODE || pin.type === PinType.GHOST;
     const isPhoto = pin.type === PinType.PHOTO;
     const isFeedback = pin.type === PinType.FEEDBACK;
     // The navbar centre collect button covers code/riddle/visit/feedback - photo submits via its own panel.
@@ -126,22 +130,29 @@ export default function PinSheet ({
                     <p className="whitespace-pre-line text-center font-semibold">{pin.description}</p>
                 </SheetSection>
 
-                {pin.clue &&
+                {(pin.clue || pin.clueImage) &&
                     <SheetSection title="Wskazówka">
-                        <p className="whitespace-pre-line text-justify">{pin.clue}</p>
+                        {pin.clue && <p className="whitespace-pre-line text-justify">{pin.clue}</p>}
+                        {pin.clueImage &&
+                            <img
+                                className={'w-full ' + (pin.clue ? 'mt-4' : '')}
+                                src={`/pin-clues/${pin.clueImage}.webp`}
+                                alt="Wskazówka"
+                            />
+                        }
                     </SheetSection>
                 }
 
                 {canCollect && needsAnswer &&
                     <SheetSection
-                        title={pin.type === PinType.CODE ? 'Wpisz kod' : 'Rozwiąż zagadkę'}
+                        title={entersCode ? 'Wpisz kod' : 'Rozwiąż zagadkę'}
                         loading={loading}
                         raised
                     >
                         <form onSubmit={handleSubmit(collect)}>
                             <input
                                 type="text"
-                                placeholder={pin.type === PinType.CODE ? 'ABCDEFGHIJ' : 'Twoja odpowiedź'}
+                                placeholder={entersCode ? 'ABCDEFGHIJ' : 'Twoja odpowiedź'}
                                 className="rounded-xl block w-full p-1 border-2 border-input-border text-center
                                     bg-input-background text-text-accent uppercase text-2xl shadow-inner-input
                                     tracking-wider font-semibold"

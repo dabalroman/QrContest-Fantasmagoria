@@ -1,4 +1,4 @@
-import { Pin } from '../types/pin';
+import { Pin, PinType } from '../types/pin';
 
 // The SINGLE source of truth for how a pin maps onto the location-achievement scopes it counts
 // towards. Used by BOTH the award path (collectPinHandle, incrementing the player's counter) and the
@@ -10,9 +10,13 @@ import { Pin } from '../types/pin';
 //
 // Namespaced with `group:`/`map:` prefixes because a group uid and a mapId can collide as bare
 // strings (e.g. group 'dwor' and mapId 'dwor' are the same string but different scopes).
+//
+// GHOST is the sole exception, and it is about the fiction, not the machinery: a ghost pin marks a
+// place that is not there, parked inside some map image only because a marker needs coordinates. Its
+// `map:` key is dropped so it cannot inflate that floor's location badge - it counts only towards its
+// groups. Both sides of the #45 invariant still read this one helper, so they cannot drift.
 export default function scopeKeys(pin: Pin): string[] {
-    return [
-        ...pin.groups.map((group) => `group:${group}`),
-        `map:${pin.mapId}`
-    ];
+    const groupKeys = pin.groups.map((group) => `group:${group}`);
+
+    return pin.type === PinType.GHOST ? groupKeys : [...groupKeys, `map:${pin.mapId}`];
 }

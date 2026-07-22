@@ -17,6 +17,7 @@ export default function toPublicPin(pin: Pin): PublicPin {
         mapId: pin.mapId,
         coords: pin.coords,
         hintRadius: pin.hintRadius ?? null,
+        clueImage: pin.clueImage ?? null,
         value: pin.value,
         withQuestion: pin.withQuestion,
         isActive: pin.isActive,

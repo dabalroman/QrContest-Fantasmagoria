@@ -14,11 +14,12 @@ import {
 } from './emulator.mjs';
 import {
     seedFixture, seedUser, seedLegacyUser, seedInvalidAchievements, seedPhotoObject,
-    seedScopedAchievement, seedLocationScopePins, seedLocationScopeExtraPins,
+    seedScopedAchievement, seedLocationScopePins, seedLocationScopeExtraPins, seedLocationScopeGhostPin,
     GUILD_UID, ROUND_UID, CARD_CODE, QUESTION_CORRECT,
     PIN_VISIT_UID, PIN_CODE_CODE,
     PIN_GROUP_TEST_UID,
-    LOC_SCOPE_MAP_ID, LOC_PIN_A_UID, LOC_PIN_B_UID, LOC_PIN_FEEDBACK_UID, LOC_PIN_PHOTO_UID,
+    LOC_SCOPE_MAP_ID, LOC_SCOPE_GROUP_UID, LOC_PIN_A_UID, LOC_PIN_B_UID,
+    LOC_PIN_FEEDBACK_UID, LOC_PIN_PHOTO_UID, LOC_PIN_GHOST_CODE,
     ACH_SCORE_1, ACH_SCORE_2, ACH_OWL_1
 } from './fixtures.mjs';
 
@@ -368,4 +369,42 @@ test('feedback and photo pins raise the target, so a badge cannot unlock early',
     assert.equal(user.collectedPinsByScope[`map:${LOC_SCOPE_MAP_ID}`], 4);
     assert.equal(user.score, 5 * 4 + def.bonus, 'four pins at 5 each plus the bonus');
     assert.equal((await roundUser(uid)).score, user.score, 'bonus fanned out to the round');
+});
+
+// The one place pinScopeKeys is NOT type-blind (#60). Both sides must skip a ghost's map key together:
+// counting it on either side alone is the #45 drift, in one direction or the other.
+test('a ghost pin raises its group target but not the map target it happens to sit on', async () => {
+    const uid = 'ach-loc-ghost';
+    const token = await createAuthUserToken(uid);
+
+    await seedLocationScopePins();
+    await seedLocationScopeGhostPin();
+    const mapDef = await seedScopedAchievement(`map:${LOC_SCOPE_MAP_ID}`);
+    // Bonus trimmed so the run's total stays under the first point cup - otherwise that cup unlocks
+    // too and the exact-grant assertions below would be asserting two badges at once.
+    const groupDef = await seedScopedAchievement(`group:${LOC_SCOPE_GROUP_UID}`, {
+        uid: 'test-location-achievement-group', bonus: 10
+    });
+    await recomputeAchievementTargets(db);
+
+    assert.equal((await achievementDoc(mapDef.uid)).target, 2, 'the ghost does not raise the map target');
+    assert.equal((await achievementDoc(groupDef.uid)).target, 3, 'but it does raise the group target');
+
+    await seedUser(uid, 'AchLocGhost', { score: 0 });
+
+    await callCallable('collectPinHandle', { pinUid: LOC_PIN_A_UID }, token);
+    const b = await callCallable('collectPinHandle', { pinUid: LOC_PIN_B_UID }, token);
+
+    assert.deepEqual(b.achievements, [{
+        uid: mapDef.uid, name: mapDef.name, icon: mapDef.icon, bonus: mapDef.bonus
+    }], 'the map badge completes on the two real pins alone');
+
+    const ghost = await callCallable('collectPinHandle', { code: LOC_PIN_GHOST_CODE }, token);
+    assert.deepEqual(ghost.achievements, [{
+        uid: groupDef.uid, name: groupDef.name, icon: groupDef.icon, bonus: groupDef.bonus
+    }], 'the ghost completes the group badge');
+
+    const user = await userDoc(uid);
+    assert.equal(user.collectedPinsByScope[`map:${LOC_SCOPE_MAP_ID}`], 2, 'ghost never touched the map counter');
+    assert.equal(user.collectedPinsByScope[`group:${LOC_SCOPE_GROUP_UID}`], 3);
 });

@@ -41,6 +41,13 @@ export const PIN_FEEDBACK_WITHQ_UID = 'test-pin-feedback-withq';
 export const PIN_PHOTO_UID = 'test-pin-photo';
 export const PIN_PHOTO_VALUE = 5;
 
+// Ghost pin (#60): riddle-like, but its answer is a printed 10-char code, so the global scanner path
+// looks it up alongside CODE pins. Also the only fixture pin carrying a clueImage.
+export const PIN_GHOST_UID = 'test-pin-ghost';
+export const PIN_GHOST_VALUE = 15;
+export const PIN_GHOST_CODE = 'PINGHOST01';   // 10 chars, [A-Z0-9]
+export const PIN_GHOST_CLUE_IMAGE = 'test-clue';
+
 /**
  * Seed a Storage object at the derived photo path, the way the client's uploadBytes would - including
  * the `firebaseStorageDownloadTokens` custom metadata the emulator auto-creates on a real upload, so
@@ -228,6 +235,33 @@ export async function seedLocationScopeExtraPins () {
     });
     await db.collection('pins').doc(LOC_PIN_PHOTO_UID).set({
         uid: LOC_PIN_PHOTO_UID, name: 'Loc pin photo', type: 'photo', coords: { x: 3, y: 3 }, ...base
+    });
+}
+
+// #60: a ghost pin carrying BOTH the loc scope's group and its mapId, to pin down the one asymmetry
+// in pinScopeKeys - it must raise the group target but not the map one. Opt-in, same as the pair above.
+export const LOC_PIN_GHOST_UID = 'loc-test-pin-ghost';
+export const LOC_PIN_GHOST_CODE = 'LOCGHOST01';
+
+export async function seedLocationScopeGhostPin () {
+    await db.collection('pins').doc(LOC_PIN_GHOST_UID).set({
+        uid: LOC_PIN_GHOST_UID,
+        name: 'Loc pin ghost',
+        description: 'test pin',
+        clue: '',
+        type: 'ghost',
+        groups: [LOC_SCOPE_GROUP_UID],
+        mapId: LOC_SCOPE_MAP_ID,
+        coords: { x: 4, y: 4 },
+        hintRadius: null,
+        clueImage: null,
+        value: 5,
+        withQuestion: false,
+        availableFrom: null,
+        availableTo: null,
+        isActive: true,
+        code: LOC_PIN_GHOST_CODE,
+        collectedBy: {}
     });
 }
 
@@ -448,6 +482,26 @@ export async function seedFixture () {
         availableTo: null,
         isActive: true,
         code: null,
+        collectedBy: {}
+    });
+
+    await db.collection('pins').doc(PIN_GHOST_UID).set({
+        uid: PIN_GHOST_UID,
+        name: 'Test pin (ghost)',
+        description: 'test pin',
+        clue: '',
+        type: 'ghost',
+        groups: ['test'],
+        mapId: 'test-map',
+        coords: { x: 41, y: 41 },
+        hintRadius: null,
+        clueImage: PIN_GHOST_CLUE_IMAGE,
+        value: PIN_GHOST_VALUE,
+        withQuestion: false,
+        availableFrom: null,
+        availableTo: null,
+        isActive: true,
+        code: PIN_GHOST_CODE,
         collectedBy: {}
     });
 

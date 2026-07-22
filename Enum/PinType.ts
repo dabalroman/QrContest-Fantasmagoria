@@ -3,7 +3,8 @@ export enum PinType {
     RIDDLE = 'riddle',
     VISIT = 'visit',
     FEEDBACK = 'feedback',
-    PHOTO = 'photo'
+    PHOTO = 'photo',
+    GHOST = 'ghost'
 }
 
 export function isPinType(type: string): type is PinType {
@@ -22,5 +23,7 @@ export function getPinTypeFriendlyName(pinType: PinType): string {
             return 'Opinia';
         case PinType.PHOTO:
             return 'Zdjęcie';
+        case PinType.GHOST:
+            return 'Duch';
     }
 }

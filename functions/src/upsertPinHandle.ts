@@ -17,6 +17,10 @@ const kebabCase: (value?: string) => string = require('lodash.kebabcase');
 
 const PIN_TYPES: PinType[] = Object.values(PinType);
 const CODE_PATTERN = /^[A-Z0-9]{10}$/;
+// Interpolated into a URL by the client (`/pin-clues/<slug>.webp`), so keep it to a bare slug.
+const CLUE_IMAGE_PATTERN = /^[a-z0-9-]+$/;
+// The types the global scanner path cross-looks-up by code, so a code must be unique across them.
+const GLOBALLY_LOOKED_UP_TYPES: PinType[] = [PinType.CODE, PinType.GHOST];
 const normalize = (s: string): string => s.trim().toUpperCase();
 
 // The validated, fully-authored field set. Mirrors Omit<Pin, 'uid' | 'collectedBy'>, except
@@ -31,6 +35,7 @@ type ValidatedPinFields = {
     mapId: string,
     coords: PinCoords,
     hintRadius: number | null,
+    clueImage: string | null,
     value: number,
     withQuestion: boolean,
     availableFrom: number | null,
@@ -78,13 +83,14 @@ export const upsertPinHandle = onCall(async (req): Promise<{ pin: PublicPin }> =
                 throw new HttpsError('already-exists', 'pin uid already exists');
             }
 
-            // Anti-bruteforce lookup mirrors collectPinHandle's own `code == X && type == 'code'`
-            // pair - only CODE pins are ever cross-pin-looked-up by the global scanner.
-            if (fields.type === PinType.CODE && fields.code !== null) {
+            // Mirrors collectPinHandle's own `code == X && type in [code, ghost]` pair - those are the
+            // types the global scanner cross-looks-up, so a duplicate between them would make which
+            // pin a printed code collects a coin toss.
+            if (GLOBALLY_LOOKED_UP_TYPES.includes(fields.type) && fields.code !== null) {
                 const codeSnapshot = await transaction.get(
                     db.collection('pins')
                         .where('code', '==', fields.code)
-                        .where('type', '==', PinType.CODE)
+                        .where('type', 'in', GLOBALLY_LOOKED_UP_TYPES)
                 );
 
                 const collision = codeSnapshot.docs.find((doc) => doc.id !== uid);
@@ -109,6 +115,7 @@ export const upsertPinHandle = onCall(async (req): Promise<{ pin: PublicPin }> =
                 mapId: fields.mapId,
                 coords: fields.coords,
                 hintRadius: fields.hintRadius,
+                clueImage: fields.clueImage,
                 value: fields.value,
                 withQuestion: fields.withQuestion,
                 availableFrom: fields.availableFrom !== null ? Timestamp.fromMillis(fields.availableFrom) : null,
@@ -199,6 +206,15 @@ function validateFields(fields: unknown, validGroups: Set<string>): ValidatedPin
         hintRadius = f.hintRadius;
     }
 
+    let clueImage: string | null = null;
+    if (f.clueImage !== null && f.clueImage !== undefined && f.clueImage !== '') {
+        if (typeof f.clueImage !== 'string' || !CLUE_IMAGE_PATTERN.test(f.clueImage)) {
+            logger.error('PIN_UPSERT_INVALID', 'clueImage is invalid', f.clueImage);
+            return null;
+        }
+        clueImage = f.clueImage;
+    }
+
     const availableFrom = parseMillisOrNull(f.availableFrom);
     const availableTo = parseMillisOrNull(f.availableTo);
     if (availableFrom === undefined || availableTo === undefined) {
@@ -206,10 +222,11 @@ function validateFields(fields: unknown, validGroups: Set<string>): ValidatedPin
         return null;
     }
 
-    // code branches by type: CODE needs the 10-char [A-Z0-9] shape, RIDDLE needs a non-empty free-text
-    // answer, everything else (VISIT/FEEDBACK/PHOTO) is forced null.
+    // code branches by type: CODE and GHOST need the 10-char [A-Z0-9] shape (both are looked up by the
+    // global scanner, where anything shorter is rejected before the query), RIDDLE needs a non-empty
+    // free-text answer, everything else (VISIT/FEEDBACK/PHOTO) is forced null.
     let code: string | null = null;
-    if (type === PinType.CODE) {
+    if (type === PinType.CODE || type === PinType.GHOST) {
         if (typeof f.code !== 'string' || !CODE_PATTERN.test(normalize(f.code))) {
             logger.error('PIN_UPSERT_INVALID', 'code is invalid for a code pin');
             return null;
@@ -232,6 +249,7 @@ function validateFields(fields: unknown, validGroups: Set<string>): ValidatedPin
         mapId: f.mapId as string,
         coords: { x: coords.x, y: coords.y },
         hintRadius,
+        clueImage,
         value: f.value,
         withQuestion: Boolean(f.withQuestion),
         availableFrom,

@@ -15,6 +15,7 @@ import {
     PIN_RIDDLE_UID, PIN_RIDDLE_VALUE, PIN_RIDDLE_ANSWER,
     PIN_VISIT_UID, PIN_VISIT_VALUE,
     PIN_FEEDBACK_UID, PIN_FEEDBACK_VALUE, PIN_FEEDBACK_WITHQ_UID, PIN_PHOTO_UID,
+    PIN_GHOST_UID, PIN_GHOST_VALUE, PIN_GHOST_CODE, PIN_GHOST_CLUE_IMAGE,
     PIN_UNAVAILABLE_UID,
     PIN_INACTIVE_UID, PIN_INACTIVE_CODE,
     PIN_FUTURE_UID, PIN_WINDOWED_UID
@@ -118,6 +119,56 @@ test('riddle pin via global scanner path is not found (anti-bruteforce)', async 
         () => callCallable('collectPinHandle', { code: 'SMOK000000' }, token),
         /not.?found|invalid/i
     );
+});
+
+test('ghost pin via global scanner path awards (its code is a printed one, unlike a riddle answer)', async () => {
+    const uid = 'pin-player-ghost-1';
+    const token = await registerPlayer(uid, 'PinPlayerGhost1');
+
+    const result = await callCallable('collectPinHandle', { code: PIN_GHOST_CODE }, token);
+    assert.equal(result.pin.uid, PIN_GHOST_UID);
+    assert.equal(result.pin.awardedPoints, PIN_GHOST_VALUE);
+
+    const user = (await db.collection('users').doc(uid).get()).data();
+    assert.equal(user.score, PIN_GHOST_VALUE);
+    assert.equal((await db.collection('ranking').doc(ROUND_UID).get()).data().users[uid].score, PIN_GHOST_VALUE);
+});
+
+test('ghost pin via pin-UI path awards, and cannot be collected twice', async () => {
+    const uid = 'pin-player-ghost-2';
+    const token = await registerPlayer(uid, 'PinPlayerGhost2');
+
+    const result = await callCallable('collectPinHandle', {
+        pinUid: PIN_GHOST_UID, answer: PIN_GHOST_CODE
+    }, token);
+    assert.equal(result.pin.awardedPoints, PIN_GHOST_VALUE);
+
+    await assert.rejects(
+        () => callCallable('collectPinHandle', { code: PIN_GHOST_CODE }, token),
+        /aborted|already/i
+    );
+});
+
+test('a ghost pin does not count towards its own map scope, only its groups', async () => {
+    const uid = 'pin-player-ghost-3';
+    const token = await registerPlayer(uid, 'PinPlayerGhost3');
+
+    await callCallable('collectPinHandle', { code: PIN_GHOST_CODE }, token);
+
+    const byScope = (await db.collection('users').doc(uid).get()).data().collectedPinsByScope;
+    assert.equal(byScope['group:test'], 1);
+    assert.equal(byScope['map:test-map'], undefined, 'a ghost marks a place that is not there');
+});
+
+test('getPins carries clueImage, null on a pin without one', async () => {
+    const token = await registerPlayer('pin-player-ghost-4', 'PinPlayerGhost4');
+
+    const result = await callCallable('getPinsHandle', {}, token);
+    const ghost = result.pins.find((pin) => pin.uid === PIN_GHOST_UID);
+    const code = result.pins.find((pin) => pin.uid === PIN_CODE_UID);
+
+    assert.equal(ghost.clueImage, PIN_GHOST_CLUE_IMAGE);
+    assert.equal(code.clueImage, null);
 });
 
 test('visit pin via pin-UI path (no answer) awards', async () => {

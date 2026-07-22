@@ -19,6 +19,7 @@ const pinGroupsSeed: PinGroup[] = [
     { uid: 'targowisko', name: 'Targowisko' },
     { uid: 'prelekcje', name: 'Prelekcje' },
     { uid: 'nocne', name: 'Nocne' },
+    { uid: 'zaswiaty', name: 'Zaświaty' },
     { uid: 'test', name: 'Test' }
 ];
 

@@ -31,6 +31,7 @@
     --color-pin-visit: #4C8C2B;
     --color-pin-feedback: #E07A1F;
     --color-pin-photo: #5B6B7C;
+    --color-pin-ghost: #6F42C1;
 }
 
 /* _app.tsx imports leaflet.css AFTER this file, so a bare .leaflet-container ties on specificity and
@@ -56,6 +57,7 @@ html .leaflet-container {
 .pin-hint-circle--visit { fill: var(--color-pin-visit); stroke: var(--color-pin-visit); }
 .pin-hint-circle--feedback { fill: var(--color-pin-feedback); stroke: var(--color-pin-feedback); }
 .pin-hint-circle--photo { fill: var(--color-pin-photo); stroke: var(--color-pin-photo); }
+.pin-hint-circle--ghost { fill: var(--color-pin-ghost); stroke: var(--color-pin-ghost); }
 
 /* Admin pin editor (#14) - the not-yet-saved marker at the tapped coords. */
 .pin-marker-draft {

@@ -229,6 +229,19 @@ const achievementsSeed: Achievement[] = [
         scope: 'group:2lo',
         target: 0,
         bonus: 40
+    },
+    // Scoped by group, not by map: ghost pins sit on the Dwór image but pinScopeKeys drops their
+    // map: key, so this is the only scope that can ever count them.
+    {
+        uid: 'ghosts',
+        name: 'Egzorcysta',
+        description: 'Odnajdź wszystkie duchy.',
+        icon: 'ghost',
+        group: 'zaswiaty',
+        type: 'pinsInScope',
+        scope: 'group:zaswiaty',
+        target: 0,
+        bonus: 15
     }
 ];
 

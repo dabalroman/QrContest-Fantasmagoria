@@ -5,7 +5,8 @@ export enum PinType {
     RIDDLE = 'riddle',
     VISIT = 'visit',
     FEEDBACK = 'feedback',
-    PHOTO = 'photo'
+    PHOTO = 'photo',
+    GHOST = 'ghost'
 }
 
 // Coordinate convention: x/y are pixels from the map image's top-left corner, y growing DOWN
@@ -42,6 +43,10 @@ export type Pin = {
     // translucent circle of this radius (CRS.Simple coordinate units, same space as coords) under it.
     // null = precise point.
     hintRadius: number | null;
+    // Slug of a picture shown alongside the clue (`/pin-clues/<slug>.webp`). Optional here but
+    // required on PublicPin: the seed entries predate the field, and upsertPinHandle always writes it
+    // explicitly while both read boundaries normalize with `?? null`, so nothing observes the gap.
+    clueImage?: string | null;
     value: number;
     withQuestion: boolean;
     availableFrom: Timestamp | FieldValue | null;
@@ -65,6 +70,7 @@ export type PublicPin = {
     mapId: string;
     coords: PinCoords;
     hintRadius: number | null;
+    clueImage: string | null;
     value: number;
     withQuestion: boolean;
     isActive: boolean;
