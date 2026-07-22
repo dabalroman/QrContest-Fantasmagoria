@@ -30,7 +30,7 @@ async function registerPlayer (uid, username) {
     return token;
 }
 
-// Written straight through the admin SDK (bypasses setupAccountHandle) — assertAdmin only needs a user
+// Written straight through the admin SDK (bypasses setupAccountHandle) - assertAdmin only needs a user
 // doc with role: 'admin'. Same idiom as admin-pins.test.mjs.
 async function registerAdmin (uid, username) {
     const token = await createAuthUserToken(uid);

@@ -40,7 +40,7 @@ export default function PinFeedbackAdminPage () {
 
                 snapshot.docs.map((doc) => doc.data() as Pin)
                     .forEach((pin) => {
-                        // Keyed on the entry carrying a rating, not on pin.type — an entry-level check
+                        // Keyed on the entry carrying a rating, not on pin.type - an entry-level check
                         // can never produce a room with an empty table.
                         const rows: FeedbackRow[] = Object.values(pin.collectedBy)
                             .filter((entry) => entry.rating !== null && entry.talkName !== null)

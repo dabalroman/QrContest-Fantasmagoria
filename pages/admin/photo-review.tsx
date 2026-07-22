@@ -50,7 +50,7 @@ export default function PhotoReviewAdminPage () {
             })
             .catch((error) => {
                 console.error(error);
-                // A failed background poll is silent — no toast spam on an always-open screen.
+                // A failed background poll is silent - no toast spam on an always-open screen.
                 if (!silent) {
                     toast.error('Nie udało się wczytać zgłoszeń.');
                 }

@@ -4,7 +4,7 @@ import { Pin } from '../types/pin';
 // towards. Used by BOTH the award path (collectPinHandle, incrementing the player's counter) and the
 // recompute (recomputeAchievementTargets, tallying the denominator).
 //
-// Sharing this helper does NOT by itself keep the two sides in step — #45 was exactly that: both
+// Sharing this helper does NOT by itself keep the two sides in step - #45 was exactly that: both
 // called it, but the call sites filtered pins by type differently, so badges unlocked early. What
 // keeps them honest is that neither side filters by type at all.
 //

@@ -4,7 +4,7 @@ import { LatLngTuple } from 'leaflet';
 // The canonical map registry (decision 29 + 30). NINE maps, not six: Dwór is a standalone city map
 // belonging to no building; MOK has 5 levels (incl. Piętro 1.5); 2LO has 3. #13 owns these mapIds and
 // the seed points at them. Real art has landed for MOK + 2LO; Dwór is still a placeholder. Swapping art
-// in is overwriting public/maps/<mapId>.webp — no code change — but the declared width/height must match
+// in is overwriting public/maps/<mapId>.webp - no code change - but the declared width/height must match
 // the file, and changing them after coords are authored points every pin at the wrong room.
 
 export enum MapArea {
@@ -81,7 +81,7 @@ export function toLatLng (coords: PinCoords): LatLngTuple {
     return [-coords.y, coords.x];
 }
 
-// The only reverse of toLatLng — #14's map-tap-to-place-a-pin coord picker. Rounded to whole pixels:
+// The only reverse of toLatLng - #14's map-tap-to-place-a-pin coord picker. Rounded to whole pixels:
 // coords are always authored/stored as integers (see PinCoords).
 export function fromLatLng (latlng: { lat: number, lng: number }): PinCoords {
     return { x: Math.round(latlng.lng), y: Math.round(-latlng.lat) };
@@ -89,7 +89,7 @@ export function fromLatLng (latlng: { lat: number, lng: number }): PinCoords {
 
 // hintRadius is authored in map-relative units, NOT pixels: 1 unit = 1% of the shorter side, so the
 // same value covers the same share of the floor on every map and survives an art resolution swap
-// (the one thing absolute coords can't — see the width/height warning at the top of this file).
+// (the one thing absolute coords can't - see the width/height warning at the top of this file).
 // Shorter side, so a radius can never overshoot the map on one axis while fitting on the other.
 const HINT_RADIUS_UNITS_PER_MAP = 100;
 

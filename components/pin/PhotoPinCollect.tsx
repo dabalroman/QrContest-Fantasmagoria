@@ -9,18 +9,18 @@ import downscaleImage from '@/utils/downscaleImage';
 import Button, { ButtonState } from '@/components/Button';
 import SheetSection from '@/components/map/SheetSection';
 
-// Imperative handle so the PinSheet's centre super-button can open the OS Camera/Gallery chooser — the
+// Imperative handle so the PinSheet's centre super-button can open the OS Camera/Gallery chooser - the
 // same action as the in-panel upload button (the picker lives here, next to the preview/upload state).
 export interface PhotoPinCollectHandle {
     openPicker: () => void;
 }
 
 // The capture UX for a `photo`-type pin (#19), rendered inside the map's PinSheet. The phone does the
-// hard work: `<input accept="image/*">` (no `capture`) opens the OS Camera/Gallery chooser — the native
+// hard work: `<input accept="image/*">` (no `capture`) opens the OS Camera/Gallery chooser - the native
 // camera gives front/back flip + focus/flash for free. The picked shot previews in-app with a
 // Zatwierdź / Wybierz inne confirm; only on confirm is it downscaled (canvas, ≤2048px q0.8) and uploaded
 // straight to Storage, then submitPhotoFunction marks the pin pending. Any error leaves NO partial
-// state (greying is written only after submitPhotoHandle commits) — the retry overwrites the same object.
+// state (greying is written only after submitPhotoHandle commits) - the retry overwrites the same object.
 const PhotoPinCollect = forwardRef<PhotoPinCollectHandle, {
     pinUid: string,
     onSubmitted: () => void

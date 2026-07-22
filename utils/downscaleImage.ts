@@ -1,5 +1,5 @@
 // Client-side image downscale for photo-proof pins (#19). Loads the picked/taken file into an <img>,
-// draws it onto a <canvas> capped at `maxEdge` on the longest side, and re-encodes as JPEG — so the
+// draws it onto a <canvas> capped at `maxEdge` on the longest side, and re-encodes as JPEG - so the
 // blob that reaches Storage is typically <1MB regardless of the phone's raw resolution. No dependency;
 // this is why the narrow owner-only Storage bucket can never accumulate real data.
 export default function downscaleImage (

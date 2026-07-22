@@ -80,7 +80,7 @@ export const collectPinHandle = onCall(async (req): Promise<{
         pin = pinDoc.data() as Pin;
         const isFeedback = pin.type === PinType.FEEDBACK;
 
-        // Photo pins go through submitPhotoHandle — they award nothing until an admin approves.
+        // Photo pins go through submitPhotoHandle - they award nothing until an admin approves.
         if (pin.type === PinType.PHOTO) {
             logger.error('collectPinHandle', 'pin type is not supported yet', pin.type);
             throw new HttpsError('invalid-argument', 'pin type is not supported yet');
@@ -175,7 +175,7 @@ export const collectPinHandle = onCall(async (req): Promise<{
 
     try {
         // The grant list MUST be the return value of the transaction callback, never an outer closure
-        // array — a retried-then-discarded run would otherwise surface phantom grants (phantom toasts).
+        // array - a retried-then-discarded run would otherwise surface phantom grants (phantom toasts).
         const grants = await db.runTransaction(async (transaction) => {
             // Re-read the user transactionally FIRST (before any write) so concurrent same-user awards
             // serialize — see readUserInTransaction. Shadows the pre-transaction snapshot above.

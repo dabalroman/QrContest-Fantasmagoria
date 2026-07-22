@@ -14,12 +14,12 @@ import {AchievementGrant} from '../types/achievement';
  * evaluates + auto-grants achievements (whose bonus feeds the same fan-out), then fans the change out
  * to every open ranking round and the user's guild.
  *
- * Every point source — card collect, question answer, pin collect — must go through here so the
+ * Every point source - card collect, question answer, pin collect - must go through here so the
  * leaderboard cannot silently desync. Reads the `ranking` collection exactly once per award. Returns
  * the achievements granted this award, so the caller can surface them in its callable response (#30).
  *
  * `scopeCounters` increments `user.collectedPinsByScope[key]` for each key (task #37's location
- * achievements) — it is deliberately NOT fanned out to RankingRoundUser/GuildMember, unlike the flat
+ * achievements) - it is deliberately NOT fanned out to RankingRoundUser/GuildMember, unlike the flat
  * `counters` map, since no leaderboard surfaces per-scope pin counts.
  */
 export default async function awardPoints(
@@ -45,7 +45,7 @@ export default async function awardPoints(
     });
 
     // Evaluate achievements. Definitions are data (cached, last-known-good on failure) but the
-    // evaluation itself is PURE — no reads/writes, does not mutate `user`. A bug here must never kill
+    // evaluation itself is PURE - no reads/writes, does not mutate `user`. A bug here must never kill
     // scoring (it runs on the hot path event-wide), so swallow and log with a stable, alertable
     // prefix; the badge self-heals on the next award.
     let grants: AchievementGrant[] = [];
@@ -72,7 +72,7 @@ export default async function awardPoints(
         updatedAt: FieldValue.serverTimestamp()
     } as UpdateData<User>));
 
-    // Scope counters go in a SEPARATE update call using FieldPath objects, not dotted strings — a
+    // Scope counters go in a SEPARATE update call using FieldPath objects, not dotted strings - a
     // scope key like `map:mok-parter` contains a `:`, which is unambiguous as a FieldPath segment but
     // would raise an escaping question as part of a dotted path string.
     if (scopeCounters.length > 0) {
@@ -89,10 +89,10 @@ export default async function awardPoints(
         );
     }
 
-    // Applier — the only achievements writer, OUTSIDE the eval try (purity contract).
+    // Applier - the only achievements writer, OUTSIDE the eval try (purity contract).
     grants.forEach((grant) => applyGrant(transaction, userRef, grant));
 
-    // Fan out — read the ranking collection once and hand it to both helpers
+    // Fan out - read the ranking collection once and hand it to both helpers
     const rounds = await db.collection('ranking')
         .orderBy('from', 'asc')
         .get();

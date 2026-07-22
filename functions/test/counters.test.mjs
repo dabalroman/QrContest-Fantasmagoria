@@ -39,7 +39,7 @@ test('a user doc missing amountOfCollectedPins can still collect a card', async 
     assert.equal(roundUser.score, CARD_VALUE, 'ranking round copy score');
     assert.equal(user.amountOfCollectedCards, 1, 'the counter this award does touch');
 
-    // The award never touched amountOfCollectedPins, so nothing normalized it per-site — the round
+    // The award never touched amountOfCollectedPins, so nothing normalized it per-site - the round
     // copy must still carry a real 0 rather than undefined (rejected by Firestore) or NaN.
     assert.equal(roundUser.amountOfCollectedPins, 0, 'ranking round copy untouched counter');
 });

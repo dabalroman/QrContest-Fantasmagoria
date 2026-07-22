@@ -10,16 +10,16 @@ import PinMarkerIcon from '@/components/map/PinMarkerIcon';
 // The ONLY file that value-imports leaflet (it touches `window` at module scope), so pages/map.tsx
 // must load it via next/dynamic with ssr:false.
 //
-// `onMapClick`/`draft`/`placing` are additive, admin-only props (#14's map-native pin editor) — all
+// `onMapClick`/`draft`/`placing` are additive, admin-only props (#14's map-native pin editor) - all
 // default to undefined/null/false so the player call site (pages/map.tsx) is unchanged. `collectedUids`
 // doubles as a generic "dim + suppress hint circle" set: the admin editor passes INACTIVE pin uids
 // through it instead of adding a new prop.
-// Only ever a temporary floor while measuring the overview zoom — low enough that no map canvas
+// Only ever a temporary floor while measuring the overview zoom - low enough that no map canvas
 // can fit at it, so it never clamps the measurement.
 const UNCLAMPED_MIN_ZOOM = -10;
 
 // In CRS.Simple zoom 0 is one image pixel per CSS pixel, so this caps zoom-in at the art's native
-// resolution — past it you are magnifying pixels, not revealing detail.
+// resolution - past it you are magnifying pixels, not revealing detail.
 const NATIVE_ZOOM = 0;
 
 export default function MapCanvas ({
@@ -79,7 +79,7 @@ export default function MapCanvas ({
             maxBoundsViscosity: 1,
             zoomSnap: 0.25,
             preferCanvas: false,
-            // Default zoom control sits top-left, under the floating floor selector — move it bottom-left.
+            // Default zoom control sits top-left, under the floating floor selector - move it bottom-left.
             zoomControl: false
         });
         L.control.zoom({ position: 'bottomleft' }).addTo(map);
@@ -88,7 +88,7 @@ export default function MapCanvas ({
         draftLayerGroupRef.current = L.layerGroup().addTo(map);
 
         // Persist the settled view for the current floor. Programmatic setView/fitBounds (floor swap,
-        // first fit) also fire these — that just re-persists the same view, which is harmless.
+        // first fit) also fire these - that just re-persists the same view, which is harmless.
         map.on('moveend zoomend', () => {
             const m = mapRef.current;
             if (!m) {
@@ -189,7 +189,7 @@ export default function MapCanvas ({
                     }),
                     // While placing, a tap landing on a marker must reach the map underneath. Leaflet's
                     // own CSS keeps .leaflet-marker-icon pointer-events:none until `interactive` adds
-                    // .leaflet-interactive, so dropping the flag is enough — no z-index or hit-test work.
+                    // .leaflet-interactive, so dropping the flag is enough - no z-index or hit-test work.
                     interactive: !placing,
                     // Leaflet stacks markers by latitude, so reordering this loop would not help; the
                     // offset is what keeps a collected pin from covering one still to find.
@@ -201,7 +201,7 @@ export default function MapCanvas ({
     }, [activeMapId, pins, collectedUids, placing]);
 
     // Admin-only draft marker for the not-yet-saved pin (#14). Always assumed to be on the currently
-    // active floor — it only ever exists right after a tap on THIS canvas. The live hint-radius circle
+    // active floor - it only ever exists right after a tap on THIS canvas. The live hint-radius circle
     // preview is CUTTABLE and not built; the draft is a plain marker.
     useEffect(() => {
         const layerGroup = draftLayerGroupRef.current;

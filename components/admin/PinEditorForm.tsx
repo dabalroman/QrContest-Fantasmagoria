@@ -58,12 +58,12 @@ function fromDatetimeLocal (value: string): number | null {
 
 const inputClass = 'rounded-xl block w-full p-2 border-2 border-input-border bg-input-background text-text-accent';
 
-// The admin editor's mobile form — react-hook-form, Polish labels/toasts throughout. The payload sent
+// The admin editor's mobile form - react-hook-form, Polish labels/toasts throughout. The payload sent
 // to upsertPinHandle is ALWAYS the complete authored field set (never a partial patch), which is why
 // every field below has a value even in edit mode.
 //
 // The parent remounts this component (key={pin?.uid ?? 'draft'}) whenever the edited target changes,
-// so plain `defaultValues` are enough here — the pin is already in hand at mount time.
+// so plain `defaultValues` are enough here - the pin is already in hand at mount time.
 //
 // Coordinates are deliberately NOT form fields: the parent owns them so arming placement can hide this
 // drawer (`hidden`) instead of unmounting it, which would discard every unsaved edit. `coords` is read
@@ -164,7 +164,7 @@ export default function PinEditorForm ({
         }
 
         const warning = hasFinders
-            ? 'Ta pinezka ma już znalazców — usunięcie nie cofnie przyznanych im punktów, ale stracisz '
+            ? 'Ta pinezka ma już znalazców - usunięcie nie cofnie przyznanych im punktów, ale stracisz '
                 + 'listę odkrywców. Na pewno usunąć?'
             : 'Na pewno usunąć tę pinezkę?';
 
@@ -265,7 +265,7 @@ export default function PinEditorForm ({
                                 <input
                                     type="number"
                                     min={0}
-                                    // Units, not pixels (1 = 1% of the map) — so the sane range is
+                                    // Units, not pixels (1 = 1% of the map) - so the sane range is
                                     // single digits, and max stops a pixel-era value covering the floor.
                                     max={100}
                                     step={0.5}

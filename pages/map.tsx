@@ -37,7 +37,7 @@ enum MapOverlayState {
 
 // The availability window is filtered client-side by clock (the getPins override): a time-limited pin
 // opens with no document write, so a server-side filter on a polled feed would leave it invisible until
-// the next poll. collectPinHandle still enforces the window server-side — this is purely cosmetic.
+// the next poll. collectPinHandle still enforces the window server-side - this is purely cosmetic.
 function isPinVisibleNow (pin: Pin): boolean {
     const now = Date.now();
     if (pin.availableFrom && pin.availableFrom.getTime() > now) {
@@ -79,7 +79,7 @@ export default function MapPage () {
         [collectedPins]
     );
 
-    // Restore the last floor once, after mount — not in the useState initializer, which would run during
+    // Restore the last floor once, after mount - not in the useState initializer, which would run during
     // SSR and cause a hydration mismatch. An unknown/renamed mapId is ignored (falls back to defaultMapId).
     useEffect(() => {
         const last = getStoredLastMapId();
@@ -197,7 +197,7 @@ export default function MapPage () {
                 />
             }
 
-            {/* Collect result overlays the still-mounted map (never unmount MapCanvas — it would reset pan/zoom). */}
+            {/* Collect result overlays the still-mounted map (never unmount MapCanvas - it would reset pan/zoom). */}
             {showCollectOverlay && collectedPin &&
                 <div className="fixed inset-0 z-40 grid grid-rows-layout items-center min-h-screen p-4
                     bg-image-default bg-cover bg-center bg-fixed">

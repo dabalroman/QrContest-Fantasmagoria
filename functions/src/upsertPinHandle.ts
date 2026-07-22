@@ -11,7 +11,7 @@ import { PinGroup } from './types/pinGroup';
 // Plain `require`, not an ES import: lodash.kebabcase's `export =` typing needs either esModuleInterop
 // (functions/tsconfig.json has none) or `import x = require(...)` (illegal under the ROOT client
 // tsconfig's esnext module target, which also type-checks this file via its repo-wide `**/*.ts`
-// include). A runtime require sidesteps both — same package models/Pin.ts uses client-side.
+// include). A runtime require sidesteps both - same package models/Pin.ts uses client-side.
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const kebabCase: (value?: string) => string = require('lodash.kebabcase');
 
@@ -20,7 +20,7 @@ const CODE_PATTERN = /^[A-Z0-9]{10}$/;
 const normalize = (s: string): string => s.trim().toUpperCase();
 
 // The validated, fully-authored field set. Mirrors Omit<Pin, 'uid' | 'collectedBy'>, except
-// availableFrom/To travel as epoch ms (or null) rather than Timestamp — a FieldValue/Timestamp cannot
+// availableFrom/To travel as epoch ms (or null) rather than Timestamp - a FieldValue/Timestamp cannot
 // cross the callable boundary, and the server is the one turning ms into a Timestamp.
 type ValidatedPinFields = {
     name: string,
@@ -39,7 +39,7 @@ type ValidatedPinFields = {
     code: string | null
 };
 
-// The editor's payload is always the COMPLETE authored field set, never a partial patch — the edit
+// The editor's payload is always the COMPLETE authored field set, never a partial patch - the edit
 // form is fully populated from the loaded doc, so there is no required-on-create-vs-patchable-on-edit
 // matrix to hand-sync across the two type worlds.
 export const upsertPinHandle = onCall(async (req): Promise<{ pin: PublicPin }> => {
@@ -56,7 +56,7 @@ export const upsertPinHandle = onCall(async (req): Promise<{ pin: PublicPin }> =
 
     const pinUidInput: string | null = typeof data.pinUid === 'string' ? data.pinUid : null;
 
-    // A plain read is right here — this is an occasional admin write, not the hot award path, so the
+    // A plain read is right here - this is an occasional admin write, not the hot award path, so the
     // 60s TTL cache loadDefinitions uses for achievements would be the wrong tool.
     const groupsSnapshot = await db.collection('pinGroups').get();
     const validGroups = new Set(groupsSnapshot.docs.map((doc) => (doc.data() as PinGroup).uid));
@@ -79,7 +79,7 @@ export const upsertPinHandle = onCall(async (req): Promise<{ pin: PublicPin }> =
             }
 
             // Anti-bruteforce lookup mirrors collectPinHandle's own `code == X && type == 'code'`
-            // pair — only CODE pins are ever cross-pin-looked-up by the global scanner.
+            // pair - only CODE pins are ever cross-pin-looked-up by the global scanner.
             if (fields.type === PinType.CODE && fields.code !== null) {
                 const codeSnapshot = await transaction.get(
                     db.collection('pins')
@@ -94,7 +94,7 @@ export const upsertPinHandle = onCall(async (req): Promise<{ pin: PublicPin }> =
                 }
             }
 
-            // collectedBy is reconstructed server-side and NEVER read from the payload — an edit can
+            // collectedBy is reconstructed server-side and NEVER read from the payload - an edit can
             // never wipe the finder map.
             const existing = existingDoc.exists ? existingDoc.data() as Pin : null;
             const collectedBy: PinCollectedBy = existing?.collectedBy ?? {};
@@ -123,7 +123,7 @@ export const upsertPinHandle = onCall(async (req): Promise<{ pin: PublicPin }> =
 
         logger.log('upsertPinHandle', `pin ${uid} saved`);
 
-        // Covers create, edit AND deactivate — the pin set just changed shape. Never throws (see the
+        // Covers create, edit AND deactivate - the pin set just changed shape. Never throws (see the
         // doc comment on recomputeAchievementTargets), so a target-recompute hiccup cannot turn a
         // successfully-saved pin into a reported error below.
         await recomputeAchievementTargets(db);
@@ -140,7 +140,7 @@ export const upsertPinHandle = onCall(async (req): Promise<{ pin: PublicPin }> =
 });
 
 /**
- * The payload is untrusted input — treat it the way achievements' isValidDefinition treats a
+ * The payload is untrusted input - treat it the way achievements' isValidDefinition treats a
  * definition doc. Every reject is logged under the stable, greppable PIN_UPSERT_INVALID prefix so a
  * silent no-op in the editor is never mysterious.
  */

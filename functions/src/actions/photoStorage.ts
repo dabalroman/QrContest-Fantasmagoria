@@ -20,7 +20,7 @@ export function photoBucket(): ReturnType<ReturnType<typeof getStorage>['bucket'
 }
 
 // Builds a Firebase download-token URL from an object's `firebaseStorageDownloadTokens` metadata (which
-// the client's uploadBytes auto-creates) — no getSignedUrl, so no IAM signBlob grant and it works
+// the client's uploadBytes auto-creates) - no getSignedUrl, so no IAM signBlob grant and it works
 // against the Storage emulator. Under the emulator the host is the emulator's, not googleapis.com.
 export function photoDownloadUrl(storagePath: string, token: string): string {
     const emulatorHost = process.env.STORAGE_EMULATOR_HOST || process.env.FIREBASE_STORAGE_EMULATOR_HOST;

@@ -99,7 +99,7 @@ export const collectCardHandle = onCall(async (req): Promise<{
 
     try {
         // The grant list MUST be the return value of the transaction callback, never an outer closure
-        // array — a retried-then-discarded run would otherwise surface phantom grants (phantom toasts).
+        // array - a retried-then-discarded run would otherwise surface phantom grants (phantom toasts).
         const grants = await db.runTransaction(async (transaction) => {
             // Re-read the user transactionally FIRST (before any write) so concurrent same-user awards
             // serialize — see readUserInTransaction. Shadows the pre-transaction snapshot above.

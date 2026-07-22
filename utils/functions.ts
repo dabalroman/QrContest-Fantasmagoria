@@ -29,14 +29,14 @@ export const upsertPinFunction: HttpsCallable<
     { pin: RawPin }
 > = httpsCallable(functions, 'upsertPinHandle');
 
-// Admin-only: delete a pin from the map-native editor (#14). Not transactional — no invariant to protect.
+// Admin-only: delete a pin from the map-native editor (#14). Not transactional - no invariant to protect.
 export const deletePinFunction: HttpsCallable<
     { pinUid: string },
     { status: string }
 > = httpsCallable(functions, 'deletePinHandle');
 
 // Photo-proof pins (#19). The client uploads the downscaled blob to Storage FIRST (Firebase Storage
-// SDK, narrow owner-only rule), then calls this to mark the pin pending — no points yet.
+// SDK, narrow owner-only rule), then calls this to mark the pin pending - no points yet.
 export const submitPhotoFunction: HttpsCallable<
     { pinUid: string },
     { submissionUid: string, status: string }

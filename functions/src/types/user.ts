@@ -11,7 +11,7 @@ export enum UserRole {
 // A player's unlocked achievements, keyed by the achievement's uid. Presence IS the exactly-once dup
 // guard (see functions/src/achievements). Kept a map on the user doc, not a subcollection: it is
 // already loaded by getCurrentUser on every award (zero extra reads on the hot path) and already
-// live-synced to the client. There is deliberately no per-user clone of the definitions — those live
+// live-synced to the client. There is deliberately no per-user clone of the definitions - those live
 // in the readable `achievements` collection, so the UI joins the two instead.
 export type UserAchievements = {
     [achievementUid: string]: UserAchievement
@@ -22,7 +22,7 @@ export type User = {
     username: string,
     score: number,
     // Points from photo submissions awaiting admin review (#19). A score SIBLING, not a leaderboard
-    // field: it never fans out to ranking/guilds and never affects sort — the ranking header shows it
+    // field: it never fans out to ranking/guilds and never affects sort - the ranking header shows it
     // only on the player's OWN row. Deliberately NOT a UserCounterKey (see USER_COUNTER_DEFAULTS),
     // so it is hydrated separately in getCurrentUser, the way collectedPinsByScope is.
     pendingScore: number,
@@ -31,7 +31,7 @@ export type User = {
     amountOfCorrectAnswers: number,
     amountOfCollectedPins: number,
     // Per-scope pin collect counter, keyed by a pinScopeKeys.ts key (e.g. `map:mok-parter`,
-    // `group:mok`). Feeds the `pinsInScope` achievement type only — it is NOT a UserCounterKey/
+    // `group:mok`). Feeds the `pinsInScope` achievement type only - it is NOT a UserCounterKey/
     // USER_COUNTER_DEFAULTS member (that Record is total over a fixed key set; this is an open map),
     // so it is hydrated separately in getCurrentUser.
     collectedPinsByScope: Record<string, number>,
@@ -54,7 +54,7 @@ export type UserCounterKey =
     | 'amountOfCollectedPins';
 
 // User docs written before a counter existed simply lack that field, so `User` only holds true once
-// these are applied — see getCurrentUser. Typed as a total Record: a new UserCounterKey without a
+// these are applied - see getCurrentUser. Typed as a total Record: a new UserCounterKey without a
 // default here is a compile error.
 export const USER_COUNTER_DEFAULTS: Record<UserCounterKey, number> = {
     amountOfCollectedCards: 0,

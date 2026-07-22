@@ -15,10 +15,10 @@ export default async function updateGuild(
     user: User
 ): Promise<void> {
     // CLUBS-DISABLED-2026: the club/guild UI is hidden for the 2026 edition, so this fan-out is
-    // WRITE-ONLY — nothing in the client reads guild docs or the ranking-round guild aggregates
+    // WRITE-ONLY - nothing in the client reads guild docs or the ranking-round guild aggregates
     // anymore. Kept intact (and still transactional) so a future edition can re-enable clubs by
     // reverting the UI diff. If you are chasing a scoring discrepancy, these guild writes are
-    // expected and unread — look at the user-doc + ranking fan-out instead.
+    // expected and unread - look at the user-doc + ranking fan-out instead.
     if (!user.memberOf) {
         return;
     }

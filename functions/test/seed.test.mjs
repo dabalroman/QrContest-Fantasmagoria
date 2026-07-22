@@ -11,7 +11,7 @@
 // self-updates as seed content changes. Never hard-code counts.
 //
 // ⚠️ Load-bearing: the population assertions run on a SINGLE immediate query right after the
-// callable resolves — no sleep, no poll/retry. A reintroduced fire-and-forget leaves writes in
+// callable resolves - no sleep, no poll/retry. A reintroduced fire-and-forget leaves writes in
 // flight; a retry loop would let them eventually flush and mask the regression.
 
 import { test, before, beforeEach } from 'node:test';
@@ -73,7 +73,7 @@ test('an admin seed fully populates every collection', async () => {
     const result = await callCallable('seedDatabaseHandle', { password: PASSWORD }, token);
     assert.deepEqual(result, { status: 'ok' }, 'handler returns ok');
 
-    // Single immediate query per collection — NO settle delay, NO retry (see file header).
+    // Single immediate query per collection - NO settle delay, NO retry (see file header).
     for (const [collection, seed] of ARRAY_SEEDS) {
         const snapshot = await db.collection(collection).get();
         assert.equal(snapshot.size, seed.length, `${collection} doc count === seed length`);

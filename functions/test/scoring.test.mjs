@@ -32,11 +32,11 @@ test('score stays consistent across user, round and guild after collect + answer
     await callCallable('setupAccountHandle', { username: 'TestPlayer' }, token);
     await callCallable('joinGuildHandle', { guild: GUILD_UID }, token);
 
-    // Collect the card — awards CARD_VALUE and hands back a question.
+    // Collect the card - awards CARD_VALUE and hands back a question.
     const collect = await callCallable('collectCardHandle', { code: CARD_CODE }, token);
     assert.ok(collect.question, 'expected the card to carry a question');
 
-    // Answer it correctly — awards QUESTION_VALUE.
+    // Answer it correctly - awards QUESTION_VALUE.
     const answer = await callCallable(
         'answerQuestionHandle',
         { uid: collect.question.uid, answer: QUESTION_CORRECT },

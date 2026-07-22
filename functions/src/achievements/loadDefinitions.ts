@@ -5,7 +5,7 @@ import { Achievement, ACHIEVEMENT_TYPES } from '../types/achievement';
 const DEFAULT_TTL_MS = 60 * 1000;
 
 // 60s in production: definitions are tiny and near-static, so a short TTL collapses ~10k reads into a
-// handful while keeping "edit in the console and see it live" genuinely live — which is the whole
+// handful while keeping "edit in the console and see it live" genuinely live - which is the whole
 // point of definitions being data (there is no redeploy window mid-event). Under the emulator the TTL
 // is 0 so the e2e suite reads fresh instead of fighting a stale in-process cache.
 const ttlMs = Number(
@@ -44,13 +44,13 @@ export default async function loadDefinitions(db: Firestore): Promise<Achievemen
 }
 
 /**
- * A definition is untrusted data — the compiler cannot vouch for a Firestore doc. An unknown `type`,
+ * A definition is untrusted data - the compiler cannot vouch for a Firestore doc. An unknown `type`,
  * a `target` saved as the string "50", or a missing field would otherwise be a SILENT no-op that
  * looks shipped but isn't. So every reject is logged under a stable, alertable prefix.
  *
  * `target < 1` is rejected outright, not just for `pinsInScope`: `counter >= 0` is true for every
  * player on their FIRST award, so a zero-target definition would mass-grant event-wide, silently and
- * irreversibly. This is reachable for a `pinsInScope` def — a fresh seed before any pin exists leaves
+ * irreversibly. This is reachable for a `pinsInScope` def - a fresh seed before any pin exists leaves
  * its derived target at 0 until the first recompute.
  */
 function isValidDefinition(definition: Achievement): boolean {

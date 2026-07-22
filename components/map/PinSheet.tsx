@@ -15,11 +15,11 @@ import SheetSection from '@/components/map/SheetSection';
 import scheduleAchievementToasts from '@/utils/scheduleAchievementToasts';
 import { getMap, MAP_AREA_LABELS } from '@/utils/maps';
 
-// Mirrors collectPinHandle's validateFeedback — the server rejects anything shorter.
+// Mirrors collectPinHandle's validateFeedback - the server rejects anything shorter.
 const MIN_TALK_NAME_LENGTH = 10;
 const MAX_TALK_NAME_LENGTH = 255;
 
-// The marker-click sheet. Reuses the SAME strip the collect screen shows (decision 18) — Pin satisfies
+// The marker-click sheet. Reuses the SAME strip the collect screen shows (decision 18) - Pin satisfies
 // PinCardData structurally, so it passes straight in. The collect control is react-hook-form, NOT
 // useState: useDynamicNavbar captures onClick once and excludes it from deps, so a useState value
 // would submit stale; RHF's handleSubmit reads a ref-backed store, so the stale closure is harmless.
@@ -50,7 +50,7 @@ export default function PinSheet ({
     const needsAnswer = pin.type === PinType.CODE || pin.type === PinType.RIDDLE;
     const isPhoto = pin.type === PinType.PHOTO;
     const isFeedback = pin.type === PinType.FEEDBACK;
-    // The navbar centre collect button covers code/riddle/visit/feedback — photo submits via its own panel.
+    // The navbar centre collect button covers code/riddle/visit/feedback - photo submits via its own panel.
     const canCollect = !collected && !isPhoto;
     // A photo pin with no image sent yet: the centre button becomes the uploader.
     const canUploadPhoto = isPhoto && !collected;
@@ -90,7 +90,7 @@ export default function PinSheet ({
 
     // The centre super-button is always actionable now: collect (check) when collectable, open the photo
     // picker (camera) for an un-submitted photo pin, otherwise back (arrow) to close the drawer. Distinct
-    // icons matter — useDynamicNavbar re-runs (and re-captures onClick) only when `icon` changes.
+    // icons matter - useDynamicNavbar re-runs (and re-captures onClick) only when `icon` changes.
     const centerIcon = canCollect ? faCheck : canUploadPhoto ? faCamera : faArrowLeft;
     const centerOnClick = canCollect
         ? handleSubmit(collect)
@@ -191,7 +191,7 @@ export default function PinSheet ({
                 {photoPending &&
                     <SheetSection raised>
                         <p className="text-center font-semibold">
-                            Zdjęcie wysłane — oczekuje na weryfikację. Punkty zostaną dodane po zaakceptowaniu zdjęcia.
+                            Zdjęcie wysłane - oczekuje na weryfikację. Punkty zostaną dodane po zaakceptowaniu zdjęcia.
                         </p>
                     </SheetSection>
                 }

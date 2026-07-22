@@ -4,7 +4,7 @@
 // callable functions exactly as the web client does, so every test exercises the real
 // Firestore transactions and score fan-out. Requires `npm run emulators` to be running.
 //
-// No client SDK and no extra dependencies — just firebase-admin (already present) and
+// No client SDK and no extra dependencies - just firebase-admin (already present) and
 // Node's global fetch. Run with: npm test (in functions/).
 
 import admin from 'firebase-admin';
@@ -65,7 +65,7 @@ export async function resetEmulator () {
 
 /**
  * Create an auth user and return a usable ID token (as the client would hold after login).
- * Does NOT create the Firestore user doc — that's setupAccountHandle's job.
+ * Does NOT create the Firestore user doc - that's setupAccountHandle's job.
  */
 export async function createAuthUserToken (uid) {
     await auth.createUser({ uid }).catch((e) => {

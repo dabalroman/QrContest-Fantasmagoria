@@ -6,7 +6,7 @@ import { HttpsError, onCall } from 'firebase-functions/v2/https';
 import * as logger from 'firebase-functions/logger';
 
 // One row of the admin review queue. `username`/`pinName` are denormalized onto the submission, so no
-// extra reads. `photoUrl` is a server-built Firebase download-token URL (no signBlob) — null when the
+// extra reads. `photoUrl` is a server-built Firebase download-token URL (no signBlob) - null when the
 // object's token metadata could not be read, so one broken object never 500s the whole queue.
 type PhotoSubmissionRow = {
     submissionUid: string,
@@ -21,7 +21,7 @@ type PhotoSubmissionRow = {
 
 // Admin-only read path for the photo-review queue (#19). Returns only PENDING submissions. The query is
 // a single-field equality (status == 'pending', auto-indexed); ordering is done in-memory to avoid a
-// composite index deploy — the pending set is tiny.
+// composite index deploy - the pending set is tiny.
 export const getPhotoSubmissionsHandle = onCall(async (req): Promise<{ submissions: PhotoSubmissionRow[] }> => {
     const auth = req.auth;
     if (!auth || !auth.uid) {

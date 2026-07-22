@@ -153,7 +153,7 @@ test('a wrong answer bumps the answered counter but not the correct-answer count
     assert.equal(user.amountOfCorrectAnswers, 0, 'a wrong answer is not a correct one');
 });
 
-test('a thrown evaluator never kills scoring — points still land, response carries no grants', async () => {
+test('a thrown evaluator never kills scoring - points still land, response carries no grants', async () => {
     const uid = 'ach-throw';
     const token = await createAuthUserToken(uid);
 
@@ -173,7 +173,7 @@ test('a malformed definition doc is skipped and cannot grant or break scoring', 
     const uid = 'ach-baddef';
     const token = await createAuthUserToken(uid);
 
-    // Both broken defs have target 1 / bonus 1000 — if either were honoured it would grant instantly.
+    // Both broken defs have target 1 / bonus 1000 - if either were honoured it would grant instantly.
     await seedInvalidAchievements();
     await seedUser(uid, 'AchBadDef', {});
 
@@ -342,7 +342,7 @@ test('feedback and photo pins raise the target, so a badge cannot unlock early',
     const a = await callCallable('collectPinHandle', { pinUid: LOC_PIN_A_UID }, token);
     const b = await callCallable('collectPinHandle', { pinUid: LOC_PIN_B_UID }, token);
     assert.deepEqual(a.achievements, [], 'no grant at 1/4');
-    assert.deepEqual(b.achievements, [], 'no grant at 2/4 — the old target');
+    assert.deepEqual(b.achievements, [], 'no grant at 2/4 - the old target');
 
     const fb = await callCallable('collectPinHandle', {
         pinUid: LOC_PIN_FEEDBACK_UID, rating: 4, talkName: 'Wyklad o smokach'

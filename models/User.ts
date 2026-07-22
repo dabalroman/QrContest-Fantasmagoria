@@ -5,7 +5,7 @@ import { GuildUid } from '@/models/Guild';
 
 // Unlocked achievements keyed by the achievement's uid. `bonus` is what was ACTUALLY awarded at the
 // time, so editing a definition later cannot rewrite history. The presentation (name/icon/target)
-// is NOT copied here — it is read live from the `achievements` collection and joined by the UI.
+// is NOT copied here - it is read live from the `achievements` collection and joined by the UI.
 export type UserAchievement = { grantedAt: Date, bonus: number };
 export type UserAchievements = { [achievementUid: string]: UserAchievement };
 
@@ -22,7 +22,7 @@ export default class User extends FirebaseModel {
     amountOfCorrectAnswers: number;
     amountOfCollectedPins: number;
     // Per-scope pin collect counter, keyed by a pinScopeKeys.ts key (`map:<mapId>` / `group:<uid>`).
-    // Feeds the `pinsInScope` achievement type's progress bar — mirrors functions/src/types/user.ts.
+    // Feeds the `pinsInScope` achievement type's progress bar - mirrors functions/src/types/user.ts.
     collectedPinsByScope: Record<string, number>;
     achievements: UserAchievements;
     memberOf: GuildUid | null;
@@ -87,7 +87,7 @@ export default class User extends FirebaseModel {
 
         // An entry written under an older shape, or a partial write, must NOT take down the whole
         // user-doc parse: useUserData subscribes to this, so a throw here bricks the app for that
-        // player. Unreadable entries are skipped — the server stays the source of truth for grants.
+        // player. Unreadable entries are skipped - the server stays the source of truth for grants.
         const achievements: UserAchievements = Object.entries(data.achievements ?? {})
             .reduce((acc: UserAchievements, [uid, entry]: [string, any]) => {
                 if (typeof entry?.grantedAt?.toDate === 'function') {

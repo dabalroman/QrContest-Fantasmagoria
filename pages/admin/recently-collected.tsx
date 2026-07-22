@@ -15,7 +15,7 @@ import toast from 'react-hot-toast';
 
 type RecentlyCollectedEntry = { uid: string, name: string, mapId: string, username: string, collectedAt: Date }
 
-// ~60 pins × up to 150 finders is ~9k entries by day 3 — fine to fetch (onSnapshot ships deltas after
+// ~60 pins × up to 150 finders is ~9k entries by day 3 - fine to fetch (onSnapshot ships deltas after
 // the first load), not fine to render on an admin phone. This is a "what just happened" feed.
 const MAX_RENDERED_ENTRIES = 500;
 

@@ -1,15 +1,15 @@
 import { FieldValue, Timestamp } from 'firebase-admin/firestore';
 
 // The generic kinds the engine can evaluate. Each maps to exactly ONE counter accessor in
-// achievements/typePredicates.ts. Adding an achievement of an existing type is a Firestore doc —
+// achievements/typePredicates.ts. Adding an achievement of an existing type is a Firestore doc -
 // no code, no deploy. Adding a TYPE is a code change, and this union makes that compile-enforced.
 //
 // `pinsInScope` counts collected pins within a `scope` (a pinScopeKeys.ts key, e.g. `map:mok-parter`
-// or `group:mok`). Unlike the other two types its `target` is DERIVED — recomputeAchievementTargets
-// overwrites it whenever the pin set changes — rather than human-authored.
+// or `group:mok`). Unlike the other two types its `target` is DERIVED - recomputeAchievementTargets
+// overwrites it whenever the pin set changes - rather than human-authored.
 export type AchievementType = 'points' | 'correctAnswers' | 'pinsInScope';
 
-// Runtime companion to the union — definitions arrive as untrusted data, so the loader needs to
+// Runtime companion to the union - definitions arrive as untrusted data, so the loader needs to
 // check `type` at runtime. Keep in sync with AchievementType (see TYPE_COUNTERS, which is a total
 // Record over the union, so a missing accessor is a compile error).
 export const ACHIEVEMENT_TYPES: AchievementType[] = ['points', 'correctAnswers', 'pinsInScope'];
@@ -20,12 +20,12 @@ export type Achievement = {
     uid: string,
     name: string,
     description: string,
-    icon: string,          // string KEY the client maps to a FontAwesome icon — never an IconDefinition
+    icon: string,          // string KEY the client maps to a FontAwesome icon - never an IconDefinition
     group: string,
     type: AchievementType,
     target: number,
     bonus: number,
-    // Only meaningful for type === 'pinsInScope' — a pinScopeKeys.ts scope key. See recomputeAchievementTargets.
+    // Only meaningful for type === 'pinsInScope' - a pinScopeKeys.ts scope key. See recomputeAchievementTargets.
     scope?: string
 };
 

@@ -1,4 +1,4 @@
-// Critical-path test for collectPinHandle — the server referee for the 2026 pin/quest system.
+// Critical-path test for collectPinHandle - the server referee for the 2026 pin/quest system.
 // Mirrors scoring.test.mjs: mints real ID tokens, POSTs to the actual callable, and asserts the
 // score is identical in every denormalized place after collecting a pin (user doc + open round copy).
 // Every new point-granting feature must extend this suite (see CLAUDE.md §9a).
@@ -59,7 +59,7 @@ test('collectedPins snapshots name/description/value but never the secret', asyn
 
     const result = await callCallable('collectPinHandle', { code: PIN_CODE_CODE }, token);
 
-    // The client renders straight off this payload — `pins` is admin-only read, so anything
+    // The client renders straight off this payload - `pins` is admin-only read, so anything
     // missing here is unrenderable. Mirrors how collectedCards snapshots the card.
     assert.equal(result.pin.name, PIN_CODE_NAME, 'callable payload name');
     assert.equal(result.pin.description, PIN_CODE_DESCRIPTION, 'callable payload description');
@@ -161,7 +161,7 @@ test('wrong code / wrong riddle answer is rejected, no write, retry still possib
         /wrong|invalid/i
     );
 
-    // No write happened — the same pin can still be collected with the right answer.
+    // No write happened - the same pin can still be collected with the right answer.
     const result = await callCallable(
         'collectPinHandle',
         { pinUid: PIN_RIDDLE_UID, answer: PIN_RIDDLE_ANSWER },
@@ -206,7 +206,7 @@ test('feedback pin awards and fans out, storing the rating and talkName', async 
     assert.equal(result.pin.awardedPoints, PIN_FEEDBACK_VALUE);
     assert.equal(result.question, null, 'a feedback pin never draws a question');
 
-    // The rating lives on the pin, not on the player's snapshot — that is what /admin/feedback listens to.
+    // The rating lives on the pin, not on the player's snapshot - that is what /admin/feedback listens to.
     const entry = (await db.collection('pins').doc(PIN_FEEDBACK_UID).get()).data().collectedBy[uid];
     assert.equal(entry.rating, 4);
     assert.equal(entry.talkName, 'Wyklad o smokach');

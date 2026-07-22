@@ -2,7 +2,7 @@ rules_version = '2';
 
 service firebase.storage {
   match /b/{bucket}/o {
-    // Photo-proof pins (#19) — the ONLY place a client may write directly to Firebase infra. Owner
+    // Photo-proof pins (#19) - the ONLY place a client may write directly to Firebase infra. Owner
     // only, <10MB, image/* content type. Overwrite is ALLOWED (no `resource == null`): create-only has
     // an orphan trap where an upload whose submitPhotoHandle call was dropped could never be replaced,
     // so retries/orphans self-heal by overwriting the single path. One object per (player, pin), so

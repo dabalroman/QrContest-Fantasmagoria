@@ -68,7 +68,7 @@ export const answerQuestionHandle = onCall(async (req): Promise<{
 
     try {
         // The grant list MUST be the return value of the transaction callback, never an outer closure
-        // array — a retried-then-discarded run would otherwise surface phantom grants (phantom toasts).
+        // array - a retried-then-discarded run would otherwise surface phantom grants (phantom toasts).
         const grants = await db.runTransaction(async (transaction) => {
             // Re-assert "not yet answered" TRANSACTIONALLY. The pre-transaction check above cannot hold:
             // the write below is a plain update on an existing doc, so it carries no precondition of its

@@ -12,7 +12,7 @@ const collectErrorsDictionary: StringMap = {
     'pin type is not supported yet': 'Ten typ miejsca będzie dostępny wkrótce.',
     'wrong answer': 'Błędna odpowiedź!',
     'rating is invalid': 'Wybierz ocenę od 1 do 5 gwiazdek.',
-    'talkName is invalid': 'Podaj nazwę prelekcji — od 10 do 255 znaków.'
+    'talkName is invalid': 'Podaj nazwę prelekcji - od 10 do 255 znaków.'
 };
 
 export function getCollectErrorMessage (error: Error): string {

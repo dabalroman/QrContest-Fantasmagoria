@@ -14,7 +14,7 @@ export default function CollectPinView ({
     onDone
 }: { pin: CollectedPin, question?: Question | null, goToQuestion: () => void, onDone?: () => void }) {
     // NavbarSuperButton prefers onClick over href, so /collect (no onDone) links to /map, while the map
-    // overlay passes onDone to close in place — a same-route push would not remount and would deadlock.
+    // overlay passes onDone to close in place - a same-route push would not remount and would deadlock.
     useDynamicNavbar({
         icon: question ? faQuestion : faCheck,
         href: !question ? Page.MAP : undefined,

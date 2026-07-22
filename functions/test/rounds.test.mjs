@@ -1,6 +1,6 @@
 // Regression net for task #4: a round-1 winner used to keep appearing in round 2's
 // leaderboard until they scored again, because updateRoundsProcessor only stamped
-// winnerInRound on the closing round's own copy and the master user doc — never on the
+// winnerInRound on the closing round's own copy and the master user doc - never on the
 // denormalized copies living in other, still-open rounds. RoundRankingTable.tsx filters
 // on that per-round copy, so inactive winners lingered indefinitely.
 //
@@ -26,7 +26,7 @@ beforeEach(async () => {
     await resetEmulator();
 });
 
-/** A minimal `users/{uid}` doc — required because the transaction updates it directly. */
+/** A minimal `users/{uid}` doc - required because the transaction updates it directly. */
 async function seedUser (uid, username, overrides = {}) {
     await db.collection('users').doc(uid).set({
         uid,
