@@ -1,4 +1,4 @@
-import { faStar, faMedal, faMagnifyingGlassLocation, faTrophy, faUser } from '@fortawesome/free-solid-svg-icons';
+import { faStar, faMedal, faQrcode, faTrophy, faUser } from '@fortawesome/free-solid-svg-icons';
 import NavbarButton from '@/components/Navbar/NavbarButton';
 import NavbarSuperButton from '@/components/Navbar/NavbarSuperButton';
 import { Page } from '@/Enum/Page';
@@ -47,7 +47,7 @@ export default function Navbar ({ navbarConfig }: { navbarConfig: NavbarConfig }
             style={{ gridTemplateColumns: 'repeat(2, 1fr) 120px repeat(2, 1fr)' }}
         >
             <NavbarButton
-                href={Page.COLLECT} icon={faMagnifyingGlassLocation}
+                href={Page.COLLECT} icon={faQrcode}
                 disabled={navbarConfig.disabledSides}
             />
             <NavbarButton

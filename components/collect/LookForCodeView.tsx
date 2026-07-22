@@ -12,6 +12,11 @@ import Button, { ButtonState } from '@/components/Button';
 import LinkButton from '@/components/LinkButton';
 import toast from 'react-hot-toast';
 import scheduleAchievementToasts from '@/utils/scheduleAchievementToasts';
+import PinMarkerIcon from '@/components/map/PinMarkerIcon';
+import { PinType } from '@/Enum/PinType';
+
+const CODE_LENGTH = 10;
+const CODE_HINT = 'Kod składa się z 10 znaków';
 
 export default function LookForCodeView ({
     code = null,
@@ -113,9 +118,9 @@ export default function LookForCodeView ({
                 </p>
             </Panel>
 
-            <Panel title="Wpisz kod miejsca" loading={loading}>
+            <Panel title="Przepisz kod QR" loading={loading}>
                 <form onSubmit={handleSubmit(collectCode, onInvalidInput)}>
-                    <input type="text" placeholder="ABCDEFGHIJ" maxLength={10}
+                    <input type="text" placeholder="ABCDEFGHIJ" maxLength={CODE_LENGTH}
                            className="rounded-xl block w-full p-1 border-2 border-input-border text-center
                                bg-input-background text-text-accent uppercase text-2xl shadow-inner-input
                                tracking-wider font-semibold"
@@ -123,19 +128,21 @@ export default function LookForCodeView ({
                                'code',
                                {
                                    setValueAs: (value: string) => value.trim(),
-                                   required: 'Kod miejsca składa się z 10 znaków',
+                                   required: CODE_HINT,
                                    pattern: {
                                        value: /^[A-z0-9]{10}$/,
-                                       message: 'Kod miejsca składa się z 10 znaków'
+                                       message: CODE_HINT
                                    }
                                }
                            )} />
 
                     <p className="text-center pt-2">
                         {
-                            formState.errors.code?.message || currentInput.length === 0
-                                ? formState.errors.code?.message
-                                : 'Kod gotowy - potwierdź poniżej!'
+                            formState.isValid
+                                ? 'Gotowe, możesz potwierdzić'
+                                : currentInput.length > 0
+                                    ? `${currentInput.length}/${CODE_LENGTH} znaków`
+                                    : <><PinMarkerIcon type={PinType.CODE} inline/> {CODE_HINT}</>
                         }
                     </p>
 
@@ -149,9 +156,9 @@ export default function LookForCodeView ({
                 </form>
             </Panel>
 
-            <Panel title="Zeskanuj kod miejsca">
-                <p>Nie chcesz wpisywać kodu ręcznie? Zeskanuj go aparatem. Możesz też użyć dowolnej innej
-                    aplikacji do skanowania.</p>
+            <Panel title="Zeskanuj kod QR">
+                <p>Nie chcesz wpisywać <PinMarkerIcon type={PinType.CODE} inline/> kodu ręcznie? Zeskanuj go
+                    aparatem. Możesz też użyć dowolnej innej aplikacji do skanowania.</p>
                 <LinkButton href={Page.SCANNER} className="w-full mt-4">
                     <FontAwesomeIcon icon={faCamera}/> Skanuj aparatem
                 </LinkButton>

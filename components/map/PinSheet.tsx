@@ -18,6 +18,7 @@ import { getMap, MAP_AREA_LABELS } from '@/utils/maps';
 // Mirrors collectPinHandle's validateFeedback - the server rejects anything shorter.
 const MIN_TALK_NAME_LENGTH = 10;
 const MAX_TALK_NAME_LENGTH = 255;
+const CODE_LENGTH = 10;
 
 // The marker-click sheet. Reuses the SAME strip the collect screen shows (decision 18) - Pin satisfies
 // PinCardData structurally, so it passes straight in. The collect control is react-hook-form, NOT
@@ -66,8 +67,11 @@ export default function PinSheet ({
 
     const photoApproved = isPhoto && collected && (collectedPin?.awardedPoints ?? 0) > 0;
     const photoPending = isPhoto && collected && !photoApproved;
-    const feedbackReady = !isFeedback
-        || (watch('rating') >= 1 && watch('talkName').trim().length >= MIN_TALK_NAME_LENGTH);
+    // Riddle answers stay free-text - arbitrary Polish phrases have no length rule.
+    const codeLength = watch('answer').trim().length;
+    const collectReady = (!isFeedback
+        || (watch('rating') >= 1 && watch('talkName').trim().length >= MIN_TALK_NAME_LENGTH))
+        && (!entersCode || codeLength === CODE_LENGTH);
 
     const collect = (data: { answer: string, talkName: string, rating: number }) => {
         setLoading(true);
@@ -106,8 +110,8 @@ export default function PinSheet ({
         icon: centerIcon,
         onClick: centerOnClick,
         disabledSides: true,
-        disabledCenter: canCollect && !feedbackReady,
-        animate: canCollect && feedbackReady
+        disabledCenter: canCollect && !collectReady,
+        animate: canCollect && collectReady
     });
 
     return (
@@ -152,13 +156,20 @@ export default function PinSheet ({
                         <form onSubmit={handleSubmit(collect)}>
                             <input
                                 type="text"
+                                maxLength={entersCode ? CODE_LENGTH : undefined}
                                 placeholder={entersCode ? 'ABCDEFGHIJ' : 'Twoja odpowiedź'}
                                 className="rounded-xl block w-full p-1 border-2 border-input-border text-center
                                     bg-input-background text-text-accent uppercase text-2xl shadow-inner-input
                                     tracking-wider font-semibold"
                                 {...register('answer', { setValueAs: (value: string) => value.trim() })}
                             />
-                            <p className="text-center pt-2">Kliknij przycisk, by potwierdzić.</p>
+                            <p className="text-center pt-2">
+                                {!entersCode
+                                    ? 'Kliknij przycisk, by potwierdzić.'
+                                    : codeLength === CODE_LENGTH
+                                        ? 'Gotowe, możesz potwierdzić'
+                                        : `${codeLength}/${CODE_LENGTH} znaków`}
+                            </p>
                         </form>
                     </SheetSection>
                 }

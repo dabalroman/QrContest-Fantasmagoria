@@ -87,8 +87,8 @@ export default function CollectPage () {
 
     return (
         <main className="grid grid-rows-layout items-center min-h-screen p-4">
-            <Metatags title="Szukaj"/>
-            <ScreenTitle>Szukaj</ScreenTitle>
+            <Metatags title="Kody QR"/>
+            <ScreenTitle>Kody QR</ScreenTitle>
 
             {state === CollectPageState.LOOK_FOR_CODE &&
                 <LookForCodeView

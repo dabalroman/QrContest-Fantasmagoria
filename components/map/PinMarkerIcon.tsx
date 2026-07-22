@@ -6,20 +6,25 @@ import getPinIcon from '@/utils/getPinIcon';
 // Tailwind's content glob sees the classes; the bg-/border-pin-* set is already safelisted (decision 19).
 export default function PinMarkerIcon ({
     type,
-    collected = false
-}: { type: PinType, collected?: boolean }) {
+    collected = false,
+    inline = false
+}: { type: PinType, collected?: boolean, inline?: boolean }) {
     const scheme = 'pin-' + type;
+    // A span so the inline variant is legal inside a <p>; display is set explicitly either way.
+    const Tag = inline ? 'span' : 'div';
 
     return (
-        <div
+        <Tag
             className={
-                'w-10 h-10 rounded-full border-2 border-white shadow-card '
-                + 'flex items-center justify-center text-text-light text-lg '
+                'rounded-full border-2 border-white items-center justify-center text-text-light '
+                + (inline
+                    ? 'inline-flex w-6 h-6 text-xs align-text-bottom '
+                    : 'flex w-10 h-10 text-lg shadow-card ')
                 + `bg-${scheme} `
                 + (collected ? 'opacity-50 grayscale' : '')
             }
         >
             <FontAwesomeIcon icon={getPinIcon(type)}/>
-        </div>
+        </Tag>
     );
 }
