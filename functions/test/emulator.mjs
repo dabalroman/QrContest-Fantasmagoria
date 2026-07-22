@@ -67,9 +67,12 @@ export async function resetEmulator () {
  * Create an auth user and return a usable ID token (as the client would hold after login).
  * Does NOT create the Firestore user doc - that's setupAccountHandle's job.
  */
-export async function createAuthUserToken (uid) {
-    await auth.createUser({ uid }).catch((e) => {
+export async function createAuthUserToken (uid, { email, emailVerified = false } = {}) {
+    await auth.createUser({ uid, ...(email ? { email, emailVerified } : {}) }).catch(async (e) => {
         if (e.code !== 'auth/uid-already-exists') throw e;
+        // Reconcile rather than swallow: a reused uid would otherwise yield a token with NO email,
+        // which is exactly the shape every negative role test expects - a false green.
+        if (email) await auth.updateUser(uid, { email, emailVerified });
     });
 
     const customToken = await auth.createCustomToken(uid);

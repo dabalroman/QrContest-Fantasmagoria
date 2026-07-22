@@ -1,8 +1,9 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import * as logger from 'firebase-functions/logger';
 import {FieldValue, getFirestore, DocumentData, DocumentReference} from 'firebase-admin/firestore';
-import {User, UserRole, UserUsername} from './types/user';
+import {User, UserUsername} from './types/user';
 import updateRanking from './actions/updateRanking';
+import roleForEmail from './actions/roleForEmail';
 import forbiddenPhrases from './data/forbiddenPhrases';
 
 function checkForForbiddenPhrases(username: string): boolean {
@@ -67,7 +68,7 @@ export const setupAccountHandle = onCall(async (req): Promise<{ user: User }> =>
         amountOfCollectedPins: 0,
         collectedPinsByScope: {},
         achievements: {},
-        role: UserRole.USER,
+        role: roleForEmail(auth.token.email, auth.token.email_verified),
         memberOf: null,
         winnerInRound: null,
         updatedAt: FieldValue.serverTimestamp(),

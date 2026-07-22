@@ -2,6 +2,7 @@
   "name": "functions",
   "scripts": {
     "lint": "eslint --ext .js,.ts .",
+    "prebuild": "node scripts/checkEnv.mjs",
     "build": "tsc",
     "build:watch": "tsc --watch",
     "test": "node --test --test-concurrency=1 \"test/**/*.test.mjs\"",

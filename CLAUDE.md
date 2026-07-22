@@ -107,7 +107,10 @@ Gotchas (from `Setup.md`, all real):
 the real seed files (`functions/src/seeds/*.ts`) must exist — they're **gitignored** (`src/seeds/*.ts`) and shipped
 separately in a password-protected zip; only `*.ts.dist` placeholder templates are in git. `seedDatabaseHandle.ts`
 imports all nine (rankingRounds, cardSets, questions, cards, guilds, clues, pins, pinGroups, achievements),
-so `tsc` fails outright without them. `.env.development` is also gitignored — copy `.env.dist` and
+so `tsc` fails outright without them. **`functions/.env` is the second gitignored prerequisite** — copy
+`functions/.env.dist` and fill in `ADMIN_EMAILS` / `DASHBOARD_EMAILS`, or the `prebuild` hook
+(`functions/scripts/checkEnv.mjs`) fails the functions build, and with it `npm run verify`, the pre-commit
+hook and `firebase deploy`. `.env.development` is also gitignored — copy `.env.dist` and
 set `NEXT_PUBLIC_EMULATOR=true`.
 
 ### Environment
@@ -251,7 +254,7 @@ Every mutation goes through an authenticated **callable Cloud Function**. They a
 
 | Callable | File | What it does |
 |---|---|---|
-| `setupAccountHandle` | `setupAccountHandle.ts` | Creates the user doc + username reservation + empty `collectedQuestions`. Validates username (3–20 chars, a regex allowlist, and a `forbiddenPhrases` blocklist). |
+| `setupAccountHandle` | `setupAccountHandle.ts` | Creates the user doc + username reservation + empty `collectedQuestions`. Validates username (3–20 chars, a regex allowlist, and a `forbiddenPhrases` blocklist). Assigns `role` from `ADMIN_EMAILS`/`DASHBOARD_EMAILS` in `functions/.env` (`actions/roleForEmail.ts`) — the only place `role` is ever written. Admin additionally requires a **verified** token email; dashboard does not. See §9. |
 | `collectCardHandle` | `collectCardHandle.ts` | Validates a 10-char code against `cards` (`isActive == true`), rejects already-collected, optionally draws a random **unanswered** question, writes `collectedCards`, increments score, fans out to ranking + guild. **Cards are retired for 2026** — still deployed, but nothing in the UI calls it (see §12). |
 | `collectPinHandle` | `collectPinHandle.ts` | The 2026 replacement for `collectCardHandle` — **fork THIS for any new pin flow.** Three entry shapes: `{code}` (global scanner/manual entry, cross-pin lookup filtered to `type == 'code'`), `{pinUid, answer}` (the map's pin UI, validated against that one pin), and `{pinUid, rating, talkName}` (feedback pins, #12 — skips the question draw entirely). Writes `collectedPins` + the pin's `collectedBy`, awards via `awardPoints`. Rejects `photo` (that routes through `submitPhotoHandle`). |
 | `getPinsHandle` | `getPinsHandle.ts` | **Read-only.** The map's pin feed — `pins` is admin-only read, so this is the client's only way in. Strips `code` + `collectedBy` via an explicit whitelist (`actions/toPublicPin.ts`), filters `isActive` + the `availableFrom/To` window. |
@@ -470,8 +473,23 @@ no rule at all**. Any new palette entry that needs `/N` opacity must be declared
 (with real codes, real questions, real answers) are gitignored — you must copy `X.ts.dist` → `X.ts` and fill
 them before `seedDatabaseHandle` will compile. There's also a `seeds.zip`.
 
-Seeding procedure (from `Setup.md`): register an account → manually flip its `role` to `admin` in the
-Firestore console → use *"Seed database"* in the app's profile tab → enter password `4064`.
+Seeding procedure: fill `ADMIN_EMAILS` in `functions/.env` **before anyone registers** and deploy →
+register that address **with the Google popup** → use *"Seed database"* in the app's profile tab →
+enter password `4064`.
+
+⚠️ **The ADMIN address must register with Google, never email+password.** That branch additionally
+requires `email_verified` on the token, and the app never sends a verification mail
+(`pages/auth/register-email.tsx` does not call `sendEmailVerification`) — so the email/password route
+silently lands the admin a plain `user`. Role is written **once, at creation**, and
+`users`/`users-usernames` are `allow write: if false`, so there is no in-app recovery: you must delete
+both `users/{uid}` and `users-usernames/{username}` and re-register. The miss is greppable in the logs
+as **`ROLE_LISTED_BUT_UNVERIFIED`**.
+
+**`DASHBOARD_EMAILS` deliberately has no such gate** — a plain email match is enough, because the
+`dashboard` role grants no data access at all (`firestore.rules` keys off `role == "admin"` only, no
+callable reads it). It just pins the account to `/dashboard` and removes the ability to play, so the
+TV account registers by email/password like any player. Do not "harden" this into symmetry with
+admin: it would lock the projector out of its own screen.
 
 ## 9a. Testing (Cloud Functions, e2e)
 
