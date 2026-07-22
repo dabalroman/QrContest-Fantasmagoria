@@ -121,8 +121,9 @@ reads `process.env`; everything else imports `configuration`. Notable vars:
 - `NEXT_PUBLIC_FIREBASE_*` — standard Firebase web config + `NEXT_PUBLIC_FIREBASE_REGION`.
 - `NEXT_PUBLIC_EMULATOR=true` — makes `utils/firebase.ts` call `connect*Emulator` for auth/firestore/functions/storage.
 - `NEXT_PUBLIC_CODE_COLLECT_URL` — the URL prefix printed into the QR codes (e.g. `https://fantas.web.app/collect/`).
-  `pages/scanner.tsx` strips this prefix from the scanned string to recover the raw code. **If this is wrong,
-  the scanner silently ignores every valid code.**
+  `components/CodeScanner.tsx` strips this prefix from the scanned string to recover the raw code. **If this
+  is wrong, the scanner silently ignores every valid code** — a player's scan is *required* to carry the
+  prefix (`allowBareCode` is admin-only), so a mismatch rejects everything.
 - `NEXT_PUBLIC_DASHBOARD_API_URL` — Fantasmagoria's JSON-RPC endpoint the TV dashboard polls for the program.
 - `NEXT_PUBLIC_APPCHECK_KEY` / `NEXT_PUBLIC_APPCHECK_DEBUG_TOKEN` — **declared but never used.**
   App Check is not wired into `utils/firebase.ts`. Dead config.
@@ -313,6 +314,11 @@ brute-forceable across every pin. That holds only because every ghost code is a 
 check runs *before* the query. Ghosts are deliberately **omitted from `PinTypeLegend`**: finding one is a
 surprise, so the legend renders five of the six.
 
+**"Enters a code" (`code` + `ghost`) is `entersCode()` in `Enum/PinType.ts`** — the predicate that drives the
+code label, the `ABCDEFGHIJ` placeholder, `maxLength`, the 10-char submit gate and the camera button. It used
+to be copy-pasted into `PinEditorForm` and `PinSheet`; keep it single. ⚠️ It is **not** the same question as
+`needsCode` (adds `riddle`, admin-editor-local) — a riddle has an answer to validate but nothing to scan.
+
 Points are per-pin (`value`), not tiered. `withQuestion: true` draws a quiz question on top (never for
 `feedback`). ⚠️ **Riddle answers are matched with `trim()` + `toUpperCase()` only** — no diacritic folding,
 no inner-whitespace collapse. Author answers short, single-token and ASCII-safe.
@@ -372,6 +378,10 @@ code, *kluby* in the UI. Four fixed uids: `guild-desert`, `guild-steel`, `guild-
 - **Reuse-first — don't reinvent.** Fork the nearest existing handler/model and match its idioms rather than
   inventing new patterns; never hand-roll what a shared action already does (route every point award through
   `functions/src/actions/awardPoints.ts`). Keeps the two type worlds + fan-out consistent.
+- ⚠️ **Inside a bottom drawer use `SheetSection`, never `Panel`.** `Panel` is a 30%-alpha grey that needs
+  the background *image* behind it; a drawer is a solid fill, so a `Panel` there lands within 6/255 of its
+  own surface and reads as a doubled border + broken shadow. `SheetSection` keeps `Panel`'s `loading`
+  contract (blurs + blocks pointer events). Both drawers — `PinSheet` and `PinEditorForm` — use it.
 - ⚠️ **Comments: default to NONE.** A comment earns its place only by explaining something a competent reader
   would still get wrong — a surprising constraint or a footgun a plausible "cleanup" would silently break.
   Specifically **never**: a header/banner block on a new file or component saying what it is; a restatement of
@@ -419,6 +429,33 @@ tab or making a side tab swappable means changing that + `NavbarConfig`.** The `
 the nav (route + `collectCardHandle` kept, just no tab). Scanning is demoted to the Skanuj tab; the collect
 code-entry screen (`LookForCodeView`) keeps the centre on Map and offers scan/confirm as **in-page buttons**,
 so the map is always one tap away.
+
+### Scanning — one overlay, three surfaces
+
+**There is no scanner page.** `pages/scanner.tsx` and `Page.SCANNER` were deleted (#67); every scan happens
+in **`components/CodeScannerOverlay.tsx`**, mounted behind a local `scanning` boolean by `LookForCodeView`,
+`PinSheet` and `PinEditorForm`. It wraps `CodeScanner` (the `<video>` + qr-scanner wiring) with the
+backdrop, the camera-permission copy and Anuluj. **Fork nothing here — mount the overlay.**
+
+- **The contract is scan → fill → the surface's own confirm.** The overlay never submits; it writes that
+  surface's input and closes, and the user confirms with `Potwierdź kod` / the navbar centre / navbar save.
+  Do not reintroduce an intermediate confirm step: the old `/scanner` had one only because a standalone
+  page has nowhere else to put an action and had to survive a route change.
+- ⚠️ **`z-[60]`, the app's only z-index above 50.** Everything else tops out at `z-50` (navbar), with the
+  map drawer at `z-30` backdrop / `z-40` sheet *below* it, because the drawer's confirm IS the navbar centre
+  button. The overlay must cover the navbar, and does so **by value** — never by equal `z-50` + DOM order
+  (`_app.tsx` renders `<Navbar>` before `<Component>`), which is what it used to rely on.
+- ⚠️ **`allowBareCode` is admin-only.** A player's scan must carry the `NEXT_PUBLIC_CODE_COLLECT_URL`
+  prefix, so a stray convention QR can never register as a code. Only `PinEditorForm` passes it (sticker
+  sheets hold the bare code).
+- **Printed QR codes never pointed at the scanner page** — they encode `/collect/:code`, a route, so
+  native camera-app scans are unaffected by its deletion.
+- `CodeScanner` calls `.start()` with no `.catch()`, so a denied permission is an unhandled rejection with
+  no error state — the overlay's standing hint copy is the mitigation, **task #69** is the fix.
+
+**`hooks/useTypingAnimation.ts`** types a code into a field character by character (150ms/char). Used by
+both player surfaces for scans *and* by `/collect/:code` deep links; the admin editor fills instantly.
+`onType` is held in a ref so the re-render each tick causes cannot restart the interval.
 
 ### Caching
 
@@ -601,7 +638,7 @@ Things that are wrong-but-harmless today; fix opportunistically, don't be surpri
   `/admin/recently-collected` (feed, capped at the newest 500 rows) read `pins` directly — admins may read
   the collection, and `Pin.fromFirestore` hydrates the real `code` + `collectedBy`, so no callable is
   involved. `/admin/cards` + `/admin/edit-card` are deleted; the pin editor gained a scan-to-fill button
-  (`components/CodeScanner.tsx`, shared with `/scanner`) in place of the scanner's old admin shortcut.
+  in place of the scanner's old admin shortcut.
 - ✅ **Fixed (task #14): re-seeding used to wipe `collectedBy`.** `seedPins`/`seedCards` used to `.set()`
   with no `{merge: true}`, so re-seeding reset every pin's/card's `collectedBy` to `{}` while
   `users/{uid}/collectedPins|collectedCards` survived — the two would then disagree and the next collect
@@ -641,6 +678,8 @@ the 2026 code core is shipped end-to-end. Read it for the design record and the 
 > the three pages drift. ⚠️ **#66 committed `/collect` to QR framing** ("KODY QR", panel `Przepisz kod QR`),
 > overriding that task's own no-`QR` decision — so regulamin/FAQ must phrase the ghost-code instruction so a
 > reader typing a non-QR code into a screen labelled QR still knows they are in the right place.
+> **#67 shipped** — scanning is one shared overlay on all three surfaces and `/scanner` is gone; ⚠️ regulamin/
+> FAQ must not tell players to "go to the scanner screen", there isn't one (see §8 *Scanning*).
 >
 > - ✅ **12.2 shipped as pins** — the pin model, `collectPinHandle`, the pin visual system and the rewired
 >   collect screen are done and manually verified. Cards are retired (handler still deployed, UI orphaned).
