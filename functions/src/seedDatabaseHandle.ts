@@ -1,18 +1,9 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import * as logger from 'firebase-functions/logger';
 import { getFirestore } from 'firebase-admin/firestore';
-import { Card } from './types/card';
 import { User, UserRole } from './types/user';
-import { RankingRound } from './types/rankingRound';
-import { CardSet } from './types/cardSet';
 import rankingRoundsSeed from './seeds/rankingRoundsSeed';
-import cardSetsSeed from './seeds/cardSetsSeed';
 import questionsSeed from './seeds/questionsSeed';
-import cardsSeed from './seeds/cardsSeed';
-import guildsSeed from './seeds/guildsSeed';
-import { Guild } from './types/guild';
-import cluesSeed from './seeds/cluesSeed';
-import { CardClue } from './types/cardClue';
 import pinsSeed from './seeds/pinsSeed';
 import { Pin } from './types/pin';
 import achievementsSeed from './seeds/achievementsSeed';
@@ -46,13 +37,9 @@ export const seedDatabaseHandle = onCall(async (req): Promise<{}> => {
     }
 
     await seedQuestions(db);
-    await seedCards(db);
     await seedPinGroups(db);
     await seedPins(db);
-    await seedCardSets(db);
     await seedRounds(db);
-    await seedGuilds(db);
-    await seedClues(db);
     await seedAchievements(db);
 
     // MUST come after seedAchievements: that seed uses a bare .set(), which would otherwise clobber
@@ -84,71 +71,42 @@ async function seedQuestions(db: FirebaseFirestore.Firestore) {
     logger.log('seedDatabaseHandle', 'seeding questions done');
 }
 
-// A bare .set() would reset every card's/pin's collectedBy to {} on re-seed while
-// users/{uid}/collectedCards|collectedPins survives, desyncing the two (see CLAUDE.md §11). The
-// tempting fix - `.set(doc, { merge: true })` while the seed literal still carries `collectedBy: {}` -
-// does NOT work: Firestore's merge treats "the key is present in the payload" as "overwrite this path",
-// regardless of whether its value is an empty object, so `collectedBy: {}` still wipes the existing
-// map. The only merge-safe fix is to OMIT the key entirely from the write for a doc that already
-// exists (merge then leaves that path untouched); a brand-new doc still gets an explicit `collectedBy`
-// so the field is never simply absent.
-async function seedWithPreservedCollectedBy<T extends { uid: string, collectedBy: unknown }> (
+// A bare .set() would reset live gameplay state on re-seed - a pin's collectedBy while
+// users/{uid}/collectedPins survives, or a round's accumulated users map and its finished flag
+// (see CLAUDE.md §11). The tempting fix - `.set(doc, { merge: true })` while the seed
+// literal still carries `collectedBy: {}` / `users: {}` - does NOT work: Firestore's merge treats
+// "the key is present in the payload" as "overwrite this path", regardless of whether its value is
+// an empty object, so the empty literal still wipes the existing map. The only merge-safe fix is to
+// OMIT those keys entirely from the write for a doc that already exists (merge then leaves those
+// paths untouched); a brand-new doc still gets them explicitly so they are never simply absent.
+async function seedWithPreservedFields<T extends { uid: string }> (
     db: FirebaseFirestore.Firestore,
     collection: string,
-    docs: T[]
+    docs: T[],
+    preservedKeys: (keyof T)[]
 ): Promise<void> {
     await Promise.all(docs.map(async (doc) => {
         const ref = db.collection(collection).doc(doc.uid);
-        const { collectedBy, ...rest } = doc;
 
-        if ((await ref.get()).exists) {
-            await ref.set(rest, { merge: true });
-        } else {
+        if (!(await ref.get()).exists) {
             await ref.set(doc);
+            return;
         }
-    }));
-}
 
-async function seedCards(db: FirebaseFirestore.Firestore) {
-    logger.log('seedDatabaseHandle', 'seeding cards');
-    await seedWithPreservedCollectedBy(db, 'cards', cardsSeed as Card[]);
-    logger.log('seedDatabaseHandle', 'seeding cards done');
+        const payload: Partial<T> = { ...doc };
+        preservedKeys.forEach((key) => delete payload[key]);
+        await ref.set(payload, { merge: true });
+    }));
 }
 
 async function seedPins(db: FirebaseFirestore.Firestore) {
     logger.log('seedDatabaseHandle', 'seeding pins');
-    await seedWithPreservedCollectedBy(db, 'pins', pinsSeed as Pin[]);
+    await seedWithPreservedFields(db, 'pins', pinsSeed as Pin[], ['collectedBy']);
     logger.log('seedDatabaseHandle', 'seeding pins done');
-}
-
-async function seedCardSets(db: FirebaseFirestore.Firestore) {
-    logger.log('seedDatabaseHandle', 'seeding card sets');
-    await Promise.all(cardSetsSeed.map((cardSet: CardSet) =>
-        db.collection('cardSets').doc(cardSet.uid).set(cardSet)
-    ));
-    logger.log('seedDatabaseHandle', 'seeding card sets done');
 }
 
 async function seedRounds(db: FirebaseFirestore.Firestore) {
     logger.log('seedDatabaseHandle', 'seeding rounds');
-    await Promise.all(rankingRoundsSeed.map((round: RankingRound) =>
-        db.collection('ranking').doc(round.uid).set(round, { merge: true })
-    ));
+    await seedWithPreservedFields(db, 'ranking', rankingRoundsSeed, ['users', 'finished']);
     logger.log('seedDatabaseHandle', 'seeding rounds done');
-}
-
-async function seedGuilds(db: FirebaseFirestore.Firestore) {
-    logger.log('seedDatabaseHandle', 'seeding guilds');
-    await Promise.all(guildsSeed.map((guild: Guild) =>
-        db.collection('guilds').doc(guild.uid).set(guild, { merge: true })
-    ));
-    logger.log('seedDatabaseHandle', 'seeding guilds done');
-}
-
-async function seedClues(db: FirebaseFirestore.Firestore) {
-    logger.log('seedDatabaseHandle', 'seeding clues');
-    await Promise.all(cluesSeed.map((clue: CardClue) =>
-        db.collection('clues').doc(clue.uid).set(clue, { merge: true })
-    ));
-    logger.log('seedDatabaseHandle', 'seeding clues done');
 }

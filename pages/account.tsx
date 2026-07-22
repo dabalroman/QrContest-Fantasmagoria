@@ -62,7 +62,7 @@ export default function AccountPage () {
                     .then((result) => toast.success(result.data.result))
                     .catch((error) => toast.error('Update failed: ' + error.message));
 
-            }}>Wymuś aktualizację rund</Button>
+            }}>Sprawdź i zamknij rundy</Button>
 
             <p className={'py-2 mt-20'}>Niebezpiecznie tutaj schodzić!</p>
             <Button className="w-full" style={{

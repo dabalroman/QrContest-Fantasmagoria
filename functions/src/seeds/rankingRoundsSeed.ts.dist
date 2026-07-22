@@ -15,7 +15,7 @@ const rankingRoundsSeed: RankingRound[] = [
         name: 'druga',
         finished: false,
         from: new Date('2026-07-25 14:00:00 GMT+0200'),
-        to: new Date('2026-07-26 12:00:00 GMT+0200'),
+        to: new Date('2026-07-26 11:59:59 GMT+0200'),
         users: {} as RankingRoundUsers,
         guilds: {} as RankingRoundGuilds
     }

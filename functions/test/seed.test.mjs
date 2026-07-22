@@ -24,13 +24,9 @@ import {
 // The compiled seeds are CommonJS (`exports.default = seed`); imported from ESM the default binding
 // is the module.exports object, so the payload lives under `.default`. `?? mod` keeps it robust if a
 // future build emits a bare default.
-import cardsSeedMod from '../lib/seeds/cardsSeed.js';
 import pinsSeedMod from '../lib/seeds/pinsSeed.js';
 import pinGroupsSeedMod from '../lib/seeds/pinGroupsSeed.js';
-import cardSetsSeedMod from '../lib/seeds/cardSetsSeed.js';
 import rankingRoundsSeedMod from '../lib/seeds/rankingRoundsSeed.js';
-import guildsSeedMod from '../lib/seeds/guildsSeed.js';
-import cluesSeedMod from '../lib/seeds/cluesSeed.js';
 import achievementsSeedMod from '../lib/seeds/achievementsSeed.js';
 import questionsSeedMod from '../lib/seeds/questionsSeed.js';
 
@@ -38,15 +34,16 @@ const unwrap = (mod) => mod.default ?? mod;
 
 // Array seeds → one doc per element in the named collection.
 const ARRAY_SEEDS = [
-    ['cards', unwrap(cardsSeedMod)],
     ['pins', unwrap(pinsSeedMod)],
     ['pinGroups', unwrap(pinGroupsSeedMod)],
-    ['cardSets', unwrap(cardSetsSeedMod)],
     ['ranking', unwrap(rankingRoundsSeedMod)],
-    ['guilds', unwrap(guildsSeedMod)],
-    ['clues', unwrap(cluesSeedMod)],
     ['achievements', unwrap(achievementsSeedMod)]
 ];
+
+// The card game and clubs are retired (CLAUDE.md §7a) and deliberately no longer seeded, even
+// though their seed files and handlers still exist. Clues belong to the card game too - each one
+// is a riddle pointing at a hidden card.
+const RETIRED_COLLECTIONS = ['cards', 'cardSets', 'guilds', 'clues'];
 
 // questionsSeed is a map object (not an array), written whole to the single doc questions/questions.
 const questionsSeed = unwrap(questionsSeedMod);
@@ -79,12 +76,43 @@ test('an admin seed fully populates every collection', async () => {
         assert.equal(snapshot.size, seed.length, `${collection} doc count === seed length`);
     }
 
+    for (const collection of RETIRED_COLLECTIONS) {
+        const snapshot = await db.collection(collection).get();
+        assert.equal(snapshot.size, 0, `${collection} is retired and must not be seeded`);
+    }
+
     const questionsDoc = await db.collection('questions').doc('questions').get();
     assert.ok(questionsDoc.exists, 'questions/questions doc exists');
     assert.equal(
         Object.keys(questionsDoc.data()).length,
         Object.keys(questionsSeed).length,
         'questions map key count === seed key count'
+    );
+});
+
+test('re-seeding preserves a round\'s users map and finished flag', async () => {
+    const token = await makeAdmin('seed-admin');
+    const seededRound = unwrap(rankingRoundsSeedMod)[0];
+
+    await callCallable('seedDatabaseHandle', { password: PASSWORD }, token);
+
+    // A played, closed round with a stale `to` - the state a re-seed must not destroy.
+    await db.collection('ranking').doc(seededRound.uid).update({
+        users: { 'player-1': { username: 'Player1', score: 42 } },
+        finished: true,
+        to: new Date('2000-01-01T00:00:00Z')
+    });
+
+    await callCallable('seedDatabaseHandle', { password: PASSWORD }, token);
+
+    const round = (await db.collection('ranking').doc(seededRound.uid).get()).data();
+    assert.ok(round.users['player-1'], 'the leaderboard must survive a re-seed');
+    assert.equal(round.users['player-1'].score, 42, 'the scores must survive a re-seed');
+    assert.equal(round.finished, true, 'a finished round must not reopen');
+    assert.equal(
+        round.to.toDate().getTime(),
+        seededRound.to.getTime(),
+        'an edited to must still land'
     );
 });
 
