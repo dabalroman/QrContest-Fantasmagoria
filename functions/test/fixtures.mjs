@@ -4,6 +4,8 @@
 
 import admin from 'firebase-admin';
 import { db, bucket } from './emulator.mjs';
+import canonicalUsernameMod from '../lib/actions/canonicalUsername.js';
+const canonicalUsername = canonicalUsernameMod.default ?? canonicalUsernameMod;
 
 const { Timestamp, FieldValue } = admin.firestore;
 
@@ -87,7 +89,7 @@ export async function seedLegacyUser (uid, username) {
         lastGuildChangeAt: Timestamp.fromDate(new Date('2020/01/01'))
     });
 
-    await db.collection('users-usernames').doc(username).set({ uid });
+    await db.collection('users-usernames').doc(canonicalUsername(username)).set({ uid });
 
     // collectCardHandle / collectPinHandle transaction.update this doc - it must exist.
     await db.collection('users').doc(uid)
@@ -252,7 +254,7 @@ export async function seedUser (uid, username, overrides = {}) {
         ...overrides
     });
 
-    await db.collection('users-usernames').doc(username).set({ uid });
+    await db.collection('users-usernames').doc(canonicalUsername(username)).set({ uid });
 
     await db.collection('users').doc(uid)
         .collection('collectedQuestions').doc('collectedQuestions')

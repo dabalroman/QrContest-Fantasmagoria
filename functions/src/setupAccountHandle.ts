@@ -4,6 +4,7 @@ import {FieldValue, getFirestore, DocumentData, DocumentReference} from 'firebas
 import {User, UserUsername} from './types/user';
 import updateRanking from './actions/updateRanking';
 import roleForEmail from './actions/roleForEmail';
+import canonicalUsername from './actions/canonicalUsername';
 import forbiddenPhrases from './data/forbiddenPhrases';
 
 function checkForForbiddenPhrases(username: string): boolean {
@@ -48,8 +49,10 @@ export const setupAccountHandle = onCall(async (req): Promise<{ user: User }> =>
         throw new HttpsError('invalid-argument', 'user uid exist already');
     }
 
-    // Is username free to take?
-    const usernameRef = db.collection('users-usernames').doc(username) as DocumentReference<UserUsername, UserUsername>;
+    // Is username free to take? Reserved under the case-folded key, while users/{uid}.username keeps
+    // the casing the player typed - so Joe, JOE and joe are one name with one display form.
+    const usernameRef = db.collection('users-usernames')
+        .doc(canonicalUsername(username)) as DocumentReference<UserUsername, UserUsername>;
     const usernameTaken = (await usernameRef.get()).exists;
 
     if (usernameTaken) {

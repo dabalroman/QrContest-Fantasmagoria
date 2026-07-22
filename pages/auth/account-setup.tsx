@@ -14,6 +14,7 @@ import { faArrowLeft, faCheck, faMapLocationDot, faStar, faX } from '@fortawesom
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useForm } from 'react-hook-form';
 import { setupAccountFunction } from '@/utils/functions';
+import canonicalUsername from '@/functions/src/actions/canonicalUsername';
 import { useRouter } from 'next/router';
 
 export default function AccountSetupPage () {
@@ -65,14 +66,19 @@ export default function AccountSetupPage () {
     });
 
     const username = watch('username');
+    const checkedUsernameRef = useRef<string>('');
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
     const checkUsername = useCallback(
         debounce(async (username: string) => {
-            if (username.length >= 3) {
-                setChecking(true);
-                const ref = doc(firestore, 'users-usernames', username);
+            if (canonicalUsername(username).length >= 3) {
+                const ref = doc(firestore, 'users-usernames', canonicalUsername(username));
                 const snapshot = await getDoc(ref);
+                // The field may have changed again while the getDoc was in flight; applying that
+                // verdict would re-open the stale window the effect below closes.
+                if (checkedUsernameRef.current !== username) {
+                    return;
+                }
                 setIsValid(!snapshot.exists());
                 setChecking(false);
             }
@@ -80,7 +86,12 @@ export default function AccountSetupPage () {
         []
     );
 
+    // isValid must never outlive the string it was computed for - otherwise a fast edit-then-submit
+    // passes the onSubmit guard with the previous nick's verdict and the callable rejects the nick.
     useEffect(() => {
+        checkedUsernameRef.current = username;
+        setIsValid(false);
+        setChecking(canonicalUsername(username).length >= 3);
         checkUsername(username);
     }, [checkUsername, username]);
 
@@ -106,6 +117,9 @@ export default function AccountSetupPage () {
 
             if((error as Error).message === 'username does not meet requirements') {
                 toast.error('Ten nick nie spełnia wymagań.');
+            } else if((error as Error).message === 'nickname already taken') {
+                toast.error('Ktoś właśnie zajął ten nick, wybierz inny.');
+                setIsValid(false);
             } else {
                 toast.error('Rejestracja nie powiodła się, spróbuj ponownie.');
                 await router.push(Page.MAIN);
@@ -173,13 +187,13 @@ export default function AccountSetupPage () {
                                 'username',
                                 {
                                     required: 'Wpisz swój nick',
-                                    minLength: {
-                                        value: 3,
-                                        message: 'Nick musi mieć co najmniej 3 znaki!'
-                                    },
-                                    maxLength: {
-                                        value: 20,
-                                        message: 'Spróbuj zmieścić się w 20 znakach.'
+                                    validate: {
+                                        // Length is judged on the trimmed value, the way the server does
+                                        // it - otherwise spaces pad a too-short nick past the rule.
+                                        minLength: (value: string) => value.trim().length >= 3
+                                            || 'Nick musi mieć co najmniej 3 znaki!',
+                                        maxLength: (value: string) => value.trim().length <= 20
+                                            || 'Spróbuj zmieścić się w 20 znakach.'
                                     },
                                     pattern: {
                                         value: /^[A-z0-9ąćęłóśźż\-\s&$#@.<>(){}:;+]+$/i,

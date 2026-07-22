@@ -85,7 +85,7 @@ test('registration creates a complete user doc, username reservation and ranking
     assert.ok(updatedAt instanceof Timestamp, 'updatedAt resolved to a real Timestamp');
     assert.ok(lastGuildChangeAt instanceof Timestamp, 'lastGuildChangeAt resolved to a real Timestamp');
 
-    const reservation = await db.collection('users-usernames').doc(username).get();
+    const reservation = await db.collection('users-usernames').doc(username.toLowerCase()).get();
     assert.deepEqual(reservation.data(), { uid }, 'the username reservation');
 
     const collectedQuestions = await db
@@ -209,6 +209,49 @@ test('registering a username someone already took is rejected', async () => {
     await assert.rejects(
         () => setupAccount('name-thief', 'TakenName', { email: 'thief@example.test', emailVerified: true }),
         /nickname already taken/
+    );
+});
+
+// Uniqueness is the users-usernames doc id, so it is only as case-insensitive as the key is. Before
+// the fold, Joe/JOE/joe were three ids, every one of which passed the pre-check AND won its own
+// transaction.create - two players walked away holding the same name.
+test('a username taken in a different case or padding is rejected', async () => {
+    await setupAccount('case-owner', 'Joe', { email: UNLISTED_EMAIL, emailVerified: true });
+
+    for (const [index, variant] of ['JOE', 'joe', 'jOe', '  Joe  ', ' joe'].entries()) {
+        await assert.rejects(
+            () => setupAccount(
+                `case-thief-${index}`, variant,
+                { email: `case-thief-${index}@example.test`, emailVerified: true }
+            ),
+            /nickname already taken/,
+            `variant ${JSON.stringify(variant)}`
+        );
+    }
+});
+
+// The fold decides the KEY only. Display casing is the player's, and it is what the leaderboard and
+// every ranking round copy render - folding it into the doc too would silently lowercase every nick.
+test('the display username keeps the casing and loses only the padding', async () => {
+    const { stored } = await setupAccount(
+        'case-display', '  MiXeDcAsE  ', { email: UNLISTED_EMAIL, emailVerified: true }
+    );
+
+    assert.equal(stored.username, 'MiXeDcAsE', 'the persisted display name');
+
+    const reservation = await db.collection('users-usernames').doc('mixedcase').get();
+    assert.deepEqual(reservation.data(), { uid: 'case-display' }, 'reserved under the folded key');
+
+    const roundUser = (await db.collection('ranking').doc(ROUND_UID).get()).data().users['case-display'];
+    assert.equal(roundUser.username, 'MiXeDcAsE', 'the ranking round copy');
+});
+
+// Padding is stripped before the length rule, matching the client - otherwise spaces pad a 1-char
+// nick past the minimum and the reservation lands under a 1-char key.
+test('a username that is only long enough before trimming is rejected', async () => {
+    await assert.rejects(
+        () => setupAccount('pad-short', '  a  ', { email: UNLISTED_EMAIL, emailVerified: true }),
+        /username does not meet requirements/
     );
 });
 
