@@ -638,7 +638,9 @@ the 2026 code core is shipped end-to-end. Read it for the design record and the 
 > **#36 shipped** — the landing page is pin-era, and it left behind `components/PinTypeLegend.tsx`
 > (the pin types, built from `PinMarkerIcon` + `getPinTypeFriendlyName`, with `ghost` filtered out).
 > **#33/#34 must reuse it rather than restating the mechanics by hand** — that duplication is exactly how
-> the three pages drift.
+> the three pages drift. ⚠️ **#66 committed `/collect` to QR framing** ("KODY QR", panel `Przepisz kod QR`),
+> overriding that task's own no-`QR` decision — so regulamin/FAQ must phrase the ghost-code instruction so a
+> reader typing a non-QR code into a screen labelled QR still knows they are in the right place.
 >
 > - ✅ **12.2 shipped as pins** — the pin model, `collectPinHandle`, the pin visual system and the rewired
 >   collect screen are done and manually verified. Cards are retired (handler still deployed, UI orphaned).
