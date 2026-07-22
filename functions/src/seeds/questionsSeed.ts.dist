@@ -2,20 +2,27 @@
 import { FieldValue } from 'firebase-admin/firestore';
 import { QuestionsDoc } from '../types/question';
 
+// TEMPLATE - copy to questionsSeed.ts and author the real pool there. The real file is gitignored and
+// ships in seeds.zip; nothing real belongs here, because this repo is public and `correct` is the
+// answer key. The pool is global (not per-pin) and lands in a single questions/questions document
+// that no client rule exposes, so `correct` never leaves the server.
+//
+// `value` is one of 0 | 5 | 10 | 15. A wrong answer still burns the question and still counts towards
+// amountOfAnsweredQuestions - only amountOfCorrectAnswers (the `owl` achievements) needs it right.
 const questionsSeed: QuestionsDoc = {
-    'jak-nazywa-sie-gra': {
-        uid: 'jak-nazywa-sie-gra',
-        question: 'Jak nazywa się gra, w której zapisujesz słowo flamastrem na tabliczce?',
+    'przykladowe-pytanie': {
+        uid: 'przykladowe-pytanie',
+        question: 'Treść pytania pokazywana graczowi?',
         answers: {
-            a: 'Jednym słowem',
-            b: 'Tajniacy',
-            c: 'Czółko',
-            d: 'Mistrz słowa'
+            a: 'Pierwsza odpowiedź',
+            b: 'Druga odpowiedź',
+            c: 'Trzecia odpowiedź',
+            d: 'Czwarta odpowiedź'
         },
         correct: 'a',
         updatedAt: FieldValue.serverTimestamp(),
         value: 5
-    },
+    }
     // ...
 };
 

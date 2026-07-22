@@ -1,26 +1,14 @@
 import { PinGroup } from '../types/pinGroup';
 
-// The pin group taxonomy. These are DATA (mirrors achievementsSeed.ts): a typo'd group in the admin
-// editor's dropdown would otherwise silently break a future group-completion badge, so the set of
-// valid groups is validated server-side against this collection (see upsertPinHandle).
+// TEMPLATE - copy to pinGroupsSeed.ts and declare the real taxonomy there. The real file is
+// gitignored and ships in seeds.zip.
 //
-// This seed is the SOURCE OF TRUTH. Mid-event you may add/edit a doc straight in the Firestore console
-// (that is the whole point of definitions being data), but fold any such change back into this file
-// afterwards so the reviewed record stays accurate.
-//
-// Keep this list a superset of every `groups[]` value used in pinsSeed.ts(.dist) - 'test' included,
-// since the dev/test-ladder fixture pins tag themselves with it.
+// Keep the real list a SUPERSET of every `groups[]` value used in pinsSeed.ts: upsertPinHandle
+// validates a pin's groups against this collection, and a group that exists only on a pin can never
+// back a `pinsInScope` achievement scope (`group:<uid>`).
 const pinGroupsSeed: PinGroup[] = [
-    { uid: 'mok', name: 'MOK' },
-    { uid: '2lo', name: '2LO' },
-    { uid: 'dwor', name: 'Dwór' },
-    { uid: 'bestiariusz', name: 'Bestiariusz' },
-    { uid: 'rzemioslo', name: 'Rzemiosło' },
-    { uid: 'targowisko', name: 'Targowisko' },
-    { uid: 'prelekcje', name: 'Prelekcje' },
-    { uid: 'nocne', name: 'Nocne' },
-    { uid: 'zaswiaty', name: 'Zaświaty' },
-    { uid: 'test', name: 'Test' }
+    { uid: 'przyklad', name: 'Przykład' }
+    // ...
 ];
 
 export default pinGroupsSeed;

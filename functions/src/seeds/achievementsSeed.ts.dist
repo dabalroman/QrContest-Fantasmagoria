@@ -1,248 +1,59 @@
 import { Achievement } from '../types/achievement';
 
-// The achievement definitions. These are DATA: `type` selects one of the engine's pure counter
-// accessors (functions/src/achievements/typePredicates.ts) and `target` is the threshold, so adding
-// an achievement of an existing type means adding an entry here - no engine change, no new branch.
+// TEMPLATE - copy to achievementsSeed.ts and author the real definitions there. The real file is
+// gitignored and ships in seeds.zip: the thresholds, bonuses and the full badge list are a spoiler,
+// and this repo is public.
 //
-// This seed is the SOURCE OF TRUTH. Mid-event you may edit a doc straight in the Firestore console
-// (that is the whole point of definitions being data - there is no redeploy window), but fold any
-// such change back into this file afterwards so the reviewed record stays accurate.
+// These are DATA: `type` selects one of the engine's pure counter accessors
+// (functions/src/achievements/typePredicates.ts) and `target` is the threshold, so adding an
+// achievement of an EXISTING type means adding an entry here - no engine change, no redeploy. Adding
+// a new TYPE is a code change, and the AchievementType union makes that compile-enforced.
 //
 // `icon` is a string KEY the client maps to a FontAwesome icon - never an IconDefinition.
+//
+// One example per type follows; the real file carries the full ladder.
 const achievementsSeed: Achievement[] = [
-    // Point cups - counter is user.score.
+    // Counter is user.score - and bonuses fold back into score, so these can cascade.
     {
-        uid: 'score-1',
-        name: 'Nowicjusz',
-        description: 'Zdobądź 50 punktów.',
+        uid: 'przyklad-punkty',
+        name: 'Nazwa odznaki',
+        description: 'Zdobądź 100 punktów.',
         icon: 'medal',
-        group: 'score',
+        group: 'punkty',
         type: 'points',
-        target: 50,
-        bonus: 5
-    },
-    {
-        uid: 'score-2',
-        name: 'Tropiciel',
-        description: 'Zdobądź 150 punktów.',
-        icon: 'medal',
-        group: 'score',
-        type: 'points',
-        target: 150,
+        target: 100,
         bonus: 10
     },
+    // Counter is user.amountOfCorrectAnswers - wrong answers do not count. Cap the target against the
+    // number of pins that actually draw a question (withQuestion, non-feedback), or it is unreachable.
     {
-        uid: 'score-3',
-        name: 'Zbieracz',
-        description: 'Zdobądź 350 punktów.',
-        icon: 'medal',
-        group: 'score',
-        type: 'points',
-        target: 350,
-        bonus: 20
-    },
-    {
-        uid: 'score-4',
-        name: 'Łowca skarbów',
-        description: 'Zdobądź 600 punktów.',
-        icon: 'trophy',
-        group: 'score',
-        type: 'points',
-        target: 600,
-        bonus: 30
-    },
-    {
-        uid: 'score-5',
-        name: 'Mistrz',
-        description: 'Zdobądź 1000 punktów.',
-        icon: 'trophy',
-        group: 'score',
-        type: 'points',
-        target: 1000,
-        bonus: 50
-    },
-    {
-        uid: 'score-6',
-        name: 'Legenda Fantasmagorii',
-        description: 'Zdobądź 1400 punktów.',
-        icon: 'crown',
-        group: 'score',
-        type: 'points',
-        target: 1400,
-        bonus: 75
-    },
-
-    // Answer owls - counter is user.amountOfCorrectAnswers (wrong answers do not count).
-    {
-        uid: 'owl-1',
-        name: 'Sówka',
-        description: 'Odpowiedz poprawnie na 5 pytań.',
+        uid: 'przyklad-pytania',
+        name: 'Nazwa odznaki',
+        description: 'Odpowiedz poprawnie na 10 pytań.',
         icon: 'owl',
-        group: 'owl',
+        group: 'pytania',
         type: 'correctAnswers',
-        target: 5,
+        target: 10,
         bonus: 10
     },
+    // Location badge. `scope` is a pinScopeKeys.ts key - `map:<mapId>` or `group:<groupUid>`.
+    // `target` here is DERIVED, not authored: recomputeAchievementTargets overwrites it on every pin
+    // create/edit/delete/re-seed with the count of ACTIVE pins in that scope, so the 0 below is only
+    // ever live for the instant between this seed write and the recompute that follows it. Authoring
+    // a value is pointless. Note that a `photo` pin in the scope means the badge cannot complete until
+    // an admin approves that photo - keep them out of any scope that must stay self-serve.
     {
-        uid: 'owl-2',
-        name: 'Sowa',
-        description: 'Odpowiedz poprawnie na 15 pytań.',
-        icon: 'owl',
-        group: 'owl',
-        type: 'correctAnswers',
-        target: 15,
-        bonus: 20
-    },
-    {
-        uid: 'owl-3',
-        name: 'Puchacz',
-        description: 'Odpowiedz poprawnie na 30 pytań.',
-        icon: 'owl',
-        group: 'owl',
-        type: 'correctAnswers',
-        target: 30,
-        bonus: 30
-    },
-
-    // Location badges (task #37) - one per map floor, plus one per whole building. `target` here is
-    // DERIVED, not human-authored: functions/src/actions/recomputeAchievementTargets.ts overwrites it
-    // on every pin create/edit/delete/re-seed to the current count of active pins in that `scope`
-    // (a pinScopeKeys.ts key). The `0` below is only ever live for the instant between this seed write
-    // and the recompute that immediately follows it in seedDatabaseHandle.
-    {
-        uid: 'location-dwor',
-        name: 'Dworzanin',
-        description: 'Odwiedź wszystkie pinezki na terenie Dworu.',
+        uid: 'przyklad-lokalizacja',
+        name: 'Nazwa odznaki',
+        description: 'Odwiedź wszystkie pinezki w tej lokalizacji.',
         icon: 'map-pin',
-        group: 'location',
+        group: 'lokalizacja',
         type: 'pinsInScope',
         scope: 'map:dwor',
         target: 0,
         bonus: 15
-    },
-    {
-        uid: 'location-mok-piwnica',
-        name: 'Kret',
-        description: 'Odwiedź wszystkie pinezki w piwnicy MOK-u.',
-        icon: 'map-pin',
-        group: 'location',
-        type: 'pinsInScope',
-        scope: 'map:mok-piwnica',
-        target: 0,
-        bonus: 15
-    },
-    {
-        uid: 'location-mok-parter',
-        name: 'Piechur',
-        description: 'Odwiedź wszystkie pinezki na parterze MOK-u.',
-        icon: 'map-pin',
-        group: 'location',
-        type: 'pinsInScope',
-        scope: 'map:mok-parter',
-        target: 0,
-        bonus: 15
-    },
-    {
-        uid: 'location-mok-pietro-1',
-        name: 'Wspinacz',
-        description: 'Odwiedź wszystkie pinezki na 1. piętrze MOK-u.',
-        icon: 'map-pin',
-        group: 'location',
-        type: 'pinsInScope',
-        scope: 'map:mok-pietro-1',
-        target: 0,
-        bonus: 15
-    },
-    {
-        uid: 'location-mok-pietro-1-5',
-        name: 'Duch Półpiętra',
-        description: 'Odwiedź wszystkie pinezki na półpiętrze (1.5) MOK-u.',
-        icon: 'map-pin',
-        group: 'location',
-        type: 'pinsInScope',
-        scope: 'map:mok-pietro-1-5',
-        target: 0,
-        bonus: 15
-    },
-    {
-        uid: 'location-mok-pietro-2',
-        name: 'Podniebny',
-        description: 'Odwiedź wszystkie pinezki na 2. piętrze MOK-u.',
-        icon: 'map-pin',
-        group: 'location',
-        type: 'pinsInScope',
-        scope: 'map:mok-pietro-2',
-        target: 0,
-        bonus: 15
-    },
-    {
-        uid: 'location-2lo-parter',
-        name: 'Świeżak',
-        description: 'Odwiedź wszystkie pinezki na parterze 2LO.',
-        icon: 'map-pin',
-        group: 'location',
-        type: 'pinsInScope',
-        scope: 'map:2lo-parter',
-        target: 0,
-        bonus: 15
-    },
-    {
-        uid: 'location-2lo-pietro-1',
-        name: 'Kujon',
-        description: 'Odwiedź wszystkie pinezki na 1. piętrze 2LO.',
-        icon: 'map-pin',
-        group: 'location',
-        type: 'pinsInScope',
-        scope: 'map:2lo-pietro-1',
-        target: 0,
-        bonus: 15
-    },
-    {
-        uid: 'location-2lo-pietro-2',
-        name: 'Absolwent',
-        description: 'Odwiedź wszystkie pinezki na 2. piętrze 2LO.',
-        icon: 'map-pin',
-        group: 'location',
-        type: 'pinsInScope',
-        scope: 'map:2lo-pietro-2',
-        target: 0,
-        bonus: 15
-    },
-    {
-        uid: 'location-building-mok',
-        name: 'Władca MOK-u',
-        description: 'Odwiedź wszystkie pinezki w całym MOK-u.',
-        icon: 'building',
-        group: 'location',
-        type: 'pinsInScope',
-        scope: 'group:mok',
-        target: 0,
-        bonus: 40
-    },
-    {
-        uid: 'location-building-2lo',
-        name: 'Władca 2LO',
-        description: 'Odwiedź wszystkie pinezki w całym 2LO.',
-        icon: 'building',
-        group: 'location',
-        type: 'pinsInScope',
-        scope: 'group:2lo',
-        target: 0,
-        bonus: 40
-    },
-    // Scoped by group, not by map: ghost pins sit on the Dwór image but pinScopeKeys drops their
-    // map: key, so this is the only scope that can ever count them.
-    {
-        uid: 'ghosts',
-        name: 'Egzorcysta',
-        description: 'Odnajdź wszystkie duchy.',
-        icon: 'ghost',
-        group: 'zaswiaty',
-        type: 'pinsInScope',
-        scope: 'group:zaswiaty',
-        target: 0,
-        bonus: 15
     }
+    // ...
 ];
 
 export default achievementsSeed;
