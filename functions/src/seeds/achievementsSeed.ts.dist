@@ -34,42 +34,42 @@ const achievementsSeed: Achievement[] = [
     {
         uid: 'score-3',
         name: 'Zbieracz',
-        description: 'Zdobądź 300 punktów.',
+        description: 'Zdobądź 350 punktów.',
         icon: 'medal',
         group: 'score',
         type: 'points',
-        target: 300,
-        bonus: 15
+        target: 350,
+        bonus: 20
     },
     {
         uid: 'score-4',
         name: 'Łowca skarbów',
-        description: 'Zdobądź 500 punktów.',
+        description: 'Zdobądź 600 punktów.',
         icon: 'trophy',
         group: 'score',
         type: 'points',
-        target: 500,
-        bonus: 25
+        target: 600,
+        bonus: 30
     },
     {
         uid: 'score-5',
         name: 'Mistrz',
-        description: 'Zdobądź 750 punktów.',
-        icon: 'trophy',
-        group: 'score',
-        type: 'points',
-        target: 750,
-        bonus: 40
-    },
-    {
-        uid: 'score-6',
-        name: 'Legenda Fantasmagorii',
         description: 'Zdobądź 1000 punktów.',
-        icon: 'crown',
+        icon: 'trophy',
         group: 'score',
         type: 'points',
         target: 1000,
         bonus: 50
+    },
+    {
+        uid: 'score-6',
+        name: 'Legenda Fantasmagorii',
+        description: 'Zdobądź 1400 punktów.',
+        icon: 'crown',
+        group: 'score',
+        type: 'points',
+        target: 1400,
+        bonus: 75
     },
 
     // Answer owls - counter is user.amountOfCorrectAnswers (wrong answers do not count).
