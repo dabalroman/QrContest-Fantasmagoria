@@ -5,13 +5,15 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Pin from '@/models/Pin';
 import CollectedPin from '@/models/CollectedPin';
 import Question from '@/models/Question';
-import { PinType } from '@/Enum/PinType';
+import { entersCode, PinType } from '@/Enum/PinType';
 import { collectPinFunction } from '@/utils/functions';
 import useDynamicNavbar from '@/hooks/useDynamicNavbar';
+import useTypingAnimation from '@/hooks/useTypingAnimation';
 import PinIdentityStrip from '@/components/pin/PinIdentityStrip';
 import PhotoPinCollect, { PhotoPinCollectHandle } from '@/components/pin/PhotoPinCollect';
 import StarRating from '@/components/pin/StarRating';
 import SheetSection from '@/components/map/SheetSection';
+import CodeScannerOverlay from '@/components/CodeScannerOverlay';
 import scheduleAchievementToasts from '@/utils/scheduleAchievementToasts';
 import { getMap, MAP_AREA_LABELS } from '@/utils/maps';
 
@@ -42,17 +44,17 @@ export default function PinSheet ({
     onError: (error: Error) => void
 }) {
     const [loading, setLoading] = useState<boolean>(false);
+    const [scanning, setScanning] = useState<boolean>(false);
     const { register, handleSubmit, setValue, watch } = useForm({
         mode: 'onChange',
         defaultValues: { answer: '', talkName: '', rating: 0 }
     });
     const photoCollectRef = useRef<PhotoPinCollectHandle>(null);
+    const typeAnswer = useTypingAnimation((text) => setValue('answer', text, { shouldValidate: true }));
 
     const needsAnswer = pin.type === PinType.CODE || pin.type === PinType.RIDDLE
         || pin.type === PinType.GHOST;
-    // A ghost's riddle is asked in person and the prize IS a printed code, so it prompts like a QR pin
-    // rather than like a riddle.
-    const entersCode = pin.type === PinType.CODE || pin.type === PinType.GHOST;
+    const isCodeEntry = entersCode(pin.type);
     const isPhoto = pin.type === PinType.PHOTO;
     const isFeedback = pin.type === PinType.FEEDBACK;
     // The navbar centre collect button covers code/riddle/visit/feedback - photo submits via its own panel.
@@ -71,7 +73,7 @@ export default function PinSheet ({
     const codeLength = watch('answer').trim().length;
     const collectReady = (!isFeedback
         || (watch('rating') >= 1 && watch('talkName').trim().length >= MIN_TALK_NAME_LENGTH))
-        && (!entersCode || codeLength === CODE_LENGTH);
+        && (!isCodeEntry || codeLength === CODE_LENGTH);
 
     const collect = (data: { answer: string, talkName: string, rating: number }) => {
         setLoading(true);
@@ -149,22 +151,36 @@ export default function PinSheet ({
 
                 {canCollect && needsAnswer &&
                     <SheetSection
-                        title={entersCode ? 'Wpisz kod' : 'Rozwiąż zagadkę'}
+                        title={isCodeEntry ? 'Wpisz kod' : 'Rozwiąż zagadkę'}
                         loading={loading}
                         raised
                     >
                         <form onSubmit={handleSubmit(collect)}>
-                            <input
-                                type="text"
-                                maxLength={entersCode ? CODE_LENGTH : undefined}
-                                placeholder={entersCode ? 'ABCDEFGHIJ' : 'Twoja odpowiedź'}
-                                className="rounded-xl block w-full p-1 border-2 border-input-border text-center
-                                    bg-input-background text-text-accent uppercase text-2xl shadow-inner-input
-                                    tracking-wider font-semibold"
-                                {...register('answer', { setValueAs: (value: string) => value.trim() })}
-                            />
+                            <div className="relative">
+                                <input
+                                    type="text"
+                                    maxLength={isCodeEntry ? CODE_LENGTH : undefined}
+                                    placeholder={isCodeEntry ? 'ABCDEFGHIJ' : 'Twoja odpowiedź'}
+                                    className={'rounded-xl block w-full p-1 border-2 border-input-border'
+                                        + ' text-center bg-input-background text-text-accent uppercase'
+                                        + ' text-2xl shadow-inner-input tracking-wider font-semibold'
+                                        + (isCodeEntry ? ' px-12' : '')}
+                                    {...register('answer', { setValueAs: (value: string) => value.trim() })}
+                                />
+                                {isCodeEntry &&
+                                    <button
+                                        type="button"
+                                        onClick={() => setScanning(true)}
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-xl
+                                            text-text-accent"
+                                        aria-label="Skanuj kod"
+                                    >
+                                        <FontAwesomeIcon icon={faCamera}/>
+                                    </button>
+                                }
+                            </div>
                             <p className="text-center pt-2">
-                                {!entersCode
+                                {!isCodeEntry
                                     ? 'Kliknij przycisk, by potwierdzić.'
                                     : codeLength === CODE_LENGTH
                                         ? 'Gotowe, możesz potwierdzić'
@@ -230,6 +246,16 @@ export default function PinSheet ({
                     </SheetSection>
                 }
             </div>
+
+            {scanning &&
+                <CodeScannerOverlay
+                    onCode={(code) => {
+                        setScanning(false);
+                        typeAnswer(code);
+                    }}
+                    onCancel={() => setScanning(false)}
+                />
+            }
         </>
     );
 }

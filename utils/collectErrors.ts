@@ -1,4 +1,5 @@
 import { StringMap } from '@/types/global';
+import { entersCode, PinType } from '@/Enum/PinType';
 
 // Keys are the HttpsError messages collectPinHandle throws. Shared by /collect and the map's pin sheet.
 const collectErrorsDictionary: StringMap = {
@@ -15,6 +16,12 @@ const collectErrorsDictionary: StringMap = {
     'talkName is invalid': 'Podaj nazwę prelekcji - od 10 do 255 znaków.'
 };
 
-export function getCollectErrorMessage (error: Error): string {
+// A code/ghost pin rejects a mistyped CODE, not a wrong riddle answer - the server throws the same
+// 'wrong answer' for both, so the pin type is what tells them apart.
+export function getCollectErrorMessage (error: Error, pinType?: PinType): string {
+    if (error.message === 'wrong answer' && pinType && entersCode(pinType)) {
+        return 'Błędny kod!';
+    }
+
     return collectErrorsDictionary[error.message] ?? 'Błąd aplikacji, spróbuj ponownie.';
 }

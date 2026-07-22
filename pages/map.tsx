@@ -19,6 +19,7 @@ import { UserRole } from '@/Enum/UserRole';
 import { defaultMapId, getMap } from '@/utils/maps';
 import { getStoredLastMapId, saveLastMapId } from '@/utils/mapView';
 import { getCollectErrorMessage } from '@/utils/collectErrors';
+import { PinType } from '@/Enum/PinType';
 
 // Leaflet touches window at module scope and /map prerenders at build → client-only.
 const MapCanvas = dynamic(() => import('@/components/map/MapCanvas'), {
@@ -119,8 +120,8 @@ export default function MapPage () {
         }
     };
 
-    const onCollectError = (error: Error) => {
-        toast.error(getCollectErrorMessage(error));
+    const onCollectError = (error: Error, pinType?: PinType) => {
+        toast.error(getCollectErrorMessage(error, pinType));
         console.error(error.message);
     };
 
@@ -193,7 +194,7 @@ export default function MapPage () {
                     collectedPin={collectedByUid.get(selectedPin.uid) ?? null}
                     onClose={() => setSelectedPin(null)}
                     onCollected={onPinCollected}
-                    onError={onCollectError}
+                    onError={(error) => onCollectError(error, selectedPin.type)}
                 />
             }
 

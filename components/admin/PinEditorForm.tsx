@@ -2,16 +2,17 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faQrcode, faXmark } from '@fortawesome/free-solid-svg-icons';
+import { faCamera, faFloppyDisk, faXmark } from '@fortawesome/free-solid-svg-icons';
 import Pin, { PinCoords } from '@/models/Pin';
 import PinGroup from '@/models/PinGroup';
-import { getPinTypeFriendlyName, PinType } from '@/Enum/PinType';
+import { entersCode, getPinTypeFriendlyName, PinType } from '@/Enum/PinType';
 import { CardTier, getCardTierFriendlyName, getCardTierValue } from '@/Enum/CardTier';
 import { RawPinAuthoredFields } from '@/models/Raw';
 import { deletePinFunction, upsertPinFunction } from '@/utils/functions';
-import Panel from '@/components/Panel';
+import SheetSection from '@/components/map/SheetSection';
+import useDynamicNavbar from '@/hooks/useDynamicNavbar';
 import Button from '@/components/Button';
-import CodeScanner from '@/components/CodeScanner';
+import CodeScannerOverlay from '@/components/CodeScannerOverlay';
 
 type FormValues = {
     name: string;
@@ -31,12 +32,6 @@ type FormValues = {
 
 function needsCode (type: PinType): boolean {
     return type === PinType.CODE || type === PinType.RIDDLE || type === PinType.GHOST;
-}
-
-// A ghost stores a printed 10-char code, not a free-text riddle answer - so it gets the code label,
-// and with it the scan-to-fill button that is how the real code gets entered once the QR is printed.
-function entersCode (type: PinType): boolean {
-    return type === PinType.CODE || type === PinType.GHOST;
 }
 
 // Points are picked by rarity, reusing the card tier scale (Enum/CardTier). The pin still stores a
@@ -167,6 +162,15 @@ export default function PinEditorForm ({
         }
     };
 
+    // `hidden` toggling on placement is what re-captures onClick: useDynamicNavbar keeps onClick out of
+    // its deps, so without that the centre button would still submit the pre-move `coords`.
+    useDynamicNavbar({
+        icon: faFloppyDisk,
+        onClick: handleSubmit(onSubmit),
+        disabledSides: true,
+        disabledCenter: hidden || saving || deleting
+    });
+
     const onDelete = async () => {
         if (!pin) {
             return;
@@ -209,7 +213,7 @@ export default function PinEditorForm ({
                     <FontAwesomeIcon icon={faXmark} size="2x"/>
                 </button>
 
-                <Panel title={pin ? 'Edycja pinezki' : 'Nowa pinezka'} loading={saving || deleting}>
+                <SheetSection title={pin ? 'Edycja pinezki' : 'Nowa pinezka'} loading={saving || deleting}>
                     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-3">
                         <label className="block">
                             <span className="block pb-1">Nazwa</span>
@@ -310,10 +314,10 @@ export default function PinEditorForm ({
                                     <button
                                         type="button"
                                         onClick={() => setScanning(true)}
-                                        className="absolute right-2 top-1/2 -translate-y-1/2 text-xl text-text-accent"
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-xl text-text-accent"
                                         aria-label="Skanuj kod"
                                     >
-                                        <FontAwesomeIcon icon={faQrcode}/>
+                                        <FontAwesomeIcon icon={faCamera}/>
                                     </button>
                                 </div>
                             </div>
@@ -348,37 +352,35 @@ export default function PinEditorForm ({
                             </p>
                         }
 
-                        <Button type="submit" className="w-full mt-2">Zapisz</Button>
+                        <div className="mt-2 flex flex-col gap-3">
+                            {pin &&
+                                <Button
+                                    type="button"
+                                    className="w-full"
+                                    style={{ background: '#660000', borderColor: '#BB0000' }}
+                                    onClick={onDelete}
+                                >
+                                    Usuń pinezkę
+                                </Button>
+                            }
 
-                        {pin &&
-                            <Button
-                                type="button"
-                                className="w-full"
-                                style={{ background: '#660000', borderColor: '#BB0000' }}
-                                onClick={onDelete}
-                            >
-                                Usuń pinezkę
+                            <Button type="button" className="w-full" onClick={onCancel}>
+                                Anuluj
                             </Button>
-                        }
+                        </div>
                     </form>
-                </Panel>
+                </SheetSection>
             </div>
 
             {scanning &&
-                <div className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-4 bg-black/90 p-4">
-                    <CodeScanner
-                        allowBareCode
-                        className="w-full max-w-lg rounded-2xl"
-                        onCode={(code) => {
-                            setValue('code', code, { shouldDirty: true });
-                            setScanning(false);
-                            toast.success('Kod zeskanowany.');
-                        }}
-                    />
-                    <Button type="button" className="w-full max-w-lg" onClick={() => setScanning(false)}>
-                        Anuluj
-                    </Button>
-                </div>
+                <CodeScannerOverlay
+                    allowBareCode
+                    onCode={(code) => {
+                        setValue('code', code, { shouldDirty: true });
+                        setScanning(false);
+                    }}
+                    onCancel={() => setScanning(false)}
+                />
             }
         </>
     );

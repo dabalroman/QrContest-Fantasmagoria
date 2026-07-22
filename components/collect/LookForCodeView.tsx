@@ -1,15 +1,15 @@
 import Panel from '../Panel';
 import { SubmitErrorHandler, useForm } from 'react-hook-form';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { collectPinFunction } from '@/utils/functions';
 import CollectedPin from '@/models/CollectedPin';
 import Question from '@/models/Question';
 import useDynamicNavbar from '@/hooks/useDynamicNavbar';
+import useTypingAnimation from '@/hooks/useTypingAnimation';
 import { faCamera, faCheck } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Page } from '@/Enum/Page';
 import Button, { ButtonState } from '@/components/Button';
-import LinkButton from '@/components/LinkButton';
+import CodeScannerOverlay from '@/components/CodeScannerOverlay';
 import toast from 'react-hot-toast';
 import scheduleAchievementToasts from '@/utils/scheduleAchievementToasts';
 import PinMarkerIcon from '@/components/map/PinMarkerIcon';
@@ -28,8 +28,7 @@ export default function LookForCodeView ({
     onCodeInvalid: (error: Error) => void
 }) {
     const [loading, setLoading] = useState<boolean>(false);
-    const typingAnimationIntervalRef = useRef<number | null>(null);
-    const [typingAnimationText, setTypingAnimationText] = useState<string>('');
+    const [scanning, setScanning] = useState<boolean>(false);
 
     const {
         register,
@@ -78,36 +77,23 @@ export default function LookForCodeView ({
     // one tap away from the collect screen.
     useDynamicNavbar({});
 
-    useEffect(() => {
-        if (code === null || code.length !== 10) {
-            return;
+    const typeCode = useTypingAnimation((text) => setValue(
+        'code',
+        text,
+        {
+            shouldValidate: true,
+            shouldDirty: true,
+            shouldTouch: true
         }
-
-        if (typingAnimationText.length >= 10 && typingAnimationIntervalRef.current !== null) {
-            window.clearInterval(typingAnimationIntervalRef.current as number);
-            return;
-        }
-
-        if (typingAnimationIntervalRef.current !== null) {
-            return;
-        }
-
-        typingAnimationIntervalRef.current = window.setInterval(() => {
-            setTypingAnimationText((value) => code.slice(0, value.length + 1));
-        }, 150);
-    }, [code, currentInput, setValue, typingAnimationText]);
+    ));
 
     useEffect(() => {
-        setValue(
-            'code',
-            typingAnimationText,
-            {
-                shouldValidate: true,
-                shouldDirty: true,
-                shouldTouch: true
-            }
-        );
-    }, [setValue, typingAnimationText]);
+        if (code === null || code.length !== CODE_LENGTH) {
+            return;
+        }
+
+        typeCode(code);
+    }, [code, typeCode]);
 
     return (
         <div>
@@ -120,21 +106,31 @@ export default function LookForCodeView ({
 
             <Panel title="Przepisz kod QR" loading={loading}>
                 <form onSubmit={handleSubmit(collectCode, onInvalidInput)}>
-                    <input type="text" placeholder="ABCDEFGHIJ" maxLength={CODE_LENGTH}
-                           className="rounded-xl block w-full p-1 border-2 border-input-border text-center
-                               bg-input-background text-text-accent uppercase text-2xl shadow-inner-input
-                               tracking-wider font-semibold"
-                           {...register(
-                               'code',
-                               {
-                                   setValueAs: (value: string) => value.trim(),
-                                   required: CODE_HINT,
-                                   pattern: {
-                                       value: /^[A-z0-9]{10}$/,
-                                       message: CODE_HINT
+                    <div className="relative">
+                        <input type="text" placeholder="ABCDEFGHIJ" maxLength={CODE_LENGTH}
+                               className="rounded-xl block w-full p-1 px-12 border-2 border-input-border
+                                   text-center bg-input-background text-text-accent uppercase text-2xl
+                                   shadow-inner-input tracking-wider font-semibold"
+                               {...register(
+                                   'code',
+                                   {
+                                       setValueAs: (value: string) => value.trim(),
+                                       required: CODE_HINT,
+                                       pattern: {
+                                           value: /^[A-z0-9]{10}$/,
+                                           message: CODE_HINT
+                                       }
                                    }
-                               }
-                           )} />
+                               )} />
+                        <button
+                            type="button"
+                            onClick={() => setScanning(true)}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-xl text-text-accent"
+                            aria-label="Skanuj kod"
+                        >
+                            <FontAwesomeIcon icon={faCamera}/>
+                        </button>
+                    </div>
 
                     <p className="text-center pt-2">
                         {
@@ -159,10 +155,20 @@ export default function LookForCodeView ({
             <Panel title="Zeskanuj kod QR">
                 <p>Nie chcesz wpisywać <PinMarkerIcon type={PinType.CODE} inline/> kodu ręcznie? Zeskanuj go
                     aparatem. Możesz też użyć dowolnej innej aplikacji do skanowania.</p>
-                <LinkButton href={Page.SCANNER} className="w-full mt-4">
+                <Button onClick={() => setScanning(true)} className="w-full mt-4">
                     <FontAwesomeIcon icon={faCamera}/> Skanuj aparatem
-                </LinkButton>
+                </Button>
             </Panel>
+
+            {scanning &&
+                <CodeScannerOverlay
+                    onCode={(scannedCode) => {
+                        setScanning(false);
+                        typeCode(scannedCode);
+                    }}
+                    onCancel={() => setScanning(false)}
+                />
+            }
         </div>
     );
 }

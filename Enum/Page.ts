@@ -4,7 +4,6 @@ export enum Page {
     COLLECTION = '/collection',
     DASHBOARD = '/dashboard',
     RANKING = '/ranking',
-    SCANNER = '/scanner',
     FAQ = '/faq',
     RULEBOOK = '/rulebook',
     GUILD = '/guild',
