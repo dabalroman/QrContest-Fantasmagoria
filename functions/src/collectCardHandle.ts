@@ -102,7 +102,7 @@ export const collectCardHandle = onCall(async (req): Promise<{
         // array - a retried-then-discarded run would otherwise surface phantom grants (phantom toasts).
         const grants = await db.runTransaction(async (transaction) => {
             // Re-read the user transactionally FIRST (before any write) so concurrent same-user awards
-            // serialize — see readUserInTransaction. Shadows the pre-transaction snapshot above.
+            // serialize - see readUserInTransaction. Shadows the pre-transaction snapshot above.
             const user = await readUserInTransaction(transaction, userRef);
 
             //Collect card

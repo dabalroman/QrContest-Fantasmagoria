@@ -58,7 +58,7 @@ export const reviewPhotoHandle = onCall(async (req): Promise<{ status: string, a
                 throw new HttpsError('failed-precondition', 'submission is not pending');
             }
 
-            // Both reads (submission above, user here) precede every write below — the read-set on the
+            // Both reads (submission above, user here) precede every write below - the read-set on the
             // user doc serializes concurrent same-user awards (see readUserInTransaction).
             const user = await readUserInTransaction(transaction, userRef);
 

@@ -74,7 +74,7 @@ export const answerQuestionHandle = onCall(async (req): Promise<{
             // the write below is a plain update on an existing doc, so it carries no precondition of its
             // own (unlike collectPinHandle, whose transaction.create throws ALREADY_EXISTS). Without this
             // read putting the doc in the read-set, two near-simultaneous answers to the same question
-            // both pass the pre-check and both commit — double score and double counters, no self-heal.
+            // both pass the pre-check and both commit - double score and double counters, no self-heal.
             const freshCollectedQuestions = (await transaction.get(collectedQuestionsRef))
                 .data() as CollectedQuestions;
 
@@ -83,7 +83,7 @@ export const answerQuestionHandle = onCall(async (req): Promise<{
                 throw new HttpsError('failed-precondition', 'question is already answered');
             }
 
-            // Both reads precede every write below — the read-set on the user doc serializes concurrent
+            // Both reads precede every write below - the read-set on the user doc serializes concurrent
             // same-user awards (see readUserInTransaction). Shadows the pre-transaction snapshot above.
             const user = await readUserInTransaction(transaction, userRef);
 

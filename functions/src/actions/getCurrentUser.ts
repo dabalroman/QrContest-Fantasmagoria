@@ -31,10 +31,10 @@ export default async function getCurrentUser(
 
 // Transactional re-read of the user doc. Its point is the READ-SET: the getCurrentUser read above runs
 // before any transaction, so concurrent same-user awards share no read on the user doc and don't
-// serialize — two awards crossing one achievement threshold would each fold the bonus into their own
+// serialize - two awards crossing one achievement threshold would each fold the bonus into their own
 // increment (a permanent double-count). Reading the user inside the transaction makes overlapping awards
 // conflict and retry against fresh state. MUST be the first op in the transaction callback, before any
-// transaction write — Firestore forbids a read after a write.
+// transaction write - Firestore forbids a read after a write.
 export async function readUserInTransaction(
     transaction: Transaction,
     userRef: DocumentReference<User>

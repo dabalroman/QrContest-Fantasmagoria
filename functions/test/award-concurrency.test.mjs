@@ -1,11 +1,11 @@
 // Regression net for task #55: awardPoints had no transactional read on the user doc, so two awards
 // for the SAME user that overlap in time did not serialize. Each read the same pre-award snapshot,
 // independently saw an achievement threshold as newly crossed, and folded the bonus into its own
-// score increment — a permanent double-count that does not self-heal (increments compose).
+// score increment - a permanent double-count that does not self-heal (increments compose).
 //
 // ⚠️ The two awards MUST come from two DIFFERENT callables. The functions emulator queues concurrent
 // invocations of the SAME function, so racing collectPinHandle against itself silently serializes and
-// the second call reads post-commit state — the race never reproduces and the test passes even against
+// the second call reads post-commit state - the race never reproduces and the test passes even against
 // the unfixed code. Racing reviewPhotoHandle against collectPinHandle (the task's own failure scenario)
 // puts the two awards in different workers, which genuinely overlap.
 
@@ -47,7 +47,7 @@ test('two overlapping same-user awards crossing a threshold grant the bonus exac
     const adminToken = await registerAdmin('race-admin', 'RaceAdmin');
 
     // Parked so BOTH awards, evaluated against the same pre-award snapshot, independently see
-    // ACH_SCORE_1 as newly crossed — a single +5 award lands exactly on the cup.
+    // ACH_SCORE_1 as newly crossed - a single +5 award lands exactly on the cup.
     const start = ACH_SCORE_1.target - PIN_VISIT_VALUE;
     await seedUser(uid, 'RaceUser', { score: start });
 
@@ -84,7 +84,7 @@ test('two overlapping same-user awards crossing a threshold grant the bonus exac
 });
 
 // Task #54: answerQuestionHandle's "already answered" guard was a non-transactional .get() before the
-// transaction, and the in-transaction write is a plain update on an existing doc — so it carried no
+// transaction, and the in-transaction write is a plain update on an existing doc - so it carried no
 // precondition (unlike collectPinHandle's transaction.create). Two answers to the same question could
 // both pass the pre-check and both commit: doubled score and counters.
 test('answering the same question twice at once awards exactly once', async () => {
