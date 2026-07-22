@@ -5,8 +5,8 @@ const PIN_TYPE_DESCRIPTIONS: Record<PinType, string> = {
     [PinType.CODE]: 'Zeskanuj kod QR ukryty gdzieś w pobliżu.',
     [PinType.RIDDLE]: 'Rozwiąż zagadkę i wpisz hasło.',
     [PinType.VISIT]: 'Po prostu dotrzyj na miejsce.',
-    [PinType.FEEDBACK]: 'Oceń prelekcję, której wysłuchałeś.',
-    [PinType.PHOTO]: 'Przyślij zdjęcie - organizator je zatwierdzi.'
+    [PinType.FEEDBACK]: 'Oceń wysłuchaną prelekcję.',
+    [PinType.PHOTO]: 'Zrób zdjęcie i wyślij je z aplikacji.'
 };
 
 export default function PinTypeLegend () {
