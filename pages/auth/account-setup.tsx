@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { doc, getDoc } from '@firebase/firestore';
 import debounce from 'lodash.debounce';
 import Metatags from '@/components/Metatags';
@@ -10,7 +10,7 @@ import ScreenTitle from '@/components/ScreenTitle';
 import Button from '@/components/Button';
 import { Page } from '@/Enum/Page';
 import useDynamicNavbar from '@/hooks/useDynamicNavbar';
-import { faArrowLeft, faCheck, faStar, faX } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft, faCheck, faMapLocationDot, faStar, faX } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useForm } from 'react-hook-form';
 import { setupAccountFunction } from '@/utils/functions';
@@ -23,15 +23,21 @@ export default function AccountSetupPage () {
     const [loading, setLoading] = useState<boolean>(false);
     const [checking, setChecking] = useState<boolean>(false);
     const [isValid, setIsValid] = useState<boolean>(false);
+    const [step, setStep] = useState<'nick' | 'welcome'>('nick');
+    const [isVeteran, setIsVeteran] = useState<boolean>(false);
 
-    useDynamicNavbar({
-        onlyCenter: true,
-        icon: faArrowLeft,
-        onClick: () => router.back()
-    });
+    // userReady flips from the useUserData snapshot the moment the handler commits, i.e. while the
+    // callable is still awaiting - so this has to be a ref, armed before the await, or the redirect
+    // below fires mid-registration and eats the welcome step.
+    const registeringRef = useRef<boolean>(false);
+
+    useDynamicNavbar(step === 'welcome'
+        ? { onlyCenter: true, icon: faMapLocationDot, href: Page.MAP }
+        : { onlyCenter: true, icon: faArrowLeft, onClick: () => router.back() }
+    );
 
     useEffect(() => {
-        if (userReady) {
+        if (userReady && !registeringRef.current) {
             router.push(Page.MAP)
                 .then();
         }
@@ -49,12 +55,12 @@ export default function AccountSetupPage () {
         register,
         handleSubmit,
         formState: { errors },
-        reset,
         watch
     } = useForm({
         mode: 'onChange',
         defaultValues: {
-            'username': ''
+            'username': '',
+            'isReturningPlayer': false
         }
     });
 
@@ -84,14 +90,20 @@ export default function AccountSetupPage () {
             return;
         }
 
+        const isReturningPlayer = data.isReturningPlayer === true;
+
+        registeringRef.current = true;
+        setIsVeteran(isReturningPlayer);
         setLoading(true);
+
         try {
-            await setupAccountFunction({ username: data.username });
+            await setupAccountFunction({ username: data.username, isReturningPlayer });
             toast.success('Rejestracja przebiegła pomyślnie!');
-            await router.push(Page.MAP);
+            setStep('welcome');
             setLoading(false);
-            reset();
         } catch (error) {
+            registeringRef.current = false;
+
             if((error as Error).message === 'username does not meet requirements') {
                 toast.error('Ten nick nie spełnia wymagań.');
             } else {
@@ -106,6 +118,41 @@ export default function AccountSetupPage () {
     const onError = async (data: any) => {
         toast.error(data.username.message);
     };
+
+    if (step === 'welcome') {
+        return (
+            <main className="grid grid-rows-layout items-center min-h-screen p-4">
+                <Metatags title="Rejestracja"/>
+                <ScreenTitle>Rejestracja</ScreenTitle>
+                <div>
+                    {isVeteran && <Panel title={'Witaj ponownie!'}>
+                        <p className="text-justify">
+                            Cieszymy się, że wracasz do Gry Konwentowej!<br/>
+                            W tej edycji nie musisz tropić kodów po całym konwencie.
+                            Większość zadań to zagadki i miejsca do odwiedzenia,
+                            a kody czekają przeważnie na widoku.
+                            Jeśli któryś jest ukryty, to mapa pokaże Ci okolicę, w której go szukać.
+                        </p>
+                    </Panel>}
+                    <Panel title={'Konto gotowe!'}>
+                        <section>
+                            <p className="text-justify">
+                                Gra Konwentowa toczy się na mapie w aplikacji
+                                - zbierasz pinezki i punkty, odkrywając konwent krok po kroku.
+                                Sprawdź mapę, by wybrać gdzie wyruszysz najpierw!
+                            </p>
+                            <Button
+                                className="w-full mt-4"
+                                onClick={() => router.push(Page.MAP)}
+                            >
+                                Zaczynamy!
+                            </Button>
+                        </section>
+                    </Panel>
+                </div>
+            </main>
+        );
+    }
 
     return (
         <main className="grid grid-rows-layout items-center min-h-screen p-4">
@@ -152,9 +199,16 @@ export default function AccountSetupPage () {
                                 })
                             }
                         </p>
+                        <div className="mt-6 mb-2">
+                            <p className="text-left pb-3">Czy grasz z nami po raz kolejny?</p>
+                            <label className="flex items-center justify-center gap-2">
+                                <input type="checkbox" className="w-5 h-5" {...register('isReturningPlayer')}/>
+                                <span>Tak, znam Grę Konwentową z poprzednich lat</span>
+                            </label>
+                        </div>
                         <Button
                             type="submit"
-                            className="w-full mt-2"
+                            className="w-full mt-4"
                         >
                             Gotowe
                         </Button>

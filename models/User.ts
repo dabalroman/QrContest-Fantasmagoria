@@ -30,6 +30,7 @@ export default class User extends FirebaseModel {
     winnerInRound: string | null;
     updatedAt: Date;
     lastGuildChangeAt: Date;
+    isReturningPlayer: boolean;
 
     constructor (
         uid: string,
@@ -47,6 +48,7 @@ export default class User extends FirebaseModel {
         winnerInRound: string | null = null,
         updatedAt: Date = new Date(),
         lastGuildChangeAt: Date = new Date(),
+        isReturningPlayer: boolean = false,
     ) {
         super();
 
@@ -65,6 +67,7 @@ export default class User extends FirebaseModel {
         this.winnerInRound = winnerInRound;
         this.updatedAt = updatedAt;
         this.lastGuildChangeAt = lastGuildChangeAt;
+        this.isReturningPlayer = isReturningPlayer;
     }
 
     protected static toFirestore (data: User): object {
@@ -115,7 +118,8 @@ export default class User extends FirebaseModel {
             data.role,
             data.winnerInRound,
             data.updatedAt.toDate(),
-            data.lastGuildChangeAt.toDate()
+            data.lastGuildChangeAt.toDate(),
+            data.isReturningPlayer ?? false
         );
     }
 

@@ -37,6 +37,7 @@ export type User = {
     collectedPinsByScope: Record<string, number>,
     achievements: UserAchievements,
     role: UserRole,
+    isReturningPlayer: boolean,
     memberOf: GuildUid | null,
     winnerInRound: string | null
     updatedAt: Timestamp | FieldValue | number,

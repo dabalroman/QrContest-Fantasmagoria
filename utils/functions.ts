@@ -60,7 +60,7 @@ export const answerQuestionFunction: HttpsCallable<
 > = httpsCallable(functions, 'answerQuestionHandle');
 
 export const setupAccountFunction: HttpsCallable<
-    { username: string },
+    { username: string, isReturningPlayer: boolean },
     {}
 > = httpsCallable(functions, 'setupAccountHandle');
 

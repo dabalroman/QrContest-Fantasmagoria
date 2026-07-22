@@ -69,6 +69,8 @@ export const setupAccountHandle = onCall(async (req): Promise<{ user: User }> =>
         collectedPinsByScope: {},
         achievements: {},
         role: roleForEmail(auth.token.email, auth.token.email_verified),
+        // Coerced, not validated: a stale client omitting the field must not fail registration.
+        isReturningPlayer: data.isReturningPlayer === true,
         memberOf: null,
         winnerInRound: null,
         updatedAt: FieldValue.serverTimestamp(),

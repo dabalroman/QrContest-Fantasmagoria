@@ -77,6 +77,7 @@ test('registration creates a complete user doc, username reservation and ranking
         collectedPinsByScope: {},
         achievements: {},
         role: 'user',
+        isReturningPlayer: false,
         memberOf: null,
         winnerInRound: null
     }, 'the persisted user doc');
@@ -116,6 +117,90 @@ test('registering the same uid twice is rejected', async () => {
         () => setupAccount('dup-uid', 'DupUidTwo', { email: UNLISTED_EMAIL, emailVerified: true }),
         /user uid exist already/
     );
+});
+
+// #63. The flag is a post-event stat, not a gate, so the handler coerces instead of throwing: a
+// player on a cached bundle that predates the field must still be able to register at the door.
+test('the returning-player flag is persisted as sent', async () => {
+    for (const [index, sent] of [true, false].entries()) {
+        const { stored } = await setupAccount(
+            `veteran-${index}`, `Veteran${index}`,
+            { email: `veteran-${index}@example.test`, emailVerified: true },
+            { isReturningPlayer: sent }
+        );
+
+        assert.equal(stored.isReturningPlayer, sent, `isReturningPlayer sent as ${sent}`);
+    }
+});
+
+test('a payload with no returning-player field still registers, defaulting to false', async () => {
+    const { stored } = await setupAccount(
+        'veteran-absent', 'VeteranAbsent', { email: UNLISTED_EMAIL, emailVerified: true }
+    );
+
+    assert.equal(stored.isReturningPlayer, false);
+});
+
+test('a junk returning-player value is coerced to false and never rejects the registration', async () => {
+    const junk = ['true', 1, 0, null, {}, [], 'yes'];
+
+    for (const [index, sent] of junk.entries()) {
+        const { stored } = await setupAccount(
+            `veteran-junk-${index}`, `VeteranJunk${index}`,
+            { email: `veteran-junk-${index}@example.test`, emailVerified: true },
+            { isReturningPlayer: sent }
+        );
+
+        assert.equal(stored.isReturningPlayer, false, `isReturningPlayer sent as ${JSON.stringify(sent)}`);
+    }
+});
+
+test('the returning-player flag does not contaminate the rest of the user doc', async () => {
+    const uid = 'veteran-clean';
+    const { stored } = await setupAccount(
+        uid, 'VeteranClean',
+        { email: configuredEmails('ADMIN_EMAILS')[0], emailVerified: true },
+        { isReturningPlayer: true }
+    );
+
+    const { updatedAt, lastGuildChangeAt, isReturningPlayer, ...fields } = stored;
+
+    assert.equal(isReturningPlayer, true, 'the flag itself');
+    assert.deepEqual(fields, {
+        uid,
+        username: 'VeteranClean',
+        score: 0,
+        pendingScore: 0,
+        amountOfCollectedCards: 0,
+        amountOfAnsweredQuestions: 0,
+        amountOfCorrectAnswers: 0,
+        amountOfCollectedPins: 0,
+        collectedPinsByScope: {},
+        achievements: {},
+        role: 'admin',
+        memberOf: null,
+        winnerInRound: null
+    }, 'every other field, including the role, is unaffected by the flag');
+});
+
+test('the returning-player flag cannot be flipped by re-registering', async () => {
+    await setupAccount(
+        'veteran-reflip', 'VeteranReflip',
+        { email: UNLISTED_EMAIL, emailVerified: true },
+        { isReturningPlayer: false }
+    );
+
+    await assert.rejects(
+        () => setupAccount(
+            'veteran-reflip', 'VeteranReflipTwo',
+            { email: UNLISTED_EMAIL, emailVerified: true },
+            { isReturningPlayer: true }
+        ),
+        /user uid exist already/
+    );
+
+    const stored = (await db.collection('users').doc('veteran-reflip').get()).data();
+    assert.equal(stored.isReturningPlayer, false, 'the original value survived the rejected call');
 });
 
 test('registering a username someone already took is rejected', async () => {
