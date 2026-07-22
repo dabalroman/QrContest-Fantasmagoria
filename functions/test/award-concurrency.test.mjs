@@ -17,13 +17,14 @@ import {
 } from './emulator.mjs';
 import {
     seedFixture, seedUser, seedPhotoObject,
-    ROUND_UID,
+    ROUND_UID, GUILD_UID, CARD_CODE, CARD_VALUE, QUESTION_VALUE, QUESTION_CORRECT,
     PIN_VISIT_UID, PIN_VISIT_VALUE, PIN_PHOTO_UID, PIN_PHOTO_VALUE,
     ACH_SCORE_1
 } from './fixtures.mjs';
 
 const userDoc = (uid) => db.collection('users').doc(uid).get().then((s) => s.data());
 const roundUser = (uid) => db.collection('ranking').doc(ROUND_UID).get().then((s) => s.data().users[uid]);
+const guildDoc = () => db.collection('guilds').doc(GUILD_UID).get().then((s) => s.data());
 
 async function registerAdmin (uid, username) {
     const token = await createAuthUserToken(uid);
@@ -80,4 +81,42 @@ test('two overlapping same-user awards crossing a threshold grant the bonus exac
 
     // The approval cleared the pending hold; it is never left dangling by the retry.
     assert.equal(user.pendingScore, 0, 'pendingScore cleared');
+});
+
+// Task #54: answerQuestionHandle's "already answered" guard was a non-transactional .get() before the
+// transaction, and the in-transaction write is a plain update on an existing doc — so it carried no
+// precondition (unlike collectPinHandle's transaction.create). Two answers to the same question could
+// both pass the pre-check and both commit: doubled score and counters.
+test('answering the same question twice at once awards exactly once', async () => {
+    const uid = 're-answer-user';
+    const token = await createAuthUserToken(uid);
+
+    await callCallable('setupAccountHandle', { username: 'ReAnswer' }, token);
+    await callCallable('joinGuildHandle', { guild: GUILD_UID }, token);
+
+    const collect = await callCallable('collectCardHandle', { code: CARD_CODE }, token);
+    assert.ok(collect.question, 'expected the card to carry a question');
+
+    const answer = { uid: collect.question.uid, answer: QUESTION_CORRECT };
+    const results = await Promise.allSettled([
+        callCallable('answerQuestionHandle', answer, token),
+        callCallable('answerQuestionHandle', answer, token)
+    ]);
+
+    const accepted = results.filter((r) => r.status === 'fulfilled');
+    assert.equal(accepted.length, 1, 'exactly one of the two answers is accepted');
+
+    const expected = CARD_VALUE + QUESTION_VALUE;
+
+    const user = await userDoc(uid);
+    const round = await roundUser(uid);
+    const guild = await guildDoc();
+
+    assert.equal(user.score, expected, 'user.score (question counted once)');
+    assert.equal(round.score, expected, 'ranking round copy');
+    assert.equal(guild.members[uid].score, expected, 'guild member copy');
+    assert.equal(guild.score, expected, 'guild aggregate');
+
+    assert.equal(user.amountOfAnsweredQuestions, 1, 'answered counter incremented once');
+    assert.equal(user.amountOfCorrectAnswers, 1, 'correct-answer counter incremented once');
 });

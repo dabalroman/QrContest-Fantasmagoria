@@ -70,8 +70,21 @@ export const answerQuestionHandle = onCall(async (req): Promise<{
         // The grant list MUST be the return value of the transaction callback, never an outer closure
         // array — a retried-then-discarded run would otherwise surface phantom grants (phantom toasts).
         const grants = await db.runTransaction(async (transaction) => {
-            // Re-read the user transactionally FIRST (before any write) so concurrent same-user awards
-            // serialize — see readUserInTransaction. Shadows the pre-transaction snapshot above.
+            // Re-assert "not yet answered" TRANSACTIONALLY. The pre-transaction check above cannot hold:
+            // the write below is a plain update on an existing doc, so it carries no precondition of its
+            // own (unlike collectPinHandle, whose transaction.create throws ALREADY_EXISTS). Without this
+            // read putting the doc in the read-set, two near-simultaneous answers to the same question
+            // both pass the pre-check and both commit — double score and double counters, no self-heal.
+            const freshCollectedQuestions = (await transaction.get(collectedQuestionsRef))
+                .data() as CollectedQuestions;
+
+            if (!freshCollectedQuestions?.[questionUid] || freshCollectedQuestions[questionUid].answer !== null) {
+                logger.warn('answerQuestionHandle', 'question is already answered', {questionUid, uid});
+                throw new HttpsError('failed-precondition', 'question is already answered');
+            }
+
+            // Both reads precede every write below — the read-set on the user doc serializes concurrent
+            // same-user awards (see readUserInTransaction). Shadows the pre-transaction snapshot above.
             const user = await readUserInTransaction(transaction, userRef);
 
             //Save user answered question
@@ -97,6 +110,9 @@ export const answerQuestionHandle = onCall(async (req): Promise<{
             achievements: grants
         };
     } catch (error) {
+        if (error instanceof HttpsError) {
+            throw error;
+        }
         logger.error('answerQuestionHandle', 'error while answering the question: ' + error);
         throw new HttpsError('aborted', 'error while answering the question');
     }

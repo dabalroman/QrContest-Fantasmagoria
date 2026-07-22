@@ -499,19 +499,21 @@ Firestore transactions and the score fan-out — nothing is mocked.
   **node** process (`pgrep -f "bin/firebase emulators:start"`), not the `sh -c` wrapper above it — the
   wrapper does not forward SIGINT, so signalling it looks like it worked and the emulator keeps running.
   The pre-commit hook also runs the FE build, so stop `npm run dev` too or the two contend on `.next`.
-- ⚠️ **A concurrency test must race two DIFFERENT callables.** The functions emulator queues concurrent
-  invocations of the *same* function, so firing one callable twice via `Promise.all` silently serializes —
-  the second call reads post-commit state, the race never happens, and the test passes **against the unfixed
-  code**. Task #55's net (`award-concurrency.test.mjs`) hit exactly this: `collectPinHandle` against itself
-  was a false green; `reviewPhotoHandle` against `collectPinHandle` reproduces. **Always falsify a
-  concurrency test** — restore the pre-fix file (`git checkout HEAD -- <file>`), rebuild, run the single test
-  (`./scripts/emu-test.sh node --test functions/test/<x>.test.mjs`) and confirm it FAILS before trusting it.
+- ⚠️ **ALWAYS falsify a concurrency test** — restore the pre-fix file (`git checkout HEAD -- <file>`), rebuild,
+  run just that test (`./scripts/emu-test.sh node --test functions/test/<x>.test.mjs`) and confirm it **FAILS**
+  before trusting it. Whether two `Promise.all` calls actually overlap in the emulator is **not reliable**:
+  racing a callable against *itself* sometimes serializes (the second call then reads post-commit state, the
+  race never happens, and the test passes against the unfixed code — a false green). Both outcomes are on
+  record in `award-concurrency.test.mjs`: #55's `collectPinHandle` against itself serialized and had to be
+  rewritten as `reviewPhotoHandle` vs `collectPinHandle`, while #54's `answerQuestionHandle` against itself
+  raced fine. **Racing two DIFFERENT callables is the reliable shape** — reach for it when a self-race won't
+  reproduce, and never assume either way without the falsification run.
 - The canonical test asserts the score is identical in all four denormalized places after a collect + answer.
   **Every new point-granting feature must extend this suite** (see the fan-out warning in §12.2).
-- Current suite (**81 tests across 9 files** — count with
+- Current suite (**82 tests across 9 files** — count with
   `grep -h '^test(' functions/test/*.test.mjs | wc -l`): `scoring` (card fan-out), `rounds` (`winnerInRound`
   propagation + the auth/admin gate on `updateRoundsHandle`), `award-concurrency` (overlapping same-user awards
-  grant an achievement bonus exactly once — the §12.2 read-set rule),
+  grant an achievement bonus exactly once, and a double-fired answer awards once — the §12.2 read-set rule),
   `pins` (all three entry shapes, anti-bruteforce, dup guard, availability window, normalization,
   snapshot/secret-stripping), `admin-pins` (upsert/delete gates + validation, re-seed `collectedBy` preservation),
   `photos` (submit → pending → approve/reject, no-points-until-approve, reopen-on-reject, idempotency),
