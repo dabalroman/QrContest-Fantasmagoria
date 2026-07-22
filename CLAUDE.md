@@ -106,8 +106,10 @@ Gotchas (from `Setup.md`, all real):
 `npm install` at the **root and in `functions/`** (two separate trees). Then, before `functions/` will compile:
 the real seed files (`functions/src/seeds/*.ts`) must exist — they're **gitignored** (`src/seeds/*.ts`) and shipped
 separately in a password-protected zip; only `*.ts.dist` placeholder templates are in git. `seedDatabaseHandle.ts`
-imports all nine (rankingRounds, cardSets, questions, cards, guilds, clues, pins, pinGroups, achievements),
-so `tsc` fails outright without them. **`functions/.env` is the second gitignored prerequisite** — copy
+imports five of the nine (rankingRounds, questions, pins, pinGroups, achievements), so `tsc` fails outright
+without **those**; the four retired ones (cards, cardSets, guilds, clues) are no longer imported anywhere, so a
+missing `cardsSeed.ts` now compiles clean instead of erroring — a trap if you conclude from a green build that
+the seed set is complete. **`functions/.env` is the second gitignored prerequisite** — copy
 `functions/.env.dist` and fill in `ADMIN_EMAILS` / `DASHBOARD_EMAILS`, or the `prebuild` hook
 (`functions/scripts/checkEnv.mjs`) fails the functions build, and with it `npm run verify`, the pre-commit
 hook and `firebase deploy`. `.env.development` is also gitignored — copy `.env.dist` and
@@ -266,7 +268,7 @@ Every mutation goes through an authenticated **callable Cloud Function**. They a
 | `getPhotoSubmissionsHandle` | `getPhotoSubmissionsHandle.ts` | **Admin-only, read-only.** The pending review queue; photos come back as server-built download-token URLs (no signBlob). |
 | `answerQuestionHandle` | `answerQuestionHandle.ts` | Grades an answer server-side, awards `value` or `0`, fans out. Rejects re-answering. **Shared by cards and pins, unchanged.** |
 | `joinGuildHandle` | `joinGuildHandle.ts` | Moves the user between guilds, enforces the **4-hour cooldown**, moves the score contribution from the old guild to the new one. |
-| `seedDatabaseHandle` | `seedDatabaseHandle.ts` | Admin-only + **hardcoded password `'4064'`**. Seeds questions, cards, cardSets, ranking rounds, guilds, clues, **pins**, **pinGroups**, **achievements**, then `recomputeAchievementTargets`. |
+| `seedDatabaseHandle` | `seedDatabaseHandle.ts` | Admin-only + **hardcoded password `'4064'`**. Seeds questions, ranking rounds, **pins**, **pinGroups**, **achievements**, then `recomputeAchievementTargets`. **Cards, cardSets, guilds and clues are no longer seeded** (retired, §7a) — their seed files and types still exist but nothing imports them. |
 | `updateRoundsHandle` | `index.ts` → `updateRoundsProcessor.ts` | Manual "force round update" from the admin panel. |
 | `autoUpdateRounds` | `index.ts` | **Scheduled**, cron `0 * * * *` (hourly). Marks finished rounds, stamps the top 3 users with `winnerInRound`. |
 
@@ -333,10 +335,26 @@ global, not per-pin. A wrong answer still burns the question (score 0) and still
 `autoUpdateRounds` marks a round `finished` and stamps `winnerInRound` on the top 3. A user with
 `winnerInRound` set is excluded from later rounds' prizes (but keeps playing).
 
+⚠️ **Author every round's `to` one second before the hour, never on it.** `updateRoundsProcessor` filters
+`!finished && to <= now` and the cron fires `0 * * * *`, so a `to` of exactly `12:00:00` ties the tick — if
+the tick lands marginally early nothing is due and the round waits a full hour. Both rounds now end at
+`:59:59` (task #58). The admin's *"Sprawdź i zamknij rundy"* button runs the same processor on demand and is
+the only in-policy recovery if the cron misses; it **cannot** force a round closed early, so a
+`"Nothing to do, no rounds to finish."` toast is a normal result, not a failure. Its three return strings
+are deliberately **English** (admin-only, identical to the function logs) — do not translate them.
+
 ### 7a. Retired mechanics — code still present, UI gone
 
 Both of these still compile, still have handlers deployed, and still appear all over the repo. **Neither is
 reachable by a 2026 player.** Do not build on them; do not assume a change here affects the live game.
+
+⚠️ **As of task #58 they are no longer SEEDED either** — `seedDatabaseHandle` stopped writing `cards`,
+`cardSets`, `guilds` and `clues`, so on a fresh database those four collections stay **empty**. The seed
+files, types, models and handlers all survive, so re-enabling is just re-adding the seeder + its import.
+Consequence: any card/club/clue surface you open will render empty rather than broken, and
+`seed.test.mjs`'s `RETIRED_COLLECTIONS` assertion will fail if a seeder is re-added without intent.
+`updateGuild` is unaffected — it early-returns on `memberOf`, which `setupAccountHandle` always sets to
+`null`, so no award ever reads a guild doc.
 
 **Cards** (retired 2026 — no navbar tab, nothing calls `collectCardFunction`). 5 tiers, fixed point values
 (`Enum/CardTier.ts` — duplicated in `functions/src/types/card.ts`):
@@ -522,11 +540,18 @@ no rule at all**. Any new palette entry that needs `/N` opacity must be declared
 
 `functions/src/seeds/*.ts.dist` are **templates checked into git with placeholder data**. The real seeds
 (with real codes, real questions, real answers) are gitignored — you must copy `X.ts.dist` → `X.ts` and fill
-them before `seedDatabaseHandle` will compile. There's also a `seeds.zip`.
+them before `seedDatabaseHandle` will compile. There's also a `seeds.zip`. Only the five still-imported seeds
+gate the build (see §2); the four retired ones can be missing without a compile error.
 
 Seeding procedure: fill `ADMIN_EMAILS` in `functions/.env` **before anyone registers** and deploy →
 register that address **with the Google popup** → use *"Seed database"* in the app's profile tab →
 enter password `4064`.
+
+⚠️ **A pre-event wipe takes the admin account with it, and the order is not recoverable.** `role` is written
+**once, at account creation**, from `ADMIN_EMAILS`, and `seedDatabaseHandle` requires an existing
+`users/{uid}` doc with `role: admin` — so wiping `users` (and `users-usernames`, or the username reservation
+collides) means re-registering the admin **with Google** *before* seeding. Verify `ADMIN_EMAILS` on the
+**deployed** function first: there is no in-app fix afterwards, only deleting both docs and starting over.
 
 ⚠️ **The ADMIN address must register with Google, never email+password.** That branch additionally
 requires `email_verified` on the token, and the app never sends a verification mail
@@ -578,7 +603,7 @@ Firestore transactions and the score fan-out — nothing is mocked.
   reproduce, and never assume either way without the falsification run.
 - The canonical test asserts the score is identical in all four denormalized places after a collect + answer.
   **Every new point-granting feature must extend this suite** (see the fan-out warning in §12.2).
-- Current suite (**82 tests across 9 files** — count with
+- Current suite (**111 tests across 10 files** — count with
   `grep -h '^test(' functions/test/*.test.mjs | wc -l`): `scoring` (card fan-out), `rounds` (`winnerInRound`
   propagation + the auth/admin gate on `updateRoundsHandle`), `award-concurrency` (overlapping same-user awards
   grant an achievement bonus exactly once, and a double-fired answer awards once — the §12.2 read-set rule),
@@ -590,7 +615,9 @@ Firestore transactions and the score fan-out — nothing is mocked.
   payload, eval-throw, malformed definition, location-badge targets counting every pin type) and `seed`
   (drives the REAL `seedDatabaseHandle` + real compiled
   `../lib/seeds/*.js`, guards the task-#5 fire-and-forget: asserts every seeded collection's doc count === seed
-  length on a single immediate query with NO settle/retry, plus the auth→password→admin gates).
+  length on a single immediate query with NO settle/retry; also asserts the four retired collections come back
+  **empty** (`RETIRED_COLLECTIONS`), and that a re-seed preserves a round's `users`/`finished` while still
+  applying an edited `to` — plus the auth→password→admin gates).
 - `fixtures.mjs` helpers: `seedFixture` (also seeds the achievement definitions — every suite gets them, and
   fixture awards stay under every threshold so the other suites are unaffected), `seedUser(uid, name, overrides)`
   for presetting counters/score/`achievements`, `seedLegacyUser` for the missing-counter case, and
@@ -639,18 +666,22 @@ Things that are wrong-but-harmless today; fix opportunistically, don't be surpri
   the collection, and `Pin.fromFirestore` hydrates the real `code` + `collectedBy`, so no callable is
   involved. `/admin/cards` + `/admin/edit-card` are deleted; the pin editor gained a scan-to-fill button
   in place of the scanner's old admin shortcut.
-- ✅ **Fixed (task #14): re-seeding used to wipe `collectedBy`.** `seedPins`/`seedCards` used to `.set()`
-  with no `{merge: true}`, so re-seeding reset every pin's/card's `collectedBy` to `{}` while
+- ✅ **Fixed (tasks #14 + #58): re-seeding used to wipe live gameplay state.** `seedPins`/`seedCards` used
+  to `.set()` with no `{merge: true}`, so re-seeding reset every pin's/card's `collectedBy` to `{}` while
   `users/{uid}/collectedPins|collectedCards` survived — the two would then disagree and the next collect
   surfaced an opaque `ABORTED` (`assertPinIsNotAlreadyCollected` passes, then `transaction.create` hits
   `ALREADY_EXISTS`). ⚠️ **`{merge: true}` alone does NOT fix this**, and never did — a common
   misconception. Firestore's merge does not skip a field just because its value is `{}`; the field being
   *present in the payload at all* means "overwrite this path", so a seed literal carrying
   `collectedBy: {}` still wipes existing finders even under `merge: true`. The actual fix
-  (`seedWithPreservedCollectedBy` in `seedDatabaseHandle.ts`) omits the `collectedBy` key from the
-  payload entirely for a doc that already exists (merge then leaves that path untouched), and only
-  writes an explicit `collectedBy: {}` on first creation. Regression net: `admin-pins.test.mjs`'s
-  re-seed test.
+  (**`seedWithPreservedFields(db, collection, docs, keys)`** in `seedDatabaseHandle.ts`) omits the listed
+  keys from the payload entirely for a doc that already exists (merge then leaves those paths untouched),
+  and writes the doc whole on first creation so they are never simply absent. `seedRounds` had the same
+  bug and got the same fix in #58 — a re-seed used to blank every round's accumulated `users` map and
+  reopen finished rounds, emptying the live leaderboard for everyone. Preserved keys: `pins` →
+  `collectedBy`, `ranking` → `users` + `finished`. `from`/`to`/`name` stay overwritable, which is what
+  lets a boundary edit land on a re-seed at all. Regression nets: `admin-pins.test.mjs`'s re-seed test
+  and `seed.test.mjs`'s round-preservation test.
 
 ---
 
