@@ -384,6 +384,12 @@ Pretty URLs are produced by rewrites in `next.config.js` (there are **no** `[par
 The page then reads the value off `router.query`. **Any new dynamic route must be added here**, and its path
 constant added to `Enum/Page.ts`.
 
+⚠️ **Never navigate to `Page.MAIN` while the user is still signed in.** `_app.tsx` bounces a `userReady`
+visitor off `/` to `/map`, so a sign-out that pushes first and calls `auth.signOut()` after strands the
+now-anonymous visitor on `/map` — not a public route, so `AuthCheck` answers with `Custom404`. Sign out
+**first**, then navigate (`pages/account.tsx`). `pages/auth/account-setup.tsx` keeps the opposite order
+safely only because its error path has no user doc, so `userReady` is already false.
+
 ### Navbar
 
 `components/Navbar/Navbar.tsx` is a fixed bottom bar with **4 side buttons** (Skanuj=`/collect` /
