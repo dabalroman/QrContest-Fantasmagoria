@@ -1,7 +1,7 @@
 import {FieldValue, getFirestore, UpdateData} from 'firebase-admin/firestore';
 import {CollectedPin, Pin, PinCollectedBy, PinType} from './types/pin';
 import {CollectedCardQuestion, CollectedQuestions, PublicQuestion, Question, QuestionsDoc} from './types/question';
-import getCurrentUser from './actions/getCurrentUser';
+import getCurrentUser, { readUserInTransaction } from './actions/getCurrentUser';
 import awardPoints from './actions/awardPoints';
 import scopeKeys from './actions/pinScopeKeys';
 import { assertPinIsActive, assertPinIsAvailable, assertPinIsNotAlreadyCollected } from './actions/assertPin';
@@ -177,6 +177,10 @@ export const collectPinHandle = onCall(async (req): Promise<{
         // The grant list MUST be the return value of the transaction callback, never an outer closure
         // array — a retried-then-discarded run would otherwise surface phantom grants (phantom toasts).
         const grants = await db.runTransaction(async (transaction) => {
+            // Re-read the user transactionally FIRST (before any write) so concurrent same-user awards
+            // serialize — see readUserInTransaction. Shadows the pre-transaction snapshot above.
+            const user = await readUserInTransaction(transaction, userRef);
+
             // Collect pin
             transaction.create(collectedPinRef, {
                 uid: pin.uid,

@@ -3,7 +3,7 @@ import { PhotoSubmission, PhotoSubmissionStatus } from './types/photoSubmission'
 import { PinCollectedBy } from './types/pin';
 import { User } from './types/user';
 import { AchievementGrant } from './types/achievement';
-import getCurrentUser from './actions/getCurrentUser';
+import getCurrentUser, { readUserInTransaction } from './actions/getCurrentUser';
 import awardPoints from './actions/awardPoints';
 import assertAdmin from './actions/assertAdmin';
 import { photoBucket } from './actions/photoStorage';
@@ -45,7 +45,7 @@ export const reviewPhotoHandle = onCall(async (req): Promise<{ status: string, a
     }
 
     const sub = submissionDoc.data() as PhotoSubmission;
-    const [userRef, user] = await getCurrentUser(db, sub.userUid);
+    const [userRef] = await getCurrentUser(db, sub.userUid);
     const collectedPinRef = userRef.collection('collectedPins').doc(sub.pinUid);
     const pinRef = db.collection('pins').doc(sub.pinUid);
 
@@ -57,6 +57,10 @@ export const reviewPhotoHandle = onCall(async (req): Promise<{ status: string, a
             if (freshSub.status !== PhotoSubmissionStatus.PENDING) {
                 throw new HttpsError('failed-precondition', 'submission is not pending');
             }
+
+            // Both reads (submission above, user here) precede every write below — the read-set on the
+            // user doc serializes concurrent same-user awards (see readUserInTransaction).
+            const user = await readUserInTransaction(transaction, userRef);
 
             transaction.update<User, User>(userRef, {
                 pendingScore: FieldValue.increment(-sub.value)

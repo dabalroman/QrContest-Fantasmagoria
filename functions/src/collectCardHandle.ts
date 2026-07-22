@@ -1,7 +1,7 @@
 import {FieldValue, getFirestore, UpdateData} from 'firebase-admin/firestore';
 import {Card, CardCollectedBy, CollectedCard} from './types/card';
 import {CollectedCardQuestion, CollectedQuestions, PublicQuestion, Question, QuestionsDoc} from './types/question';
-import getCurrentUser from './actions/getCurrentUser';
+import getCurrentUser, { readUserInTransaction } from './actions/getCurrentUser';
 import awardPoints from './actions/awardPoints';
 import {AchievementGrant} from './types/achievement';
 import {HttpsError, onCall} from 'firebase-functions/v2/https';
@@ -101,6 +101,10 @@ export const collectCardHandle = onCall(async (req): Promise<{
         // The grant list MUST be the return value of the transaction callback, never an outer closure
         // array — a retried-then-discarded run would otherwise surface phantom grants (phantom toasts).
         const grants = await db.runTransaction(async (transaction) => {
+            // Re-read the user transactionally FIRST (before any write) so concurrent same-user awards
+            // serialize — see readUserInTransaction. Shadows the pre-transaction snapshot above.
+            const user = await readUserInTransaction(transaction, userRef);
+
             //Collect card
             transaction.create(collectedCardRef, {
                 cardSet: card.cardSet,
