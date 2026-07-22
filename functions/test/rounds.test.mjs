@@ -27,7 +27,7 @@ beforeEach(async () => {
 });
 
 /** A minimal `users/{uid}` doc — required because the transaction updates it directly. */
-async function seedUser (uid, username) {
+async function seedUser (uid, username, overrides = {}) {
     await db.collection('users').doc(uid).set({
         uid,
         username,
@@ -38,7 +38,8 @@ async function seedUser (uid, username) {
         memberOf: null,
         winnerInRound: null,
         updatedAt: FieldValue.serverTimestamp(),
-        lastGuildChangeAt: FieldValue.serverTimestamp()
+        lastGuildChangeAt: FieldValue.serverTimestamp(),
+        ...overrides
     });
 }
 
@@ -106,6 +107,7 @@ test('closing a round propagates winnerInRound into other still-open rounds', as
         users: round2Users
     });
 
+    await seedUser('caller', 'Caller', { role: 'admin' });
     const token = await createAuthUserToken('caller');
     await callCallable('updateRoundsHandle', {}, token);
 
@@ -180,6 +182,7 @@ test('two rounds closing in the same pass do not cross-contaminate each other', 
         users: round3Users
     });
 
+    await seedUser('caller', 'Caller', { role: 'admin' });
     const token = await createAuthUserToken('caller');
     await callCallable('updateRoundsHandle', {}, token);
 
@@ -204,4 +207,20 @@ test('two rounds closing in the same pass do not cross-contaminate each other', 
     // Round 3 (still open, not part of the closing set) receives both propagations correctly.
     assert.equal(round3.users.shared1.winnerInRound, '1', 'round 1 winner propagated into open round 3');
     assert.equal(round3.users.shared2.winnerInRound, '2', 'round 2 winner propagated into open round 3');
+});
+
+test('updateRoundsHandle requires auth', async () => {
+    await assert.rejects(
+        () => callCallable('updateRoundsHandle', {}, null),
+        /permission/i
+    );
+});
+
+test('updateRoundsHandle rejects a non-admin', async () => {
+    await seedUser('plain', 'Plain');
+    const token = await createAuthUserToken('plain');
+    await assert.rejects(
+        () => callCallable('updateRoundsHandle', {}, token),
+        /permission/i
+    );
 });

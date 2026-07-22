@@ -19,7 +19,9 @@ import {getPhotoSubmissionsHandle} from './getPhotoSubmissionsHandle';
 import {onSchedule} from "firebase-functions/scheduler";
 import {logger} from "firebase-functions";
 import updateRoundsProcessor from "./updateRoundsProcessor";
-import {onCall} from "firebase-functions/https";
+import {HttpsError, onCall} from "firebase-functions/https";
+import {getFirestore} from "firebase-admin/firestore";
+import assertAdmin from "./actions/assertAdmin";
 
 export {
     setupAccountHandle, seedDatabaseHandle, collectCardHandle, answerQuestionHandle, joinGuildHandle,
@@ -27,7 +29,16 @@ export {
     submitPhotoHandle, reviewPhotoHandle, getPhotoSubmissionsHandle
 };
 
-export const updateRoundsHandle = onCall(async (): Promise<{}> => {
+export const updateRoundsHandle = onCall(async (req): Promise<{}> => {
+    const auth = req.auth;
+
+    if (!auth || !auth.uid) {
+        logger.error('updateRoundsHandle', 'permission denied');
+        throw new HttpsError('permission-denied', 'permission denied');
+    }
+
+    await assertAdmin(getFirestore(), auth.uid);
+
     const result = await updateRoundsProcessor();
     return { result };
 });
