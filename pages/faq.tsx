@@ -25,48 +25,60 @@ export default function FaqPage() {
             answer: 'Zeskanuj jeden z kodów QR za pomocą smartfona, a zostaniesz przeniesiony/a do formularza rejestracyjnego.'
         },
         {
-            question: 'Gdzie mogę znaleźć karty?',
-            answer: 'Kody QR zostały ukryte na terenie konwentu - na zewnątrz, wewnątrz, w korytarzach, a nawet w miejscach, które mogą Cię zaskoczyć! Jednakże, aby nie zakłócać innych atrakcji konwentu, kody nie zostaną ukryte w salach prelekcyjnych.'
+            question: 'Jak korzystać z mapy?',
+            answer: 'Mapa to główny ekran gry - od niej zaczynasz zabawę. Teren konwentu podzielony jest na dziewięć map i możesz swobodnie przełączać się między nimi. Zaznaczone na mapach piny to miejsca do zdobycia - dotknij pinu, aby zobaczyć, co trzeba zrobić. Zdobyte piny są wyszarzone, więc od razu widać, co jeszcze zostało do odkrycia.'
+        },
+        {
+            question: 'Czym są piny?',
+            answer: 'Piny to zaznaczone na mapie miejsca, a każdy z nich zdobywa się inaczej. Jeden wymaga zeskanowania ukrytego kodu QR, drugi rozwiązania zagadki, trzeci po prostu dotarcia na miejsce, czwarty oceny wysłuchanej prelekcji, a piąty przysłania zdjęcia. Sposób zdobycia rozpoznasz po ikonie pinu, a szczegóły znajdziesz w opisie, który pojawi się po jego dotknięciu.'
+        },
+        {
+            question: 'Gdzie mogę znaleźć piny?',
+            answer: 'Wszystkie piny są zaznaczone na mapie konwentu. Część z nich prowadzi do ukrytych kodów QR - mapa pokazuje wtedy okolicę, w której warto ich szukać. Kody czekają na zewnątrz, wewnątrz, w korytarzach, a nawet w miejscach, które mogą Cię zaskoczyć! Jednakże, aby nie zakłócać innych atrakcji konwentu, kody nie zostaną ukryte w salach prelekcyjnych.'
         },
         {
             question: 'Jak mogę zdobyć punkty?',
-            answer: 'Każde zebranie karty dodaje punkty do Twojego konta. Pod niektórymi kodami kryją się również pytania, na które odpowiedź daje dodatkowe punkty.'
+            answer: 'Każde zdobycie pinu dodaje punkty do Twojego konta. Przy niektórych pinach pojawia się dodatkowo pytanie - za poprawną odpowiedź otrzymasz kolejne punkty. Punkty przyznajemy również za zdobyte osiągnięcia.'
         },
         {
-            question: 'Czy mogę zeskanować ten sam kod QR wielokrotnie?',
+            question: 'Czym są osiągnięcia?',
+            answer: 'Osiągnięcia to odznaki przyznawane za wyczyny w grze - między innymi za zwiedzanie kolejnych zakątków konwentu, wiedzę wykazaną w pytaniach czy kolejne progi zdobytych punktów. Każda odznaka to dodatkowe punkty. Wszystkie odznaki - te zdobyte i te, które dopiero przed Tobą - znajdziesz w zakładce „Osiągnięcia”.'
+        },
+        {
+            question: 'Jak działają piny ze zdjęciem?',
+            answer: 'Przy takim pinie robisz zdjęcie i przesyłasz je prosto z aplikacji do organizatora. Punkty otrzymasz dopiero wtedy, gdy je zatwierdzi. Do tego czasu przy Twoim wyniku w rankingu widoczna jest informacja „+X oczekuje na weryfikację”. Jeśli zdjęcie nie zostanie przyjęte, pin wraca na mapę i możesz spróbować jeszcze raz.'
+        },
+        {
+            question: 'Jak ocenić prelekcję?',
+            answer: 'Przy salach prelekcyjnych znajdziesz piny do oceny prelekcji. Gdy wysłuchasz jednej z nich, dotknij takiego pinu, wpisz jej nazwę i przyznaj od jednej do pięciu gwiazdek. Przy tych pinach nie pojawia się pytanie - punkty otrzymasz od razu po wysłaniu oceny.'
+        },
+        {
+            question: 'Czy mogę zdobyć ten sam pin wielokrotnie?',
             answer: 'Możesz próbować, ale nie przyniesie to skutku.'
         },
         {
-            question: 'Czy mogę brać udział w drugiej turze, jeśli zdobyłem/am nagrodę w pierwszej?',
-            answer: 'Tak, ale nie będziesz mógł/mogła zdobyć nagrody. Możesz dalej skanować kody, by zdobyć wszystkie możliwe karty w kolekcji.'
+            question: 'Czy mogę brać udział w drugiej rundzie, jeśli zdobyłem/am nagrodę w pierwszej?',
+            answer: 'Tak, ale nie będziesz mógł/mogła zdobyć nagrody. Możesz dalej zdobywać piny i osiągnięcia.'
         },
         {
-            question: 'Czy punkty z pierwszej tury przechodzą do drugiej tury?',
-            answer: 'Tak, pod warunkiem, że nie zdobyłeś/aś nagrody w pierwszej turze.'
+            question: 'Czy punkty z pierwszej rundy przechodzą do drugiej rundy?',
+            answer: 'Tak, pod warunkiem, że nie zdobyłeś/aś nagrody w pierwszej rundzie.'
         },
         {
             question: 'Jakie są nagrody w konkursie?',
-            answer: 'Nagrody czekają na trzech uczestników z największą ilością punktów w każdej turze. Nagrodami są punkty konwentowe nazywane “Fanty”, które można wymienić na gadżety w sklepiku.'
+            answer: 'Nagrody czekają na trzech uczestników z największą ilością punktów w każdej rundzie. Nagrodami są punkty konwentowe nazywane “Fanty”, które można wymienić na gadżety w sklepiku.'
         },
         {
             question: 'Skąd mam wiedzieć, czy wygrałem/am?',
-            answer: 'Po zakończeniu każdej tury, w aplikacji pojawia się informacja o zwycięzcach. Możesz ją sprawdzić, aby dowiedzieć się, czy jesteś jednym z nich.'
+            answer: 'Po zakończeniu każdej rundy, w aplikacji pojawia się informacja o zwycięzcach. Możesz ją sprawdzić, aby dowiedzieć się, czy jesteś jednym z nich.'
         },
         {
-            question: 'Gdzie mogę zobaczyć swoją kolekcję kart?',
-            answer: 'Twoja kolekcja kart jest widoczna w galerii w aplikacji konkursowej.'
-        },
-        {
-            question: 'Czy mogę zobaczyć ilustracje na kartach, zanim zeskanuję kod QR?',
-            answer: 'Nie, ilustracje są widoczne tylko po zeskanowaniu kodu QR.'
-        },
-        {
-            question: 'Jak długo trwa każda tura?',
-            answer: 'Pierwsza tura trwa od początku konwentu do soboty o 14:00. Druga tura rozpoczyna się w sobotę o 14:00 i kończy w niedzielę o 12:00.'
+            question: 'Jak długo trwa każda runda?',
+            answer: 'Pierwsza runda trwa od 14:00 24/07/2026 do 14:00 25/07/2026, a druga od 14:00 25/07/2026 do 12:00 26/07/2026.'
         },
         {
             question: 'Gdzie mogę sprawdzić, ile punktów zdobyłem/am?',
-            answer: 'Ilość Twoich punktów jest widoczna w aplikacji konkursowej na ekranach ranking i profil.'
+            answer: 'Liczba Twoich punktów jest widoczna w aplikacji konkursowej w zakładkach „Ranking” oraz „Konto”.'
         },
         {
             question: 'Czy aplikacja konkursowa jest dostępna na wszystkich urządzeniach?',
@@ -74,7 +86,7 @@ export default function FaqPage() {
         },
         {
             question: 'Kiedy i gdzie rozdawane będą nagrody?',
-            answer: 'Nagrody będą rozdawane w punkcie informacyjnym po zakończeniu każdej tury.'
+            answer: 'Nagrody będą rozdawane w punkcie informacyjnym po zakończeniu każdej rundy.'
         },
         {
             question: 'Które miejsce w konkursie zajmuję?',
@@ -89,23 +101,11 @@ export default function FaqPage() {
             answer: 'Do odebrania nagrody potrzebujesz smartfona z zalogowaną aplikacją konkursową. Pokaż swoje konto przy odbiorze nagrody.'
         },
         {
-            question: 'Czym są kluby?',
-            answer: 'System klubów to społeczny element konkursu, który pozwala uczestnikom na dołączanie do jednego z czterech dostępnych klubów. Wybierzesz jedną z nich przy rejestracji swojego konta. Wybór klubu jest czysto kosmetyczny i nie wpływa na Twoje szanse na wygraną.'
-        },
-        {
             question: 'Czy w sekcji FAQ kryje się kod?',
             answer: 'Nie. Na pewno nie jest to "9DG76W9SGN". A już na pewno nie pisany od tyłu.'
         },
         {
-            question: 'Czy mogę zmienić klub?',
-            answer: 'Tak, możesz zmienić klub raz na 4 godziny. Możesz skorzystać z tej opcji, jeśli zdecydujesz, że chciałbyś należeć do innego klubu.'
-        },
-        {
-            question: 'Jak jest wyliczany wynik klubu?',
-            answer: 'Moc klubu jest obliczana jako średnia punktów wszystkich jej członków. To oznacza, że każdy uczestnik ma wkład w sukces swojego klubu, niezależnie od tego, ile punktów zdobył.'
-        },
-        {
-            question: 'Czy mogę zbierać karty wspólnie z przyjacielem?',
+            question: 'Czy mogę zdobywać piny wspólnie z przyjacielem?',
             answer: 'Tak, ale pamiętaj, że jedno konto to zawsze tylko jedna nagroda.'
         },
         {
