@@ -25,6 +25,7 @@ import usePinsData from '@/hooks/usePinsData';
 import { UserRole } from '@/Enum/UserRole';
 import { useRouter } from 'next/router';
 import { Page } from '@/Enum/Page';
+import { destinationAfterAuth } from '@/utils/pendingCode';
 
 config.autoAddCss = false;
 
@@ -71,7 +72,7 @@ export default function App ({
 
     useEffect(() => {
         if (userData.userReady && userData.user?.role !== UserRole.DASHBOARD && router.pathname === Page.MAIN) {
-            router.push(Page.MAP)
+            router.push(destinationAfterAuth())
                 .then();
         }
     }, [router, userData.userReady, userData.user]);

@@ -115,15 +115,18 @@ export default function AccountPage () {
                     }}/>
                     <p className="text-2xl">
                         <span className="font-semibold text-text-accent">1. miejsce <br/></span>
-                        <span>2x 50 fantów</span>
+                        <span>50 fantów</span>
+                        <span className="block text-sm">w każdej rundzie</span>
                     </p>
                     <p className="text-xl pt-3">
                         <span className="font-semibold text-text-accent">2. miejsce <br/> </span>
-                        <span>2x 35 fantów</span>
+                        <span>35 fantów</span>
+                        <span className="block text-sm">w każdej rundzie</span>
                     </p>
                     <p className="text-lg pt-3">
                         <span className="font-semibold text-text-accent">3. miejsce <br/> </span>
-                        <span>2x 20 fantów</span>
+                        <span>20 fantów</span>
+                        <span className="block text-sm">w każdej rundzie</span>
                     </p>
                 </Panel>
 

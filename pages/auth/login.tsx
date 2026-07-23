@@ -1,5 +1,5 @@
 import {signInWithPopup} from '@firebase/auth';
-import {useContext, useEffect, useState} from 'react';
+import {useContext, useEffect, useRef, useState} from 'react';
 import Metatags from '@/components/Metatags';
 import {UserContext, UserContextType} from '@/utils/context';
 import {auth, googleAuthProvider} from '@/utils/firebase';
@@ -13,6 +13,7 @@ import {faArrowLeft, faEnvelope} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import LinkButton from '@/components/LinkButton';
 import {useRouter} from 'next/router';
+import {destinationAfterAuth} from '@/utils/pendingCode';
 
 export default function LoginPage () {
     const router = useRouter();
@@ -48,11 +49,19 @@ export default function LoginPage () {
         setLoading(authLoading || userLoading);
     }, [authLoading, userLoading]);
 
+    // Fires once: router is a dependency, so the push itself re-runs this effect while the page is
+    // still mounted, and a second destinationAfterAuth() would find the stash already spent and
+    // overwrite the collect destination with the map.
+    const redirectedRef = useRef<boolean>(false);
+
     useEffect(() => {
-        if (!authLoading && !userLoading && authUser) {
-            router.push(userReady ? Page.COLLECT : Page.ACCOUNT_SETUP)
-                .then();
+        if (redirectedRef.current || authLoading || userLoading || !authUser) {
+            return;
         }
+
+        redirectedRef.current = true;
+        router.push(userReady ? destinationAfterAuth() : Page.ACCOUNT_SETUP)
+            .then();
     }, [userReady, authUser, router, userLoading, authLoading]);
 
     return (

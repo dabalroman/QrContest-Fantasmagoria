@@ -17,6 +17,7 @@ import { setupAccountFunction } from '@/utils/functions';
 import canonicalUsername from '@/functions/src/actions/canonicalUsername';
 import { useRouter } from 'next/router';
 import Loader from '@/components/Loader';
+import { destinationAfterAuth, peekPendingCode } from '@/utils/pendingCode';
 
 export default function AccountSetupPage () {
     const router = useRouter();
@@ -33,14 +34,19 @@ export default function AccountSetupPage () {
     // below fires mid-registration and eats the welcome step.
     const registeringRef = useRef<boolean>(false);
 
+    // Read once at mount - AuthCheck stashed it before this page was ever reached. The copy below and
+    // the exits must stay stable across the re-renders that follow destinationAfterAuth() clearing it,
+    // so this must not become an inline peekPendingCode() during render.
+    const [pendingCode] = useState<string | null>(() => peekPendingCode());
+
     useDynamicNavbar(step === 'welcome'
-        ? { onlyCenter: true, icon: faMapLocationDot, href: Page.MAP }
+        ? { onlyCenter: true, icon: faMapLocationDot, onClick: () => router.push(destinationAfterAuth()) }
         : { onlyCenter: true, icon: faArrowLeft, onClick: () => router.back() }
     );
 
     useEffect(() => {
         if (userReady && !registeringRef.current) {
-            router.push(Page.MAP)
+            router.push(destinationAfterAuth())
                 .then();
         }
     }, [userReady, router]);
@@ -158,15 +164,24 @@ export default function AccountSetupPage () {
                     <Panel title={'Konto gotowe!'}>
                         <section>
                             <p className="text-justify">
-                                Gra Konwentowa toczy się na mapie w aplikacji
-                                - zbierasz pinezki i punkty, odkrywając konwent krok po kroku.
-                                Sprawdź mapę, by wybrać gdzie wyruszysz najpierw!
+                                {pendingCode
+                                    ? <>
+                                        Zeskanowany kod jest już wpisany i czeka na potwierdzenie
+                                        - zgarnij za niego pierwsze punkty. Potem zajrzyj na mapę,
+                                        bo to właśnie tam toczy się Gra Konwentowa.
+                                    </>
+                                    : <>
+                                        Gra Konwentowa toczy się na mapie w aplikacji
+                                        - zbierasz pinezki i punkty, odkrywając konwent krok po kroku.
+                                        Sprawdź mapę, by wybrać gdzie wyruszysz najpierw!
+                                    </>
+                                }
                             </p>
                             <Button
                                 className="w-full mt-4"
-                                onClick={() => router.push(Page.MAP)}
+                                onClick={() => router.push(destinationAfterAuth())}
                             >
-                                Zaczynamy!
+                                {pendingCode ? 'Przejdź do kodu' : 'Zaczynamy!'}
                             </Button>
                         </section>
                     </Panel>

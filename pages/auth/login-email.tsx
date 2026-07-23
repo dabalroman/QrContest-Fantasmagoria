@@ -1,5 +1,5 @@
 import Button, { ButtonState } from '@/components/Button';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import Panel from '@/components/Panel';
 import { signInWithEmailAndPassword } from '@firebase/auth';
@@ -12,6 +12,7 @@ import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import { Page } from '@/Enum/Page';
 import { UserContext, UserContextType } from '@/utils/context';
 import { useRouter } from 'next/router';
+import { destinationAfterAuth } from '@/utils/pendingCode';
 
 export default function LoginEmail () {
     const router = useRouter();
@@ -58,10 +59,17 @@ export default function LoginEmail () {
         }
     };
 
+    // See login.tsx - router is a dependency, so the push re-runs this effect and a second
+    // destinationAfterAuth() would find the stash already spent.
+    const redirectedRef = useRef<boolean>(false);
+
     useEffect(() => {
-        if (!authLoading && !userLoading && authUser) {
-            router.push(userReady ? Page.COLLECT : Page.ACCOUNT_SETUP).then();
+        if (redirectedRef.current || authLoading || userLoading || !authUser) {
+            return;
         }
+
+        redirectedRef.current = true;
+        router.push(userReady ? destinationAfterAuth() : Page.ACCOUNT_SETUP).then();
     }, [userReady, authUser, router, authLoading, userLoading]);
 
     return (

@@ -1,5 +1,5 @@
 import {signInWithPopup} from '@firebase/auth';
-import React, {useContext, useEffect, useState} from 'react';
+import React, {useContext, useEffect, useRef, useState} from 'react';
 import Metatags from '@/components/Metatags';
 import {UserContext, UserContextType} from '@/utils/context';
 import {auth, googleAuthProvider} from '@/utils/firebase';
@@ -13,6 +13,7 @@ import {faArrowLeft, faEnvelope} from '@fortawesome/free-solid-svg-icons';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import LinkButton from '@/components/LinkButton';
 import {useRouter} from 'next/router';
+import {destinationAfterAuth} from '@/utils/pendingCode';
 
 export default function RegisterPage() {
     const router = useRouter();
@@ -43,11 +44,18 @@ export default function RegisterPage() {
         }
     };
 
+    // See login.tsx - router is a dependency, so the push re-runs this effect and a second
+    // destinationAfterAuth() would find the stash already spent.
+    const redirectedRef = useRef<boolean>(false);
+
     useEffect(() => {
-        if (!authLoading && !userLoading && authUser) {
-            router.push(userReady ? Page.COLLECT : Page.ACCOUNT_SETUP)
-                .then();
+        if (redirectedRef.current || authLoading || userLoading || !authUser) {
+            return;
         }
+
+        redirectedRef.current = true;
+        router.push(userReady ? destinationAfterAuth() : Page.ACCOUNT_SETUP)
+            .then();
     }, [userReady, authUser, router, authLoading, userLoading]);
 
     return (
