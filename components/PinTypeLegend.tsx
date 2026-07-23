@@ -3,7 +3,7 @@ import PinMarkerIcon from '@/components/map/PinMarkerIcon';
 
 const PIN_TYPE_DESCRIPTIONS: Record<PinType, string> = {
     [PinType.CODE]: 'Zeskanuj kod QR ukryty gdzieś w pobliżu.',
-    [PinType.RIDDLE]: 'Rozwiąż zagadkę i wpisz hasło.',
+    [PinType.RIDDLE]: 'Rozwiąż zagadkę i wpisz odpowiedź.',
     [PinType.VISIT]: 'Dotrzyj we wskazane miejsce.',
     [PinType.FEEDBACK]: 'Oceń wysłuchaną prelekcję.',
     [PinType.PHOTO]: 'Zrób zdjęcie, a punkty dostaniesz po chwili.',

@@ -69,8 +69,8 @@ export default function RoundRankingTable ({
                 </tbody>
             </table>
             <div className="text-sm text-center mt-4">
-                <span className="px-4"><FontAwesomeIcon icon={faLocationDot}/> Ilość pinezek</span>
-                <span className="px-4"><FontAwesomeIcon icon={faStar}/> Ilość punktów</span>
+                <span className="px-4"><FontAwesomeIcon icon={faLocationDot}/> Liczba pinezek</span>
+                <span className="px-4"><FontAwesomeIcon icon={faStar}/> Liczba punktów</span>
             </div>
         </div>
     );

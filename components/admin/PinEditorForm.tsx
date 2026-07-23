@@ -11,6 +11,7 @@ import { RawPinAuthoredFields } from '@/models/Raw';
 import { deletePinFunction, upsertPinFunction } from '@/utils/functions';
 import SheetSection from '@/components/map/SheetSection';
 import useDynamicNavbar from '@/hooks/useDynamicNavbar';
+import { getPolishPluralForm } from '@/utils/date';
 import Button from '@/components/Button';
 import CodeScannerOverlay from '@/components/CodeScannerOverlay';
 
@@ -348,7 +349,11 @@ export default function PinEditorForm ({
                         {hasFinders &&
                             <p className="text-sm text-center opacity-80">
                                 Tę pinezkę znalazło już {Object.keys(pin!.collectedBy).length}{' '}
-                                {Object.keys(pin!.collectedBy).length === 1 ? 'osoba' : 'osób'}.
+                                {{
+                                    singular: 'osoba',
+                                    plural: 'osoby',
+                                    plural2: 'osób'
+                                }[getPolishPluralForm(Object.keys(pin!.collectedBy).length)]}.
                             </p>
                         }
 

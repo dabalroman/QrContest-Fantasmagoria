@@ -7,7 +7,7 @@ export default function JoinGuildPanel () {
     return (
         <Panel title="Klub">
             <p className="mb-3">
-                Nie jesteś jeszcze w Klubie. Dołącz do towarzyszy i wspólnie wyruszcie w przygodę!
+                Nie jesteś jeszcze w klubie. Dołącz do towarzyszy i wspólnie wyruszcie w przygodę!
             </p>
             <LinkButton href={Page.GUILD}>Dołącz do klubu</LinkButton>
         </Panel>

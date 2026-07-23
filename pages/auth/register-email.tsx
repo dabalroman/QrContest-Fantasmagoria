@@ -71,7 +71,7 @@ export default function LoginEmail () {
             <Metatags title="Rejestracja"/>
             <ScreenTitle>Rejestracja</ScreenTitle>
 
-            <Panel loading={loading} title='Rejestracja z email'>
+            <Panel loading={loading} title='Rejestracja przez e-mail'>
                 <p className='mb-2'>Wpisz swój adres email i hasło.</p>
                 <form onSubmit={handleSubmit(registerUser)}>
                     <p>Adres email</p>

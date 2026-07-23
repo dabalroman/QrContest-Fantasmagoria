@@ -40,7 +40,7 @@ export default function UsersAdminPage () {
         <main className="grid grid-rows-layout items-center min-h-screen p-4">
             <ScreenTitle>Lista użytkowników</ScreenTitle>
 
-            <Panel title="Karty" loading={!users} className={'overflow-scroll'}>
+            <Panel title="Użytkownicy" loading={!users} className={'overflow-scroll'}>
                 <table className="table-auto whitespace-nowrap min-w-full">
                     <thead>
                         <tr className="text-left">
@@ -48,7 +48,6 @@ export default function UsersAdminPage () {
                             <th className="p-2">Wynik</th>
                             <th className="p-2"># pinezek</th>
                             <th className="p-2"># pytań</th>
-                            <th className="p-2">Klub</th>
                             <th className="p-2">Ostatnia akcja</th>
                         </tr>
                     </thead>
@@ -59,7 +58,6 @@ export default function UsersAdminPage () {
                                 <td className="p-2">{user.score}</td>
                                 <td className="p-2">{user.amountOfCollectedPins}</td>
                                 <td className="p-2">{user.amountOfAnsweredQuestions}</td>
-                                <td className="p-2">{user.memberOf}</td>
                                 <td className="p-2">{user.updatedAt.toLocaleString('pl-PL')}</td>
                             </tr>
                         ))}

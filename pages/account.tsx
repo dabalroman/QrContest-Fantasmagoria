@@ -64,7 +64,7 @@ export default function AccountPage () {
 
             }}>Sprawdź i zamknij rundy</Button>
 
-            <p className={'py-2 mt-20'}>Niebezpiecznie tutaj schodzić!</p>
+            <p className={'py-2 mt-20'}>Niebezpiecznie jest schodzić niżej!</p>
             <Button className="w-full" style={{
                 background: '#660000',
                 borderColor: '#BB0000'
@@ -163,7 +163,7 @@ export default function AccountPage () {
 
                 <Panel title="Konto">
                     <p className="pb-4 text-justify">
-                        Kliknij tutaj, by wylogować się z aplikacji. Do zobaczenia!
+                        Wylogowanie zakończy Twoją sesję w aplikacji. Do zobaczenia!
                     </p>
                     <Button
                         onClick={async () => {

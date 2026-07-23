@@ -43,13 +43,12 @@ export default function CollectionPage ({}) {
 
     const empty = (
         <Panel title="Kolekcja jest pusta">
-            <p className="my-2">By zebrać kartę, zeskanuj kod QR lub przejdź do ekranu &quot;Szukaj&quot; i tam
-                wpisz jej kod.</p>
+            <p className="my-2">By zebrać pinezkę, zeskanuj kod QR lub przejdź do ekranu &quot;Kody QR&quot; i
+                tam wpisz jej kod.</p>
             <p className="my-2">Skąd wziąć kod? To dobre pytanie.</p>
-            <p>Kody zostały ukryte w różnych miejscach w budynku konwentu. Wciel się w rolę poszukiwacza i
-                spróbuj
-                znaleźć je wszystkie!</p>
-            <LinkButton className="mt-4" href={Page.COLLECT}>Szukaj</LinkButton>
+            <p>Pinezki czekają w różnych miejscach na terenie całego konwentu. Otwórz mapę i sprawdź, gdzie
+                ich szukać!</p>
+            <LinkButton className="mt-4" href={Page.COLLECT}>Kody QR</LinkButton>
         </Panel>
     );
 
