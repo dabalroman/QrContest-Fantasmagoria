@@ -8,6 +8,7 @@ import { faLocationDot, faStar } from '@fortawesome/free-solid-svg-icons';
 import Metatags from '@/components/Metatags';
 import { UserRole } from '@/Enum/UserRole';
 import Button from '@/components/Button';
+import SegmentedControl from '@/components/SegmentedControl';
 import { seedDatabaseFunction, updateRoundsFunction } from '@/utils/functions';
 import toast from 'react-hot-toast';
 import { Page } from '@/Enum/Page';
@@ -159,28 +160,15 @@ export default function AccountPage () {
                         Mapy w wysokiej jakości wyglądają ostrzej, ale na starszych telefonach mogą działać
                         wolniej. Jeśli mapa się zacina, wybierz niską jakość.
                     </p>
-                    <div className="flex gap-2 mt-4">
-                        <Button
-                            className="w-full"
-                            style={mapQuality === MapQuality.HIGH ? {
-                                background: 'var(--color-primary)',
-                                borderColor: 'var(--color-primary)'
-                            } : {}}
-                            onClick={() => chooseMapQuality(MapQuality.HIGH)}
-                        >
-                            Wysoka
-                        </Button>
-                        <Button
-                            className="w-full"
-                            style={mapQuality === MapQuality.LOW ? {
-                                background: 'var(--color-primary)',
-                                borderColor: 'var(--color-primary)'
-                            } : {}}
-                            onClick={() => chooseMapQuality(MapQuality.LOW)}
-                        >
-                            Niska
-                        </Button>
-                    </div>
+                    <SegmentedControl
+                        className="mt-4"
+                        value={mapQuality}
+                        onChange={chooseMapQuality}
+                        options={[
+                            { value: MapQuality.HIGH, label: 'Wysoka' },
+                            { value: MapQuality.LOW, label: 'Niska' }
+                        ]}
+                    />
                 </Panel>
 
                 {/* CLUBS-DISABLED-2026: club panels hidden for the 2026 edition
