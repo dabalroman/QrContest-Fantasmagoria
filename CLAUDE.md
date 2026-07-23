@@ -331,6 +331,14 @@ no inner-whitespace collapse. Author answers short, single-token and ASCII-safe.
 global, not per-pin. A wrong answer still burns the question (score 0) and still increments
 `amountOfAnsweredQuestions`. Shared by cards and pins.
 
+⚠️ **Every question in the seed is authored with the correct answer in slot `a` and `correct: 'a'`** — all
+132 of them. This is not a leak and must not be "fixed" by scattering correct answers across b/c/d:
+`components/collect/QuestionPinView.tsx` shuffles the four entries before rendering, and `correct` never
+leaves the server anyway (`questions/questions` has no client rule). Authoring the key anywhere but `a`
+buys nothing and breaks the one invariant that makes the pool skimmable. **There is no time limit on
+answering** — a drawn question sits in `collectedQuestions` with `answer: null` indefinitely, and
+`answerQuestionHandle` never compares timestamps.
+
 **Rounds.** `ranking/{uid}` docs with `from`/`to`. Points **carry over** between rounds. The hourly
 `autoUpdateRounds` marks a round `finished` and stamps `winnerInRound` on the top 3. A user with
 `winnerInRound` set is excluded from later rounds' prizes (but keeps playing).
