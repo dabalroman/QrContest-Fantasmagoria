@@ -26,39 +26,39 @@ export default function FaqPage() {
         },
         {
             question: 'Jak korzystać z mapy?',
-            answer: 'Mapa to główny ekran gry - od niej zaczynasz zabawę. Teren konwentu podzielony jest na dziewięć map i możesz swobodnie przełączać się między nimi. Zaznaczone na mapach piny to miejsca do zdobycia - dotknij pinu, aby zobaczyć, co trzeba zrobić. Zdobyte piny są wyszarzone, więc od razu widać, co jeszcze zostało do odkrycia.'
+            answer: 'Mapa to główny ekran gry - od niej zaczynasz zabawę. Teren konwentu podzielony jest na dziewięć map i możesz swobodnie przełączać się między nimi. Zaznaczone na mapach pinezki to miejsca do zdobycia - dotknij pinezki, aby zobaczyć, co trzeba zrobić. Zdobyte pinezki są wyszarzone, więc od razu widać, co jeszcze zostało do odkrycia.'
         },
         {
-            question: 'Czym są piny?',
-            answer: 'Piny to zaznaczone na mapie miejsca, a każdy z nich zdobywa się inaczej. Jeden wymaga zeskanowania ukrytego kodu QR, drugi rozwiązania zagadki, trzeci dotarcia na miejsce, czwarty oceny wysłuchanej prelekcji, a piąty przysłania zdjęcia. Sposób zdobycia rozpoznasz po ikonie pinu, a szczegóły znajdziesz w opisie, który pojawi się po jego dotknięciu.'
+            question: 'Czym są pinezki?',
+            answer: 'Pinezki to zaznaczone na mapie miejsca, a każdą z nich zdobywa się inaczej. Jedna wymaga zeskanowania ukrytego kodu QR, druga rozwiązania zagadki, trzecia dotarcia na miejsce, czwarta oceny wysłuchanej prelekcji, a piąta przysłania zdjęcia. Sposób zdobycia rozpoznasz po ikonie pinezki, a szczegóły znajdziesz w opisie, który pojawi się po jej dotknięciu.'
         },
         {
-            question: 'Gdzie mogę znaleźć piny?',
-            answer: 'Wszystkie piny są zaznaczone na mapie konwentu. Część z nich prowadzi do ukrytych kodów QR - mapa pokazuje wtedy okolicę, w której warto ich szukać. Kody czekają na zewnątrz, wewnątrz, w korytarzach, a nawet w miejscach, które mogą Cię zaskoczyć! Jednakże, aby nie zakłócać innych atrakcji konwentu, kody nie zostaną ukryte w salach prelekcyjnych.'
+            question: 'Gdzie mogę znaleźć pinezki?',
+            answer: 'Wszystkie pinezki są zaznaczone na mapie konwentu. Część z nich prowadzi do ukrytych kodów QR - mapa pokazuje wtedy okolicę, w której warto ich szukać. Kody czekają na zewnątrz, wewnątrz, w korytarzach, a nawet w miejscach, które mogą Cię zaskoczyć! Jednakże, aby nie zakłócać innych atrakcji konwentu, kody nie zostaną ukryte w salach prelekcyjnych.'
         },
         {
             question: 'Jak mogę zdobyć punkty?',
-            answer: 'Każde zdobycie pinu dodaje punkty do Twojego konta. Przy niektórych pinach pojawia się dodatkowo pytanie - za poprawną odpowiedź otrzymasz kolejne punkty. Punkty przyznajemy również za zdobyte osiągnięcia.'
+            answer: 'Każde zdobycie pinezki dodaje punkty do Twojego konta. Przy niektórych pinezkach pojawia się dodatkowo pytanie - za poprawną odpowiedź otrzymasz kolejne punkty. Punkty przyznajemy również za zdobyte osiągnięcia.'
         },
         {
             question: 'Czym są osiągnięcia?',
             answer: 'Osiągnięcia to odznaki przyznawane za wyczyny w grze - między innymi za zwiedzanie kolejnych zakątków konwentu, wiedzę wykazaną w pytaniach czy kolejne progi zdobytych punktów. Każda odznaka to dodatkowe punkty. Wszystkie odznaki - te zdobyte i te, które dopiero przed Tobą - znajdziesz w zakładce „Osiągnięcia”.'
         },
         {
-            question: 'Jak działają piny ze zdjęciem?',
-            answer: 'Przy takim pinie robisz zdjęcie i przesyłasz je prosto z aplikacji do organizatora. Punkty otrzymasz dopiero wtedy, gdy je zatwierdzi. Do tego czasu przy Twoim wyniku w rankingu widoczna jest informacja „+X oczekuje na weryfikację”. Jeśli zdjęcie nie zostanie przyjęte, pin wraca na mapę i możesz spróbować jeszcze raz.'
+            question: 'Jak działają pinezki ze zdjęciem?',
+            answer: 'Przy takiej pinezce robisz zdjęcie i przesyłasz je prosto z aplikacji do organizatora. Punkty otrzymasz dopiero wtedy, gdy je zatwierdzi. Do tego czasu przy Twoim wyniku w rankingu widoczna jest informacja „+X oczekuje na weryfikację”. Jeśli zdjęcie nie zostanie przyjęte, pinezka wraca na mapę i możesz spróbować jeszcze raz.'
         },
         {
             question: 'Jak ocenić prelekcję?',
-            answer: 'Przy salach prelekcyjnych znajdziesz piny do oceny prelekcji. Gdy wysłuchasz jednej z nich, dotknij takiego pinu, wpisz jej nazwę i przyznaj od jednej do pięciu gwiazdek. Przy tych pinach nie pojawia się pytanie - punkty otrzymasz od razu po wysłaniu oceny.'
+            answer: 'Przy salach prelekcyjnych znajdziesz pinezki do oceny prelekcji. Gdy wysłuchasz jednej z nich, dotknij takiej pinezki, wpisz jej nazwę i przyznaj od jednej do pięciu gwiazdek. Przy tych pinezkach nie pojawia się pytanie - punkty otrzymasz od razu po wysłaniu oceny.'
         },
         {
-            question: 'Czy mogę zdobyć ten sam pin wielokrotnie?',
+            question: 'Czy mogę zdobyć tę samą pinezkę wielokrotnie?',
             answer: 'Możesz próbować, ale nie przyniesie to skutku.'
         },
         {
             question: 'Czy mogę brać udział w drugiej rundzie, jeśli zdobyłem/am nagrodę w pierwszej?',
-            answer: 'Tak, ale nie będziesz mógł/mogła zdobyć nagrody. Możesz dalej zdobywać piny i osiągnięcia.'
+            answer: 'Tak, ale nie będziesz mógł/mogła zdobyć nagrody. Możesz dalej zdobywać pinezki i osiągnięcia.'
         },
         {
             question: 'Czy punkty z pierwszej rundy przechodzą do drugiej rundy?',
@@ -105,7 +105,7 @@ export default function FaqPage() {
             answer: 'Nie. Na pewno nie jest to "9DG76W9SGN". A już na pewno nie pisany od tyłu.'
         },
         {
-            question: 'Czy mogę zdobywać piny wspólnie z przyjacielem?',
+            question: 'Czy mogę zdobywać pinezki wspólnie z przyjacielem?',
             answer: 'Tak, ale pamiętaj, że jedno konto to zawsze tylko jedna nagroda.'
         },
         {

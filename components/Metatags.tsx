@@ -3,7 +3,7 @@ import Head from 'next/head';
 export default function Metatags({
     title = '',
     description = 'Gra Konwentowa to internetowa gra terenowa dla uczestników konwentu fantastyki Fantasmagoria ' +
-        'w Gnieźnie. Odkrywaj piny na mapie konwentu, skanuj kody QR, rozwiązuj zagadki i zbieraj punkty, ' +
+        'w Gnieźnie. Odkrywaj pinezki na mapie konwentu, skanuj kody QR, rozwiązuj zagadki i zbieraj punkty, ' +
         'a następnie rywalizuj w rankingu o nagrody.',
     image = '',
 }) {

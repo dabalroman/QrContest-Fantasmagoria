@@ -60,10 +60,10 @@ export default function Home() {
             >
                 <Panel title="Co to jest Gra Konwentowa?" className="text-justify">
                     <p className="pt-1">Gra Konwentowa to internetowa gra terenowa dla uczestników konwentu
-                        fantastyki Fantasmagoria. Otwierasz mapę konwentu, a na niej czekają piny - miejsca,
-                        które trzeba odnaleźć i zdobyć. Jeden skrywa ukryty kod QR, drugi zagadkę do
-                        rozwiązania, a do trzeciego wystarczy dotrzeć. Za każdy zdobyty
-                        pin dostajesz punkty, a im więcej ich zbierzesz, tym wyżej jesteś w rankingu.
+                        fantastyki Fantasmagoria. Otwierasz mapę konwentu, a na niej czekają pinezki - miejsca,
+                        które trzeba odnaleźć i zdobyć. Jedna skrywa ukryty kod QR, druga zagadkę do
+                        rozwiązania, a do trzeciej wystarczy dotrzeć. Za każdą zdobytą
+                        pinezkę dostajesz punkty, a im więcej ich zbierzesz, tym wyżej jesteś w rankingu.
                         Miejsce na podium gwarantuje fantastyczną nagrodę!</p>
                     <p className="pt-4">Udział w konkursie jest całkowicie darmowy - wystarczy smartfon
                         z dostępem do internetu.</p>
@@ -95,9 +95,9 @@ export default function Home() {
                     </p>
                 </Panel>
 
-                <Panel title="Piny">
+                <Panel title="Pinezki">
                     <p className="mb-4 text-justify">
-                        Teren konwentu to dziewięć map, a każdy pin zdobywa się inaczej.
+                        Teren konwentu to dziewięć map, a każdą pinezkę zdobywa się inaczej.
                         Po ikonie od razu poznasz, co trzeba zrobić:
                     </p>
 

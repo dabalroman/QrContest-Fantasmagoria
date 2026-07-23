@@ -9,6 +9,7 @@ import Metatags from '@/components/Metatags';
 import { UserRole } from '@/Enum/UserRole';
 import Button from '@/components/Button';
 import SegmentedControl from '@/components/SegmentedControl';
+import PinTypeLegend from '@/components/PinTypeLegend';
 import { seedDatabaseFunction, updateRoundsFunction } from '@/utils/functions';
 import toast from 'react-hot-toast';
 import { Page } from '@/Enum/Page';
@@ -169,6 +170,15 @@ export default function AccountPage () {
                             { value: MapQuality.LOW, label: 'Niska' }
                         ]}
                     />
+                </Panel>
+
+                <Panel title="Pinezki">
+                    <p className="mb-4 text-justify">
+                        Teren konwentu to dziewięć map, a każdą pinezkę zdobywa się inaczej.
+                        Po ikonie od razu poznasz, co trzeba zrobić:
+                    </p>
+
+                    <PinTypeLegend/>
                 </Panel>
 
                 {/* CLUBS-DISABLED-2026: club panels hidden for the 2026 edition

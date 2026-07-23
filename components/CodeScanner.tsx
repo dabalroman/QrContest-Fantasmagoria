@@ -3,20 +3,48 @@ import QrScanner from 'qr-scanner';
 
 const CODE_REGEX = /^[A-Za-z0-9]{8,10}$/;
 
+export type ScannerStatus = 'ready' | 'denied' | 'no-camera' | 'unknown';
+export type ScannerError = Exclude<ScannerStatus, 'ready'>;
+
+// qr-scanner 1.4.2 throws a bare STRING (not an Error) when navigator.mediaDevices is undefined - an
+// insecure origin or an ancient browser. Reading .name or testing instanceof Error first mis-handles it.
+function classifyScannerError (error: unknown): ScannerError {
+    if (typeof error === 'string') {
+        return 'no-camera';
+    }
+
+    const name = typeof error === 'object' && error !== null && 'name' in error
+        ? String((error as { name: unknown }).name)
+        : null;
+
+    switch (name) {
+        case 'NotAllowedError':
+        case 'SecurityError':
+            return 'denied';
+        case 'NotFoundError':
+        case 'OverconstrainedError':
+            return 'no-camera';
+        default:
+            return 'unknown';
+    }
+}
+
 // allowBareCode is admin-only: a player's scan MUST carry the collect-URL prefix, so a stray convention
 // QR can never register as a code. Authoring reads pre-printed sticker sheets, which hold the bare code.
 export default function CodeScanner ({
     onCode,
     allowBareCode = false,
-    className
+    className,
+    onStatus
 }: {
     onCode: (code: string) => void,
     allowBareCode?: boolean,
-    className?: string
+    className?: string,
+    onStatus?: (status: ScannerStatus) => void
 }) {
     const ref = useRef<HTMLVideoElement>(null);
-    const qrScannerRef = useRef<QrScanner | null>(null);
     const handleRef = useRef<(value: string) => void>(() => undefined);
+    const statusRef = useRef<((status: ScannerStatus) => void) | undefined>(undefined);
 
     useEffect(() => {
         handleRef.current = (value: string) => {
@@ -32,13 +60,20 @@ export default function CodeScanner ({
                 onCode(value);
             }
         };
+
+        statusRef.current = onStatus;
     });
 
     useEffect(() => {
-        let init = false;
+        const video = ref.current;
 
-        qrScannerRef.current = ref.current ? new QrScanner(
-            ref.current,
+        if (!video) {
+            return;
+        }
+
+        let cancelled = false;
+        const scanner = new QrScanner(
+            video,
             (result) => handleRef.current(result.data),
             {
                 maxScansPerSecond: 4,
@@ -47,19 +82,15 @@ export default function CodeScanner ({
                 highlightScanRegion: false,
                 returnDetailedScanResult: true
             }
-        ) : null;
+        );
 
-        const interval = setInterval(() => {
-            if (!init && ref.current && qrScannerRef.current !== null) {
-                qrScannerRef.current?.start();
-                init = true;
-                clearInterval(interval);
-            }
-        }, 1000);
+        scanner.start()
+            .then(() => cancelled || statusRef.current?.('ready'))
+            .catch((error) => cancelled || statusRef.current?.(classifyScannerError(error)));
 
         return () => {
-            qrScannerRef.current?.destroy();
-            clearInterval(interval);
+            cancelled = true;
+            scanner.destroy();
         };
     }, []);
 
