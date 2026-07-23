@@ -284,9 +284,23 @@ server-side via `functions/src/actions/photoStorage.ts`.
 "a Firestore user doc with a username exists" — i.e. account setup is complete.
 
 `components/AuthCheck.tsx` wraps every page in `_app.tsx`. It hard-codes a `publicRoutes` allowlist
-(main, login/register + email variants, account-setup, collect, rulebook, faq). Anything else renders
-`Custom404` for a signed-out visitor. **`/collect` is intentionally public** so a first-time scanner
-lands somewhere sane and gets funneled into registration.
+(main, login/register + email variants, account-setup, collect, rulebook, faq). A visitor with **no
+Firestore user doc** on any *other* route in `Enum/Page.ts` — `/admin/*`, `/guild` and `/dashboard`
+included, deliberately no exclusion list — is `router.replace`d to the landing page (a `<Loader/>`
+renders meanwhile, never a 404 frame); only a genuinely unknown URL still gets `Custom404`. `replace`,
+not `push`, or Back re-enters the route and re-redirects. **`/collect` is intentionally public** so a
+first-time scanner lands somewhere sane and gets funneled into registration; its branch also stashes
+the scanned code (`utils/pendingCode.ts`, sessionStorage, single-use — cleared inside
+`destinationAfterAuth()`) so registration ends back on `/collect/:code` with it prefilled.
+
+⚠️ **`AuthCheck` must never render `children` while `user` is unresolved.** `hooks/useAdminOnly.ts`
+bounces to `/collect` on `!user`, and it only stays out of the redirect's way because the admin page
+never mounts. An "avoid the loader flash" change that renders optimistically would throw **legitimate
+admins** off every admin page. Nothing else in the codebase enforces this.
+
+⚠️ **`hasAccount` is in the effect's dep list on purpose.** Losing the account — signing out, an
+expired session — is itself the trigger; `authLoading`/`userLoading`/`pathname` are all unchanged at
+that moment, so without it a session expiring mid-page hangs on the Loader forever.
 
 Roles (`Enum/UserRole.ts`): `user`, `admin`, `dashboard`.
 - `admin` → unlocks the admin panel in `/account` and the `/admin/*` pages (guarded by `useAdminOnly`).
@@ -429,10 +443,29 @@ The page then reads the value off `router.query`. **Any new dynamic route must b
 constant added to `Enum/Page.ts`.
 
 ⚠️ **Never navigate to `Page.MAIN` while the user is still signed in.** `_app.tsx` bounces a `userReady`
-visitor off `/` to `/map`, so a sign-out that pushes first and calls `auth.signOut()` after strands the
-now-anonymous visitor on `/map` — not a public route, so `AuthCheck` answers with `Custom404`. Sign out
+visitor off `/` to `/map`, so a sign-out that pushes first and calls `auth.signOut()` after dumps the
+now-anonymous visitor on `/map` — no longer the dead `Custom404` it used to be (`AuthCheck` now bounces
+them back to the landing page), but still a pointless round trip through a screen they cannot use. Sign out
 **first**, then navigate (`pages/account.tsx`). `pages/auth/account-setup.tsx` keeps the opposite order
 safely only because its error path has no user doc, so `userReady` is already false.
+
+⚠️ **A redirect effect with `router` in its deps fires AGAIN after its own `push`.** The router identity
+changes on navigation, the page is still mounted, the effect re-runs. Harmless when the destination is
+constant (both pushes go to the same route), which is why the four auth pages got away with it for
+years — but the moment the destination has a **single-use side effect** it is a real bug: the second
+run found `destinationAfterAuth()`'s stash already spent and overwrote `/collect/:code` with `/map`.
+All four (`login`, `login-email`, `register`, `register-email`) now guard with a `redirectedRef`, the
+same idiom as `account-setup.tsx`'s `registeringRef`. Ref-guard any new one.
+
+⚠️ **`userLoading` / `userReady` in `hooks/useUserData.ts` are DERIVED, never `useState` + effect.**
+State set inside an effect is still stale on the render `authUser` first appears, so the hook reports
+`authLoading:false, userLoading:false, userReady:false` — indistinguishable from "resolved, no
+account" — and every consumer routes on it. `userLoading = !!authUid && loadedForUid !== authUid`, with
+`loadedForUid` stamped in the `onSnapshot` callback. Two traps if you touch it: the **`!authUid` branch
+must resolve to not-loading** (a signed-out visitor never gets a snapshot, so a `true` there pins the
+whole app on `<Loader/>` and no public page ever renders — fails closed for 100% of players), and the
+subscription effect must be keyed on the **uid string**, not the `authUser` object, or identity churn
+resubscribes and flips `userLoading` synchronously into a full-screen Loader mid-game.
 
 ### Navbar
 
