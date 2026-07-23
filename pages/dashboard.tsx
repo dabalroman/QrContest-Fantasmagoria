@@ -16,16 +16,16 @@ enum ScreenType {
     FantasmagoriaSplash,
     QrContestSplash,
     Event,
-    News,
+    Reminder,
     Agenda
 }
 
 const screenTypeWeights = {
-    [ScreenType.FantasmagoriaSplash]: 0.05,
-    [ScreenType.QrContestSplash]: 0.1,
-    [ScreenType.News]: 0.03,
-    [ScreenType.Event]: 0.40,
-    [ScreenType.Agenda]: 0.42
+    [ScreenType.FantasmagoriaSplash]: 0.07,
+    [ScreenType.QrContestSplash]: 0.07,
+    [ScreenType.Reminder]: 0.07,
+    [ScreenType.Event]: 0.39,
+    [ScreenType.Agenda]: 0.40
 };
 
 // Event and Agenda render nothing at all without program data, so a failed first fetch would
@@ -34,8 +34,33 @@ const screenTypeWeights = {
 const programFreeScreenTypeWeights = {
     [ScreenType.FantasmagoriaSplash]: 0.35,
     [ScreenType.QrContestSplash]: 0.45,
-    [ScreenType.News]: 0.2
+    [ScreenType.Reminder]: 0.2
 };
+
+const billboards = [
+    '/dashboard/mok-parter.webp',
+    '/dashboard/mok-piwnica.webp'
+];
+
+type Reminder = {
+    title: string,
+    subtitle: string,
+    nightOnly?: boolean
+};
+
+/* eslint-disable max-len */
+const reminders: Reminder[] = [
+    { title: 'Pij wodę!', subtitle: 'Odwodniony bohater to martwy bohater.' },
+    { title: 'Pij wodę!', subtitle: 'Na Arrakis za łyk wody ginęli ludzie. Tu masz go za darmo, korzystaj.' },
+    { title: 'Pij wodę!', subtitle: 'Herbata się nie liczy. Energetyk tym bardziej.' },
+    { title: 'Zjedz coś!', subtitle: 'Głodny bohater podejmuje decyzje, których żałuje cała drużyna.' },
+    { title: 'Weź prysznic!', subtitle: 'Yennefer pachniała bzem i agrestem. A Ty? Trudno powiedzieć...' },
+    { title: 'Zrób sobie przerwę!', subtitle: 'Nawet smok przerywa, żeby odnowiło mu się zionięcie.' },
+    { title: 'Rozprostuj nogi!', subtitle: 'Frodo przeszedł do Mordoru na piechotę. Ty możesz obejść korytarz.' },
+    { title: 'Naładuj telefon!', subtitle: 'Skanowanie kodów na jednym procencie to ryzyko, a nie strategia.' },
+    { title: 'Idź spać!', subtitle: 'Nieumarli nie śpią i widać po nich, że to zły pomysł.', nightOnly: true }
+];
+/* eslint-enable max-len */
 
 const colorThemes = [
     'rgba(44, 41, 67, 0.8)',
@@ -117,12 +142,24 @@ const getRandomScreenType = (hasProgramEntries: boolean) => {
     ) as ScreenType;
 };
 
+const getRandomReminder = (): Reminder => {
+    const currentHour = new Date().getHours();
+    const isDarkAlready = currentHour >= 21 || currentHour < 6;
+
+    return getRandomArrayElement(
+        reminders.filter((reminder) => (reminder.nightOnly ?? false) === isDarkAlready)
+    ) as Reminder;
+};
+
 export default function DashboardPage () {
     const { user } = useUserData();
     const router = useRouter();
     const [screenType, setScreenType] = useState<ScreenType>(ScreenType.Agenda);
     const [programEntries, setProgramEntries] = useState<FantasmagoriaProgramEntry[]>([]);
     const [currentTheme, setCurrentTheme] = useState<string>(colorThemes[0]);
+    const [billboard, setBillboard] = useState<string>(billboards[0]);
+    const [reminder, setReminder] = useState<Reminder>(reminders[0]);
+    const [cycle, setCycle] = useState<number>(0);
 
     useDynamicNavbar({
         onlyCenter: true
@@ -135,18 +172,19 @@ export default function DashboardPage () {
         }
     }, [router, user]);
 
+    // Drawn here rather than in the JSX: the screen re-renders on the colour transition,
+    // which would swap the billboard and the reminder text mid-display. A timeout rather than an
+    // interval, so a tap-to-skip restarts the full minute instead of landing next to the old tick.
     useEffect(() => {
-        const hasProgramEntries = programEntries.length > 0;
+        setScreenType(getRandomScreenType(programEntries.length > 0));
+        setBillboard(getRandomArrayElement(billboards) as string);
+        setReminder(getRandomReminder());
+        setCurrentTheme(getRandomArrayElement(colorThemes) as string);
 
-        setScreenType(getRandomScreenType(hasProgramEntries));
+        const timeout = setTimeout(() => setCycle((current) => current + 1), cycleScreenEveryMs);
 
-        const timeout = setInterval(() => {
-            setScreenType(getRandomScreenType(hasProgramEntries));
-            setCurrentTheme(getRandomArrayElement(colorThemes) as string);
-        }, cycleScreenEveryMs);
-
-        return () => clearInterval(timeout);
-    }, [programEntries]);
+        return () => clearTimeout(timeout);
+    }, [programEntries, cycle]);
 
     useEffect(() => {
         // A failed refetch keeps the previously fetched program - it changes rarely, and a blank
@@ -167,13 +205,11 @@ export default function DashboardPage () {
         return () => clearInterval(fetchTimeout);
     }, []);
 
-    const currentHour = new Date().getHours();
-    const isDarkAlready = currentHour >= 21 || currentHour < 6;
-
     return (
         <div
             className="fixed top-0 left-0 w-screen h-screen z-50 bg-center bg-cover bg-fixed bg-no-repeat"
             style={{ backgroundImage: `url(/backgrounds/bg-dashboard.webp)` }}
+            onClick={() => setCycle((current) => current + 1)}
         >
             <div
                 className={'h-full w-full z-50 text-white font-base'
@@ -192,37 +228,28 @@ export default function DashboardPage () {
                    ></div>
                 }
 
-                {screenType === ScreenType.QrContestSplash && (
-                    isDarkAlready ? (
-                        <div
-                            className="w-full h-full fill bg-center bg-contain bg-no-repeat"
-                            style={{
-                                'backgroundImage': `url(/dashboard/zaraz-bedzie-ciemno.webp)`
-                            }}
-                        ></div>
-                    ) : (
-                        <div
-                            className="w-full h-full fill bg-center bg-contain bg-no-repeat"
-                            style={{
-                                'backgroundImage': `url(/dashboard/qrContest.webp)`
-                            }}
-                        ></div>
-                    )
-                )
+                {screenType === ScreenType.QrContestSplash &&
+                   <div
+                       className="w-full h-full fill bg-center bg-contain bg-no-repeat"
+                       style={{
+                           'backgroundImage': `url(${billboard})`
+                       }}
+                   ></div>
                 }
 
-                {screenType === ScreenType.News &&
+                {screenType === ScreenType.Reminder &&
                   <div className="w-full h-full flex flex-col justify-center p-20 font-semibold text-center">
                     <p style={{
                         padding: '0.3em 0',
                         fontSize: '7em',
                         filter: 'brightness(1.4)',
-                        position: 'relative',
-                        paddingLeft: '5rem',
-                        left: '-5rem',
                         marginBottom: '2rem',
                         fontWeight: '800'
-                    }}>Pij wodę!</p>
+                    }}>{reminder.title}</p>
+                    <p style={{
+                        fontSize: '3em',
+                        filter: 'brightness(1.2)'
+                    }}>{reminder.subtitle}</p>
                   </div>
                 }
 
