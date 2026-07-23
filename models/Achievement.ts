@@ -22,6 +22,9 @@ export default class Achievement extends FirebaseModel {
     type: AchievementType;
     target: number;
     bonus: number;
+    // Display sort key for /achievements (lower first). Defaults high so a legacy/unordered doc sinks
+    // to the bottom rather than jumping ahead of the authored ladder. See pages/achievements.tsx.
+    order: number;
     // Only meaningful for type === 'pinsInScope' - a pinScopeKeys.ts scope key. See
     // functions/src/actions/recomputeAchievementTargets.ts.
     scope?: string;
@@ -35,6 +38,7 @@ export default class Achievement extends FirebaseModel {
         type: AchievementType = 'points',
         target: number = 0,
         bonus: number = 0,
+        order: number = Number.MAX_SAFE_INTEGER,
         scope?: string
     ) {
         super();
@@ -47,6 +51,7 @@ export default class Achievement extends FirebaseModel {
         this.type = type;
         this.target = target;
         this.bonus = bonus;
+        this.order = order;
         this.scope = scope;
     }
 
@@ -73,6 +78,7 @@ export default class Achievement extends FirebaseModel {
             data.type,
             data.target,
             data.bonus,
+            data.order,
             data.scope
         );
     }

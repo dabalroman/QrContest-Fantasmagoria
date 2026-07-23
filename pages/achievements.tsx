@@ -21,12 +21,12 @@ export default function AchievementsPage () {
 
     const ready = !loading && user && achievements;
 
-    // Flat list, no group headers: sort so same-type achievements cluster (by group) and each run
-    // climbs its ladder (by target). Headers are deliberately deferred - this order makes them purely
-    // additive later.
+    // Flat list, no group headers: sort by the authored `order` (blocks of 100 per category, see
+    // achievementsSeed.ts), then by target so a same-order tie still climbs its ladder. Headers are
+    // deliberately deferred - this order makes them purely additive later.
     const sorted = achievements
         ? [...achievements].sort((a: Achievement, b: Achievement) =>
-            a.group.localeCompare(b.group) || a.target - b.target)
+            a.order - b.order || a.target - b.target)
         : [];
 
     // Sums the STORED grant bonus, never the definition's current one - retuning a definition later

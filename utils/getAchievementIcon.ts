@@ -1,10 +1,14 @@
 import {
     faBuilding,
+    faCompass,
     faCrown,
     faGhost,
     faGraduationCap,
     faLocationDot,
     faMedal,
+    faMicrophone,
+    faPuzzlePiece,
+    faQrcode,
     faTrophy,
     IconDefinition
 } from '@fortawesome/free-solid-svg-icons';
@@ -41,6 +45,22 @@ export default function getAchievementIcon (iconKey: string): IconDefinition {
 
     if (iconKey === 'ghost') {
         return faGhost;
+    }
+
+    if (iconKey === 'qrcode') {
+        return faQrcode;
+    }
+
+    if (iconKey === 'puzzle-piece') {
+        return faPuzzlePiece;
+    }
+
+    if (iconKey === 'microphone') {
+        return faMicrophone;
+    }
+
+    if (iconKey === 'compass') {
+        return faCompass;
     }
 
     return faMedal;

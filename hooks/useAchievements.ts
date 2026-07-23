@@ -22,7 +22,14 @@ export default function useAchievements () {
 
         getDocs(achievementsQuery)
             .then((querySnapshot: QuerySnapshot) => {
-                setAchievements(querySnapshot.docs.map((doc: any) => doc.data()) as Achievement[]);
+                const definitions = querySnapshot.docs.map((doc: any) => doc.data()) as Achievement[];
+
+                // Mirror the server's grant rule (functions/src/achievements/loadDefinitions.ts): a
+                // definition with target < 1 can never unlock - `counter >= 0` holds for everyone, so
+                // the server refuses it outright. A DERIVED `pinsInScope` target sits at 0 whenever its
+                // scope has no active pins (an empty `type:`/`map:`/`group:` scope), so hide those:
+                // an unachievable badge must not show, nor inflate the completion-% denominator.
+                setAchievements(definitions.filter((achievement: Achievement) => achievement.target >= 1));
             })
             .catch(() => {
                 setAchievements([]);

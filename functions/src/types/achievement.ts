@@ -25,6 +25,10 @@ export type Achievement = {
     type: AchievementType,
     target: number,
     bonus: number,
+    // Display sort key for the /achievements screen (lower shows first) - authored in the seed with
+    // gaps between groups (100s score, 200s location, ...) so a new badge slots in without a renumber.
+    // Presentation only: the server never reads it.
+    order: number,
     // Only meaningful for type === 'pinsInScope' - a pinScopeKeys.ts scope key. See recomputeAchievementTargets.
     scope?: string
 };

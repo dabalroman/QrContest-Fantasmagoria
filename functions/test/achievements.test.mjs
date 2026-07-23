@@ -15,11 +15,13 @@ import {
 import {
     seedFixture, seedUser, seedLegacyUser, seedInvalidAchievements, seedPhotoObject,
     seedScopedAchievement, seedLocationScopePins, seedLocationScopeExtraPins, seedLocationScopeGhostPin,
+    seedGeocachingPins,
     GUILD_UID, ROUND_UID, CARD_CODE, QUESTION_CORRECT,
-    PIN_VISIT_UID, PIN_CODE_CODE,
+    PIN_VISIT_UID, PIN_CODE_CODE, PIN_CODE_VALUE, PIN_GHOST_CODE,
     PIN_GROUP_TEST_UID,
     LOC_SCOPE_MAP_ID, LOC_SCOPE_GROUP_UID, LOC_PIN_A_UID, LOC_PIN_B_UID,
     LOC_PIN_FEEDBACK_UID, LOC_PIN_PHOTO_UID, LOC_PIN_GHOST_CODE,
+    GEO_PIN_A_UID, GEO_PIN_B_UID,
     ACH_SCORE_1, ACH_SCORE_2, ACH_OWL_1
 } from './fixtures.mjs';
 
@@ -407,4 +409,117 @@ test('a ghost pin raises its group target but not the map target it happens to s
     const user = await userDoc(uid);
     assert.equal(user.collectedPinsByScope[`map:${LOC_SCOPE_MAP_ID}`], 2, 'ghost never touched the map counter');
     assert.equal(user.collectedPinsByScope[`group:${LOC_SCOPE_GROUP_UID}`], 3);
+});
+
+// --- Per-type achievements (task #38): `type:<pinType>` scopes, derived target, no manual grouping ---
+
+test('a type: scope derives its target from the count of active pins of that type', async () => {
+    // recomputeAchievementTargets counts by isActive alone (window ignored) - the query mirrors that,
+    // so the assertion is self-consistent regardless of how many visit pins the fixture carries.
+    const activeVisit = (await db.collection('pins')
+        .where('type', '==', 'visit').where('isActive', '==', true).get()).size;
+    assert.ok(activeVisit > 0, 'fixture has active visit pins to count');
+
+    const def = await seedScopedAchievement('type:visit', { uid: 'test-type-visit' });
+    await recomputeAchievementTargets(db);
+
+    assert.equal((await achievementDoc(def.uid)).target, activeVisit,
+        'target equals the live active-visit-pin count');
+});
+
+test('collecting every pin of a type completes the per-type badge and fans it to all four places', async () => {
+    const uid = 'ach-type-code';
+    const token = await createAuthUserToken(uid);
+
+    // The fixture seeds exactly one active `code` pin (PIN_CODE); the inactive one does not count.
+    const def = await seedScopedAchievement('type:code', { uid: 'test-type-code', bonus: 12 });
+    await recomputeAchievementTargets(db);
+    assert.equal((await achievementDoc(def.uid)).target, 1, 'one active code pin in the fixture');
+
+    await seedUser(uid, 'AchTypeCode', { score: 0 });
+    await callCallable('joinGuildHandle', { guild: GUILD_UID }, token);
+
+    const res = await callCallable('collectPinHandle', { code: PIN_CODE_CODE }, token);
+    assert.deepEqual(res.achievements, [{
+        uid: def.uid, name: def.name, icon: def.icon, bonus: def.bonus
+    }], 'the sole code pin completes the type badge');
+
+    const expected = PIN_CODE_VALUE + def.bonus; // 20 + 12 = 32, below the first point cup (50)
+    const user = await userDoc(uid);
+    const round = await roundUser(uid);
+    const guild = await guildDoc();
+
+    assert.equal(user.score, expected, 'user.score');
+    assert.equal(round.score, expected, 'ranking round copy');
+    assert.equal(guild.members[uid].score, expected, 'guild member copy');
+    assert.equal(guild.score, expected, 'guild aggregate');
+    assert.equal(user.collectedPinsByScope['type:code'], 1, 'per-type counter');
+});
+
+// The ghost is the one type whose `map:` key is dropped (#60). It must still count towards `type:ghost`
+// - that is exactly how the ghosts badge is scoped after #38 - while never touching the map it sits on.
+test('a ghost completes its type badge but never touches the map scope it merely sits on', async () => {
+    const uid = 'ach-type-ghost';
+    const token = await createAuthUserToken(uid);
+
+    const def = await seedScopedAchievement('type:ghost', { uid: 'test-type-ghost', bonus: 12 });
+    await recomputeAchievementTargets(db);
+    assert.equal((await achievementDoc(def.uid)).target, 1, 'one active ghost pin in the fixture');
+
+    await seedUser(uid, 'AchTypeGhost', { score: 0 });
+
+    const res = await callCallable('collectPinHandle', { code: PIN_GHOST_CODE }, token);
+    assert.deepEqual(res.achievements, [{
+        uid: def.uid, name: def.name, icon: def.icon, bonus: def.bonus
+    }], 'the ghost completes the type:ghost badge');
+
+    const user = await userDoc(uid);
+    assert.equal(user.collectedPinsByScope['type:ghost'], 1, 'ghost counts towards its type scope');
+    assert.equal(user.collectedPinsByScope['group:test'], 1, 'and towards its group scope');
+    assert.equal(user.collectedPinsByScope['map:test-map'], undefined,
+        'but never towards the map it merely sits on');
+});
+
+// The `group:` scope path is untouched by #38 - the geocaching badge relies on it end-to-end.
+test('the group-scoped geocaching badge still derives its target and grants on clearing every cache', async () => {
+    const uid = 'ach-geocaching';
+    const token = await createAuthUserToken(uid);
+
+    await seedGeocachingPins();
+    const def = await seedScopedAchievement('group:geocaching', { uid: 'test-geocaching', bonus: 12 });
+    await recomputeAchievementTargets(db);
+    assert.equal((await achievementDoc(def.uid)).target, 2, 'two geocaching pins in scope');
+
+    await seedUser(uid, 'AchGeocaching', { score: 0 });
+
+    const first = await callCallable('collectPinHandle', { pinUid: GEO_PIN_A_UID }, token);
+    assert.deepEqual(first.achievements, [], 'one of two caches - not complete');
+
+    const second = await callCallable('collectPinHandle', { pinUid: GEO_PIN_B_UID }, token);
+    assert.deepEqual(second.achievements, [{
+        uid: def.uid, name: def.name, icon: def.icon, bonus: def.bonus
+    }], 'clearing all caches grants the badge');
+
+    const user = await userDoc(uid);
+    assert.equal(user.collectedPinsByScope['group:geocaching'], 2, 'per-group counter');
+});
+
+// The empty-scope guard (loadDefinitions rejects target < 1) must hold for `type:` scopes exactly as
+// it does for `map:`/`group:` above: a type with no active pins leaves the derived target at 0, so the
+// badge can never grant - and the client (useAchievements) hides any target < 1 def so it never shows.
+test('an empty type: scope yields target 0 and can never be granted', async () => {
+    const def = await seedScopedAchievement('type:nonexistent', { uid: 'test-type-empty' });
+    await recomputeAchievementTargets(db);
+    assert.equal((await achievementDoc(def.uid)).target, 0, 'no pins carry this type');
+
+    const uid = 'ach-type-empty';
+    const token = await createAuthUserToken(uid);
+    await seedUser(uid, 'AchTypeEmpty', { score: 0 });
+
+    const res = await callCallable('collectPinHandle', { pinUid: PIN_VISIT_UID }, token);
+    assert.ok(
+        !res.achievements.some((grant) => grant.uid === def.uid),
+        'a zero-target type scope must never grant, even on a first award'
+    );
+    assert.ok(!(def.uid in ((await userDoc(uid)).achievements ?? {})), 'nothing stamped');
 });

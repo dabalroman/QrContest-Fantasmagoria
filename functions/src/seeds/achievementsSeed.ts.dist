@@ -11,6 +11,9 @@ import { Achievement } from '../types/achievement';
 //
 // `icon` is a string KEY the client maps to a FontAwesome icon - never an IconDefinition.
 //
+// `order` is the /achievements display sort key (lower first) - author it in blocks of 100 per
+// category with gaps so a new badge slots in without a renumber.
+//
 // One example per type follows; the real file carries the full ladder.
 const achievementsSeed: Achievement[] = [
     // Counter is user.score - and bonuses fold back into score, so these can cascade.
@@ -22,7 +25,8 @@ const achievementsSeed: Achievement[] = [
         group: 'punkty',
         type: 'points',
         target: 100,
-        bonus: 10
+        bonus: 10,
+        order: 100
     },
     // Counter is user.amountOfCorrectAnswers - wrong answers do not count. Cap the target against the
     // number of pins that actually draw a question (withQuestion, non-feedback), or it is unreachable.
@@ -34,7 +38,8 @@ const achievementsSeed: Achievement[] = [
         group: 'pytania',
         type: 'correctAnswers',
         target: 10,
-        bonus: 10
+        bonus: 10,
+        order: 200
     },
     // Location badge. `scope` is a pinScopeKeys.ts key - `map:<mapId>` or `group:<groupUid>`.
     // `target` here is DERIVED, not authored: recomputeAchievementTargets overwrites it on every pin
@@ -42,6 +47,9 @@ const achievementsSeed: Achievement[] = [
     // ever live for the instant between this seed write and the recompute that follows it. Authoring
     // a value is pointless. Note that a `photo` pin in the scope means the badge cannot complete until
     // an admin approves that photo - keep them out of any scope that must stay self-serve.
+    //
+    // `scope` may also be `type:<pinType>` (e.g. `type:code`) for a "collect every pin of this kind"
+    // badge - same DERIVED-target machinery, no manual grouping needed since pin type is intrinsic.
     {
         uid: 'przyklad-lokalizacja',
         name: 'Nazwa odznaki',
@@ -51,7 +59,8 @@ const achievementsSeed: Achievement[] = [
         type: 'pinsInScope',
         scope: 'map:dwor',
         target: 0,
-        bonus: 15
+        bonus: 15,
+        order: 300
     }
     // ...
 ];

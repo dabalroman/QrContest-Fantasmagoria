@@ -265,6 +265,38 @@ export async function seedLocationScopeGhostPin () {
     });
 }
 
+// #38: two active pins tagged with the geocaching group, in a dedicated group scope so a test can
+// exhaust `group:geocaching` and observe the completionist badge grant. Mirrors seedLocationScopePins;
+// separate mapId keeps them out of any location scope the other suites assert on.
+export const GEO_GROUP_UID = 'geocaching';
+export const GEO_PIN_A_UID = 'geo-test-pin-a';
+export const GEO_PIN_B_UID = 'geo-test-pin-b';
+
+export async function seedGeocachingPins () {
+    const base = {
+        description: 'test pin',
+        clue: '',
+        type: 'visit',
+        groups: [GEO_GROUP_UID],
+        mapId: 'geo-test-map',
+        hintRadius: null,
+        value: 5,
+        withQuestion: false,
+        availableFrom: null,
+        availableTo: null,
+        isActive: true,
+        code: null,
+        collectedBy: {}
+    };
+
+    await db.collection('pins').doc(GEO_PIN_A_UID).set({
+        uid: GEO_PIN_A_UID, name: 'Geo pin A', coords: { x: 0, y: 0 }, ...base
+    });
+    await db.collection('pins').doc(GEO_PIN_B_UID).set({
+        uid: GEO_PIN_B_UID, name: 'Geo pin B', coords: { x: 1, y: 1 }, ...base
+    });
+}
+
 /**
  * A fully-formed user doc written straight through the admin SDK, so a test can preset counters or
  * the achievements map (e.g. seed a score just below a cup threshold, or a malformed achievements
