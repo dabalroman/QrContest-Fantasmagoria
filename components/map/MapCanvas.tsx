@@ -22,6 +22,23 @@ const UNCLAMPED_MIN_ZOOM = -10;
 // resolution - past it you are magnifying pixels, not revealing detail.
 const NATIVE_ZOOM = 0;
 
+// Zoom-in headroom past native, in zoom levels. The art is smooth painted work that survives a 2x
+// upscale, and the floors are dense enough that stopping dead at native leaves them hard to read.
+const MAX_OVERZOOM = 1;
+
+// How far below the contain-fit the overview may go, so the art is not pinned flush to the viewport
+// edges. Must stay a multiple of zoomSnap or the floor lands off the snap grid.
+const OVERVIEW_ZOOM_SLACK = 0.5;
+
+// Breathing room around the overview, in CSS pixels. Deliberately small and symmetric: the art is
+// edge-to-edge, so whatever is reserved here comes straight off the readable size of the map - which
+// is why the floating MapAreaToggle is NOT accounted for, and overlaps the map's top edge at overview.
+const EDGE_PADDING = 16;
+
+// Pan slack past the image, as a fraction of the map's own size. It is in MAP units, so the CSS pixels
+// it buys shrink as you zoom out - thinnest at the overview, which is exactly where the edge feels hard.
+const PAN_SLACK = 0.2;
+
 export default function MapCanvas ({
     pins,
     activeMapId,
@@ -131,24 +148,23 @@ export default function MapCanvas ({
             overlayRef.current.setBounds(bounds);
         }
 
-        map.setMaxBounds(bounds.pad(0.05));
+        map.setMaxBounds(bounds.pad(PAN_SLACK));
         // getBoundsZoom clamps its result to the CURRENT minZoom (0 by default), so asking it for the
         // overview of an image wider than the viewport returns 0 and pins minZoom there permanently.
         // Drop the limit before measuring.
         map.setMinZoom(UNCLAMPED_MIN_ZOOM);
-        // minZoom = the overview (whole image visible), recomputed per floor and set BEFORE any restore so
-        // a stored zoom can never sit below the overview. A stored center/zoom outside the current art is
-        // clamped by minZoom + maxBounds.
-        const fitZoom = map.getBoundsZoom(bounds);
-        map.setMinZoom(fitZoom);
+        // The contain-fit for THIS floor. Recomputed per floor and set BEFORE any restore, so a stored
+        // view is clamped to the current art.
+        const fitZoom = map.getBoundsZoom(bounds, false, L.point(EDGE_PADDING * 2, EDGE_PADDING * 2));
+        map.setMinZoom(fitZoom - OVERVIEW_ZOOM_SLACK);
         // Never below the overview: art smaller than the viewport fits at a zoom above native.
-        map.setMaxZoom(Math.max(fitZoom, NATIVE_ZOOM));
+        map.setMaxZoom(Math.max(fitZoom, NATIVE_ZOOM + MAX_OVERZOOM));
 
         const stored = getStoredView(activeMapId);
         if (stored) {
             map.setView(stored.center, stored.zoom, { animate: false });
         } else {
-            map.fitBounds(bounds);
+            map.fitBounds(bounds, { padding: [EDGE_PADDING, EDGE_PADDING] });
         }
     }, [activeMapId]);
 
