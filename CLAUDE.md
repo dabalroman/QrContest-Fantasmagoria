@@ -584,6 +584,19 @@ no rule at all**. Any new palette entry that needs `/N` opacity must be declared
 them before `seedDatabaseHandle` will compile. There's also a `seeds.zip`. Only the five still-imported seeds
 gate the build (see §2); the four retired ones can be missing without a compile error.
 
+**Editor → seed round-trip (`scripts/export-pins.ts`).** The map-native pin editor (`upsertPinHandle`)
+writes pins only to the emulator's `pins` collection (the gitignored `.emulators` dump), so authoring is lost
+on a wipe. With `npm run emulators` up, `npx tsx scripts/export-pins.ts` reads the live `pins`, **merges** them
+by uid with the existing `pinsSeed.ts`, and writes a **review copy `pinsSeed.generated.ts`** — it **never
+overwrites** the real seed. Diff it (`git diff --no-index functions/src/seeds/pinsSeed.ts …generated.ts`) and
+promote by hand. Merge = new uids appended, edited replaced, **seed-only entries preserved** (a hard
+`deletePinHandle` delete does NOT propagate — retire via `isActive: false`, which merge captures). Output is
+uid-sorted (so the **first** promote is a one-time reorder diff, stable after), strips `collectedBy` (re-emits
+`{}`), serializes availability `Timestamp`s, and **fails loud** on a missing required `Pin` field or a
+duplicate `code` across `code`/`ghost` pins (the invariant `upsertPinHandle` only checks against *live*
+Firestore — a merge can reintroduce it). `pinsSeed.generated.ts` is gitignored (`src/seeds/*.ts`), so it never
+shows in `git status`.
+
 Seeding procedure: fill `ADMIN_EMAILS` in `functions/.env` **before anyone registers** and deploy →
 register that address **with the Google popup** → use *"Seed database"* in the app's profile tab →
 enter password `4064`.
@@ -875,7 +888,7 @@ up is Firebase **Storage**, for photo uploads — see 12.4 — and only under ti
 They **award points**, so granting routes through `awardPoints` like every other point source. The split
 that matters: **definitions are DATA, logic is CODE.**
 
-- `achievements/{uid}` is a readable collection (`{name, description, icon, group, type, target, bonus}`),
+- `achievements/{uid}` is a readable collection (`{name, description, icon, group, type, target, bonus, order, scope?}`),
   seeded from `achievementsSeed.ts`. Definitions are data so a threshold can be retuned **by editing the seed
   and re-seeding**, with no redeploy of logic. ⚠️ **Do not hand-edit these in the Firestore console** — the
   committed seed is the source of truth and a console edit is invisible to git and silently lost on the next
@@ -887,7 +900,7 @@ that matters: **definitions are DATA, logic is CODE.**
   Never `switch (uid)`; never let a predicate read Firestore or touch the tx.
 - **Location badges (#37) are the `pinsInScope` type** — one per map floor + per building. Counter is
   `user.collectedPinsByScope[def.scope]` (a **map-valued** counter, incremented via `actions/pinScopeKeys.ts` =
-  `group:<g>` + `map:<mapId>`; it does NOT join the flat `UserCounterKey`/`USER_COUNTER_DEFAULTS` machinery —
+  `group:<g>` + `map:<mapId>` + `type:<pinType>`; it does NOT join the flat `UserCounterKey`/`USER_COUNTER_DEFAULTS` machinery —
   `getCurrentUser` hydrates it to `{}` separately). Unlike every other type, **`target` is DERIVED, not
   authored**: `recomputeAchievementTargets` recounts pins per scope and writes `target` onto the defs on
   every seed/`upsertPinHandle`/`deletePinHandle` (so authoring `target` on these is pointless — it's
@@ -897,12 +910,25 @@ that matters: **definitions are DATA, logic is CODE.**
   sides must agree, which they do by both reading `scopeKeys` and neither filtering around it. The one
   deliberate exception lives *inside* that helper, so both sides still drop it together: **`ghost` omits its
   `map:<mapId>` key** (#60) — a ghost sits on a map image only because a marker needs coordinates, and must
-  not inflate that floor's badge. It still counts towards its `group:` scopes.
+  not inflate that floor's badge. It still counts towards its `group:` **and its `type:ghost`** scopes.
   Consequences worth knowing when authoring pins (#16): a `feedback` pin in a
   scope means its badge needs the talk rated, and a **`photo` pin means the badge cannot complete until an
   admin approves that photo** — keep photo pins out of any scope that must stay self-serve.
   `loadDefinitions` rejects a `pinsInScope` def with `target < 1` (a `>= 0`
   target auto-grants event-wide on a player's first award).
+- **Per-type badges (#38) are `pinsInScope` scoped `type:<pinType>`** — "collect every pin of a kind", one per
+  collectible type (code/riddle/visit/feedback/ghost; `photo` is excluded — it can't self-complete, it needs an
+  admin approval). They need **no manual grouping** (type is intrinsic): `scopeKeys` emits `type:<pin.type>` for
+  every pin, so the derived target and the award numerator stay in step exactly the way the location badges do.
+  Geocaching (`group:geocaching`) is the sole badge that still needs hand-tagged pins. ⚠️ **The client
+  (`useAchievements`) hides any def with `target < 1`** so an empty-scope badge (a `type:`/`map:`/`group:` whose
+  scope has zero active pins) neither shows nor dilutes the completion-%, mirroring the server `loadDefinitions`
+  reject.
+- **`order`** is the /achievements display sort key (lower first; `pages/achievements.tsx` sorts on it, then
+  `target`). The seed authors it in blocks of 100 per category (100s score · 200s location incl. building
+  "kings" · 300s owls · 400s types · 500 geocaching · 501 zaświaty) with gaps so a new badge slots in without a
+  renumber. It is **display-only — the server never reads it.** Per-type badge `icon` keys mirror `getPinIcon`
+  (qrcode/puzzle-piece/map-pin/microphone/ghost); building "kings" use `crown`.
 - ⚠️ **A bug here must never kill scoring** — it runs inside *every* `awardPoints` transaction, event-wide.
   `evaluateAchievements(user, definitions)` is pure (no writes, does not mutate `user`, returns a grant LIST)
   and is wrapped in try/catch; `applyGrant` — the only writer — runs **outside** the try, which is why a
