@@ -61,7 +61,7 @@ export default function PinSheet ({
     const canCollect = !collected && !isPhoto;
     // A photo pin with no image sent yet: the centre button becomes the uploader.
     const canUploadPhoto = isPhoto && !collected;
-    // Dwór is a city map with no floors (floorLabel null), so it renders as just the area name.
+    // Miasto is a city map with no floors (floorLabel null), so it renders as just the area name.
     const pinMap = getMap(pin.mapId);
     const locationLabel = pinMap
         ? [MAP_AREA_LABELS[pinMap.area], pinMap.floorLabel].filter(Boolean).join(' · ')

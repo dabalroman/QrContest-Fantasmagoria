@@ -56,7 +56,7 @@ export default function MapPage () {
     const isAdmin = user?.role === UserRole.ADMIN;
 
     const [activeMapId, setActiveMapId] = useState<string>(defaultMapId);
-    // Gate the canvas until we've read the stored floor, so it never mounts on Dwór and swaps a frame later.
+    // Gate the canvas until we've read the stored floor, so it never mounts on Miasto and swaps a frame later.
     const [restored, setRestored] = useState<boolean>(false);
     // Admin-only: swaps the play canvas for the pin editor, sharing the same area/floor picker.
     const [editMode, setEditMode] = useState<boolean>(false);
