@@ -21,7 +21,7 @@ export default function CodeScannerOverlay ({
             </p>
             <CodeScanner
                 allowBareCode={allowBareCode}
-                className="w-full max-w-lg rounded-2xl"
+                className="max-h-[60vh] w-full max-w-lg rounded-2xl object-cover"
                 onCode={(code) => {
                     onCode(code);
                     toast.success('Kod zeskanowany.');
