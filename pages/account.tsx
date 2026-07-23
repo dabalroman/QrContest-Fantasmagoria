@@ -13,6 +13,8 @@ import toast from 'react-hot-toast';
 import { Page } from '@/Enum/Page';
 import { auth, firestore } from '@/utils/firebase';
 import { useRouter } from 'next/router';
+import { MapQuality } from '@/Enum/MapQuality';
+import { getMapQuality, setMapQuality } from '@/utils/mapQuality';
 // CLUBS-DISABLED-2026: club UI hidden for the 2026 edition
 // import Guild from '@/models/Guild';
 // import { doc, onSnapshot } from '@firebase/firestore';
@@ -24,6 +26,16 @@ import { useRouter } from 'next/router';
 export default function AccountPage () {
     const router = useRouter();
     const { user } = useContext<UserContextType>(UserContext);
+
+    // Read after mount: getMapQuality() returns HIGH on the server, so the first client render matches SSR
+    // and the stored value is picked up in the effect (avoids a hydration mismatch).
+    const [mapQuality, setMapQualityState] = useState<MapQuality>(MapQuality.HIGH);
+    useEffect(() => setMapQualityState(getMapQuality()), []);
+
+    const chooseMapQuality = (quality: MapQuality) => {
+        setMapQuality(quality);
+        setMapQualityState(quality);
+    };
 
     /* CLUBS-DISABLED-2026: guild subscription hidden for the 2026 edition
     const [guild, setGuild] = useState<Guild | null>(null);
@@ -140,6 +152,35 @@ export default function AccountPage () {
                         Zwycięzców zapraszamy po odbiór nagród do punktu informacyjnego konwentu w momencie
                         zakończenia rundy.
                     </p>
+                </Panel>
+
+                <Panel title="Jakość map">
+                    <p className="mt-2 text-justify">
+                        Mapy w wysokiej jakości wyglądają ostrzej, ale na starszych telefonach mogą działać
+                        wolniej. Jeśli mapa się zacina, wybierz niską jakość.
+                    </p>
+                    <div className="flex gap-2 mt-4">
+                        <Button
+                            className="w-full"
+                            style={mapQuality === MapQuality.HIGH ? {
+                                background: 'var(--color-primary)',
+                                borderColor: 'var(--color-primary)'
+                            } : {}}
+                            onClick={() => chooseMapQuality(MapQuality.HIGH)}
+                        >
+                            Wysoka
+                        </Button>
+                        <Button
+                            className="w-full"
+                            style={mapQuality === MapQuality.LOW ? {
+                                background: 'var(--color-primary)',
+                                borderColor: 'var(--color-primary)'
+                            } : {}}
+                            onClick={() => chooseMapQuality(MapQuality.LOW)}
+                        >
+                            Niska
+                        </Button>
+                    </div>
                 </Panel>
 
                 {/* CLUBS-DISABLED-2026: club panels hidden for the 2026 edition

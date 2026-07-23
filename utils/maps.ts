@@ -1,11 +1,14 @@
 import { PinCoords } from '@/models/Pin';
 import { LatLngTuple } from 'leaflet';
+import { MapQuality } from '@/Enum/MapQuality';
 
 // The canonical map registry (decision 29 + 30). NINE maps, not six: Miasto is a standalone city map
 // belonging to no building; MOK has 5 levels (incl. Piętro 1.5); 2LO has 3. #13 owns these mapIds and
-// the seed points at them. Swapping art in is overwriting public/maps/<mapId>.webp - no code change -
-// but the declared width/height must match the file, and changing them after coords are authored points
-// every pin at the wrong room.
+// the seed points at them. Swapping art in is overwriting public/maps/<mapId>.webp - but then also
+// re-run scripts/generate-low-maps.sh (#56): the "Niska" quality toggle serves public/maps/low/, and
+// overwriting the full-res art without regenerating leaves every "Niska" player on the old edition's
+// map with no error anywhere. The declared width/height must match the FULL-res file, and changing
+// them after coords are authored points every pin at the wrong room.
 
 export enum MapArea {
     DWOR = 'dwor',
@@ -66,6 +69,14 @@ export const defaultMapId = 'dwor';
 
 export function getMap (mapId: string): MapDefinition | undefined {
     return maps.find((map) => map.mapId === mapId);
+}
+
+// The single place that knows the directory layout for the #56 quality toggle. LOW serves the half-res
+// copy from public/maps/low/; L.ImageOverlay stretches it to imageBounds(), which reads the registry's
+// full-res width/height - so a low-res file lands every pin in the exact same place, just softer.
+// Never "correct" width/height to a low-res file's size: that is the one edit that relocates every pin.
+export function mapImageUrl (map: MapDefinition, quality: MapQuality): string {
+    return quality === MapQuality.LOW ? `/maps/low/${map.mapId}.webp` : `/maps/${map.mapId}.webp`;
 }
 
 export function getMapsInArea (area: MapArea): MapDefinition[] {

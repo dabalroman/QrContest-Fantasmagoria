@@ -1,10 +1,12 @@
 import L from 'leaflet';
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import debounce from 'lodash.debounce';
 import Pin, { PinCoords } from '@/models/Pin';
-import { fromLatLng, getMap, hintRadiusToPixels, imageBounds, toLatLng } from '@/utils/maps';
+import { fromLatLng, getMap, hintRadiusToPixels, imageBounds, mapImageUrl, toLatLng } from '@/utils/maps';
 import { getStoredView, saveView } from '@/utils/mapView';
+import { getMapQuality } from '@/utils/mapQuality';
+import { MapQuality } from '@/Enum/MapQuality';
 import PinMarkerIcon from '@/components/map/PinMarkerIcon';
 
 // The ONLY file that value-imports leaflet (it touches `window` at module scope), so pages/map.tsx
@@ -61,6 +63,14 @@ export default function MapCanvas ({
     const overlayRef = useRef<L.ImageOverlay | null>(null);
     const layerGroupRef = useRef<L.LayerGroup | null>(null);
     const draftLayerGroupRef = useRef<L.LayerGroup | null>(null);
+
+    // #56 quality, read once at mount. /map remounts on navigation, so flipping the toggle on Profil and
+    // tapping to the map is enough - deliberately no live cross-page reactivity.
+    const [quality] = useState(() => getMapQuality());
+
+    // The URL last intentionally handed to the overlay - the 404-fallback handler compares against this
+    // (not the DOM src) so a low-res miss retries full-res exactly once and a second failure is a no-op.
+    const requestedUrlRef = useRef<string | null>(null);
 
     // Latest click handler, read by ref so re-rendering doesn't rebuild every marker's listener.
     const onPinClickRef = useRef(onPinClick);
@@ -140,11 +150,27 @@ export default function MapCanvas ({
         }
 
         const bounds = L.latLngBounds(imageBounds(mapDef));
+        const url = mapImageUrl(mapDef, quality);
+        requestedUrlRef.current = url;
 
         if (!overlayRef.current) {
-            overlayRef.current = L.imageOverlay(mapDef.image, bounds).addTo(map);
+            const overlay = L.imageOverlay(url, bounds).addTo(map);
+            // Fall back to full-res if a low/ file 404s: an incomplete low/ directory would otherwise
+            // blank the app's main screen mid-event. Retry once (guarded by requestedUrlRef), never loop.
+            overlay.on('error', () => {
+                const activeDef = getMap(activeMapIdRef.current);
+                if (!activeDef) {
+                    return;
+                }
+                const fullResUrl = mapImageUrl(activeDef, MapQuality.HIGH);
+                if (requestedUrlRef.current !== fullResUrl) {
+                    requestedUrlRef.current = fullResUrl;
+                    overlay.setUrl(fullResUrl);
+                }
+            });
+            overlayRef.current = overlay;
         } else {
-            overlayRef.current.setUrl(mapDef.image);
+            overlayRef.current.setUrl(url);
             overlayRef.current.setBounds(bounds);
         }
 
@@ -166,7 +192,7 @@ export default function MapCanvas ({
         } else {
             map.fitBounds(bounds, { padding: [EDGE_PADDING, EDGE_PADDING] });
         }
-    }, [activeMapId]);
+    }, [activeMapId, quality]);
 
     // Rebuild markers + hint circles for the active floor.
     useEffect(() => {

@@ -816,6 +816,9 @@ up is Firebase **Storage**, for photo uploads — see 12.4 — and only under ti
   *city* map belonging to no building; **MOK** has 5 levels (Piwnica, Parter, Piętro 1, **Piętro 1.5**,
   Piętro 2); **2LO** has 3 (Parter, Piętro 1, Piętro 2). `utils/maps.ts` is canonical. Swapping placeholder
   art for real art is **overwriting files in `public/maps/`, no code change**, as long as filenames match.
+  ⚠️ **But then re-run `scripts/generate-low-maps.sh` (#56).** The "Niska" quality toggle serves
+  half-res copies from `public/maps/low/`; overwriting the full-res art without regenerating leaves every
+  player on "Niska" seeing the *previous* edition's map, with no error anywhere.
 - `hintRadius` makes a marker an *area* hint rather than a precise dot — used for `code` pins, whose QR is
   hidden "somewhere around here". `null` = precise point. ⚠️ It is authored in **map-relative units, not
   pixels**: 1 unit = 1% of the map's shorter side, converted at render time by `hintRadiusToPixels`

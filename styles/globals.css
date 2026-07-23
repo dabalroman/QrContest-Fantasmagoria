@@ -86,7 +86,7 @@ body {
 }
 
 .bg-image-mobile-position {
-    background-size: auto max(600px, 100vh);
+    background-size: cover;
     background-position: center 0;
     background-repeat: no-repeat;
 }
