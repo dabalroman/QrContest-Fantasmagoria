@@ -20,7 +20,7 @@ const collectErrorsDictionary: StringMap = {
 // 'wrong answer' for both, so the pin type is what tells them apart.
 export function getCollectErrorMessage (error: Error, pinType?: PinType): string {
     if (error.message === 'wrong answer' && pinType && entersCode(pinType)) {
-        return 'Błędny kod!';
+        return 'Błędny kod! Upewnij się, że wybrałeś właściwą pinezkę.';
     }
 
     return collectErrorsDictionary[error.message] ?? 'Błąd aplikacji, spróbuj ponownie.';
