@@ -25,6 +25,8 @@ export default function LoginEmail () {
 
     const {
         authUser,
+        authLoading,
+        userLoading,
         userReady
     }: UserContextType = useContext(UserContext);
 
@@ -57,10 +59,10 @@ export default function LoginEmail () {
     };
 
     useEffect(() => {
-        if(authUser) {
+        if (!authLoading && !userLoading && authUser) {
             router.push(userReady ? Page.COLLECT : Page.ACCOUNT_SETUP).then();
         }
-    }, [userReady, authUser, router]);
+    }, [userReady, authUser, router, authLoading, userLoading]);
 
     return (
         <main className="grid grid-rows-layout items-center min-h-screen p-4">

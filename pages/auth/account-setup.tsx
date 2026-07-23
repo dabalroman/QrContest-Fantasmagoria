@@ -16,6 +16,7 @@ import { useForm } from 'react-hook-form';
 import { setupAccountFunction } from '@/utils/functions';
 import canonicalUsername from '@/functions/src/actions/canonicalUsername';
 import { useRouter } from 'next/router';
+import Loader from '@/components/Loader';
 
 export default function AccountSetupPage () {
     const router = useRouter();
@@ -132,6 +133,12 @@ export default function AccountSetupPage () {
     const onError = async (data: any) => {
         toast.error(data.username.message);
     };
+
+    // Same condition as the redirect effect above - without this the nick form paints for a frame
+    // before the push lands, which is the flash this page is meant to stop showing.
+    if (userReady && !registeringRef.current) {
+        return <Loader/>;
+    }
 
     if (step === 'welcome') {
         return (
