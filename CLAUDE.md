@@ -642,13 +642,28 @@ will need an index added here.
 ## 10. The TV dashboard
 
 `pages/dashboard.tsx` is a full-screen kiosk view for a projector/TV, gated to `UserRole.DASHBOARD`.
-It cycles randomly (weighted) between screen types every 60s — Agenda, Event, splash screens, and a
-"Pij wodę!" (drink water) reminder — and re-fetches the convention program hourly from Fantasmagoria's
+It cycles randomly (weighted) between screen types every 60s — Agenda, Event, the two splashes and a
+`Reminder` — and re-fetches the convention program hourly from Fantasmagoria's
 JSON-RPC API (`NEXT_PUBLIC_DASHBOARD_API_URL`, method `GetKonwent2026Program`). The method is a **hardcoded
 literal in `pages/dashboard.tsx`** and **year-stamped** — bump each edition. The URL var must be set in
 `.env.production` at build time (`NEXT_PUBLIC_`, inlined) or the fetch silently resolves to `''`.
 `AgendaScreen` drops entries longer than 6h (`MAX_AGENDA_ENTRY_DURATION_HOURS`) — permanent all-day booths
 that would otherwise flood the scroll list.
+
+⚠️ **The screen, the billboard, the reminder line and the colour theme are all drawn in the cycle effect,
+never inline in the JSX** — the 1s colour transition re-renders the page, so an inline draw swaps the
+artwork and the text mid-display. The cycle is a self-rescheduling `setTimeout` keyed on a `cycle`
+counter, not an interval, so the tap-anywhere-to-advance handler restarts the full minute. `ScreenType`
+weights need not sum to 1 (`getRandomArrayElementWithWeights` normalizes), but keeping them at 1 is what
+makes them readable as percentages.
+
+**`QrContestSplash` renders the two MOK map billboards** (`/dashboard/mok-{parter,piwnica}.webp`, 3840x2160)
+picked at random. ⚠️ **Each has a live 10-char pin code and its QR baked into the art** — `1MB2C1F9WG`
+(Parter) and `1DLDL9NRT8` (Piwnica). The pins must match the billboards, never the other way round; a
+re-export that drops or alters either string breaks a scannable code with no in-app fix.
+The `Reminder` pool partitions on `nightOnly` via `(reminder.nightOnly ?? false) === isDarkAlready`
+(21:00-06:00), so night entries are the *only* ones eligible after 21:00 — adding a second night line
+needs no logic change.
 
 Fetch the live program yourself (no app needed):
 `curl -s -X POST "$NEXT_PUBLIC_DASHBOARD_API_URL" -H 'content-type: application/json-rpc' -d '{"id":null,"method":"GetKonwent2026Program"}'`
