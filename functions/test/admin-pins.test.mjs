@@ -163,14 +163,22 @@ test('re-seeding preserves a pin\'s collectedBy', async () => {
     // First real seed, so the production pin/card content exists.
     await callCallable('seedDatabaseHandle', { password: '4064' }, adminToken);
 
-    const playerToken = await registerPlayer('reseed-finder', 'ReseedFinder');
-    // A stable code/uid pair from the real pin seed (map:mok-pietro-2, slot 1).
-    await callCallable('collectPinHandle', { code: 'MP20000001' }, playerToken);
+    // Picked at runtime, never hardcoded: the real seed is gitignored and its pins are re-authored
+    // every edition, so a fixed uid/code pair here fails the moment the content changes.
+    const scannable = (await db.collection('pins').get()).docs.find((doc) => {
+        const data = doc.data();
+        return data.code && data.isActive && !data.availableFrom && !data.availableTo
+            && ['code', 'ghost', 'geocaching'].includes(data.type);
+    });
+    assert.ok(scannable, 'the real seed must contain at least one scannable pin');
 
-    // Re-seed - must NOT wipe the finder (seedPins now uses set(pin, { merge: true })).
+    const playerToken = await registerPlayer('reseed-finder', 'ReseedFinder');
+    await callCallable('collectPinHandle', { code: scannable.data().code }, playerToken);
+
+    // Re-seed - must NOT wipe the finder (seedWithPreservedFields omits collectedBy on an existing doc).
     await callCallable('seedDatabaseHandle', { password: '4064' }, adminToken);
 
-    const pin = (await db.collection('pins').doc('mok-pietro-2-1').get()).data();
+    const pin = (await db.collection('pins').doc(scannable.id).get()).data();
     assert.ok(pin.collectedBy['reseed-finder'], 'collectedBy must survive a re-seed');
 });
 
