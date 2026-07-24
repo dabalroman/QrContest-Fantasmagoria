@@ -21,7 +21,7 @@ import {
     PIN_GROUP_TEST_UID,
     LOC_SCOPE_MAP_ID, LOC_SCOPE_GROUP_UID, LOC_PIN_A_UID, LOC_PIN_B_UID,
     LOC_PIN_FEEDBACK_UID, LOC_PIN_PHOTO_UID, LOC_PIN_GHOST_CODE,
-    GEO_PIN_A_UID, GEO_PIN_B_UID,
+    GEO_PIN_A_UID, GEO_PIN_B_UID, GEO_PIN_A_CODE, GEO_PIN_B_CODE, GEO_PIN_MAP_ID,
     ACH_SCORE_1, ACH_SCORE_2, ACH_OWL_1
 } from './fixtures.mjs';
 
@@ -480,28 +480,32 @@ test('a ghost completes its type badge but never touches the map scope it merely
         'but never towards the map it merely sits on');
 });
 
-// The `group:` scope path is untouched by #38 - the geocaching badge relies on it end-to-end.
-test('the group-scoped geocaching badge still derives its target and grants on clearing every cache', async () => {
+// #75: geocaching is a first-class type now, so its badge is `type:geocaching` (per-type, #38 style),
+// its target derived by recomputeAchievementTargets like every other type badge. And like ghost, a
+// geocaching pin is dropped from its `map:` scope - it must not advance that floor's location badge.
+test('the type-scoped geocaching badge derives its target and grants on clearing every cache', async () => {
     const uid = 'ach-geocaching';
     const token = await createAuthUserToken(uid);
 
     await seedGeocachingPins();
-    const def = await seedScopedAchievement('group:geocaching', { uid: 'test-geocaching', bonus: 12 });
+    const def = await seedScopedAchievement('type:geocaching', { uid: 'test-geocaching', bonus: 12 });
     await recomputeAchievementTargets(db);
     assert.equal((await achievementDoc(def.uid)).target, 2, 'two geocaching pins in scope');
 
     await seedUser(uid, 'AchGeocaching', { score: 0 });
 
-    const first = await callCallable('collectPinHandle', { pinUid: GEO_PIN_A_UID }, token);
+    const first = await callCallable('collectPinHandle', { pinUid: GEO_PIN_A_UID, answer: GEO_PIN_A_CODE }, token);
     assert.deepEqual(first.achievements, [], 'one of two caches - not complete');
 
-    const second = await callCallable('collectPinHandle', { pinUid: GEO_PIN_B_UID }, token);
+    const second = await callCallable('collectPinHandle', { pinUid: GEO_PIN_B_UID, answer: GEO_PIN_B_CODE }, token);
     assert.deepEqual(second.achievements, [{
         uid: def.uid, name: def.name, icon: def.icon, bonus: def.bonus
     }], 'clearing all caches grants the badge');
 
     const user = await userDoc(uid);
-    assert.equal(user.collectedPinsByScope['group:geocaching'], 2, 'per-group counter');
+    assert.equal(user.collectedPinsByScope['type:geocaching'], 2, 'per-type counter');
+    assert.equal(user.collectedPinsByScope[`map:${GEO_PIN_MAP_ID}`], undefined,
+        'a geocache is hidden - it does not advance its floor location badge');
 });
 
 // The empty-scope guard (loadDefinitions rejects target < 1) must hold for `type:` scopes exactly as

@@ -32,7 +32,8 @@ type FormValues = {
 };
 
 function needsCode (type: PinType): boolean {
-    return type === PinType.CODE || type === PinType.RIDDLE || type === PinType.GHOST;
+    return type === PinType.CODE || type === PinType.RIDDLE || type === PinType.GHOST
+        || type === PinType.GEOCACHING;
 }
 
 // Points are picked by rarity, reusing the card tier scale (Enum/CardTier). The pin still stores a

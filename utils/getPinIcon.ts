@@ -1,6 +1,7 @@
 import {PinType} from '@/Enum/PinType';
 import {
     faCamera,
+    faCompass,
     faGhost,
     faLocationDot,
     faMicrophone,
@@ -28,6 +29,10 @@ export default function getPinIcon(pinType: PinType): IconDefinition {
 
     if (pinType === PinType.GHOST) {
         return faGhost;
+    }
+
+    if (pinType === PinType.GEOCACHING) {
+        return faCompass;
     }
 
     return faCamera;

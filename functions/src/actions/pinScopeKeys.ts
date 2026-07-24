@@ -15,16 +15,18 @@ import { Pin, PinType } from '../types/pin';
 // intrinsic, so no manual grouping is needed to classify a pin. It is emitted for EVERY pin, ghost
 // included - a ghost still counts towards `type:ghost` (that is how the ghosts badge is scoped).
 //
-// GHOST is the sole exception, and it is only about the `map:` key and the fiction, not the machinery:
-// a ghost pin marks a place that is not there, parked inside some map image only because a marker needs
-// coordinates. Its `map:` key alone is dropped so it cannot inflate that floor's location badge - it
-// still counts towards its groups and its `type:ghost`. Both sides of the #45 invariant still read this
-// one helper, so they cannot drift.
+// GHOST and GEOCACHING are the exceptions, and it is only about the `map:` key, not the machinery:
+// a ghost marks a place that is not there, and a geocache is hidden in plain sight - both are parked
+// inside a map image only because a marker needs coordinates, so neither must inflate that floor's
+// location badge. Their `map:` key alone is dropped; each still counts towards its groups and its own
+// `type:` scope. Both sides of the #45 invariant still read this one helper, so they cannot drift.
+const MAP_SCOPED_EXCEPTIONS: PinType[] = [PinType.GHOST, PinType.GEOCACHING];
+
 export default function scopeKeys(pin: Pin): string[] {
     const groupKeys = pin.groups.map((group) => `group:${group}`);
     const typeKey = `type:${pin.type}`;
 
-    return pin.type === PinType.GHOST
+    return MAP_SCOPED_EXCEPTIONS.includes(pin.type)
         ? [...groupKeys, typeKey]
         : [...groupKeys, `map:${pin.mapId}`, typeKey];
 }

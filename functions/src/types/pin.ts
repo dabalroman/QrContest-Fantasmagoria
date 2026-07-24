@@ -6,7 +6,8 @@ export enum PinType {
     VISIT = 'visit',
     FEEDBACK = 'feedback',
     PHOTO = 'photo',
-    GHOST = 'ghost'
+    GHOST = 'ghost',
+    GEOCACHING = 'geocaching'
 }
 
 // Coordinate convention: x/y are pixels from the map image's top-left corner, y growing DOWN

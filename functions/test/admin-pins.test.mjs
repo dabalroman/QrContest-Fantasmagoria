@@ -279,6 +279,37 @@ test('a ghost code collides with a code pin\'s code', async () => {
     );
 });
 
+test('a geocaching pin takes the code shape and its code collides across code/ghost', async () => {
+    const adminToken = await registerAdmin('admin-geo-1', 'AdminGeo1');
+
+    // free text is rejected - geocaching is a globally-looked-up code type
+    await assert.rejects(
+        () => callCallable(
+            'upsertPinHandle',
+            { pinUid: null, fields: validFields({ name: 'Zly kesz', type: 'geocaching', code: 'kesz' }) },
+            adminToken
+        ),
+        /invalid/i
+    );
+
+    const result = await callCallable(
+        'upsertPinHandle',
+        { pinUid: null, fields: validFields({ name: 'Dobry kesz', type: 'geocaching', code: 'GEOCODE001' }) },
+        adminToken
+    );
+    assert.equal(result.pin.type, 'geocaching');
+
+    // and its code shares the uniqueness namespace with code/ghost
+    await assert.rejects(
+        () => callCallable(
+            'upsertPinHandle',
+            { pinUid: null, fields: validFields({ name: 'Kesz kolizja', type: 'geocaching', code: PIN_CODE_CODE }) },
+            adminToken
+        ),
+        /already in use/i
+    );
+});
+
 // The necklace pin's planned edit (swap in the printed code) must not drop its picture.
 test('clueImage survives an edit round trip and rejects a non-slug', async () => {
     const adminToken = await registerAdmin('admin-ghost-3', 'AdminGhost3');

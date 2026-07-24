@@ -78,7 +78,8 @@ module.exports = {
                 'pin-visit': 'var(--color-pin-visit)',
                 'pin-feedback': 'var(--color-pin-feedback)',
                 'pin-photo': 'var(--color-pin-photo)',
-                'pin-ghost': 'var(--color-pin-ghost)'
+                'pin-ghost': 'var(--color-pin-ghost)',
+                'pin-geocaching': 'var(--color-pin-geocaching)'
             },
             keyframes: {
                 pointsAdded: {
@@ -177,24 +178,28 @@ module.exports = {
         'border-pin-feedback',
         'border-pin-photo',
         'border-pin-ghost',
+        'border-pin-geocaching',
         'bg-pin-code',
         'bg-pin-riddle',
         'bg-pin-visit',
         'bg-pin-feedback',
         'bg-pin-photo',
         'bg-pin-ghost',
+        'bg-pin-geocaching',
         'ring-pin-code',
         'ring-pin-riddle',
         'ring-pin-visit',
         'ring-pin-feedback',
         'ring-pin-photo',
         'ring-pin-ghost',
+        'ring-pin-geocaching',
         'text-pin-code',
         'text-pin-riddle',
         'text-pin-visit',
         'text-pin-feedback',
         'text-pin-photo',
         'text-pin-ghost',
+        'text-pin-geocaching',
     ],
     plugins: []
 };

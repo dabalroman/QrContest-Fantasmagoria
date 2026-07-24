@@ -265,35 +265,38 @@ export async function seedLocationScopeGhostPin () {
     });
 }
 
-// #38: two active pins tagged with the geocaching group, in a dedicated group scope so a test can
-// exhaust `group:geocaching` and observe the completionist badge grant. Mirrors seedLocationScopePins;
-// separate mapId keeps them out of any location scope the other suites assert on.
-export const GEO_GROUP_UID = 'geocaching';
+// #75: two active geocaching-type pins in a dedicated map so a test can exhaust `type:geocaching` and
+// observe the completionist badge grant. Geocaching enters a 10-char code like code/ghost, and (like
+// ghost) is dropped from its `map:` scope by pinScopeKeys - the shared mapId here lets a test assert
+// that omission. Mirrors seedLocationScopePins; separate mapId keeps them out of any location scope the
+// other suites assert on.
+export const GEO_PIN_MAP_ID = 'geo-test-map';
 export const GEO_PIN_A_UID = 'geo-test-pin-a';
 export const GEO_PIN_B_UID = 'geo-test-pin-b';
+export const GEO_PIN_A_CODE = 'GEOCACHE0A';
+export const GEO_PIN_B_CODE = 'GEOCACHE0B';
 
 export async function seedGeocachingPins () {
     const base = {
         description: 'test pin',
         clue: '',
-        type: 'visit',
-        groups: [GEO_GROUP_UID],
-        mapId: 'geo-test-map',
+        type: 'geocaching',
+        groups: [],
+        mapId: GEO_PIN_MAP_ID,
         hintRadius: null,
         value: 5,
         withQuestion: false,
         availableFrom: null,
         availableTo: null,
         isActive: true,
-        code: null,
         collectedBy: {}
     };
 
     await db.collection('pins').doc(GEO_PIN_A_UID).set({
-        uid: GEO_PIN_A_UID, name: 'Geo pin A', coords: { x: 0, y: 0 }, ...base
+        uid: GEO_PIN_A_UID, name: 'Geo pin A', coords: { x: 0, y: 0 }, code: GEO_PIN_A_CODE, ...base
     });
     await db.collection('pins').doc(GEO_PIN_B_UID).set({
-        uid: GEO_PIN_B_UID, name: 'Geo pin B', coords: { x: 1, y: 1 }, ...base
+        uid: GEO_PIN_B_UID, name: 'Geo pin B', coords: { x: 1, y: 1 }, code: GEO_PIN_B_CODE, ...base
     });
 }
 

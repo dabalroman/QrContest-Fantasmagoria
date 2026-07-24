@@ -20,7 +20,7 @@ const CODE_PATTERN = /^[A-Z0-9]{10}$/;
 // Interpolated into a URL by the client (`/pin-clues/<slug>.webp`), so keep it to a bare slug.
 const CLUE_IMAGE_PATTERN = /^[a-z0-9-]+$/;
 // The types the global scanner path cross-looks-up by code, so a code must be unique across them.
-const GLOBALLY_LOOKED_UP_TYPES: PinType[] = [PinType.CODE, PinType.GHOST];
+const GLOBALLY_LOOKED_UP_TYPES: PinType[] = [PinType.CODE, PinType.GHOST, PinType.GEOCACHING];
 const normalize = (s: string): string => s.trim().toUpperCase();
 
 // The validated, fully-authored field set. Mirrors Omit<Pin, 'uid' | 'collectedBy'>, except
@@ -222,11 +222,11 @@ function validateFields(fields: unknown, validGroups: Set<string>): ValidatedPin
         return null;
     }
 
-    // code branches by type: CODE and GHOST need the 10-char [A-Z0-9] shape (both are looked up by the
-    // global scanner, where anything shorter is rejected before the query), RIDDLE needs a non-empty
-    // free-text answer, everything else (VISIT/FEEDBACK/PHOTO) is forced null.
+    // code branches by type: the globally-looked-up types (CODE/GHOST/GEOCACHING) need the 10-char
+    // [A-Z0-9] shape (the global scanner rejects anything shorter before the query), RIDDLE needs a
+    // non-empty free-text answer, everything else (VISIT/FEEDBACK/PHOTO) is forced null.
     let code: string | null = null;
-    if (type === PinType.CODE || type === PinType.GHOST) {
+    if (GLOBALLY_LOOKED_UP_TYPES.includes(type)) {
         if (typeof f.code !== 'string' || !CODE_PATTERN.test(normalize(f.code))) {
             logger.error('PIN_UPSERT_INVALID', 'code is invalid for a code pin');
             return null;

@@ -4,7 +4,8 @@ export enum PinType {
     VISIT = 'visit',
     FEEDBACK = 'feedback',
     PHOTO = 'photo',
-    GHOST = 'ghost'
+    GHOST = 'ghost',
+    GEOCACHING = 'geocaching'
 }
 
 export function isPinType(type: string): type is PinType {
@@ -14,7 +15,7 @@ export function isPinType(type: string): type is PinType {
 // A ghost's prize is a printed 10-char code like a QR pin's, so it prompts and validates as a code
 // even though it is found by solving something.
 export function entersCode(pinType: PinType): boolean {
-    return pinType === PinType.CODE || pinType === PinType.GHOST;
+    return pinType === PinType.CODE || pinType === PinType.GHOST || pinType === PinType.GEOCACHING;
 }
 
 export function getPinTypeFriendlyName(pinType: PinType): string {
@@ -31,5 +32,7 @@ export function getPinTypeFriendlyName(pinType: PinType): string {
             return 'Zdjęcie';
         case PinType.GHOST:
             return 'Duch';
+        case PinType.GEOCACHING:
+            return 'Geocaching';
     }
 }

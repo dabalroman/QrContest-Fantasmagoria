@@ -311,7 +311,7 @@ Roles (`Enum/UserRole.ts`): `user`, `admin`, `dashboard`.
 
 ## 7. Game mechanics
 
-**Pins are the 2026 collectible** (`functions/src/types/pin.ts`). Six `PinType`s, each with its own collect
+**Pins are the 2026 collectible** (`functions/src/types/pin.ts`). Seven `PinType`s, each with its own collect
 flow, colour (`--color-pin-*`) and icon (`utils/getPinIcon.ts`):
 
 | Type | How it's collected | Entry point |
@@ -322,18 +322,22 @@ flow, colour (`--color-pin-*`) and icon (`utils/getPinIcon.ts`):
 | `feedback` | rate a room's talk (`rating` 1–5 + `talkName`) | map sheet only |
 | `photo` | upload a photo, admin approves (#19) | map sheet only, via `submitPhotoHandle` |
 | `ghost` | type a 10-char code hidden in the app's own copy (#60) | `/collect/:code` **and** the map sheet |
+| `geocaching` | find a physical cache, enter the 10-char code inside it (#75) | `/collect/:code` **and** the map sheet |
 
-⚠️ **`code` and `ghost` are the ONLY types the global `/collect` input resolves** — the scanner path queries
-`type in [code, ghost]`, deliberately excluding `riddle`, whose free-text answer would otherwise be
-brute-forceable across every pin. That holds only because every ghost code is a 10-char `[A-Z0-9]` string
-(`upsertPinHandle` enforces the same `CODE_PATTERN` for both, and their codes must not collide) — the length
-check runs *before* the query. Ghosts are deliberately **omitted from `PinTypeLegend`**: finding one is a
-surprise, so the legend renders five of the six.
+⚠️ **`code`, `ghost` and `geocaching` are the ONLY types the global `/collect` input resolves** — the scanner
+path queries `type in [code, ghost, geocaching]`, deliberately excluding `riddle`, whose free-text answer would
+otherwise be brute-forceable across every pin. That holds only because every one of those three codes is a
+10-char `[A-Z0-9]` string (`upsertPinHandle` enforces the same `CODE_PATTERN` across all of them, and their
+codes must not collide) — the length check runs *before* the query. Ghosts are deliberately **omitted from
+`PinTypeLegend`** (finding one is a surprise); geocaching is **shown** (players should know to look for caches),
+so the legend renders six of the seven — only `ghost` is filtered.
 
-**"Enters a code" (`code` + `ghost`) is `entersCode()` in `Enum/PinType.ts`** — the predicate that drives the
-code label, the `ABCDEFGHIJ` placeholder, `maxLength`, the 10-char submit gate and the camera button. It used
-to be copy-pasted into `PinEditorForm` and `PinSheet`; keep it single. ⚠️ It is **not** the same question as
-`needsCode` (adds `riddle`, admin-editor-local) — a riddle has an answer to validate but nothing to scan.
+**"Enters a code" (`code` + `ghost` + `geocaching`) is `entersCode()` in `Enum/PinType.ts`** — the predicate
+that drives the code label, the `ABCDEFGHIJ` placeholder, `maxLength`, the 10-char submit gate and the camera
+button. It used to be copy-pasted into `PinEditorForm` and `PinSheet`; keep it single. ⚠️ It is **not** the
+same question as `needsCode` (adds `riddle`, admin-editor-local) — a riddle has an answer to validate but
+nothing to scan. ⚠️ **`geocaching`'s `PinSheet` also renders a "Czym jest Geocaching?" explainer card** (concept
++ `/geocaching.webp`), the one type-specific card in the sheet.
 
 Points are per-pin (`value`), not tiered. `withQuestion: true` draws a quiz question on top (never for
 `feedback`). ⚠️ **Riddle answers are matched with `trim()` + `toUpperCase()` only** — no diacritic folding,
@@ -657,7 +661,7 @@ Firestore transactions and the score fan-out — nothing is mocked.
   reproduce, and never assume either way without the falsification run.
 - The canonical test asserts the score is identical in all four denormalized places after a collect + answer.
   **Every new point-granting feature must extend this suite** (see the fan-out warning in §12.2).
-- Current suite (**111 tests across 10 files** — count with
+- Current suite (**119 tests across 10 files** — count with
   `grep -h '^test(' functions/test/*.test.mjs | wc -l`): `scoring` (card fan-out), `rounds` (`winnerInRound`
   propagation + the auth/admin gate on `updateRoundsHandle`), `award-concurrency` (overlapping same-user awards
   grant an achievement bonus exactly once, and a double-fired answer awards once — the §12.2 read-set rule),
@@ -907,26 +911,28 @@ that matters: **definitions are DATA, logic is CODE.**
   overwritten). ⚠️ **EVERY active pin type counts toward the target** (task #45) — `recomputeAchievementTargets`
   filters on `isActive` alone, matching the award path, which calls `scopeKeys(pin)` for every type. Filtering
   by type on **one side only** is exactly what made badges unlock early before #45 — the rule is that the two
-  sides must agree, which they do by both reading `scopeKeys` and neither filtering around it. The one
-  deliberate exception lives *inside* that helper, so both sides still drop it together: **`ghost` omits its
-  `map:<mapId>` key** (#60) — a ghost sits on a map image only because a marker needs coordinates, and must
-  not inflate that floor's badge. It still counts towards its `group:` **and its `type:ghost`** scopes.
+  sides must agree, which they do by both reading `scopeKeys` and neither filtering around it. The
+  deliberate exceptions live *inside* that helper, so both sides still drop them together: **`ghost` (#60) and
+  `geocaching` (#75) omit their `map:<mapId>` key** — each sits on a map image only because a marker needs
+  coordinates (a ghost marks a place that is not there; a geocache is hidden in plain sight), so neither must
+  inflate that floor's badge. Each still counts towards its `group:` **and its own `type:` scope**.
   Consequences worth knowing when authoring pins (#16): a `feedback` pin in a
   scope means its badge needs the talk rated, and a **`photo` pin means the badge cannot complete until an
   admin approves that photo** — keep photo pins out of any scope that must stay self-serve.
   `loadDefinitions` rejects a `pinsInScope` def with `target < 1` (a `>= 0`
   target auto-grants event-wide on a player's first award).
 - **Per-type badges (#38) are `pinsInScope` scoped `type:<pinType>`** — "collect every pin of a kind", one per
-  collectible type (code/riddle/visit/feedback/ghost; `photo` is excluded — it can't self-complete, it needs an
-  admin approval). They need **no manual grouping** (type is intrinsic): `scopeKeys` emits `type:<pin.type>` for
-  every pin, so the derived target and the award numerator stay in step exactly the way the location badges do.
-  Geocaching (`group:geocaching`) is the sole badge that still needs hand-tagged pins. ⚠️ **The client
+  collectible type (code/riddle/visit/feedback/ghost/geocaching; `photo` is excluded — it can't self-complete, it
+  needs an admin approval). They need **no manual grouping** (type is intrinsic): `scopeKeys` emits `type:<pin.type>`
+  for every pin, so the derived target and the award numerator stay in step exactly the way the location badges do.
+  Geocaching used to be the one hand-tagged `group:geocaching` badge; since #75 it is a first-class `PinType` with a
+  `type:geocaching` badge, so **no badge needs hand-tagged pins** any more. ⚠️ **The client
   (`useAchievements`) hides any def with `target < 1`** so an empty-scope badge (a `type:`/`map:`/`group:` whose
   scope has zero active pins) neither shows nor dilutes the completion-%, mirroring the server `loadDefinitions`
   reject.
 - **`order`** is the /achievements display sort key (lower first; `pages/achievements.tsx` sorts on it, then
   `target`). The seed authors it in blocks of 100 per category (100s score · 200s location incl. building
-  "kings" · 300s owls · 400s types · 500 geocaching · 501 zaświaty) with gaps so a new badge slots in without a
+  "kings" · 300s owls · 400s types incl. geocaching · 501 zaświaty) with gaps so a new badge slots in without a
   renumber. It is **display-only — the server never reads it.** Per-type badge `icon` keys mirror `getPinIcon`
   (qrcode/puzzle-piece/map-pin/microphone/ghost); building "kings" use `crown`.
 - ⚠️ **A bug here must never kill scoring** — it runs inside *every* `awardPoints` transaction, event-wide.

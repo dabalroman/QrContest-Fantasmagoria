@@ -18,7 +18,8 @@ import {
     PIN_GHOST_UID, PIN_GHOST_VALUE, PIN_GHOST_CODE, PIN_GHOST_CLUE_IMAGE,
     PIN_UNAVAILABLE_UID,
     PIN_INACTIVE_UID, PIN_INACTIVE_CODE,
-    PIN_FUTURE_UID, PIN_WINDOWED_UID
+    PIN_FUTURE_UID, PIN_WINDOWED_UID,
+    seedGeocachingPins, GEO_PIN_A_UID, GEO_PIN_A_CODE, GEO_PIN_MAP_ID
 } from './fixtures.mjs';
 
 before(async () => {
@@ -158,6 +159,34 @@ test('a ghost pin does not count towards its own map scope, only its groups', as
     const byScope = (await db.collection('users').doc(uid).get()).data().collectedPinsByScope;
     assert.equal(byScope['group:test'], 1);
     assert.equal(byScope['map:test-map'], undefined, 'a ghost marks a place that is not there');
+});
+
+test('geocaching pin via global scanner path awards (its code is a printed one, like a ghost)', async () => {
+    const uid = 'pin-player-geo-1';
+    const token = await registerPlayer(uid, 'PinPlayerGeo1');
+    await seedGeocachingPins();
+
+    const result = await callCallable('collectPinHandle', { code: GEO_PIN_A_CODE }, token);
+    assert.equal(result.pin.uid, GEO_PIN_A_UID);
+
+    const user = (await db.collection('users').doc(uid).get()).data();
+    assert.equal(user.collectedPinsByScope['type:geocaching'], 1, 'counts towards its type scope');
+    assert.equal(user.collectedPinsByScope[`map:${GEO_PIN_MAP_ID}`], undefined,
+        'a geocache is hidden - it does not advance its floor location badge');
+});
+
+test('geocaching pin via pin-UI path awards on the right code, and cannot be collected twice', async () => {
+    const uid = 'pin-player-geo-2';
+    const token = await registerPlayer(uid, 'PinPlayerGeo2');
+    await seedGeocachingPins();
+
+    const result = await callCallable('collectPinHandle', { pinUid: GEO_PIN_A_UID, answer: GEO_PIN_A_CODE }, token);
+    assert.equal(result.pin.uid, GEO_PIN_A_UID);
+
+    await assert.rejects(
+        () => callCallable('collectPinHandle', { code: GEO_PIN_A_CODE }, token),
+        /aborted|already/i
+    );
 });
 
 test('getPins carries clueImage, null on a pin without one', async () => {

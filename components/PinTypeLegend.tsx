@@ -7,7 +7,8 @@ const PIN_TYPE_DESCRIPTIONS: Record<PinType, string> = {
     [PinType.VISIT]: 'Dotrzyj we wskazane miejsce.',
     [PinType.FEEDBACK]: 'Oceń wysłuchaną prelekcję.',
     [PinType.PHOTO]: 'Zrób zdjęcie, a punkty dostaniesz po chwili.',
-    [PinType.GHOST]: 'Miejsce, którego nie ma. Kodu szukaj gdzie indziej niż na mapie.'
+    [PinType.GHOST]: 'Miejsce, którego nie ma. Kodu szukaj gdzie indziej niż na mapie.',
+    [PinType.GEOCACHING]: 'Ukryta skrytka. Znajdź ją i przepisz kod z jej wnętrza.'
 };
 
 const LISTED_PIN_TYPES = Object.values(PinType).filter((type) => type !== PinType.GHOST);

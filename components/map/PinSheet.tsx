@@ -53,8 +53,9 @@ export default function PinSheet ({
     const typeAnswer = useTypingAnimation((text) => setValue('answer', text, { shouldValidate: true }));
 
     const needsAnswer = pin.type === PinType.CODE || pin.type === PinType.RIDDLE
-        || pin.type === PinType.GHOST;
+        || pin.type === PinType.GHOST || pin.type === PinType.GEOCACHING;
     const isCodeEntry = entersCode(pin.type);
+    const isGeocaching = pin.type === PinType.GEOCACHING;
     const isPhoto = pin.type === PinType.PHOTO;
     const isFeedback = pin.type === PinType.FEEDBACK;
     // The navbar centre collect button covers code/riddle/visit/feedback - photo submits via its own panel.
@@ -135,6 +136,18 @@ export default function PinSheet ({
                 <SheetSection>
                     <p className="whitespace-pre-line text-center font-semibold">{pin.description}</p>
                 </SheetSection>
+
+                {isGeocaching &&
+                    <SheetSection title="Czym jest Geocaching?">
+                        <p className="whitespace-pre-line text-justify">
+                            Geocaching to szukanie skrytek ukrytych na widoku - najczęściej małych,
+                            magnetycznych tub schowanych na drzewach, słupach czy płotach. Rozglądaj się
+                            uważnie! Gdy znajdziesz skrytkę, wyjmij ją dyskretnie i odłóż na miejsce - tak,
+                            by nie zwrócić niczyjej uwagi.
+                        </p>
+                        <img className="mt-4 w-full" src="/geocaching.webp" alt="Rodzaje skrytek"/>
+                    </SheetSection>
+                }
 
                 {(pin.clue || pin.clueImage) &&
                     <SheetSection title="Wskazówka">
